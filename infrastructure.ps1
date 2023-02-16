@@ -1,0 +1,1 @@
+docker-compose up -d --build localstack database.api kafka zookeeper elasticsearch

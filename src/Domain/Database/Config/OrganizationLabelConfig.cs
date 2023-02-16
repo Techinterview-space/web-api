@@ -1,0 +1,29 @@
+﻿using Domain.Entities.Labels;
+using Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Domain.Database.Config;
+
+public class OrganizationLabelConfig : IEntityTypeConfiguration<OrganizationLabel>
+{
+    public void Configure(EntityTypeBuilder<OrganizationLabel> builder)
+    {
+        builder.ToTable("OrganizationLabels");
+        builder
+            .Property(x => x.HexColor)
+            .HasConversion(
+                x => x.ToString(),
+                x => new HexColor(x));
+
+        builder
+            .HasOne(x => x.CreatedBy)
+            .WithMany()
+            .HasForeignKey(x => x.CreatedById);
+
+        builder
+            .HasOne(x => x.Organization)
+            .WithMany()
+            .HasForeignKey(x => x.OrganizationId);
+    }
+}
