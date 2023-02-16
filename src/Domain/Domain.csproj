@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Coravel" Version="4.1.2" />
+    <PackageReference Include="Markdig" Version="0.30.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.6" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Export\MG.Utils.Export.csproj" />
+    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils\MG.Utils.csproj" />
+    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.AspNetCore\MG.Utils.AspNetCore.csproj" />
+    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Authentication\MG.Utils.Authentication.csproj" />
+    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Kafka\MG.Utils.Kafka.csproj" />
+    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.EFCore\MG.Utils.EFCore.csproj" />
+    <ProjectReference Include="..\EmailService.Intergration\EmailService.Integration.csproj" />
+    <ProjectReference Include="..\FileService\FileService.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,43 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: tls-secret-taxer
+  namespace: intranet-stage
+spec:
+  secretName: cert-taxer
+  dnsNames:
+    - qa.api.techinterview.space
+    - qa.techinterview.space
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - qa.api.techinterview.space
+          - qa.sso.techinterview.space
+          - qa.techinterview.space
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: tls-secret-taxer
+  namespace: intranet
+spec:
+  secretName: tls-secret-taxer
+  dnsNames:
+    - api.techinterview.space
+    - techinterview.space
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - api.techinterview.space
+          - techinterview.space
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer

@@ -1,0 +1,20 @@
+stages:
+  - tests
+
+backend-tests:
+  stage: tests
+  image: mcr.microsoft.com/dotnet/sdk:6.0
+  only:
+    - merge_requests
+    - main
+  variables:
+    SOLUTION_FILE: "SharedUtils.sln"
+  cache:
+    key: "build_dependency_dotnet"
+    paths:
+      - nuget/
+  before_script:
+    - "dotnet restore $SOLUTION_FILE"
+  script:
+    - dotnet build $SOLUTION_FILE --configuration Release
+    - dotnet test $SOLUTION_FILE

@@ -1,0 +1,61 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using Domain.Enums;
+using MG.Utils.Abstract;
+using MG.Utils.Abstract.Entities;
+using MG.Utils.Abstract.Extensions;
+
+namespace Domain.Services;
+
+public class CurrentUser
+{
+    // For test purposes
+    protected CurrentUser()
+    {
+    }
+
+    public CurrentUser(ClaimsPrincipal principal)
+    {
+        principal.ThrowIfNull(nameof(principal));
+
+        if (!principal.HasClaims())
+        {
+            throw new ArgumentException("Principal does not have any claim");
+        }
+
+        Id = principal.GetClaimValue(ClaimTypes.NameIdentifier);
+        Email = principal.GetClaimValue(ClaimTypes.Email);
+        FirstName = principal.GetClaimValue(ClaimTypes.GivenName);
+        LastName = principal.GetClaimValue(ClaimTypes.Surname);
+
+        Roles = principal.Claims
+            .Where(x => x.Type == ClaimTypes.Role)
+            .Select(x => x.Value.ToEnum<Role>())
+            .ToArray();
+    }
+
+    public string Id { get; protected set; }
+
+    public string Email { get; protected set; }
+
+    public string FirstName { get; protected set; }
+
+    public string LastName { get; protected set; }
+
+    public IReadOnlyCollection<Role> Roles { get; protected set; }
+
+    public bool Has(Role role)
+    {
+        return Roles.Contains(role);
+    }
+
+    public bool HasAny(IReadOnlyCollection<Role> roles)
+    {
+        roles.ThrowIfNullOrEmpty(nameof(roles));
+        return roles.Any(Roles.Contains);
+    }
+
+    public string Fullname => $"{FirstName} {LastName}";
+}

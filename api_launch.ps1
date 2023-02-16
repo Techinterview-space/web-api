@@ -1,0 +1,1 @@
+dotnet run --project src\Web.Api\Web.Api.csproj

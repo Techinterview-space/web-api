@@ -1,0 +1,154 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-taxer-stage
+  namespace: intranet-stage
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, PATCH, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Content-Range, Content-Disposition, Content-Description, Origin, Link, X-Request-No-Transparent"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: REALTIMESERVERID
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/send-timeout: "3600"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Xss-Protection: 1; mode=block";
+      more_set_headers "X-Content-Type-Options: nosniff";
+
+spec:
+  tls:
+    - hosts:
+        - qa.api.techinterview.space
+      secretName: cert-taxer
+  rules:
+    - host: qa.api.techinterview.space
+      http:
+        paths:
+          - backend:
+              service:
+                name: api-taxer
+                port: 
+                  number: 5001
+            path: /
+            pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-taxer-stage-front
+  namespace: intranet-stage
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, PATCH, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Content-Range, Content-Disposition, Content-Description, Origin, Link, X-Request-No-Transparent"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+
+spec:
+  tls:
+    - hosts:
+        - qa.techinterview.space
+      secretName: qa-cert-taxer
+  rules:
+    - host: qa.techinterview.space
+      http:
+        paths:
+          - backend:
+              service:
+                name: client-taxer
+                port: 
+                  number: 80
+            path: /
+            pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-taxer
+  namespace: intranet
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, PATCH, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Content-Range, Content-Disposition, Content-Description, Origin, Link, X-Request-No-Transparent"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: REALTIMESERVERID
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/send-timeout: "3600"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Xss-Protection: 1; mode=block";
+      more_set_headers "X-Content-Type-Options: nosniff";
+
+spec:
+  tls:
+    - hosts:
+        - api.techinterview.space
+      secretName: tls-secret-taxer
+  rules:
+    - host: api.techinterview.space
+      http:
+        paths:
+          - backend:
+              service:
+                name: api-taxer
+                port: 
+                  number: 5001
+            path: /
+            pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-taxer-front
+  namespace: intranet
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, OPTIONS, PATCH, DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type, Content-Range, Content-Disposition, Content-Description, Origin, Link, X-Request-No-Transparent"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+
+spec:
+  tls:
+    - hosts:
+        - techinterview.space
+      secretName: tls-secret-taxer-prod
+  rules:
+    - host: techinterview.space
+      http:
+        paths:
+          - backend:
+              service:
+                name: client-taxer
+                port: 
+                  number: 80
+            path: /
+            pathType: ImplementationSpecific

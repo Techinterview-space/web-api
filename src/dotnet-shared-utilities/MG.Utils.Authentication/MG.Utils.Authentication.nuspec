@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+	  <id>MaximGorbatyuk.Utils.Authentication</id>
+	  <version>1.0.3</version>
+	  <title>MaximGorbatyuk.Utils.Authentication - useful classes for cut your routine</title>
+	  <authors>@maximgorbatyuk</authors>
+	  <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	  <license type="expression">MIT</license>
+	  <projectUrl>https://github.com/maximgorbatyuk/MG.Utils</projectUrl>
+	  <description>Useful classes for cut your routine with ASP.Net core</description>
+	  <releaseNotes>First release.</releaseNotes>
+	  <copyright>Copyright (c) @maximgorbatyuk, 2021</copyright>
+	  <tags></tags>
+	  <dependencies>
+		  <dependency id="MaximGorbatyuk.Utils" version="1.0.6" />
+		  <dependency id="Microsoft.Identity.Client" version="4.25.0" />
+		  <dependency id="Microsoft.Identity.Web" version="1.5.1" />
+		  <dependency id="Microsoft.IdentityModel.Clients.ActiveDirectory" version="5.2.8" />
+	  </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+	  <Company>@maximgorbatyuk</Company>
+	  <Copyright>Copyright © @maximgorbatyuk</Copyright>
+	  <RepositoryUrl>https://github.com/maximgorbatyuk/MG.Utils</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/maximgorbatyuk/MG.Utils</PackageProjectUrl>
+	  <PackageLicenseFile></PackageLicenseFile>
+	  <Description>Useful utilities for the ASP</Description>
+	  <Product>Web app utils</Product>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>,NU5128,NU5118</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.46.0" />
+		<PackageReference Include="Microsoft.Identity.Web" Version="1.25.1" />
+		<PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\MG.Utils\MG.Utils.csproj" />
+	</ItemGroup>
+
+</Project>

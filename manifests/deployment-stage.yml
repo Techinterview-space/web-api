@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-taxer
+  namespace: intranet-stage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-taxer
+  template:
+    metadata:
+      labels:
+        app: api-taxer
+    spec:
+      terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: gitlab
+      containers:
+        - name: api-taxer
+          image: {api-image}
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Staging"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-taxer
+  namespace: intranet-stage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-taxer
+  template:
+    metadata:
+      labels:
+        app: client-taxer
+    spec:
+      terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: gitlab
+      containers:
+        - name: client-taxer
+          image: {frontend-image}
+          imagePullPolicy: Always
+          ports:
+            - name: client-taxer
+              containerPort: 80
