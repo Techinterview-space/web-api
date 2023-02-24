@@ -32,3 +32,4 @@ msbuild.wrn
 /src/.vs/Petrel.Taxer/DesignTimeBuild/*.v2
 src/.idea
 src/Frontend/.angular
+volume
