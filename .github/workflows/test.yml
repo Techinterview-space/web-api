@@ -69,6 +69,6 @@ jobs:
           script_stop: true
           script: |
             cd ~/deploy
-            docker login --username ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
+            docker login --username ${{ env.DO_TOKEN }} --password-stdin ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
             docker-compose pull
             docker-compose up -d
