@@ -56,8 +56,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{0613B82A-F688-480D-B644-FED4A8FF9B7D}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
-		Dockerfile_Frontend = Dockerfile_Frontend
-		Dockerfile_Frontend_Prod = Dockerfile_Frontend_Prod
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Integration", "EmailService.Intergration\EmailService.Integration.csproj", "{E4F1F76F-761B-4C09-8B25-2404A09E79A5}"

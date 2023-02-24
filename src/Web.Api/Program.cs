@@ -59,10 +59,5 @@ public class Program
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
-            })
-            .ConfigureServices(services =>
-            {
-                services
-                    .AddHostedService<KafkaHostedService>();
             });
 }
