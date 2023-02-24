@@ -34,7 +34,8 @@ jobs:
       - name: Docker build and push
         run: |
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com
-          docker build -f src/Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
+          cd src
+          docker build -f Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
           docker push ${{ secrets.CR }}:backend_${{ github.sha }}
   deploy-ssh:
     if: github.event_name == 'push'
