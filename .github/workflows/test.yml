@@ -25,13 +25,46 @@ jobs:
     # needs: tests
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v3
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DO_TOKEN }}
 
-      - name: Log in to DigitalOcean Container Registry with short-lived credentials
-        run: doctl registry login --expiry-seconds 600
+    container:
+      image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Docker build and push
+        run: |
+          docker login --username ${{ secrets.DO_TOKEN }} --password-stdin ${{ secrets.DO_TOKEN }}
+          docker build -f src/Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
+          docker push ${{ secrets.CR }}:backend_${{ github.sha }}
+  deploy-ssh:
+    if: github.event_name == 'push'
+    container:
+      image: docker:stable
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy ssh
+        run: |
+          sed -i "s,{api},${{ secrets.CR }}:backend_${{ github.sha }},g" docker-compose.deploy.yml
+      - name: copy file via ssh key
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: devops
+          key: ${{ secrets.SSH_KEY_PRIVATE }}
+          port: ${{ secrets.PORT }}
+          source: "docker-compose.deploy.yml"
+          target: "/home/devops/deploy"
+      - name: Execute commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.IP }}
+          username: devops
+          key: ${{ secrets.SSH_KEY_PRIVATE }}
+          port: ${{ secrets.PORT }}
+          script_stop: true
+          script: |
+            cd ~/deploy
+            docker login --username ${{ secrets.DO_TOKEN }} --password-stdin ${{ secrets.DO_TOKEN }}
+            docker-compose pull
+            docker-compose up -d
