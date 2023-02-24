@@ -27,12 +27,12 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+      image: docker:stable
     steps:
       - uses: actions/checkout@v3
       - name: Docker build and push
         run: |
-          docker login --username ${{ secrets.DO_TOKEN }} --password-stdin ${{ secrets.DO_TOKEN }}
+          docker login -u ${{ secrets.DO_TOKEN }} -p ${{ secrets.DO_TOKEN }}
           docker build -f src/Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
           docker push ${{ secrets.CR }}:backend_${{ github.sha }}
   deploy-ssh:
