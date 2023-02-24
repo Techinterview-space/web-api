@@ -25,20 +25,23 @@ jobs:
     # needs: tests
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-
+    env:
+      DO_TOKEN: ${{ secrets.DO_TOKEN }}
     container:
       image: docker:stable
     steps:
       - uses: actions/checkout@v3
       - name: Docker build and push
         run: |
-          docker login -u ${{ secrets.DO_TOKEN }} -password-stdin ${{ secrets.DO_TOKEN }}
+          docker login -u ${{ env.DO_TOKEN }} -password-stdin ${{ env.DO_TOKEN }}
           docker build -f src/Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
           docker push ${{ secrets.CR }}:backend_${{ github.sha }}
   deploy-ssh:
     if: github.event_name == 'push'
     container:
       image: docker:stable
+    env:
+      DO_TOKEN: ${{ secrets.DO_TOKEN }}
     runs-on: self-hosted
     needs: build
     steps:
@@ -65,6 +68,6 @@ jobs:
           script_stop: true
           script: |
             cd ~/deploy
-            docker login --username ${{ secrets.DO_TOKEN }} --password-stdin ${{ secrets.DO_TOKEN }}
+            docker login --username ${{ env.DO_TOKEN }} --password-stdin ${{ env.DO_TOKEN }}
             docker-compose pull
             docker-compose up -d
