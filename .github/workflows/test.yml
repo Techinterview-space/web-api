@@ -35,8 +35,8 @@ jobs:
         run: |
           cd src
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
-          docker build -f Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
-          docker push ${{ secrets.CR }}:backend_${{ github.sha }}
+          docker build -f Dockerfile -t ${{ secrets.CR }}/backend:${{ github.sha }} .
+          docker push ${{ secrets.CR }}/backend:${{ github.sha }}
   deploy-ssh:
     if: github.event_name == 'push'
     container:
