@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Docker build and push
         run: |
-          docker login -u ${{ env.DO_TOKEN }} -password-stdin ${{ env.DO_TOKEN }} registry.digitalocean.com
+          docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com
           docker build -f src/Dockerfile -t ${{ secrets.CR }}:backend_${{ github.sha }} .
           docker push ${{ secrets.CR }}:backend_${{ github.sha }}
   deploy-ssh:
