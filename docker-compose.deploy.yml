@@ -93,10 +93,11 @@ services:
       - 4571:4571
     environment:
       - SERVICES=s3,dynamodb
+      - LEGACY_DIRECTORIES=1
       # - DEBUG=${DEBUG-}
       # - DATA_DIR=${DATA_DIR-}
       # - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
-      # - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
+      - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
       - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
