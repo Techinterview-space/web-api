@@ -164,7 +164,7 @@ build containers identity prod:
     - docker version
     - docker info
     - docker login --username gitlab-ci-token --password $CI_BUILD_TOKEN registry.gitlab.com
-    - sed -i "s,{DATABASE_HOST},${DATABASE_HOST},g;s,{DATABASE_PORT},${DATABASE_PORT},g;s,{DATABASE_STAGING},${DATABASE_STAGING},g;s,{DATABASE_PROD},${DATABASE_PROD},g;s,{DATABASE_USER},${DATABASE_USER},g;s,{DATABASE_PASS},${DATABASE_PASS},g;s,{GOOGLE_CLIENT_SECRET},${GOOGLE_CLIENT_SECRET},g;s,{ELASTIC_HOST},${ELASTIC_HOST},g;s,{ELASTIC_PASS},${ELASTIC_PASS},g" src/SSO/appsettings*.json
+    - sed -i "s,{DATABASE_HOST},${DATABASE_HOST},g;s,{DATABASE_PORT},${DATABASE_PORT},g;s,{DATABASE_STAGING},${DATABASE_STAGING},g;s,{DATABASE_PROD},${DATABASE_PROD},g;s,{DATABASE_USER},${DATABASE_USER},g;s,{DATABASE_PASS},${DATABASE_PASS},g;s,{GOOGLE_CLIENT_ID},${GOOGLE_CLIENT_ID},g;s,{GOOGLE_CLIENT_SECRET},${GOOGLE_CLIENT_SECRET},g;s,{ELASTIC_HOST},${ELASTIC_HOST},g;s,{ELASTIC_PASS},${ELASTIC_PASS},g" src/SSO/appsettings*.json
     - cd src
 
     script:
