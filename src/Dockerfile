@@ -33,8 +33,8 @@ COPY aspnetapp.pfx .
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/aspnetapp.pfx
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=petrel
 ENV ASPNETCORE_URLS http://0.0.0.0:5000;https://0.0.0.0:5001
-ENV ASPNETCORE_HTTPS_PORT=443
-EXPOSE 80
-EXPOSE 443
+#ENV ASPNETCORE_HTTPS_PORT=443
+EXPOSE 5000
+EXPOSE 5001
 
 ENTRYPOINT ["dotnet", "Web.Api.dll"]
