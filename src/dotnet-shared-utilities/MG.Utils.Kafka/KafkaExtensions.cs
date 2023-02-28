@@ -7,7 +7,8 @@ namespace MG.Utils.Kafka;
 
 public static class KafkaExtensions
 {
-    public static IServiceCollection AddConsumer<T>(this IServiceCollection services)
+    public static IServiceCollection AddConsumer<T>(
+        this IServiceCollection services)
         where T : class, IKafkaConsumer
     {
         if (services.Any(x => x.ServiceType == typeof(T)))
