@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
-using MG.Utils.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Services.Labels;

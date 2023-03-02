@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Attributes;
 using Domain.Authentication.Abstract;
-using Domain.Consumers.Contract.Messages;
 using Domain.Database;
 using Domain.Entities.Users;
 using Domain.Enums;
@@ -11,7 +10,6 @@ using Domain.Services.Users;
 using MG.Utils.EFCore;
 using MG.Utils.Entities;
 using MG.Utils.Exceptions;
-using MG.Utils.Kafka.Abstract;
 using MG.Utils.Pagination;
 using MG.Utils.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -26,16 +24,13 @@ public class AdminUsersController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
-    private readonly IProducer _publisher;
 
     public AdminUsersController(
         IAuthorization auth,
-        DatabaseContext context,
-        IProducer publisher)
+        DatabaseContext context)
     {
         _auth = auth;
         _context = context;
-        _publisher = publisher;
     }
 
     [HttpGet("")]
@@ -81,9 +76,6 @@ public class AdminUsersController : ControllerBase
 
         var id = await _context.SaveAsync(user);
 
-        // TODO Maxim: send email
-        await _publisher.PublishAsync(UserChangeMessage.TopicName, new UserChangeMessage(user, ChangeType.Create));
-
         return Ok(id);
     }
 
@@ -104,8 +96,6 @@ public class AdminUsersController : ControllerBase
         }
 
         await _context.TrySaveChangesAsync();
-
-        await _publisher.PublishAsync(UserChangeMessage.TopicName, new UserChangeMessage(user, ChangeType.Update));
         return Ok();
     }
 
@@ -125,8 +115,6 @@ public class AdminUsersController : ControllerBase
         }
 
         await _context.TrySaveChangesAsync();
-
-        await _publisher.PublishAsync(UserChangeMessage.TopicName, new UserChangeMessage(user, ChangeType.Update));
         return Ok();
     }
 
@@ -149,7 +137,6 @@ public class AdminUsersController : ControllerBase
         user.Delete();
 
         await _context.TrySaveChangesAsync();
-        await _publisher.PublishAsync(UserChangeMessage.TopicName, new UserChangeMessage(user, ChangeType.SoftDelete));
         return Ok();
     }
 
@@ -172,7 +159,6 @@ public class AdminUsersController : ControllerBase
         user.Restore();
 
         await _context.TrySaveChangesAsync();
-        await _publisher.PublishAsync(UserChangeMessage.TopicName, new UserChangeMessage(user, ChangeType.Restore));
         return Ok();
     }
 

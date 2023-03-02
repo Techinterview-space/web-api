@@ -8,6 +8,7 @@ using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.MD;
 using EmailService.Integration.Core;
+using EmailService.Integration.Core.Clients;
 using EmailService.Integration.Core.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -16,18 +17,18 @@ namespace Domain.Emails.Services;
 
 public class TechInterviewerEmailService : IEmailService
 {
-    private readonly IEmailPublisher _emailPublisher;
+    private readonly IEmailSender _sender;
     private readonly IWebHostEnvironment _env;
     private readonly IGlobal _global;
     private readonly ITechInterviewHtmlGenerator _html;
 
     public TechInterviewerEmailService(
-        IEmailPublisher emailPublisher,
+        IEmailSender sender,
         IWebHostEnvironment env,
         IGlobal global,
         ITechInterviewHtmlGenerator html)
     {
-        _emailPublisher = emailPublisher;
+        _sender = sender;
         _env = env;
         _global = global;
         _html = html;
@@ -37,7 +38,7 @@ public class TechInterviewerEmailService : IEmailService
     {
         if (_global.EnableEmailPublishing)
         {
-            await _emailPublisher.PublishAsync(Prepare(emailContent));
+            await _sender.SendAsync(Prepare(emailContent));
         }
     }
 

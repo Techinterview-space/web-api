@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Domain.Database;
-using Domain.Entities.Employments;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using MG.Utils.EFCore;

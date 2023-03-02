@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.Services;
 using MG.Utils.Abstract;
-using MG.Utils.Abstract.NonNullableObjects;
 using MG.Utils.Entities;
 using MG.Utils.Exceptions;
 using Microsoft.EntityFrameworkCore;

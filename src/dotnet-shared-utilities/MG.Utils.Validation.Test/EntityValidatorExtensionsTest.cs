@@ -1,7 +1,6 @@
 ﻿using System;
 using MG.Utils.Abstract.Dates;
 using MG.Utils.Abstract.Dates.Interfaces;
-using MG.Utils.Abstract.Entities;
 using MG.Utils.Abstract.Exceptions;
 using Xunit;
 
