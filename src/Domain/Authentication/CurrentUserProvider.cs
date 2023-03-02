@@ -49,6 +49,12 @@ public class CurrentUserProvider
             save = true;
         }
 
+        if (user.Roles.Count == 0 && _currentUser.Roles.Count > 0)
+        {
+            user.SetRoles(_currentUser.Roles);
+            save = true;
+        }
+
         if (save)
         {
             await _context.TrySaveChangesAsync();

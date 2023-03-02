@@ -37,7 +37,7 @@ public class User : BaseModel, IHasDeletedAt, IHasUserData
 
         UserRoles = new List<UserRole>();
 
-        foreach (Role role in roles)
+        foreach (var role in roles)
         {
             UserRoles.Add(new UserRole(role, this));
         }
@@ -80,8 +80,7 @@ public class User : BaseModel, IHasDeletedAt, IHasUserData
         new List<OrganizationUser>();
 
     [JsonIgnore]
-    public virtual ICollection<UserRole> UserRoles { get; protected set; }
-        = new List<UserRole>();
+    public virtual ICollection<UserRole> UserRoles { get; protected set; } = new List<UserRole>();
 
     [NotMapped]
     public ICollection<SharedUserRole> Roles
@@ -112,6 +111,20 @@ public class User : BaseModel, IHasDeletedAt, IHasUserData
         }
 
         IdentityId = currentUser.Id;
+    }
+
+    public void SetRoles(
+        IReadOnlyCollection<Role> roles)
+    {
+        if (UserRoles.Any())
+        {
+            throw new InvalidOperationException($"The user Id:{Id} has roles");
+        }
+
+        foreach (var role in roles)
+        {
+            UserRoles.Add(new UserRole(role, this));
+        }
     }
 
     public void AddRole(Role role)
