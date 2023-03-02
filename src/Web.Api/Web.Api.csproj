@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaximGorbatyuk.DatabaseSqlEndpoints" Version="1.0.1" />
+    <PackageReference Include="MaximGorbatyuk.DatabaseSqlEndpoints" Version="1.0.14" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.16.1" />
   </ItemGroup>
