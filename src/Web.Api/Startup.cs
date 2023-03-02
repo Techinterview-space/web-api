@@ -98,7 +98,10 @@ public class Startup
         ScheduleConfig.Use(app);
 
         app
-            .UseDatabaseTable<DatabaseContext>(checkForAuthentication: true, sqlEngine: SqlEngine.PostgreSQL, roleToCheckForAuthorization: Role.Admin.ToString())
+            .UseSqlEndpoints<DatabaseContext>(
+                checkForAuthentication: false,
+                sqlEngine: SqlEngine.PostgreSQL,
+                roleToCheckForAuthorization: Role.Admin.ToString())
             .UseTableOutputEndpoint()
             .UseExecuteEndpoint()
             .UseReadEndpoint();
