@@ -53,9 +53,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MG.Utils.Export", "dotnet-s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MG.Utils.Export.Test", "dotnet-shared-utilities\MG.Utils.Export.Test\MG.Utils.Export.Test.csproj", "{0C4D2E3D-32C3-473F-A448-54292FCDB4B8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{0613B82A-F688-480D-B644-FED4A8FF9B7D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Items", "Items", "{0613B82A-F688-480D-B644-FED4A8FF9B7D}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
+		..\docker-compose.deploy.yml = ..\docker-compose.deploy.yml
+		..\docker-compose.yml = ..\docker-compose.yml
+		..\add-migration.ps1 = ..\add-migration.ps1
+		..\infrastructure.ps1 = ..\infrastructure.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailService.Integration", "EmailService.Intergration\EmailService.Integration.csproj", "{E4F1F76F-761B-4C09-8B25-2404A09E79A5}"
