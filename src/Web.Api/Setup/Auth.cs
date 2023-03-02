@@ -17,7 +17,6 @@ public static class Auth
             {
                 options.Authority = configuration["IdentityServer:Authority"];
                 options.Audience = configuration["IdentityServer:Audience"];
-                options.RequireHttpsMetadata = false;
             });
     }
 }
