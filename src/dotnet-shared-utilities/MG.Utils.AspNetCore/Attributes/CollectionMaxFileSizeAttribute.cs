@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using MG.Utils.AspNetCore.Validation;
 using Microsoft.AspNetCore.Http;
 
 namespace MG.Utils.AspNetCore.Attributes

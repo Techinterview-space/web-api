@@ -5,7 +5,6 @@ using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Services.Organizations;
 using MG.Utils.Abstract;
-using MG.Utils.Abstract.Extensions;
 
 namespace Domain.Services.Users;
 

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Domain.Emails.Services;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Moq;
-using Moq.Protected;
 
 namespace TestUtils;
 

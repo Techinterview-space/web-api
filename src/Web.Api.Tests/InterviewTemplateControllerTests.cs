@@ -7,7 +7,6 @@ using Domain.Enums;
 using Domain.Services.InterviewTemplates;
 using Domain.Services.Labels;
 using MG.Utils.EFCore;
-using MG.Utils.Exceptions;
 using MG.Utils.ValueObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

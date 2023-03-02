@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Organizations;
-using Domain.Services.Labels;
 using Domain.Services.Users;
 
 namespace Domain.Services.Organizations;

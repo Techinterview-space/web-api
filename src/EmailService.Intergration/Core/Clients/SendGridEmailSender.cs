@@ -16,7 +16,9 @@ public class SendGridEmailSender : IEmailSender
     private readonly SendGridClient _client;
     private readonly ILogger<SendGridEmailSender> _logger;
 
-    public SendGridEmailSender(IConfiguration configuration, ILogger<SendGridEmailSender> logger)
+    public SendGridEmailSender(
+        IConfiguration configuration,
+        ILogger<SendGridEmailSender> logger)
     {
         _logger = logger;
         _client = new SendGridClient(new NonNullableString(configuration["SendGridApiKey"]).ToString());

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
-using Domain.Emails.Requests;
 using Domain.Emails.Services;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;

@@ -4,8 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
-using Domain.Consumers.Contract.Enums;
-using Domain.Consumers.Contract.Messages;
 using Domain.Entities.Organizations;
 using Domain.Enums;
 using Domain.Services;
@@ -16,7 +14,7 @@ using MG.Utils.Entities;
 
 namespace Domain.Entities.Users;
 
-public class User : BaseModel, IHasDeletedAt, IHasUserData
+public class User : BaseModel, IHasDeletedAt
 {
     public const int NameLength = 150;
 
@@ -83,10 +81,10 @@ public class User : BaseModel, IHasDeletedAt, IHasUserData
     public virtual ICollection<UserRole> UserRoles { get; protected set; } = new List<UserRole>();
 
     [NotMapped]
-    public ICollection<SharedUserRole> Roles
+    public IReadOnlyCollection<Role> Roles
         => UserRoles
             .CollectionOrEmpty()
-            .Select(x => (SharedUserRole)x.RoleId)
+            .Select(x => x.RoleId)
             .ToArray();
 
     [NotMapped]

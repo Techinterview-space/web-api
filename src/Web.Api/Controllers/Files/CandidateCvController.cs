@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AspNetCore.Aws.S3.Simple.Models;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Users;

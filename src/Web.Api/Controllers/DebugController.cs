@@ -1,11 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Domain.Emails.Requests;
 using Domain.Emails.Services;
 using EmailService.Integration.Core.Clients;
-using MG.Utils.Kafka;
-using MG.Utils.Kafka.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Controllers;
@@ -16,23 +13,13 @@ public class DebugController : ControllerBase
 {
     private readonly IEmailService _emailService;
     private readonly IEmailSender _emailSender;
-    private readonly KafkaOptions _kafkaOptions;
 
     public DebugController(
         IEmailService emailService,
-        IEmailSender emailSender,
-        KafkaOptions kafkaOptions)
+        IEmailSender emailSender)
     {
         _emailService = emailService;
         _emailSender = emailSender;
-        _kafkaOptions = kafkaOptions;
-    }
-
-    [HttpGet("kafka/topics")]
-    public IActionResult GetKafkaTopics()
-    {
-        var collection = new KafkaTopicsCollection(_kafkaOptions);
-        return Ok(collection.Select(x => x.Topic));
     }
 
     [HttpPost("emails/direct")]

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.Services.Organizations;
 using MG.Utils.EFCore;
-using MG.Utils.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Organizations;

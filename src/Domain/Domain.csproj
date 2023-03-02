@@ -26,7 +26,6 @@
     <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils\MG.Utils.csproj" />
     <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.AspNetCore\MG.Utils.AspNetCore.csproj" />
     <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Authentication\MG.Utils.Authentication.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Kafka\MG.Utils.Kafka.csproj" />
     <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.EFCore\MG.Utils.EFCore.csproj" />
     <ProjectReference Include="..\EmailService.Intergration\EmailService.Integration.csproj" />
     <ProjectReference Include="..\FileService\FileService.csproj" />

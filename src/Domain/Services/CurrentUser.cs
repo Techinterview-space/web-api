@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using Domain.Enums;
 using MG.Utils.Abstract;
-using MG.Utils.Abstract.Entities;
 using MG.Utils.Abstract.Extensions;
 
 namespace Domain.Services;
