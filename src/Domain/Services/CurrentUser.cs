@@ -8,14 +8,15 @@ using MG.Utils.Abstract.Extensions;
 
 namespace Domain.Services;
 
-public class CurrentUser
+public record CurrentUser
 {
     // For test purposes
     protected CurrentUser()
     {
     }
 
-    public CurrentUser(ClaimsPrincipal principal)
+    public CurrentUser(
+        ClaimsPrincipal principal)
     {
         principal.ThrowIfNull(nameof(principal));
 
@@ -26,8 +27,16 @@ public class CurrentUser
 
         Id = principal.GetClaimValue(ClaimTypes.NameIdentifier);
         Email = principal.GetClaimValue(ClaimTypes.Email);
-        FirstName = principal.GetClaimValue(ClaimTypes.GivenName);
-        LastName = principal.GetClaimValue(ClaimTypes.Surname);
+        FirstName = principal.GetClaimValue(ClaimTypes.GivenName, false);
+        LastName = principal.GetClaimValue(ClaimTypes.Surname, false);
+
+        if (LastName is null && FirstName is null)
+        {
+            var fullname = principal.GetClaimValue(ClaimTypes.Name);
+            var names = fullname.Split(' ');
+            FirstName = names[0];
+            LastName = names[1];
+        }
 
         Roles = principal.Claims
             .Where(x => x.Type == ClaimTypes.Role)

@@ -7,7 +7,7 @@ using Domain.Services;
 
 namespace TestUtils.Auth;
 
-public class FakeCurrentUser : CurrentUser
+public record FakeCurrentUser : CurrentUser
 {
     public FakeCurrentUser(User user)
     {
