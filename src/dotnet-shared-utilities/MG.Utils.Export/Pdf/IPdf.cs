@@ -6,7 +6,14 @@ namespace MG.Utils.Export.Pdf;
 
 public interface IPdf : IDisposable
 {
-    Task<FileData> RenderAsync(string htmlContent, string filename, string contentType, CancellationToken cancellationToken = default);
+    Task<FileData> RenderAsync(
+        string htmlContent,
+        string filename,
+        string contentType,
+        CancellationToken cancellationToken = default);
 
-    FileData Render(string htmlContent, string filename, string contentType);
+    FileData Render(
+        string htmlContent,
+        string filename,
+        string contentType);
 }

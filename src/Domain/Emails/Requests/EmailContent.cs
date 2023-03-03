@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EmailService.Integration.Core.Models;
+namespace Domain.Emails.Requests;
 
 public record EmailContent
 {

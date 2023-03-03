@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AspNetCore.Aws.S3.Simple.Models;
-using FileService.Contracts;
+using Domain.Files;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 

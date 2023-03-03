@@ -2,18 +2,16 @@
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Emails.Requests;
+using Domain.Emails.Services;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.MD;
-using EmailService.Integration.Core;
-using EmailService.Integration.Core.Clients;
-using EmailService.Integration.Core.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Domain.Emails.Services;
+namespace TechInterviewer.Services.Email;
 
 public class TechInterviewerEmailService : IEmailService
 {

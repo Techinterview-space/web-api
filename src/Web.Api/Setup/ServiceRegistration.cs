@@ -2,18 +2,17 @@
 using Domain.Authentication;
 using Domain.Authentication.Abstract;
 using Domain.Emails.Services;
+using Domain.Files;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.Interviews;
-using EmailService.Integration.Core;
-using EmailService.Integration.Core.Clients;
-using FileService.Contracts;
-using FileService.Implementation;
 using MG.Utils.AspNetCore.Views;
 using MG.Utils.Export.Pdf;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TechInterviewer.Services.Email;
+using TechInterviewer.Services.Files;
 
 namespace TechInterviewer.Setup;
 

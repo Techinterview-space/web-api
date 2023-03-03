@@ -7,7 +7,7 @@ namespace MG.Utils.Validation.Exception;
 
 public class EntityInvalidException : InvalidOperationException
 {
-    protected EntityInvalidException(string message)
+    public EntityInvalidException(string message)
         : base(message)
     {
     }

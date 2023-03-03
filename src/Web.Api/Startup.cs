@@ -6,7 +6,6 @@ using MG.Utils.Abstract.NonNullableObjects;
 using MG.Utils.AspNetCore.HealthCheck;
 using MG.Utils.AspNetCore.Middlewares;
 using MG.Utils.AspNetCore.Swagger;
-using MG.Utils.SerilogElk.Builders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
+using TechInterviewer.Services.Logging;
 using TechInterviewer.Setup;
 using TechInterviewer.Setup.Healthcheck;
 

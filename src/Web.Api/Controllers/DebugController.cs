@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Domain.Emails.Requests;
 using Domain.Emails.Services;
-using EmailService.Integration.Core.Clients;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Controllers;

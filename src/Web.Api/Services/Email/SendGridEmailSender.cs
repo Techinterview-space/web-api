@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using EmailService.Integration.Core.Models;
+using Domain.Emails.Requests;
+using Domain.Emails.Services;
 using MG.Utils.Abstract;
 using MG.Utils.Abstract.NonNullableObjects;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace EmailService.Integration.Core.Clients;
+namespace TechInterviewer.Services.Email;
 
 public class SendGridEmailSender : IEmailSender
 {
@@ -33,7 +34,7 @@ public class SendGridEmailSender : IEmailSender
             var response = await _client.SendEmailAsync(Message(email));
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError($"SendGrid returned unsuccessful status code: {response.StatusCode}");
+                _logger.LogError("SendGrid returned unsuccessful status code: {ResponseStatusCode}", response.StatusCode);
             }
         }
         catch (Exception e)
@@ -44,8 +45,8 @@ public class SendGridEmailSender : IEmailSender
 
     private SendGridMessage Message(EmailContent email)
     {
-        SendGridMessage msg = MailHelper.CreateSingleEmailToMultipleRecipients(
-            @from: new EmailAddress(email.From),
+        var msg = MailHelper.CreateSingleEmailToMultipleRecipients(
+            from: new EmailAddress(email.From),
             tos: email.Recipients.Select(x => new EmailAddress(x)).ToList(),
             subject: email.Subject,
             plainTextContent: string.Empty,

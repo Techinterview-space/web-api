@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using EmailService.Integration.Core.Models;
+using Domain.Emails.Requests;
 
-namespace EmailService.Integration.Core.Clients;
+namespace Domain.Emails.Services;
 
 public interface IEmailSender
 {

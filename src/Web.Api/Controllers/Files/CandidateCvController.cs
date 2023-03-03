@@ -4,8 +4,8 @@ using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Files;
 using Domain.Services.Organizations;
-using FileService.Contracts;
 using MG.Utils.EFCore;
 using Microsoft.AspNetCore.Mvc;
 

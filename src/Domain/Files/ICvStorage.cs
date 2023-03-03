@@ -1,6 +1,6 @@
 ﻿using AspNetCore.Aws.S3.Simple.Contracts;
 
-namespace FileService.Contracts;
+namespace Domain.Files;
 
 public interface ICvStorage : IFileStorageBase
 {

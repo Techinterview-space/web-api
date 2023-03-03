@@ -1,16 +1,16 @@
 ﻿using AspNetCore.Aws.S3.Simple.AmazonServices;
 using AspNetCore.Aws.S3.Simple.Contracts;
 using AspNetCore.Aws.S3.Simple.Settings;
-using FileService.Contracts;
+using Domain.Files;
 
-namespace FileService.Implementation;
+namespace TechInterviewer.Services.Files;
 
-public class PublicStorage : AmazonS3StorageBase, IPublicStorage
+public class CvStorageS3Service : AmazonS3StorageBase, ICvStorage
 {
-    public PublicStorage(
+    public CvStorageS3Service(
         S3StorageSettings configuration,
         IS3FileValidator fileValidator)
-        : base(configuration, fileValidator, "public-storage")
+        : base(configuration, fileValidator, "candidate-cv")
     {
     }
 }

@@ -13,7 +13,6 @@ public class PdfRenderer : IPdf
     private readonly IDisposableConverter _converter;
     private readonly GlobalSettings _globalSettings;
     private readonly string _defaultEncoding;
-    private readonly ILogger<PdfRenderer> _logger;
 
     private bool _disposed;
 
@@ -35,28 +34,27 @@ public class PdfRenderer : IPdf
         ILogger<PdfRenderer> logger)
     {
         _converter = converter ?? throw new ArgumentNullException(nameof(converter));
-        _logger = logger;
         _globalSettings = globalSettings ?? new GlobalSettings();
         _defaultEncoding = defaultEncoding ?? DefaultEncoding;
 
         _converter.Error += (sender, args) =>
         {
-            _logger.LogError("Error converting PDF: {Message}", args.Message);
+            logger.LogError("Error converting PDF: {Message}", args.Message);
         };
 
         _converter.Warning += (sender, args) =>
         {
-            _logger.LogWarning("Warning converting PDF: {Message}", args.Message);
+            logger.LogWarning("Warning converting PDF: {Message}", args.Message);
         };
 
         _converter.Finished += (sender, args) =>
         {
-            _logger.LogInformation("Finished converting PDF. Success: {Success}", args.Success);
+            logger.LogInformation("Finished converting PDF. Success: {Success}", args.Success);
         };
 
         _converter.PhaseChanged += (sender, args) =>
         {
-            _logger.LogInformation("Phase changed during converting PDF. {CurrentPhase}/{PhaseCount}", args.CurrentPhase, args.PhaseCount);
+            logger.LogInformation("Phase changed during converting PDF. {CurrentPhase}/{PhaseCount}", args.CurrentPhase, args.PhaseCount);
         };
     }
 
