@@ -6,13 +6,13 @@ using Domain.Files;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.Interviews;
-using MG.Utils.AspNetCore.Views;
-using MG.Utils.Export.Pdf;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TechInterviewer.Services.Email;
 using TechInterviewer.Services.Files;
+using TechInterviewer.Services.Http;
+using TechInterviewer.Services.PDF;
 
 namespace TechInterviewer.Setup;
 
@@ -23,7 +23,6 @@ public static class ServiceRegistration
         services.AddHttpContextAccessor();
         services.AddScoped<IHttpContext, AppHttpContext>();
         services.AddScoped<IAuthorization, Authorization>();
-        services.AddScoped<IView, ViewService>();
         services.AddScoped<IGlobal, Global>();
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
 

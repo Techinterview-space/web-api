@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using Domain.Database;
-using MG.Utils.Abstract.NonNullableObjects;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -16,10 +14,10 @@ public class DatabaseContextDesignTimeFactory : DatabaseContextDesignTimeFactory
         return new DatabaseContext(builder.Options);
     }
 
-    protected override NonNullableString ConnectionString => new (Configuration.GetConnectionString("Database"));
+    protected override string ConnectionString => Configuration.GetConnectionString("Database");
 
     public DatabaseContextDesignTimeFactory()
-        : base(new NonNullableString(new DirectoryInfo("../Web.Api").FullName))
+        : base(new DirectoryInfo("../Web.Api").FullName)
     {
     }
 }

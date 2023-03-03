@@ -1,6 +1,6 @@
 ﻿using Domain.Authentication.Abstract;
 using Domain.Services;
-using MG.Utils.Abstract;
+using Domain.Validation;
 
 namespace TestUtils.Auth;
 

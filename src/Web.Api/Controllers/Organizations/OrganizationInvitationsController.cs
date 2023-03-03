@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Emails.Services;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Exceptions;
 using Domain.Services.Organizations;
-using MG.Utils.EFCore;
-using MG.Utils.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Organizations;
 

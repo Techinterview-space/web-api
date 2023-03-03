@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Domain.Attributes;
 using Domain.Entities.Employments;
 using Domain.Services.Labels;
-using MG.Utils.Attributes;
 
 namespace Domain.Services.Organizations.Requests;
 

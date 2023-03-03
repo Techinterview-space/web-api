@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Services.Users;
-using MG.Utils.EFCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Users;
 

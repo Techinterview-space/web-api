@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Employments;
-using MG.Utils.Abstract.Extensions;
-using MG.Utils.Pagination;
-using MG.Utils.ValueObjects;
+using Domain.Extensions;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Pagination;
 
 namespace Domain.Services.Organizations.Requests;
 

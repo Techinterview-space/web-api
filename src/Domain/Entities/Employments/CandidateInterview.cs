@@ -2,8 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Interviews;
 using Domain.Entities.Users;
-using MG.Utils.Abstract.Entities;
-using MG.Utils.Entities;
 
 namespace Domain.Entities.Employments;
 

@@ -3,23 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Employments;
 using Domain.Entities.Interviews;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Exceptions;
 using Domain.Services.Interviews;
 using Domain.Services.Interviews.Dtos;
 using Domain.Services.Labels;
-using MG.Utils.EFCore;
-using MG.Utils.Exceptions;
-using MG.Utils.Pagination;
-using MG.Utils.Validation;
+using Domain.Validation;
+using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers;
 

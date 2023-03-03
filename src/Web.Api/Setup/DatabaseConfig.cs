@@ -1,6 +1,5 @@
 ﻿using System;
 using Domain.Database;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

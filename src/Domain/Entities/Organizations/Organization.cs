@@ -7,8 +7,6 @@ using Domain.Entities.Employments;
 using Domain.Entities.Interviews;
 using Domain.Entities.Users;
 using Domain.Enums;
-using MG.Utils.Abstract.Entities;
-using MG.Utils.Entities;
 
 namespace Domain.Entities.Organizations;
 

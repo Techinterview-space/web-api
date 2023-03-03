@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Employments;
 using Domain.Services.Organizations.Requests;
-using MG.Utils.EFCore;
-using MG.Utils.Pagination;
+using Domain.ValueObjects.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Services.Organizations;

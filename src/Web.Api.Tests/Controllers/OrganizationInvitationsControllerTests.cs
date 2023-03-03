@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Database;
 using Domain.Entities.Organizations;
 using Domain.Enums;
 using Domain.Services.Organizations;
-using MG.Utils.EFCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;

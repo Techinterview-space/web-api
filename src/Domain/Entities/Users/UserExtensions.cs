@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
+using Domain.Exceptions;
 using Domain.Services;
-using MG.Utils.Abstract;
-using MG.Utils.Entities;
-using MG.Utils.Exceptions;
+using Domain.Validation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Entities.Users;

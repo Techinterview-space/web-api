@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Domain.Attributes;
 using Domain.Enums;
-using MG.Utils.Attributes;
 
 namespace Domain.Services.Users;
 

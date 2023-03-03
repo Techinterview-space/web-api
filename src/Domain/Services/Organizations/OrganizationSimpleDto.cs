@@ -1,6 +1,6 @@
 ﻿using System;
+using Domain.Entities;
 using Domain.Entities.Organizations;
-using MG.Utils.Abstract.Entities;
 
 namespace Domain.Services.Organizations;
 

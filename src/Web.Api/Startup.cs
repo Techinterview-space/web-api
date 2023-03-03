@@ -2,10 +2,6 @@
 using Domain.Enums;
 using Domain.Services.Global;
 using MaximGorbatyuk.DatabaseSqlEndpoints;
-using MG.Utils.Abstract.NonNullableObjects;
-using MG.Utils.AspNetCore.HealthCheck;
-using MG.Utils.AspNetCore.Middlewares;
-using MG.Utils.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +9,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
+using TechInterviewer.Middlewares;
 using TechInterviewer.Services.Logging;
+using TechInterviewer.Services.Swagger;
 using TechInterviewer.Setup;
 using TechInterviewer.Setup.Healthcheck;
 
@@ -23,7 +21,7 @@ public class Startup
 {
     private const string CorsPolicyName = "CorsPolicy";
 
-    private readonly NonNullableString _appName = new ("Tech.Interview.API");
+    private const string _appName = "Tech.Interview.API";
     private readonly IGlobal _global;
 
     public Startup(IConfiguration configuration, IHostEnvironment environment)
@@ -43,13 +41,13 @@ public class Startup
         new ElkSerilog(
             config: Configuration,
             appName: _appName,
-            connectionString: new NonNullableString(Configuration.GetConnectionString("Elasticsearch")),
-            environmentName: new NonNullableString(Environment.EnvironmentName)).Setup();
+            connectionString: Configuration.GetConnectionString("Elasticsearch"),
+            environmentName: Environment.EnvironmentName).Setup();
 
         services.AddControllersWithViews();
         services.AddRazorPages();
 
-        services.AddSwaggerGen(c => SwaggerConfig.Apply(c, _appName, new NonNullableString(_global.FrontendBaseUrl)));
+        services.AddSwaggerGen(c => SwaggerConfig.Apply(c, _appName, _global.FrontendBaseUrl));
 
         services.AddCors(options =>
         {

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Employments;
 using Domain.Entities.Users;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using TestUtils.Db;
 

@@ -17,17 +17,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.6" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
     <PackageReference Include="AspNetCore.Aws.S3.Simple" Version="0.1.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Export\MG.Utils.Export.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils\MG.Utils.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.AspNetCore\MG.Utils.AspNetCore.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.Authentication\MG.Utils.Authentication.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.EFCore\MG.Utils.EFCore.csproj" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

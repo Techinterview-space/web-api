@@ -4,8 +4,8 @@ using Domain.Entities.Employments;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Enums;
-using MG.Utils.Exceptions;
-using MG.Utils.ValueObjects;
+using Domain.Exceptions;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.Labels;
 

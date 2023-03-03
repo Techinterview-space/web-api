@@ -3,8 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Emails.Requests;
 using Domain.Emails.Services;
-using MG.Utils.Abstract;
-using MG.Utils.Abstract.NonNullableObjects;
+using Domain.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SendGrid;
@@ -22,7 +21,7 @@ public class SendGridEmailSender : IEmailSender
         ILogger<SendGridEmailSender> logger)
     {
         _logger = logger;
-        _client = new SendGridClient(new NonNullableString(configuration["SendGridApiKey"]).ToString());
+        _client = new SendGridClient(configuration["SendGridApiKey"]);
     }
 
     public async Task SendAsync(EmailContent email)

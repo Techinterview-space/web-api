@@ -1,5 +1,5 @@
 ﻿using Domain.Enums;
-using MG.Utils.Abstract;
+using Domain.Validation;
 
 namespace Domain.Entities.Users;
 

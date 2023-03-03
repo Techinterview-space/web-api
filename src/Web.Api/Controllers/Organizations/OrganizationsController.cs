@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Organizations;
@@ -12,11 +11,11 @@ using Domain.Services.Interviews.Dtos;
 using Domain.Services.InterviewTemplates;
 using Domain.Services.Organizations;
 using Domain.Services.Organizations.Requests;
-using MG.Utils.EFCore;
-using MG.Utils.Pagination;
+using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Organizations;
 

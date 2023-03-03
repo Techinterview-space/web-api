@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Labels;
-using MG.Utils.ValueObjects;
+using Domain.ValueObjects;
 
 namespace Domain.Services.Labels;
 
@@ -17,7 +17,7 @@ public record LabelDto
         HexColor color = null)
     {
         Title = title;
-        HexColor = (color ?? MG.Utils.ValueObjects.HexColor.Random()).ToString();
+        HexColor = (color ?? ValueObjects.HexColor.Random()).ToString();
     }
 
     public LabelDto(

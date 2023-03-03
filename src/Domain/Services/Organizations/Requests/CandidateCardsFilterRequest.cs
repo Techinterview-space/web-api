@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Employments;
-using MG.Utils.ValueObjects;
+using Domain.ValueObjects;
 
 namespace Domain.Services.Organizations.Requests;
 

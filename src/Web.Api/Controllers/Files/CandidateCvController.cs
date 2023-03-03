@@ -6,7 +6,6 @@ using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Files;
 using Domain.Services.Organizations;
-using MG.Utils.EFCore;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Controllers.Files;

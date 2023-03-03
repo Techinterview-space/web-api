@@ -1,6 +1,5 @@
 ﻿using Domain.Entities.Employments;
 using Domain.Services.Organizations;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

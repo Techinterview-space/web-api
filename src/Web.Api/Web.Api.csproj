@@ -18,12 +18,14 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.4.1" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.AspNetCore.Middlewares\MG.Utils.AspNetCore.Middlewares.csproj" />
-    <ProjectReference Include="..\dotnet-shared-utilities\MG.Utils.AspNetCore.Swagger\MG.Utils.AspNetCore.Swagger.csproj" />
   </ItemGroup>
 
 </Project>

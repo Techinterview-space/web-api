@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.Interviews;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
+using Domain.Entities;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Exceptions;
 using Domain.Services.Users;
-using MG.Utils.EFCore;
-using MG.Utils.Entities;
-using MG.Utils.Exceptions;
-using MG.Utils.Pagination;
-using MG.Utils.Validation;
+using Domain.Validation;
+using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Admin;
 

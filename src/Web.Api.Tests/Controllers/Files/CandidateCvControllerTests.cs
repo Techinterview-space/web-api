@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AspNetCore.Aws.S3.Simple.Models;
+using Domain.Database;
 using Domain.Entities.Employments;
 using Domain.Enums;
 using Domain.Services.Organizations;
-using MG.Utils.EFCore;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TechInterviewer.Controllers.Files;
@@ -13,6 +13,7 @@ using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using TestUtils.Mocks;
+using Web.Api.Tests.Mocks;
 using Xunit;
 
 namespace Web.Api.Tests.Controllers.Files;

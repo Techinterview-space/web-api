@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Interviews;
 using Domain.Entities.Users;
-using MG.Utils.ValueObjects;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.Labels;
 

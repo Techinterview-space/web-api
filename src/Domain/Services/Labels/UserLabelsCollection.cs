@@ -2,7 +2,7 @@
 using Domain.Database;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
-using MG.Utils.ValueObjects;
+using Domain.ValueObjects;
 
 namespace Domain.Services.Labels;
 

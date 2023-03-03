@@ -7,7 +7,6 @@ using Domain.Entities.Enums;
 using Domain.Entities.Labels;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
-using MG.Utils.Abstract.Entities;
 
 namespace Domain.Entities.Interviews;
 

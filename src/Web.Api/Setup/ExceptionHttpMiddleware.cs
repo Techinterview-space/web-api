@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using MG.Utils.Abstract.Exceptions;
-using MG.Utils.AspNetCore.Middlewares.Error;
-using MG.Utils.Exceptions;
-using MG.Utils.Helpers;
-using MG.Utils.Validation.Exception;
+using Domain.Exceptions;
+using Domain.Validation.Exception;
 using Microsoft.AspNetCore.Http;
+using TechInterviewer.Middlewares.Error;
 
 namespace TechInterviewer.Setup;
 
@@ -74,6 +72,6 @@ public class ExceptionHttpMiddleware
 
     protected string Serialize<T>(T instance)
     {
-        return instance.AsJson();
+        return System.Text.Json.JsonSerializer.Serialize(instance);
     }
 }

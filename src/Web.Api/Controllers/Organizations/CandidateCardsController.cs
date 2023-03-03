@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Employments;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.Services.Labels;
 using Domain.Services.Organizations;
 using Domain.Services.Organizations.Requests;
-using MG.Utils.Abstract.Extensions;
-using MG.Utils.EFCore;
-using MG.Utils.Pagination;
+using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Organizations;
 

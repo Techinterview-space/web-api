@@ -3,10 +3,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Interviews;
+using Domain.Files;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.MD;
-using MG.Utils.Export.Pdf;
 
 namespace Domain.Services.Interviews;
 
