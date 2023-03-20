@@ -6,7 +6,6 @@ using Domain.Database;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Enums;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using TestUtils.Db;
 

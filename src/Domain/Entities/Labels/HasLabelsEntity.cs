@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MG.Utils.Entities;
 
 namespace Domain.Entities.Labels;
 

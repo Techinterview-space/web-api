@@ -2,8 +2,8 @@
 using System.Text;
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
+using Domain.Extensions;
 using Domain.Services.MD;
-using MG.Utils.Abstract.Extensions;
 
 namespace Domain.Services.Interviews;
 

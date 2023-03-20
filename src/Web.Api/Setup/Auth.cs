@@ -6,7 +6,9 @@ namespace TechInterviewer.Setup;
 
 public static class Auth
 {
-    public static void Setup(IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection SetupAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddAuthentication(options =>
             {
@@ -18,5 +20,7 @@ public static class Auth
                 options.Authority = configuration["IdentityServer:Authority"];
                 options.Audience = configuration["IdentityServer:Audience"];
             });
+
+        return services;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Interviews;
-using MG.Utils.Export.Pdf;
+using Domain.Files;
 
 namespace Domain.Services.Interviews;
 

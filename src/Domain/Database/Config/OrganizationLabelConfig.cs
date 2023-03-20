@@ -1,5 +1,5 @@
 ﻿using Domain.Entities.Labels;
-using MG.Utils.ValueObjects;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

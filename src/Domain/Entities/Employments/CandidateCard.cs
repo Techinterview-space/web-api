@@ -6,7 +6,6 @@ using Domain.Entities.Labels;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Services.Organizations;
-using MG.Utils.Abstract.Entities;
 
 namespace Domain.Entities.Employments;
 

@@ -1,6 +1,5 @@
 ﻿using System.Data.Common;
-using MG.Utils.Abstract;
-using MG.Utils.AspNetCore.HealthCheck;
+using Domain.Validation;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 

@@ -2,7 +2,6 @@
 using Domain.Emails.Requests;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
-using EmailService.Integration.Core.Models;
 
 namespace Domain.Emails.Services;
 

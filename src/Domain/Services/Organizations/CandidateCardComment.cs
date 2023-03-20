@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Domain.Entities;
 using Domain.Entities.Employments;
 using Domain.Entities.Users;
-using MG.Utils.Entities;
 
 namespace Domain.Services.Organizations;
 

@@ -6,11 +6,9 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Domain.Entities.Organizations;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.Services;
-using MG.Utils.Abstract;
-using MG.Utils.Abstract.Entities;
-using MG.Utils.Abstract.Extensions;
-using MG.Utils.Entities;
+using Domain.Validation;
 
 namespace Domain.Entities.Users;
 

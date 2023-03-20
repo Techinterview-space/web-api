@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
 using Domain.Entities.Users;
-using MG.Utils.Abstract;
+using Domain.Validation;
 
 namespace Domain.Authentication.Abstract;
 

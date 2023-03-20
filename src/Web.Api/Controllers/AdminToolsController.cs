@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Database;
 using Domain.Enums;
-using MG.Utils.Abstract;
-using MG.Utils.Export.Pdf;
-using MG.Utils.Validation;
+using Domain.Files;
+using Domain.Validation;
 using Microsoft.AspNetCore.Mvc;
 using TechInterviewer.Controllers.Admin.Dtos;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers;
 

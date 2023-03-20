@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Users;
 using Domain.Enums;
-using MG.Utils.Abstract.Entities;
-using MG.Utils.Exceptions;
-using MG.Utils.ValueObjects;
+using Domain.Exceptions;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.Labels;
 

@@ -4,7 +4,7 @@ using System.Linq;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Services.Organizations;
-using MG.Utils.Abstract;
+using Domain.Validation;
 
 namespace Domain.Services.Users;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using Domain.Database;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +9,10 @@ namespace TechInterviewer.Setup;
 
 public static class DatabaseConfig
 {
-    public static void Setup(IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    public static IServiceCollection SetupDatabase(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
         services
             .AddDbContext<DatabaseContext>(options =>
@@ -22,5 +24,7 @@ public static class DatabaseConfig
                 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
                 options.IgnoreMultipleCollectionIncludeWarningWhen(!environment.IsDevelopment());
             });
+
+        return services;
     }
 }

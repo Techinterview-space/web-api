@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Domain.Attributes;
 using Domain.Authentication.Abstract;
 using Domain.Services.Users;
 using Microsoft.AspNetCore.Mvc;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers;
 

@@ -3,7 +3,6 @@ using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Organizations;
 using Domain.Entities.Users;
-using MG.Utils.EFCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Database;

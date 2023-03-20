@@ -2,10 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
-using MG.Utils.AspNetCore.HostedServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TechInterviewer.Setup.HostedServices;
 
 namespace TechInterviewer.Setup;
 

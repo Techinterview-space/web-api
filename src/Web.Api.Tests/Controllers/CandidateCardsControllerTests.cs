@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Database;
 using Domain.Entities.Employments;
 using Domain.Enums;
 using Domain.Services.Labels;
 using Domain.Services.Organizations;
 using Domain.Services.Organizations.Requests;
-using MG.Utils.EFCore;
-using MG.Utils.ValueObjects;
+using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Organizations;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Domain.Attributes;
 using Domain.Entities.Users;
 using Domain.Enums;
-using MG.Utils.Attributes;
 
 namespace Domain.Services.Users;
 

@@ -1,7 +1,5 @@
 ﻿using System;
 using Domain.Entities.Users;
-using MG.Utils.Abstract.Entities;
-using MG.Utils.Entities;
 
 namespace Domain.Entities.Organizations;
 

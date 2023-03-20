@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using MG.Utils.EFCore;
+using Domain.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace TestUtils.Db;
