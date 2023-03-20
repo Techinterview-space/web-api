@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using Domain.Emails.Requests;
+﻿using Domain.Emails.Requests;
 using Domain.Emails.Services;
 using Microsoft.Extensions.Logging;
 
-namespace TechInterviewer.Services.Email;
+namespace Infrastructure.Emails;
 
 public class LocalEmailSender : IEmailSender
 {

@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using DinkToPdf.Contracts;
 using Domain.Files;
+using Infrastructure.Services.PDF;
 using Microsoft.Extensions.Logging;
 using Moq;
-using TechInterviewer.Services.PDF;
 using Xunit;
 
 namespace Web.Api.Tests.Services.PDF

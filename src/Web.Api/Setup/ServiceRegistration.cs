@@ -6,19 +6,21 @@ using Domain.Files;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.Interviews;
+using Infrastructure.Emails;
+using Infrastructure.Services.Files;
+using Infrastructure.Services.Http;
+using Infrastructure.Services.PDF;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TechInterviewer.Services.Email;
-using TechInterviewer.Services.Files;
-using TechInterviewer.Services.Http;
-using TechInterviewer.Services.PDF;
 
 namespace TechInterviewer.Setup;
 
 public static class ServiceRegistration
 {
-    public static void Setup(IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection SetupAppServices(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IHttpContext, AppHttpContext>();
@@ -36,10 +38,12 @@ public static class ServiceRegistration
             .AddS3Settings()
             .AddS3Storage<ICvStorage, CvStorageS3Service>()
             .AddS3Storage<IPublicStorage, PublicStorage>();
+
+        return services;
     }
 
-    public static void EmailIntegration(
-        IServiceCollection services,
+    public static IServiceCollection SetupEmailIntegration(
+        this IServiceCollection services,
         IHostEnvironment environment)
     {
         services
@@ -55,5 +59,7 @@ public static class ServiceRegistration
             services
                 .AddScoped<IEmailSender, SendGridEmailSender>();
         }
+
+        return services;
     }
 }

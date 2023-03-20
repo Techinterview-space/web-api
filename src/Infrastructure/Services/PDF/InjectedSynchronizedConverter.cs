@@ -1,7 +1,6 @@
-﻿using System;
-using DinkToPdf;
+﻿using DinkToPdf;
 
-namespace TechInterviewer.Services.PDF;
+namespace Infrastructure.Services.PDF;
 
 public class InjectedSynchronizedConverter : SynchronizedConverter, IDisposableConverter
 {

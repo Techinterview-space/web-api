@@ -1,9 +1,8 @@
-﻿using System;
-using Domain.Authentication.Abstract;
+﻿using Domain.Authentication.Abstract;
 using Domain.Services;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Services.Http;
+namespace Infrastructure.Services.Http;
 
 public class AppHttpContext : IHttpContext
 {

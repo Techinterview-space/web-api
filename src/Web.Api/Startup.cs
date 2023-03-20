@@ -57,12 +57,13 @@ public class Startup
                 .AllowAnyHeader());
         });
 
-        DatabaseConfig.Setup(services, Configuration, Environment);
-        ServiceRegistration.Setup(services, Configuration);
-        ServiceRegistration.EmailIntegration(services, Environment);
-        Health.Setup(services, Configuration);
-        Auth.Setup(services, Configuration);
-        ScheduleConfig.Setup(services);
+        services
+            .SetupDatabase(Configuration, Environment)
+            .SetupAppServices(Configuration)
+            .SetupEmailIntegration(Environment)
+            .SetupHealthCheck(Configuration)
+            .SetupAuthentication(Configuration)
+            .SetupScheduler();
 
         services.AddHostedService<AppInitializeService>();
     }

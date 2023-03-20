@@ -3,7 +3,7 @@ using AspNetCore.Aws.S3.Simple.Contracts;
 using AspNetCore.Aws.S3.Simple.Settings;
 using Domain.Files;
 
-namespace TechInterviewer.Services.Files;
+namespace Infrastructure.Services.Files;
 
 public class CvStorageS3Service : AmazonS3StorageBase, ICvStorage
 {

@@ -12,10 +12,13 @@ public static class ScheduleConfig
     private const int Afternoon = 15;
     private const int Evening = 21;
 
-    public static void Setup(IServiceCollection services)
+    public static IServiceCollection SetupScheduler(
+        this IServiceCollection services)
     {
         services
             .AddScheduler();
+
+        return services;
     }
 
     public static void Use(IApplicationBuilder app)

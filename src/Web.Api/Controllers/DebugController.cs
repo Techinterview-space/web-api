@@ -41,17 +41,6 @@ public class DebugController : ControllerBase
             request.Body)));
     }
 
-    [HttpPost("emails/via-publisher")]
-    public async Task<IActionResult> SendEmailViaPublisherAsync([FromBody] DirectEmailSendRequest request)
-    {
-        await _emailService.SendEmailAsync(new EmailSendRequest(
-            "Hi there",
-            request.Email,
-            "Hello world"));
-
-        return Ok();
-    }
-
     public record DirectEmailSendRequest
     {
         [Required]

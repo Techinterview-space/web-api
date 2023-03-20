@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain.Emails.Requests;
+﻿using Domain.Emails.Requests;
 using Domain.Emails.Services;
 using Domain.Validation;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
-namespace TechInterviewer.Services.Email;
+namespace Infrastructure.Emails;
 
 public class SendGridEmailSender : IEmailSender
 {
@@ -42,7 +39,8 @@ public class SendGridEmailSender : IEmailSender
         }
     }
 
-    private SendGridMessage Message(EmailContent email)
+    private SendGridMessage Message(
+        EmailContent email)
     {
         var msg = MailHelper.CreateSingleEmailToMultipleRecipients(
             from: new EmailAddress(email.From),

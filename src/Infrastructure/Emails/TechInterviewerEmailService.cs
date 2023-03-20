@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Domain.Emails.Requests;
 using Domain.Emails.Services;
 using Domain.Entities.Organizations;
@@ -8,21 +6,20 @@ using Domain.Entities.Users;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.MD;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace TechInterviewer.Services.Email;
+namespace Infrastructure.Emails;
 
 public class TechInterviewerEmailService : IEmailService
 {
     private readonly IEmailSender _sender;
-    private readonly IWebHostEnvironment _env;
+    private readonly IHostEnvironment _env;
     private readonly IGlobal _global;
     private readonly ITechInterviewHtmlGenerator _html;
 
     public TechInterviewerEmailService(
         IEmailSender sender,
-        IWebHostEnvironment env,
+        IHostEnvironment env,
         IGlobal global,
         ITechInterviewHtmlGenerator html)
     {

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using DinkToPdf;
+﻿using DinkToPdf;
 using Domain.Files;
 using Microsoft.Extensions.Logging;
 
-namespace TechInterviewer.Services.PDF;
+namespace Infrastructure.Services.PDF;
 
 public class PdfRenderer : IPdf
 {
