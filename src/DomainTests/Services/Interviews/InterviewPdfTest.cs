@@ -45,7 +45,8 @@ public class InterviewPdfTest
             .Setup(x => x.RenderAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Callback((string html, string _, string _, CancellationToken _) =>
             {
-                Assert.StartsWith(expectedHtml, html);
+                var stringToCompare = expectedHtml.Replace("\r\n", "\n");
+                Assert.StartsWith(stringToCompare, html);
             })
             .ReturnsAsync(new FileData(Array.Empty<byte>(), "test.pdf", FileData.PDfContentType));
 
