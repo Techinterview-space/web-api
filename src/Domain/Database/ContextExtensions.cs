@@ -15,49 +15,6 @@ namespace Domain.Database;
 
 public static class ContextExtensions
 {
-    public static async Task SaveAsync<TEntity>(this DatabaseContext context, IReadOnlyCollection<TEntity> entities)
-        where TEntity : class, IBaseModel
-    {
-        entities.ThrowIfNullOrEmpty(nameof(entities));
-        foreach (TEntity entity in entities)
-        {
-            entity.ThrowIfInvalid();
-        }
-
-        await context.AddRangeAsync(entities);
-        await context.TrySaveChangesAsync();
-    }
-
-    public static async Task<long> SaveAsync<TEntity>(this DatabaseContext context, TEntity entity)
-        where TEntity : class, IBaseModel
-    {
-        entity.ThrowIfNull(nameof(entity));
-        entity.ThrowIfInvalid();
-
-        var entry = await context.AddAsync(entity);
-        await context.TrySaveChangesAsync();
-
-        return entry.Entity.Id;
-    }
-
-    public static async Task RemoveAsync<TEntity>(this DatabaseContext context, TEntity entity)
-    {
-        entity.ThrowIfNull(nameof(entity));
-        context.Remove(entity);
-        await context.TrySaveChangesAsync();
-    }
-
-    public static void RemoveRangeIfNotEmpty<TEntity>(
-        this DatabaseContext context,
-        IEnumerable<TEntity> entities)
-        where TEntity : class
-    {
-        if (entities.Any())
-        {
-            context.RemoveRange(entities);
-        }
-    }
-
     public static IQueryable<TEntity> Active<TEntity>(this IQueryable<TEntity> set)
         where TEntity : class, IHasDeletedAt
     {
@@ -254,19 +211,6 @@ public static class ContextExtensions
         }
     }
 
-    public static async Task<int> TrySaveChangesAsync<TContext>(this TContext context, CancellationToken cancellationToken = default(CancellationToken))
-        where TContext : DbContext
-    {
-        try
-        {
-            return await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception exception)
-        {
-            throw new DatabaseException(exception);
-        }
-    }
-
     public static IQueryable<TEntity> IncludeWhen<TEntity, TProperty>(
         this IQueryable<TEntity> query,
         bool condition,
@@ -290,33 +234,6 @@ public static class ContextExtensions
         where TEntity : BaseModel
     {
         return query.Select(x => x.Id);
-    }
-
-    public static async Task<TResult> DoWithinTransactionAsync<TContext, TResult>(
-        this TContext context,
-        Func<Task<TResult>> action,
-        string errorMessage = null,
-        CancellationToken cancellationToken = default(CancellationToken))
-        where TContext : DbContext
-    {
-        action.ThrowIfNull(nameof(action));
-
-        try
-        {
-            await context.Database.BeginTransactionAsync(cancellationToken);
-
-            TResult result = await action();
-
-            await context.Database.CommitTransactionAsync(cancellationToken);
-
-            return result;
-        }
-        catch (Exception exception)
-        {
-            await context.Database.RollbackTransactionAsync(cancellationToken);
-            const string defaultError = "Cannot execute transaction due to database error";
-            throw new InvalidOperationException(errorMessage ?? defaultError, exception);
-        }
     }
 
     public static void RemoveRangeIfAny<TEntity>(
