@@ -33,7 +33,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("")]
-    public async Task<Pageable<UserDto>> AllAsync([FromQuery] PageModel pageParams = null)
+    public async Task<Pageable<UserDto>> All([FromQuery] PageModel pageParams = null)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
         pageParams ??= PageModel.Default;
@@ -44,7 +44,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserDto> UserAsync([FromRoute] long id)
+    public async Task<UserDto> GetUser([FromRoute] long id)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
         return new UserDto(await _context.Users
@@ -56,7 +56,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<IActionResult> CreateAsync(
+    public async Task<IActionResult> Create(
         [FromBody] CreateUserRequest request)
     {
         request.ThrowIfInvalid();
@@ -79,7 +79,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpPut("")]
-    public async Task<IActionResult> UpdateAsync([FromBody] UserUpdateRequest request)
+    public async Task<IActionResult> Update([FromBody] UserUpdateRequest request)
     {
         request.ThrowIfInvalid();
 
@@ -99,7 +99,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpPut("roles")]
-    public async Task<IActionResult> UpdateAsync([FromBody] UserUpdateRolesRequest request)
+    public async Task<IActionResult> Update([FromBody] UserUpdateRolesRequest request)
     {
         request.ThrowIfInvalid();
 
@@ -118,7 +118,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    public async Task<IActionResult> DeleteAsync([FromRoute] long id)
+    public async Task<IActionResult> Delete([FromRoute] long id)
     {
         var currentUser = await _auth.CurrentUserAsync();
         currentUser.HasAnyOrFail(Role.Admin);
@@ -140,7 +140,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpPut("{id:long}/restore")]
-    public async Task<IActionResult> RestoreAsync([FromRoute] long id)
+    public async Task<IActionResult> Restore([FromRoute] long id)
     {
         var currentUser = await _auth.CurrentUserAsync();
         currentUser.HasAnyOrFail(Role.Admin);
@@ -152,7 +152,7 @@ public class AdminUsersController : ControllerBase
 
         if (currentUser.Id == user.Id)
         {
-            throw new BadRequestException("Нельзя восстановить свою учетную запись");
+            throw new BadRequestException("You are not able to restore your own account");
         }
 
         user.Restore();

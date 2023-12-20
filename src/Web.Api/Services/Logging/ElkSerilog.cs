@@ -53,7 +53,7 @@ public class ElkSerilog
             IndexFormat = $"logstash-{_appName}-{_environmentName}",
             AutoRegisterTemplate = true,
             OverwriteTemplate = true,
-            DetectElasticsearchVersion = true,
+            DetectElasticsearchVersion = false, // TODO mgorbatyuk: trying to fix
             AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
             NumberOfReplicas = 1,
             NumberOfShards = 2,
