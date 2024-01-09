@@ -32,7 +32,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public Guid Id { get; }
 
-    public long UserId { get; protected set; }
+    public long? UserId { get; protected set; }
 
     public virtual User User { get; protected set; }
 

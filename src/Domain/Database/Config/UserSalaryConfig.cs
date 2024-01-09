@@ -9,10 +9,12 @@ public class UserSalaryConfig : IEntityTypeConfiguration<UserSalary>
     public void Configure(EntityTypeBuilder<UserSalary> builder)
     {
         builder.ToTable("UserSalaries");
+        builder.HasKey(x => x.Id);
 
         builder
             .HasOne(x => x.User)
             .WithMany()
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
