@@ -21,7 +21,46 @@ public class SalariesControllerTests
     public async Task Create_ValidData_Ok(
         Role userRole)
     {
-        await using var context = new SqliteContext();
+        await using var context = new InMemoryDatabaseContext();
+        var user = await new FakeUser(userRole).PleaseAsync(context);
+
+        var salary1 = await context.SaveAsync(new UserSalaryFake(
+                user,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var request = new CreateSalaryRecordRequest
+        {
+            Value = 100_000,
+            Quarter = salary1.Quarter,
+            Year = salary1.Year,
+            Currency = Currency.KZT,
+            Company = CompanyType.Local,
+            Grage = DeveloperGrade.Middle
+        };
+
+        Assert.Equal(1, context.Salaries.Count());
+
+        context.ChangeTracker.Clear();
+        await Assert.ThrowsAsync<BadRequestException>(() =>
+            new SalariesController(
+                    new FakeAuth(user),
+                    context)
+                .Create(
+                    request,
+                    default));
+
+        Assert.Equal(1, context.Salaries.Count());
+    }
+
+    [Theory]
+    [InlineData(Role.Admin)]
+    [InlineData(Role.Interviewer)]
+    public async Task Create_ValidData_HasRecordForThisQuarterAlready_Error(
+        Role userRole)
+    {
+        await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(userRole).PleaseAsync(context);
 
         var request = new CreateSalaryRecordRequest
@@ -35,8 +74,8 @@ public class SalariesControllerTests
         };
 
         var salary = await new SalariesController(
-            new FakeAuth(user),
-            context)
+                new FakeAuth(user),
+                context)
             .Create(
                 request,
                 default);
@@ -89,7 +128,7 @@ public class SalariesControllerTests
     public async Task Create_YearInvalidValue_Error(
         int year)
     {
-        await using var context = new SqliteContext();
+        await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
         var request = new CreateSalaryRecordRequest
@@ -119,7 +158,7 @@ public class SalariesControllerTests
     public async Task Create_ValueInvalidValue_Error(
         double value)
     {
-        await using var context = new SqliteContext();
+        await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
         var request = new CreateSalaryRecordRequest
