@@ -59,6 +59,9 @@ public class SalariesController : ControllerBase
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
+        // TODO mgorbatyuk:
+        // 1. Add validation for duplicated salary for same quarter and year
+        // 2. Add validation for future dates
         var salary = await _context.SaveAsync(
             new UserSalary(
                 user,
