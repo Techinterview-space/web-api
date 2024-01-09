@@ -8,6 +8,7 @@ using Domain.Entities.Employments;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Organizations;
+using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Exceptions;
 using Domain.Validation;
@@ -44,7 +45,10 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
 
     public DbSet<OrganizationUser> OrganizationUsers { get; set; }
 
-    public async Task SaveAsync<TEntity>(IReadOnlyCollection<TEntity> entities)
+    public DbSet<UserSalary> Salaries { get; set; }
+
+    public async Task SaveAsync<TEntity>(
+        IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel
     {
         entities.ThrowIfNullOrEmpty(nameof(entities));
@@ -57,19 +61,22 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
         await TrySaveChangesAsync();
     }
 
-    public async Task<long> SaveAsync<TEntity>(TEntity entity)
-        where TEntity : class, IBaseModel
+    public async Task<TEntity> SaveAsync<TEntity>(
+        TEntity entity,
+        CancellationToken cancellationToken = default)
+        where TEntity : class
     {
         entity.ThrowIfNull(nameof(entity));
         entity.ThrowIfInvalid();
 
-        var entry = await AddAsync(entity);
-        await TrySaveChangesAsync();
+        var entry = await AddAsync(entity, cancellationToken);
+        await TrySaveChangesAsync(cancellationToken);
 
-        return entry.Entity.Id;
+        return entry.Entity;
     }
 
-    public async Task RemoveAsync<TEntity>(TEntity entity)
+    public async Task RemoveAsync<TEntity>(
+        TEntity entity)
     {
         entity.ThrowIfNull(nameof(entity));
         Remove(entity);
@@ -86,7 +93,8 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
         }
     }
 
-    public async Task<int> TrySaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task<int> TrySaveChangesAsync(
+        CancellationToken cancellationToken = default)
     {
         try
         {
