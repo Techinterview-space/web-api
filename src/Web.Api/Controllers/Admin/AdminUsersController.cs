@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
@@ -57,14 +58,17 @@ public class AdminUsersController : ControllerBase
 
     [HttpPost("")]
     public async Task<IActionResult> Create(
-        [FromBody] CreateUserRequest request)
+        [FromBody] CreateUserRequest request,
+        CancellationToken cancellationToken)
     {
         request.ThrowIfInvalid();
 
         await _auth.HasRoleOrFailAsync(Role.Admin);
-        await _context.Users.NoItemsByConditionOrFailAsync(
-            x => x.Email == request.Email.ToUpper(),
-            "There is a user with such email in the database");
+        await _context.Users
+            .NoItemsByConditionOrFailAsync(
+                x => x.Email == request.Email.ToUpper(),
+                "There is a user with such email in the database",
+                cancellationToken: cancellationToken);
 
         var user = new User(
                 email: request.Email,
@@ -73,13 +77,13 @@ public class AdminUsersController : ControllerBase
                 roles: request.Roles.ToArray())
             .ThrowIfInvalid();
 
-        var id = await _context.SaveAsync(user);
-
-        return Ok(id);
+        user = await _context.SaveAsync(user, cancellationToken);
+        return Ok(user.Id);
     }
 
     [HttpPut("")]
-    public async Task<IActionResult> Update([FromBody] UserUpdateRequest request)
+    public async Task<IActionResult> Update(
+        [FromBody] UserUpdateRequest request)
     {
         request.ThrowIfInvalid();
 

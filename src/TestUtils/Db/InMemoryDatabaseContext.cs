@@ -24,4 +24,9 @@ public class InMemoryDatabaseContext : DatabaseContext
         Database.EnsureDeleted();
         Database.EnsureCreated();
     }
+
+    protected override bool IsInMemory()
+    {
+        return true;
+    }
 }

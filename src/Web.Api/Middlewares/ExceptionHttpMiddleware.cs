@@ -7,7 +7,7 @@ using Domain.Validation.Exception;
 using Microsoft.AspNetCore.Http;
 using TechInterviewer.Middlewares.Error;
 
-namespace TechInterviewer.Setup;
+namespace TechInterviewer.Middlewares;
 
 public class ExceptionHttpMiddleware
 {
