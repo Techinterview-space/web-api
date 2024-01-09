@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Domain.Attributes;
 using Domain.Entities.Enums;
 using Domain.Entities.Users;
 
@@ -38,13 +40,17 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public double Value { get; protected set; }
 
+    [Range(1, 4)]
     public int Quarter { get; protected set; }
 
+    [Range(2000, 3000)]
     public int Year { get; protected set; }
 
+    [NotDefaultValue]
     public Currency Currency { get; protected set; }
 
     public DeveloperGrade? Grage { get; protected set; }
 
+    [NotDefaultValue]
     public CompanyType Company { get; protected set; }
 }
