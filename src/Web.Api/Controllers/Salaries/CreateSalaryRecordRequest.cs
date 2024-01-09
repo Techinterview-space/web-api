@@ -13,13 +13,10 @@ public record CreateSalaryRecordRequest
 
     public int Quarter { get; init; }
 
-    [Range(2000, 3000)]
     public int Year { get; init; }
 
-    [NotDefaultValue]
     public Currency Currency { get; init; }
 
-    [NotDefaultValue]
     public CompanyType Company { get; init; }
 
     public DeveloperGrade? Grage { get; init; }
@@ -40,6 +37,21 @@ public record CreateSalaryRecordRequest
         if (Year < 2000 || Year > thisYear)
         {
             throw new BadRequestException("Year must be between 2000 and current year");
+        }
+
+        if (Currency == default)
+        {
+            throw new BadRequestException("Currency must be specified");
+        }
+
+        if (Company == default)
+        {
+            throw new BadRequestException("Company must be specified");
+        }
+
+        if (Grage == DeveloperGrade.Unknown)
+        {
+            throw new BadRequestException("Grage must be valid");
         }
     }
 }
