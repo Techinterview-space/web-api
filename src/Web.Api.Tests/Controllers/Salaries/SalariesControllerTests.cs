@@ -1,11 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
-using TechInterviewer.Controllers.Organizations;
 using TechInterviewer.Controllers.Salaries;
-using TestUtils;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -49,5 +48,31 @@ public class SalariesControllerTests
         Assert.Equal(request.Grage, salary.Grage);
 
         Assert.Equal(1, context.Salaries.Count());
+    }
+
+    [Fact]
+    public async Task All_ReturnsDataForLastYear_Ok()
+    {
+        await using var context = new SqliteContext();
+        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
+        var salary1 = new UserSalaryFake(
+            user,
+            value: 400_000,
+            createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1));
+
+        var salary2 = new UserSalaryFake(
+            user,
+            value: 600_000,
+            createdAt: DateTimeOffset.Now.AddDays(-1));
+
+        var salaries = await new SalariesController(
+                new FakeAuth(user),
+                context)
+            .AllAsync(default);
+
+        Assert.Single(salaries);
+        Assert.Contains(salaries, x => Math.Abs(x.Value - salary2.Value) < 0.01);
+        Assert.DoesNotContain(salaries, x => Math.Abs(x.Value - salary1.Value) < 0.01);
     }
 }

@@ -30,10 +30,10 @@ public class SalariesController : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<IEnumerable<UserSalaryDto>> AllAsync(
+    public async Task<List<UserSalaryDto>> AllAsync(
         CancellationToken cancellationToken)
     {
-        var yearAgoGap = DateTime.UtcNow.AddYears(-1);
+        var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
         return await _context.Salaries
             .Where(x => x.CreatedAt >= yearAgoGap)
             .Select(x => new UserSalaryDto
