@@ -53,18 +53,23 @@ public class SalariesControllerTests
     [Fact]
     public async Task All_ReturnsDataForLastYear_Ok()
     {
-        await using var context = new SqliteContext();
+        await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
-        var salary1 = new UserSalaryFake(
+        var salary1 = await context.SaveAsync(new UserSalaryFake(
             user,
             value: 400_000,
-            createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1));
+            createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
 
-        var salary2 = new UserSalaryFake(
+        var salary2 = await context.SaveAsync(new UserSalaryFake(
             user,
             value: 600_000,
-            createdAt: DateTimeOffset.Now.AddDays(-1));
+            createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var createdSalaries = context.Salaries.ToList();
+        Assert.Equal(2, createdSalaries.Count);
 
         var salaries = await new SalariesController(
                 new FakeAuth(user),

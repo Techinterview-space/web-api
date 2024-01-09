@@ -49,9 +49,24 @@ public abstract class AppDbContextBase<TContext> : DbContext
                     break;
 
                 case EntityState.Added:
-                    entry.Entity.OnCreate(currentDateTime);
+                    if (!IsInMemory())
+                    {
+                        entry.Entity.OnCreate(currentDateTime);
+                        break;
+                    }
+
+                    if (entry.Entity.CreatedAt == default)
+                    {
+                        entry.Entity.OnCreate(currentDateTime);
+                    }
+
                     break;
             }
         }
+    }
+
+    protected virtual bool IsInMemory()
+    {
+        return false;
     }
 }
