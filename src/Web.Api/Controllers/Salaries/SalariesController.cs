@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
+using Domain.Entities.Users;
+using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Services.Salaries;
+using Domain.ValueObjects.Dates;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Setup.Attributes;
@@ -31,11 +34,48 @@ public class SalariesController : ControllerBase
     }
 
     [HttpGet("all")]
+    [HasAnyRole(Role.Admin)]
     public async Task<List<UserSalaryDto>> AllAsync(
         CancellationToken cancellationToken)
     {
-        var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
         return await _context.Salaries
+            .Select(x => new UserSalaryDto
+            {
+                Value = x.Value,
+                Quarter = x.Quarter,
+                Year = x.Year,
+                Currency = x.Currency,
+                Company = x.Company,
+                Grage = x.Grage,
+                CreatedAt = x.CreatedAt
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    [HttpGet("chart")]
+    public async Task<SalariesChartResponse> ChartAsync(
+        CancellationToken cancellationToken)
+    {
+        var currentUser = await _auth.CurrentUserAsync();
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
+
+        var currentQuarter = DateQuarter.Current;
+        var hasRecordsForTheQuarter = await _context.Salaries
+            .Where(x =>
+                x.UserId == user.Id &&
+                x.Quarter == currentQuarter.Quarter &&
+                x.Year == currentQuarter.Year)
+            .AnyAsync(cancellationToken);
+
+        if (!hasRecordsForTheQuarter)
+        {
+            return SalariesChartResponse.RequireOwnSalary();
+        }
+
+        var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
+        var salaries = await _context.Salaries
             .Where(x => x.CreatedAt >= yearAgoGap)
             .Select(x => new UserSalaryDto
             {
@@ -49,6 +89,11 @@ public class SalariesController : ControllerBase
             })
             .AsNoTracking()
             .ToListAsync(cancellationToken);
+        
+        return new SalariesChartResponse(
+            salaries,
+            yearAgoGap,
+            DateTimeOffset.Now);
     }
 
     [HttpPost("")]
