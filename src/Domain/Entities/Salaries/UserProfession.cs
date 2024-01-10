@@ -35,4 +35,6 @@ public enum UserProfession
     DataWarehouseSpecialist = 15,
 
     DatabaseAdministrator = 16,
+
+    TechLeader = 17,
 }
