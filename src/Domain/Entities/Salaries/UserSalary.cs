@@ -19,7 +19,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         int year,
         Currency currency,
         DeveloperGrade? grage,
-        CompanyType company)
+        CompanyType company,
+        UserProfession profession)
     {
         Id = Guid.NewGuid();
         UserId = user.Id;
@@ -30,6 +31,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency = currency;
         Grage = grage;
         Company = company;
+        Profession = profession;
     }
 
     public Guid Id { get; }
@@ -53,4 +55,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     [NotDefaultValue]
     public CompanyType Company { get; protected set; }
+
+    [NotDefaultValue]
+    public UserProfession Profession { get; protected set; }
 }

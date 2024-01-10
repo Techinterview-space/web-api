@@ -19,6 +19,7 @@ public record UserSalaryDto
         Currency = salary.Currency;
         Company = salary.Company;
         Grage = salary.Grage;
+        Profession = salary.Profession;
         CreatedAt = salary.CreatedAt;
     }
 
@@ -33,6 +34,8 @@ public record UserSalaryDto
     public CompanyType Company { get; init; }
 
     public DeveloperGrade? Grage { get; init; }
+
+    public UserProfession Profession { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
 }

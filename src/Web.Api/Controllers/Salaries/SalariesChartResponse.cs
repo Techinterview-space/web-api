@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Domain.Services.Salaries;
 
@@ -32,7 +32,7 @@ public record SalariesChartResponse
 
     public static SalariesChartResponse RequireOwnSalary()
     {
-        return new(
+        return new (
             new List<UserSalaryDto>(),
             true,
             null,

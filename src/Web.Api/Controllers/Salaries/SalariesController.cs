@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
-using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Services.Salaries;
@@ -47,6 +46,7 @@ public class SalariesController : ControllerBase
                 Currency = x.Currency,
                 Company = x.Company,
                 Grage = x.Grage,
+                Profession = x.Profession,
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking()
@@ -89,7 +89,7 @@ public class SalariesController : ControllerBase
             })
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-        
+
         return new SalariesChartResponse(
             salaries,
             yearAgoGap,
@@ -126,7 +126,8 @@ public class SalariesController : ControllerBase
                 request.Year,
                 request.Currency,
                 request.Grage,
-                request.Company),
+                request.Company,
+                request.Profession),
             cancellationToken);
 
         return new UserSalaryDto(salary);
