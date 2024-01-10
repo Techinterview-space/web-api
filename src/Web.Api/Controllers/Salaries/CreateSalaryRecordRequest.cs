@@ -21,6 +21,8 @@ public record CreateSalaryRecordRequest
 
     public DeveloperGrade? Grage { get; init; }
 
+    public UserProfession Profession { get; init; }
+
     public void IsValidOrFail()
     {
         if (Value <= 0)
@@ -52,6 +54,11 @@ public record CreateSalaryRecordRequest
         if (Grage == DeveloperGrade.Unknown)
         {
             throw new BadRequestException("Grage must be valid");
+        }
+
+        if (Profession == UserProfession.Undefined)
+        {
+            throw new BadRequestException("Profession must be valid");
         }
     }
 }

@@ -15,6 +15,7 @@ public class UserSalaryFake : UserSalary
         Currency currency = Currency.KZT,
         DeveloperGrade? grage = null,
         CompanyType company = CompanyType.Local,
+        UserProfession profession = UserProfession.Developer,
         DateTimeOffset? createdAt = null)
         : base(
             user,
@@ -23,7 +24,8 @@ public class UserSalaryFake : UserSalary
             year,
             currency,
             grage,
-            company)
+            company,
+            profession)
     {
         if (createdAt.HasValue)
         {

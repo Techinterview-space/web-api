@@ -70,7 +70,8 @@ public class SalariesControllerTests
             Year = 2023,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grage = DeveloperGrade.Middle
+            Grage = DeveloperGrade.Middle,
+            Profession = UserProfession.ProductOwner,
         };
 
         var salary = await new SalariesController(
@@ -183,7 +184,7 @@ public class SalariesControllerTests
     }
 
     [Fact]
-    public async Task All_ReturnsDataForLastYear_Ok()
+    public async Task All_ReturnsAllData_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
@@ -208,8 +209,93 @@ public class SalariesControllerTests
                 context)
             .AllAsync(default);
 
-        Assert.Single(salaries);
-        Assert.Contains(salaries, x => Math.Abs(x.Value - salary2.Value) < 0.01);
-        Assert.DoesNotContain(salaries, x => Math.Abs(x.Value - salary1.Value) < 0.01);
+        Assert.Equal(2, salaries.Count);
+    }
+
+    [Fact]
+    public async Task Chart_UserHasSalaryForLastQuarter_Ok()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user3 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
+        var salary11 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary12 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 600_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var salary21 = await context.SaveAsync(new UserSalaryFake(
+                user2,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary22 = await context.SaveAsync(new UserSalaryFake(
+                user2,
+                value: 600_000,
+                createdAt: DateTimeOffset.Now.AddDays(-4))
+            .AsDomain());
+
+        var salary31 = await context.SaveAsync(new UserSalaryFake(
+                user3,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary32 = await context.SaveAsync(new UserSalaryFake(
+                user3,
+                value: 600_000,
+                createdAt: DateTimeOffset.Now.AddDays(-2))
+            .AsDomain());
+
+        var createdSalaries = context.Salaries.ToList();
+        Assert.Equal(6, createdSalaries.Count);
+
+        var salariesResponse = await new SalariesController(
+                new FakeAuth(user1),
+                context)
+            .ChartAsync(default);
+
+        Assert.False(salariesResponse.ShouldAddOwnSalary);
+        Assert.Equal(3, salariesResponse.Salaries.Count);
+    }
+
+    [Fact]
+    public async Task Chart_UserHasNoSalaryForLastQuarter_ReturnsFalse()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
+        var salary11 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary12 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 600_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var createdSalaries = context.Salaries.ToList();
+        Assert.Equal(2, createdSalaries.Count);
+
+        var salariesResponse = await new SalariesController(
+                new FakeAuth(user2),
+                context)
+            .ChartAsync(default);
+
+        Assert.True(salariesResponse.ShouldAddOwnSalary);
+        Assert.Empty(salariesResponse.Salaries);
     }
 }
