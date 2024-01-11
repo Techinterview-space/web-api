@@ -31,6 +31,10 @@ public record SalariesChartResponse
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
         MedianSalary = salaries.Select(x => x.Value).Median();
+        SalariesByProfession = salaries
+            .GroupBy(x => x.Profession)
+            .Select(x => new SalariesByProfession(x.Key, x.ToList()))
+            .ToList();
     }
 
     public static SalariesChartResponse RequireOwnSalary()
@@ -53,4 +57,6 @@ public record SalariesChartResponse
     public DateTimeOffset? RangeStart { get; }
 
     public DateTimeOffset? RangeEnd { get; }
+
+    public List<SalariesByProfession> SalariesByProfession { get; }
 }

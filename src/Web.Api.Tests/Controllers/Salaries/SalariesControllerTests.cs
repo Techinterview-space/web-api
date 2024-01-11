@@ -228,7 +228,7 @@ public class SalariesControllerTests
 
         var salary12 = await context.SaveAsync(new UserSalaryFake(
                 user1,
-                value: 600_000,
+                value: 700_000,
                 createdAt: DateTimeOffset.Now.AddDays(-1))
             .AsDomain());
 
@@ -241,6 +241,7 @@ public class SalariesControllerTests
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
+                profession: UserProfession.BusinessAnalyst,
                 createdAt: DateTimeOffset.Now.AddDays(-4))
             .AsDomain());
 
@@ -252,7 +253,8 @@ public class SalariesControllerTests
 
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
-                value: 600_000,
+                value: 650_000,
+                profession: UserProfession.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2))
             .AsDomain());
 
@@ -266,6 +268,9 @@ public class SalariesControllerTests
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
         Assert.Equal(3, salariesResponse.Salaries.Count);
+        Assert.Equal(650_000, salariesResponse.AverageSalary);
+        Assert.Equal(650_000, salariesResponse.MedianSalary);
+        Assert.Equal(3, salariesResponse.SalariesByProfession.Count);
     }
 
     [Fact]

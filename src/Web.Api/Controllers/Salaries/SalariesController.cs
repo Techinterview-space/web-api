@@ -62,14 +62,12 @@ public class SalariesController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
         var currentQuarter = DateQuarter.Current;
-        var hasRecordsForTheQuarter = await _context.Salaries
-            .Where(x =>
-                x.UserId == user.Id &&
-                x.Quarter == currentQuarter.Quarter &&
-                x.Year == currentQuarter.Year)
+        var hasRecordsForAnyQuarterForLastYear = await _context.Salaries
+            .Where(x => x.UserId == user.Id)
+            .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
             .AnyAsync(cancellationToken);
 
-        if (!hasRecordsForTheQuarter)
+        if (!hasRecordsForAnyQuarterForLastYear)
         {
             return SalariesChartResponse.RequireOwnSalary();
         }
