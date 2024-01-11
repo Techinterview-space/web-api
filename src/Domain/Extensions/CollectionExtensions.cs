@@ -58,4 +58,37 @@ public static class CollectionExtensions
     {
         return items != null && items.Any();
     }
+
+    public static double Median(
+        this IEnumerable<double> sourceNumbers)
+    {
+        return sourceNumbers.ToList().Median();
+    }
+
+    public static double Median(
+        this List<double> sourceNumbers)
+    {
+        if (sourceNumbers == null)
+        {
+            throw new ArgumentNullException(nameof(sourceNumbers), "Median of empty array not defined.");
+        }
+
+        if (sourceNumbers.Count == 0)
+        {
+            return 0;
+        }
+
+        // make sure the list is sorted, but use a new array
+        var sortedPNumbers = sourceNumbers.ToArray();
+        Array.Sort(sortedPNumbers);
+
+        // get the median
+        var size = sortedPNumbers.Length;
+        var mid = size / 2;
+        var median = (size % 2 != 0)
+            ? sortedPNumbers[mid]
+            : (sortedPNumbers[mid] + sortedPNumbers[mid - 1]) / 2;
+
+        return median;
+    }
 }
