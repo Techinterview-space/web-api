@@ -30,11 +30,16 @@ public record SalariesChartResponse
         ShouldAddOwnSalary = shouldAddOwnSalary;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
-        MedianSalary = salaries.Select(x => x.Value).Median();
-        SalariesByProfession = salaries
-            .GroupBy(x => x.Profession)
-            .Select(x => new SalariesByProfession(x.Key, x.ToList()))
-            .ToList();
+
+        if (salaries.Any())
+        {
+            AverageSalary = salaries.Select(x => x.Value).Average();
+            MedianSalary = salaries.Select(x => x.Value).Median();
+            SalariesByProfession = salaries
+                .GroupBy(x => x.Profession)
+                .Select(x => new SalariesByProfession(x.Key, x.ToList()))
+                .ToList();
+        }
     }
 
     public static SalariesChartResponse RequireOwnSalary()
@@ -50,7 +55,7 @@ public record SalariesChartResponse
 
     public bool ShouldAddOwnSalary { get; }
 
-    public double AverageSalary => Salaries.Average(x => x.Value);
+    public double AverageSalary { get; }
 
     public double MedianSalary { get; }
 
