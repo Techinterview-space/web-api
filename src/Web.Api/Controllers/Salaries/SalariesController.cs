@@ -85,6 +85,7 @@ public class SalariesController : ControllerBase
                 Currency = x.Currency,
                 Company = x.Company,
                 Grage = x.Grage,
+                Profession = x.Profession,
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking()

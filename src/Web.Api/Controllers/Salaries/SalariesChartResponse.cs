@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Domain.Extensions;
 using Domain.Services.Salaries;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -28,6 +30,7 @@ public record SalariesChartResponse
         ShouldAddOwnSalary = shouldAddOwnSalary;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
+        MedianSalary = salaries.Select(x => x.Value).Median();
     }
 
     public static SalariesChartResponse RequireOwnSalary()
@@ -42,6 +45,10 @@ public record SalariesChartResponse
     public List<UserSalaryDto> Salaries { get; }
 
     public bool ShouldAddOwnSalary { get; }
+
+    public double AverageSalary => Salaries.Average(x => x.Value);
+
+    public double MedianSalary { get; }
 
     public DateTimeOffset? RangeStart { get; }
 
