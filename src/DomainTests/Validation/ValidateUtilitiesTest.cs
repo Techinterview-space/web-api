@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Exceptions;
 using Domain.Validation;
 using Domain.ValueObjects.Dates;
 using Xunit;
@@ -77,7 +78,7 @@ public class ValidateUtilitiesTest
     [InlineData(null)]
     public void ThrowIfNullOrEmpty_ForString_Cases_Exception(string source)
     {
-        Assert.Throws<ArgumentNullException>(() =>
+        Assert.Throws<BadRequestException>(() =>
             source.ThrowIfNullOrEmpty("paramName"));
     }
 }
