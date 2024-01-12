@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Exceptions;
 
 namespace Domain.Validation;
 
@@ -70,7 +71,7 @@ public static class ValidateUtilities
 
         if (@string.NullOrEmpty())
         {
-            throw new ArgumentNullException(paramName: paramName);
+            throw new BadRequestException("You should not pass null or empty string for " + paramName);
         }
 
         return @string;
