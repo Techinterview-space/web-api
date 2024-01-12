@@ -258,8 +258,15 @@ public class SalariesControllerTests
                 createdAt: DateTimeOffset.Now.AddDays(-2))
             .AsDomain());
 
+        var salary33 = await context.SaveAsync(new UserSalaryFake(
+                user3,
+                value: 1_260_000,
+                profession: UserProfession.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2))
+            .AsDomain());
+
         var createdSalaries = context.Salaries.ToList();
-        Assert.Equal(6, createdSalaries.Count);
+        Assert.Equal(7, createdSalaries.Count);
 
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user1),
@@ -267,10 +274,15 @@ public class SalariesControllerTests
             .ChartAsync(default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
-        Assert.Equal(3, salariesResponse.Salaries.Count);
-        Assert.Equal(650_000, salariesResponse.AverageSalary);
-        Assert.Equal(650_000, salariesResponse.MedianSalary);
+        Assert.Equal(4, salariesResponse.Salaries.Count);
+        Assert.Equal(802_500, salariesResponse.AverageSalary);
+        Assert.Equal(675_000, salariesResponse.MedianSalary);
         Assert.Equal(3, salariesResponse.SalariesByProfession.Count);
+
+        Assert.NotNull(salariesResponse.SalariesByMoneyBarChart);
+        Assert.Equal(4, salariesResponse.SalariesByMoneyBarChart.Items.Count);
+        Assert.Equal(250_000, salariesResponse.SalariesByMoneyBarChart.Step);
+        Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.Items[0].Count);
     }
 
     [Fact]

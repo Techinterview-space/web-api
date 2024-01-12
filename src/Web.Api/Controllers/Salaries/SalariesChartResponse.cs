@@ -39,6 +39,8 @@ public record SalariesChartResponse
                 .GroupBy(x => x.Profession)
                 .Select(x => new SalariesByProfession(x.Key, x.ToList()))
                 .ToList();
+
+            SalariesByMoneyBarChart = new SalariesByMoneyBarChart(salaries);
         }
     }
 
@@ -64,4 +66,6 @@ public record SalariesChartResponse
     public DateTimeOffset? RangeEnd { get; }
 
     public List<SalariesByProfession> SalariesByProfession { get; }
+
+    public SalariesByMoneyBarChart SalariesByMoneyBarChart { get; }
 }
