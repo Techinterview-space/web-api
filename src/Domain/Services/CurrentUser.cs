@@ -34,8 +34,16 @@ public record CurrentUser
         {
             var fullname = principal.GetClaimValue(ClaimTypes.Name);
             var names = fullname.Split(' ');
-            FirstName = names[0];
-            LastName = names[1];
+            if (names.Length == 1)
+            {
+                FirstName = names[0];
+                LastName = "-";
+            }
+            else
+            {
+                FirstName = names[0];
+                LastName = names[1];
+            }
         }
 
         Roles = principal.Claims

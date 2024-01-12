@@ -28,7 +28,8 @@ public class CurrentUserProvider
 
         if (user == null)
         {
-            user = await _context.AddEntityAsync(new User(_currentUser));
+            var claimsUser = new User(_currentUser);
+            user = await _context.AddEntityAsync(claimsUser);
             await _context.TrySaveChangesAsync();
             return user;
         }
