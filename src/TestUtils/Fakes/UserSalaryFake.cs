@@ -13,7 +13,7 @@ public class UserSalaryFake : UserSalary
         int quarter = 1,
         int year = 2024,
         Currency currency = Currency.KZT,
-        DeveloperGrade? grage = null,
+        DeveloperGrade? grade = null,
         CompanyType company = CompanyType.Local,
         UserProfession profession = UserProfession.Developer,
         DateTimeOffset? createdAt = null)
@@ -23,7 +23,7 @@ public class UserSalaryFake : UserSalary
             quarter,
             year,
             currency,
-            grage,
+            grade,
             company,
             profession)
     {
