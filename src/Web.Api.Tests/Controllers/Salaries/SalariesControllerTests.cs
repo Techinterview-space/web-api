@@ -283,6 +283,17 @@ public class SalariesControllerTests
         Assert.Equal(4, salariesResponse.SalariesByMoneyBarChart.Items.Count);
         Assert.Equal(250_000, salariesResponse.SalariesByMoneyBarChart.Step);
         Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.Items[0].Count);
+
+        Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.ItemsByProfession.Count);
+        Assert.Equal(
+            UserProfession.Developer,
+            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[0].Profession);
+        Assert.Equal(
+            UserProfession.BusinessAnalyst,
+            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[1].Profession);
+        Assert.Equal(
+            UserProfession.Tester,
+            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[2].Profession);
     }
 
     [Fact]
