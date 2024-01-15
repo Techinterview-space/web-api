@@ -49,7 +49,7 @@ public class SalariesController : ControllerBase
                 Year = x.Year,
                 Currency = x.Currency,
                 Company = x.Company,
-                Grage = x.Grage,
+                Grade = x.Grade,
                 Profession = x.Profession,
                 CreatedAt = x.CreatedAt
             })
@@ -86,7 +86,7 @@ public class SalariesController : ControllerBase
                 Year = x.Year,
                 Currency = x.Currency,
                 Company = x.Company,
-                Grage = x.Grage,
+                Grade = x.Grade,
                 Profession = x.Profession,
                 CreatedAt = x.CreatedAt
             })
@@ -128,7 +128,7 @@ public class SalariesController : ControllerBase
                 request.Quarter,
                 request.Year,
                 request.Currency,
-                request.Grage,
+                request.Grade,
                 request.Company,
                 request.Profession),
             cancellationToken);

@@ -38,7 +38,7 @@ public class SalariesControllerTests
             Year = salary1.Year,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grage = DeveloperGrade.Middle
+            Grade = DeveloperGrade.Middle
         };
 
         Assert.Equal(1, context.Salaries.Count());
@@ -71,7 +71,7 @@ public class SalariesControllerTests
             Year = 2023,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grage = DeveloperGrade.Middle,
+            Grade = DeveloperGrade.Middle,
             Profession = UserProfession.ProductOwner,
         };
 
@@ -87,7 +87,7 @@ public class SalariesControllerTests
         Assert.Equal(request.Year, salary.Year);
         Assert.Equal(request.Currency, salary.Currency);
         Assert.Equal(request.Company, salary.Company);
-        Assert.Equal(request.Grage, salary.Grage);
+        Assert.Equal(request.Grade, salary.Grade);
 
         Assert.Equal(1, context.Salaries.Count());
     }
@@ -109,7 +109,7 @@ public class SalariesControllerTests
             Year = 2023,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grage = DeveloperGrade.Middle
+            Grade = DeveloperGrade.Middle
         };
 
         await Assert.ThrowsAsync<BadRequestException>(() =>
@@ -140,7 +140,7 @@ public class SalariesControllerTests
             Year = year,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grage = DeveloperGrade.Middle
+            Grade = DeveloperGrade.Middle
         };
 
         await Assert.ThrowsAsync<BadRequestException>(() =>
@@ -170,7 +170,7 @@ public class SalariesControllerTests
             Year = 2024,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grage = DeveloperGrade.Middle
+            Grade = DeveloperGrade.Middle
         };
 
         await Assert.ThrowsAsync<BadRequestException>(() =>
