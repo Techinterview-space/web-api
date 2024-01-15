@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities.Salaries;
 using Domain.Services;
 using Domain.Services.Salaries;
 
@@ -33,6 +34,18 @@ public record SalariesByMoneyBarChart
                 values.Count(y => y >= x.Start && y < x.End)))
             .ToList();
 
+        ItemsByProfession = salaries
+            .GroupBy(x => x.Profession)
+            .Select(x => new ItemsByProfessionByValuePeriods(
+                x.Key,
+                splitter
+                    .Select(y => new ItemsByValuePeriods(
+                        y.Start,
+                        y.End,
+                        x.Count(z => z.Value >= y.Start && z.Value < y.End)))
+                    .ToList()))
+            .ToList();
+
         Step = StepValue;
     }
 
@@ -40,9 +53,15 @@ public record SalariesByMoneyBarChart
 
     public List<ItemsByValuePeriods> Items { get; }
 
+    public List<ItemsByProfessionByValuePeriods> ItemsByProfession { get; }
+
     public int Step { get; }
 
 #pragma warning disable SA1313
+    public record ItemsByProfessionByValuePeriods(
+        UserProfession Profession,
+        List<ItemsByValuePeriods> Items);
+
     public record ItemsByValuePeriods(
         double Start,
         double End,
