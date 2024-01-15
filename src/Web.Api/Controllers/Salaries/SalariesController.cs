@@ -37,12 +37,12 @@ public class SalariesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<Pageable<UserSalaryAdminDto>> AllAsync(
+    public async Task<Pageable<UserSalaryDto>> AllAsync(
         [FromQuery] GetAllSalariesRequest request,
         CancellationToken cancellationToken)
     {
         return await _context.Salaries
-            .Select(x => new UserSalaryAdminDto
+            .Select(x => new UserSalaryDto
             {
                 Value = x.Value,
                 Quarter = x.Quarter,
@@ -51,8 +51,6 @@ public class SalariesController : ControllerBase
                 Company = x.Company,
                 Grage = x.Grage,
                 Profession = x.Profession,
-                UserId = x.UserId,
-                UserEmail = x.User.Email,
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking()
