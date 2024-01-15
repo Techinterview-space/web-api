@@ -6,6 +6,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Exceptions;
 using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -204,12 +205,13 @@ public class SalariesControllerTests
         var createdSalaries = context.Salaries.ToList();
         Assert.Equal(2, createdSalaries.Count);
 
-        var salaries = await new SalariesController(
-                new FakeAuth(user),
-                context)
-            .AllAsync(default);
+        var salaries = await new SalariesController(new FakeAuth(user), context)
+            .AllAsync(
+                new GetAllSalariesRequest(),
+                default);
 
-        Assert.Equal(2, salaries.Count);
+        Assert.Equal(2, salaries.TotalItems);
+        Assert.Equal(2, salaries.Results.Count);
     }
 
     [Fact]
