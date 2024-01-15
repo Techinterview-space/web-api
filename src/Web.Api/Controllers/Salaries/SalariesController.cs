@@ -10,8 +10,11 @@ using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Dates;
+using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Controllers.Salaries.Charts;
+using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -34,11 +37,12 @@ public class SalariesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<List<UserSalaryDto>> AllAsync(
+    public async Task<Pageable<UserSalaryAdminDto>> AllAsync(
+        [FromQuery] GetAllSalariesRequest request,
         CancellationToken cancellationToken)
     {
         return await _context.Salaries
-            .Select(x => new UserSalaryDto
+            .Select(x => new UserSalaryAdminDto
             {
                 Value = x.Value,
                 Quarter = x.Quarter,
@@ -47,10 +51,12 @@ public class SalariesController : ControllerBase
                 Company = x.Company,
                 Grage = x.Grage,
                 Profession = x.Profession,
+                UserId = x.UserId,
+                UserEmail = x.User.Email,
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .AsPaginatedAsync(request, cancellationToken);
     }
 
     [HttpGet("chart")]
