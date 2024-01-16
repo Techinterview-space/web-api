@@ -37,13 +37,14 @@ public class SalariesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<Pageable<UserSalaryDto>> AllAsync(
+    public async Task<Pageable<UserSalaryAdminDto>> AllAsync(
         [FromQuery] GetAllSalariesRequest request,
         CancellationToken cancellationToken)
     {
         return await _context.Salaries
-            .Select(x => new UserSalaryDto
+            .Select(x => new UserSalaryAdminDto
             {
+                Id = x.Id,
                 Value = x.Value,
                 Quarter = x.Quarter,
                 Year = x.Year,
