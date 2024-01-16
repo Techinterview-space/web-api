@@ -18,7 +18,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         int quarter,
         int year,
         Currency currency,
-        DeveloperGrade? grage,
+        DeveloperGrade? grade,
         CompanyType company,
         UserProfession profession)
     {
@@ -29,7 +29,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Quarter = quarter;
         Year = year;
         Currency = currency;
-        Grage = grage;
+        Grade = grade;
         Company = company;
         Profession = profession;
     }
@@ -51,7 +51,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     [NotDefaultValue]
     public Currency Currency { get; protected set; }
 
-    public DeveloperGrade? Grage { get; protected set; }
+    public DeveloperGrade? Grade { get; protected set; }
 
     [NotDefaultValue]
     public CompanyType Company { get; protected set; }

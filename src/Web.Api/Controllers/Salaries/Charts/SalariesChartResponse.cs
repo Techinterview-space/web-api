@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.Services.Salaries;
 
-namespace TechInterviewer.Controllers.Salaries;
+namespace TechInterviewer.Controllers.Salaries.Charts;
 
 public record SalariesChartResponse
 {
@@ -31,16 +32,34 @@ public record SalariesChartResponse
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
 
-        if (salaries.Any())
+        var localSalaries = salaries
+            .Where(x => x.Company == CompanyType.Local)
+            .ToList();
+
+        var remoteSalaries = salaries
+            .Where(x => x.Company == CompanyType.Foreign)
+            .ToList();
+
+        if (localSalaries.Any())
         {
-            AverageSalary = salaries.Select(x => x.Value).Average();
-            MedianSalary = salaries.Select(x => x.Value).Median();
-            SalariesByProfession = salaries
+            AverageSalary = localSalaries.Select(x => x.Value).Average();
+            MedianSalary = localSalaries.Select(x => x.Value).Median();
+            SalariesByProfession = localSalaries
                 .GroupBy(x => x.Profession)
                 .Select(x => new SalariesByProfession(x.Key, x.ToList()))
                 .ToList();
 
-            SalariesByMoneyBarChart = new SalariesByMoneyBarChart(salaries);
+            SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
+        }
+
+        if (remoteSalaries.Any())
+        {
+            var values = remoteSalaries
+                .Select(x => x.Value)
+                .ToList();
+
+            AverageRemoteSalary = values.Average();
+            MedianRemoteSalary = values.Median();
         }
     }
 
@@ -60,6 +79,10 @@ public record SalariesChartResponse
     public double AverageSalary { get; }
 
     public double MedianSalary { get; }
+
+    public double? AverageRemoteSalary { get; }
+
+    public double? MedianRemoteSalary { get; }
 
     public DateTimeOffset? RangeStart { get; }
 

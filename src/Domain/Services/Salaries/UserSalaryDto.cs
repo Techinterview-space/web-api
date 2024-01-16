@@ -18,7 +18,7 @@ public record UserSalaryDto
         Year = salary.Year;
         Currency = salary.Currency;
         Company = salary.Company;
-        Grage = salary.Grage;
+        Grade = salary.Grade;
         Profession = salary.Profession;
         CreatedAt = salary.CreatedAt;
     }
@@ -33,7 +33,7 @@ public record UserSalaryDto
 
     public CompanyType Company { get; init; }
 
-    public DeveloperGrade? Grage { get; init; }
+    public DeveloperGrade? Grade { get; init; }
 
     public UserProfession Profession { get; init; }
 

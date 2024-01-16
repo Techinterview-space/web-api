@@ -19,7 +19,7 @@ public record CreateSalaryRecordRequest
 
     public CompanyType Company { get; init; }
 
-    public DeveloperGrade? Grage { get; init; }
+    public DeveloperGrade? Grade { get; init; }
 
     public UserProfession Profession { get; init; }
 
@@ -51,9 +51,9 @@ public record CreateSalaryRecordRequest
             throw new BadRequestException("Company must be specified");
         }
 
-        if (Grage == DeveloperGrade.Unknown)
+        if (Grade == DeveloperGrade.Unknown)
         {
-            throw new BadRequestException("Grage must be valid");
+            throw new BadRequestException("Grade must be valid");
         }
 
         if (Profession == UserProfession.Undefined)
