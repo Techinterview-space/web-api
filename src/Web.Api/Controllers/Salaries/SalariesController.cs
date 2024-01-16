@@ -135,4 +135,20 @@ public class SalariesController : ControllerBase
 
         return new UserSalaryDto(salary);
     }
+
+    [HttpDelete("{id:guid}")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> Delete(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var salary = await _context.Salaries
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+            ?? throw new ResourceNotFoundException("Salary record not found");
+
+        _context.Salaries.Remove(salary);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
 }
