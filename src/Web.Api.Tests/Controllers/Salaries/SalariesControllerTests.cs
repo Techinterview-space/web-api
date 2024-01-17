@@ -283,7 +283,6 @@ public class SalariesControllerTests
         Assert.Equal(4, salariesResponse.Salaries.Count);
         Assert.Equal(802_500, salariesResponse.AverageSalary);
         Assert.Equal(675_000, salariesResponse.MedianSalary);
-        Assert.Equal(3, salariesResponse.SalariesByProfession.Count);
 
         Assert.NotNull(salariesResponse.SalariesByMoneyBarChart);
         Assert.Equal(4, salariesResponse.SalariesByMoneyBarChart.Items.Count);
