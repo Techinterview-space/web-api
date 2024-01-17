@@ -37,4 +37,6 @@ public enum UserProfession
     DatabaseAdministrator = 16,
 
     TechLeader = 17,
+
+    SystemAnalyst = 18,
 }

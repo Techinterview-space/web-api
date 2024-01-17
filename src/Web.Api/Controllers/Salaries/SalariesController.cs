@@ -14,6 +14,7 @@ using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Salaries.Charts;
+using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TechInterviewer.Setup.Attributes;
 
@@ -101,7 +102,7 @@ public class SalariesController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<UserSalaryDto> Create(
+    public async Task<CreateSalaryRecordResponse> Create(
         [FromBody] CreateSalaryRecordRequest request,
         CancellationToken cancellationToken)
     {
@@ -119,7 +120,7 @@ public class SalariesController : ControllerBase
 
         if (hasRecordsForTheQuarter)
         {
-            throw new BadRequestException("You already have a record for this quarter");
+            return CreateSalaryRecordResponse.Failure("You already have a record for this quarter");
         }
 
         var salary = await _context.SaveAsync(
@@ -134,7 +135,8 @@ public class SalariesController : ControllerBase
                 request.Profession),
             cancellationToken);
 
-        return new UserSalaryDto(salary);
+        return CreateSalaryRecordResponse.Success(
+            new UserSalaryDto(salary));
     }
 
     [HttpDelete("{id:guid}")]
