@@ -44,10 +44,6 @@ public record SalariesChartResponse
         {
             AverageSalary = localSalaries.Select(x => x.Value).Average();
             MedianSalary = localSalaries.Select(x => x.Value).Median();
-            SalariesByProfession = localSalaries
-                .GroupBy(x => x.Profession)
-                .Select(x => new SalariesByProfession(x.Key, x.ToList()))
-                .ToList();
 
             SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
         }
@@ -60,11 +56,6 @@ public record SalariesChartResponse
 
             AverageRemoteSalary = values.Average();
             MedianRemoteSalary = values.Median();
-
-            SalariesByProfessionForRemote = remoteSalaries
-                .GroupBy(x => x.Profession)
-                .Select(x => new SalariesByProfession(x.Key, x.ToList()))
-                .ToList();
 
             SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
         }
@@ -94,10 +85,6 @@ public record SalariesChartResponse
     public DateTimeOffset? RangeStart { get; }
 
     public DateTimeOffset? RangeEnd { get; }
-
-    public List<SalariesByProfession> SalariesByProfession { get; }
-
-    public List<SalariesByProfession> SalariesByProfessionForRemote { get; }
 
     public SalariesByMoneyBarChart SalariesByMoneyBarChart { get; }
 
