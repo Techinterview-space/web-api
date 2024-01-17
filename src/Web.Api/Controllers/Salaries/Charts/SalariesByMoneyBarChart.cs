@@ -31,7 +31,7 @@ public record SalariesByMoneyBarChart
             .Select(x => new ItemsByValuePeriods(
                 x.Start,
                 x.End,
-                values.Count(y => y >= x.Start && y < x.End)))
+                values.Count(y => y > x.Start && y <= x.End)))
             .ToList();
 
         ItemsByProfession = salaries
