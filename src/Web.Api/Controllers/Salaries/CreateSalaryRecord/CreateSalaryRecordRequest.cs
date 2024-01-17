@@ -1,11 +1,9 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Domain.Attributes;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Exceptions;
 
-namespace TechInterviewer.Controllers.Salaries;
+namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 
 public record CreateSalaryRecordRequest
 {

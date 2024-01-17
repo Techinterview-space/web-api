@@ -6,6 +6,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Exceptions;
 using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TestUtils.Auth;
 using TestUtils.Db;
@@ -19,7 +20,7 @@ public class SalariesControllerTests
     [Theory]
     [InlineData(Role.Admin)]
     [InlineData(Role.Interviewer)]
-    public async Task Create_ValidData_Ok(
+    public async Task Create_ValidData_HasRecordForThisQuarterAlready_Error(
         Role userRole)
     {
         await using var context = new InMemoryDatabaseContext();
@@ -44,21 +45,19 @@ public class SalariesControllerTests
         Assert.Equal(1, context.Salaries.Count());
 
         context.ChangeTracker.Clear();
-        await Assert.ThrowsAsync<BadRequestException>(() =>
-            new SalariesController(
-                    new FakeAuth(user),
-                    context)
-                .Create(
-                    request,
-                    default));
+        var result = await new SalariesController(new FakeAuth(user), context)
+            .Create(request, default);
 
         Assert.Equal(1, context.Salaries.Count());
+        Assert.False(result.IsSuccess);
+        Assert.Equal("Salary for this quarter already exists", result.ErrorMessage);
+        Assert.Null(result.CreatedSalary);
     }
 
     [Theory]
     [InlineData(Role.Admin)]
     [InlineData(Role.Interviewer)]
-    public async Task Create_ValidData_HasRecordForThisQuarterAlready_Error(
+    public async Task Create_HasRecordForThisQuarterAlready_FailedResult(
         Role userRole)
     {
         await using var context = new InMemoryDatabaseContext();
@@ -75,12 +74,16 @@ public class SalariesControllerTests
             Profession = UserProfession.ProductOwner,
         };
 
-        var salary = await new SalariesController(
+        var result = await new SalariesController(
                 new FakeAuth(user),
                 context)
             .Create(
                 request,
                 default);
+
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.ErrorMessage);
+        var salary = result.CreatedSalary;
 
         Assert.Equal(request.Value, salary.Value);
         Assert.Equal(request.Quarter, salary.Quarter);
