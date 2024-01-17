@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Services;
@@ -17,12 +18,10 @@ public record SalariesByMoneyBarChart
             .Select(x => x.Value)
             .ToList();
 
-        var splitter = new RoundedValuesByRangesSplitter(
-            values.Min(),
-            values.Max(),
-            StepValue)
-            .ToList();
+        var minSalary = values.Min();
+        var maxSalary = values.Max();
 
+        var splitter = new RoundedValuesByRangesSplitter(minSalary, maxSalary, StepValue).ToList();
         Labels = splitter
             .Select(x => x.End.ToString("000"))
             .ToList();
@@ -31,7 +30,9 @@ public record SalariesByMoneyBarChart
             .Select(x => new ItemsByValuePeriods(
                 x.Start,
                 x.End,
-                values.Count(y => y > x.Start && y <= x.End)))
+                values.Count(y =>
+                    y >= x.Start &&
+                    (y < x.End || (Math.Abs(x.End - maxSalary) < 0.01 && Math.Abs(y - maxSalary) < 0.01)))))
             .ToList();
 
         ItemsByProfession = salaries
@@ -42,7 +43,9 @@ public record SalariesByMoneyBarChart
                     .Select(y => new ItemsByValuePeriods(
                         y.Start,
                         y.End,
-                        x.Count(z => z.Value >= y.Start && z.Value < y.End)))
+                        x.Count(z =>
+                            z.Value >= y.Start &&
+                            (z.Value < y.End || (Math.Abs(y.End - maxSalary) < 0.01 && Math.Abs(z.Value - maxSalary) < 0.01)))))
                     .ToList()))
             .ToList();
 
