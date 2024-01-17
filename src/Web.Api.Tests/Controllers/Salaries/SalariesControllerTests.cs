@@ -39,7 +39,8 @@ public class SalariesControllerTests
             Year = salary1.Year,
             Currency = Currency.KZT,
             Company = CompanyType.Local,
-            Grade = DeveloperGrade.Middle
+            Grade = DeveloperGrade.Middle,
+            Profession = UserProfession.Developer,
         };
 
         Assert.Equal(1, context.Salaries.Count());
@@ -50,7 +51,7 @@ public class SalariesControllerTests
 
         Assert.Equal(1, context.Salaries.Count());
         Assert.False(result.IsSuccess);
-        Assert.Equal("Salary for this quarter already exists", result.ErrorMessage);
+        Assert.Equal("You already have a record for this quarter", result.ErrorMessage);
         Assert.Null(result.CreatedSalary);
     }
 
