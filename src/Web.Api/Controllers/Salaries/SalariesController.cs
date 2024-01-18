@@ -45,6 +45,8 @@ public class SalariesController : ControllerBase
     {
         return await _context.Salaries
             .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
+            .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
+            .When(request.Profession.HasValue, x => x.Profession == request.Profession.Value)
             .Select(x => new UserSalaryAdminDto
             {
                 Id = x.Id,
