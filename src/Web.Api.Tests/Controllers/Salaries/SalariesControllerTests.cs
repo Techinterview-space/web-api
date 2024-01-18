@@ -6,6 +6,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Exceptions;
 using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TestUtils.Auth;
@@ -277,7 +278,7 @@ public class SalariesControllerTests
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user1),
                 context)
-            .ChartAsync(default);
+            .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
         Assert.Equal(4, salariesResponse.Salaries.Count);
@@ -345,7 +346,7 @@ public class SalariesControllerTests
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user1),
                 context)
-            .ChartAsync(default);
+            .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
         Assert.Equal(4, salariesResponse.Salaries.Count);
@@ -377,7 +378,7 @@ public class SalariesControllerTests
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user2),
                 context)
-            .ChartAsync(default);
+            .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
         Assert.Empty(salariesResponse.Salaries);

@@ -65,6 +65,7 @@ public class SalariesController : ControllerBase
 
     [HttpGet("chart")]
     public async Task<SalariesChartResponse> ChartAsync(
+        [FromQuery] SalariesChartQueryParams request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserAsync();
@@ -88,6 +89,7 @@ public class SalariesController : ControllerBase
         var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
         var salaries = await _context.Salaries
             .Where(x => x.CreatedAt >= yearAgoGap)
+            .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .Select(x => new UserSalaryDto
             {
                 Value = x.Value,
