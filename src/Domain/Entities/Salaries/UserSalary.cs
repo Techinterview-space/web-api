@@ -58,4 +58,12 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     [NotDefaultValue]
     public UserProfession Profession { get; protected set; }
+
+    public void Update(
+        CompanyType company,
+        DeveloperGrade? grade)
+    {
+        Company = company;
+        Grade = grade;
+    }
 }
