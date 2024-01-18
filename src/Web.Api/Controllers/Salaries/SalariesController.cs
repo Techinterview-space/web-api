@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
+using TechInterviewer.Controllers.Salaries.UpdateSalary;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -43,6 +44,7 @@ public class SalariesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await _context.Salaries
+            .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
             .Select(x => new UserSalaryAdminDto
             {
                 Id = x.Id,
@@ -137,6 +139,26 @@ public class SalariesController : ControllerBase
 
         return CreateSalaryRecordResponse.Success(
             new UserSalaryDto(salary));
+    }
+
+    [HttpPost("{id:guid}")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> Update(
+        [FromRoute] Guid id,
+        [FromBody] UpdateSalaryRequest request,
+        CancellationToken cancellationToken)
+    {
+        request.IsValidOrFail();
+        var salary = await _context.Salaries
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+            ?? throw new ResourceNotFoundException("Salary record not found");
+
+        salary.Update(
+            request.Company,
+            request.Grade);
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return Ok(new UserSalaryDto(salary));
     }
 
     [HttpDelete("{id:guid}")]
