@@ -302,6 +302,57 @@ public class SalariesControllerTests
     }
 
     [Fact]
+    public async Task Chart_UserHasSeveralSalariesForYear_OnlyLastBeingReturned_Ok()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
+        var salary1 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 400_000,
+                quarter: 2,
+                year: DateTimeOffset.Now.Year - 1,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var salary2 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 300_000,
+                quarter: 1,
+                year: DateTimeOffset.Now.Year - 1,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var salary3 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 450_000,
+                quarter: 4,
+                year: DateTimeOffset.Now.Year - 1,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var salary4 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 500_000,
+                quarter: 1,
+                year: DateTimeOffset.Now.Year,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var createdSalaries = context.Salaries.ToList();
+        Assert.Equal(4, createdSalaries.Count);
+
+        var salariesResponse = await new SalariesController(
+                new FakeAuth(user1),
+                context)
+            .ChartAsync(default);
+
+        Assert.False(salariesResponse.ShouldAddOwnSalary);
+        Assert.Equal(4, salariesResponse.Salaries.Count);
+        Assert.Equal(salary4.Value, salariesResponse.CurrentUserSalary.Value);
+    }
+
+    [Fact]
     public async Task Chart_UserHasNoSalaryForLastQuarter_ReturnsFalse()
     {
         await using var context = new InMemoryDatabaseContext();

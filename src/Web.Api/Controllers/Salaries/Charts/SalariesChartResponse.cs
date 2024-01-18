@@ -11,10 +11,12 @@ public record SalariesChartResponse
 {
     public SalariesChartResponse(
         List<UserSalaryDto> salaries,
+        UserSalaryDto currentUserSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd)
         : this(
             salaries,
+            currentUserSalary,
             false,
             rangeStart,
             rangeEnd)
@@ -23,11 +25,13 @@ public record SalariesChartResponse
 
     private SalariesChartResponse(
         List<UserSalaryDto> salaries,
+        UserSalaryDto currentUserSalary,
         bool shouldAddOwnSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd)
     {
         Salaries = salaries;
+        CurrentUserSalary = currentUserSalary;
         ShouldAddOwnSalary = shouldAddOwnSalary;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
@@ -65,12 +69,15 @@ public record SalariesChartResponse
     {
         return new (
             new List<UserSalaryDto>(),
+            null,
             true,
             null,
             null);
     }
 
     public List<UserSalaryDto> Salaries { get; }
+
+    public UserSalaryDto CurrentUserSalary { get; }
 
     public bool ShouldAddOwnSalary { get; }
 

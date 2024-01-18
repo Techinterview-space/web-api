@@ -70,12 +70,15 @@ public class SalariesController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
         var currentQuarter = DateQuarter.Current;
-        var hasRecordsForAnyQuarterForLastYear = await _context.Salaries
+        var userSalariesForLastYear = await _context.Salaries
             .Where(x => x.UserId == user.Id)
             .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
-            .AnyAsync(cancellationToken);
+            .AsNoTracking()
+            .OrderByDescending(x => x.Year)
+            .ThenByDescending(x => x.Quarter)
+            .ToListAsync(cancellationToken);
 
-        if (!hasRecordsForAnyQuarterForLastYear)
+        if (!userSalariesForLastYear.Any())
         {
             return SalariesChartResponse.RequireOwnSalary();
         }
@@ -99,6 +102,7 @@ public class SalariesController : ControllerBase
 
         return new SalariesChartResponse(
             salaries,
+            new UserSalaryDto(userSalariesForLastYear.First()),
             yearAgoGap,
             DateTimeOffset.Now);
     }
