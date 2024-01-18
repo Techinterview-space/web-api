@@ -39,4 +39,8 @@ public enum UserProfession
     TechLeader = 17,
 
     SystemAnalyst = 18,
+
+    ItHr = 19,
+
+    ItRecruiter = 20,
 }
