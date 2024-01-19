@@ -40,7 +40,15 @@ public enum UserProfession
 
     SystemAnalyst = 18,
 
-    ItHr = 19,
+    UiDesigner = 19,
 
-    ItRecruiter = 20,
+    UxDesigner = 20,
+
+    UiUxDesigner = 21,
+
+    ProductAnalyst = 22,
+
+    ProductManager = 23,
+
+    ProductDesigner = 24,
 }
