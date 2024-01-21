@@ -60,6 +60,7 @@ public class SalariesController : ControllerBase
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking()
+            .OrderByDescending(x => x.CreatedAt)
             .AsPaginatedAsync(request, cancellationToken);
     }
 
@@ -101,6 +102,7 @@ public class SalariesController : ControllerBase
                 Profession = x.Profession,
                 CreatedAt = x.CreatedAt
             })
+            .OrderBy(x => x.Value)
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
@@ -133,6 +135,13 @@ public class SalariesController : ControllerBase
             return CreateSalaryRecordResponse.Failure("You already have a record for this quarter");
         }
 
+        Skill skill = null;
+        if (request.SkillId is > 0)
+        {
+            skill = await _context.Skills
+                .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
+        }
+
         var salary = await _context.SaveAsync(
             new UserSalary(
                 user,
@@ -142,7 +151,8 @@ public class SalariesController : ControllerBase
                 request.Currency,
                 request.Grade,
                 request.Company,
-                request.Profession),
+                request.Profession,
+                skill?.Id),
             cancellationToken);
 
         return CreateSalaryRecordResponse.Success(

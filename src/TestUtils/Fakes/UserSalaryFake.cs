@@ -16,7 +16,8 @@ public class UserSalaryFake : UserSalary
         DeveloperGrade? grade = null,
         CompanyType company = CompanyType.Local,
         UserProfession profession = UserProfession.Developer,
-        DateTimeOffset? createdAt = null)
+        DateTimeOffset? createdAt = null,
+        Skill skill = null)
         : base(
             user,
             value,
@@ -25,7 +26,8 @@ public class UserSalaryFake : UserSalary
             currency,
             grade,
             company,
-            profession)
+            profession,
+            skill?.Id)
     {
         if (createdAt.HasValue)
         {
