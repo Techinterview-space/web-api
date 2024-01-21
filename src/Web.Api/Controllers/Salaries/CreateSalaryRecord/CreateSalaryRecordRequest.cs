@@ -21,6 +21,8 @@ public record CreateSalaryRecordRequest
 
     public UserProfession Profession { get; init; }
 
+    public long? SkillId { get; init; }
+
     public void IsValidOrFail()
     {
         if (Value <= 0)

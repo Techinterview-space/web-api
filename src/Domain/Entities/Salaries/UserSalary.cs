@@ -20,7 +20,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency currency,
         DeveloperGrade? grade,
         CompanyType company,
-        UserProfession profession)
+        UserProfession profession,
+        long? skillId)
     {
         Id = Guid.NewGuid();
         UserId = user.Id;
@@ -32,6 +33,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Grade = grade;
         Company = company;
         Profession = profession;
+        SkillId = skillId;
     }
 
     public Guid Id { get; }
@@ -58,6 +60,10 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     [NotDefaultValue]
     public UserProfession Profession { get; protected set; }
+
+    public long? SkillId { get; protected set; }
+
+    public virtual Skill Skill { get; protected set; }
 
     public void Update(
         CompanyType company,
