@@ -149,7 +149,7 @@ public class SalariesController : ControllerBase
 
         return new SalariesChartResponse(
             salaries,
-            new UserSalaryDto(userSalariesForLastYear.First()),
+            new UserSalaryAdminDto(userSalariesForLastYear.First()),
             yearAgoGap,
             DateTimeOffset.Now);
     }

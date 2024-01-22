@@ -11,7 +11,7 @@ public record SalariesChartResponse
 {
     public SalariesChartResponse(
         List<UserSalaryDto> salaries,
-        UserSalaryDto currentUserSalary,
+        UserSalaryAdminDto currentUserSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd)
         : this(
@@ -25,7 +25,7 @@ public record SalariesChartResponse
 
     private SalariesChartResponse(
         List<UserSalaryDto> salaries,
-        UserSalaryDto currentUserSalary,
+        UserSalaryAdminDto currentUserSalary,
         bool shouldAddOwnSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd)
@@ -77,7 +77,7 @@ public record SalariesChartResponse
 
     public List<UserSalaryDto> Salaries { get; }
 
-    public UserSalaryDto CurrentUserSalary { get; }
+    public UserSalaryAdminDto CurrentUserSalary { get; }
 
     public bool ShouldAddOwnSalary { get; }
 
