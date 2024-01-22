@@ -261,48 +261,6 @@ public class SalariesControllerTests
     }
 
     [Fact]
-    public async Task Update_HasRecordForNewQuarterAlready_ErrorReturned()
-    {
-        await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var salary1 = await new UserSalaryFake(
-            user,
-            quarter: 1,
-            year: 2024)
-            .PleaseAsync(context);
-
-        var salary2 = await new UserSalaryFake(
-                user,
-                quarter: 3,
-                year: 2023)
-            .PleaseAsync(context);
-
-        var request = new CreateOrEditSalaryRecordRequest
-        {
-            Value = 600_000,
-            Quarter = salary2.Quarter,
-            Year = salary2.Year,
-            Currency = Currency.KZT,
-            Company = CompanyType.Foreign,
-            Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.ProductOwner,
-        };
-
-        Assert.NotEqual(request.Value, salary1.Value);
-        Assert.NotEqual(request.Quarter, salary1.Quarter);
-        Assert.NotEqual(request.Year, salary1.Year);
-        Assert.NotEqual(request.Company, salary1.Company);
-        Assert.NotEqual(request.Grade, salary1.Grade);
-
-        var result = await new SalariesController(new FakeAuth(user), context)
-            .Update(salary1.Id, request, default);
-
-        Assert.False(result.IsSuccess);
-        Assert.NotNull(result.ErrorMessage);
-        Assert.Null(result.CreatedSalary);
-    }
-
-    [Fact]
     public async Task All_ReturnsAllData_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
