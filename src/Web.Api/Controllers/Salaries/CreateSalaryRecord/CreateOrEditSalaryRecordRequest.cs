@@ -5,7 +5,7 @@ using Domain.Exceptions;
 
 namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 
-public record CreateSalaryRecordRequest
+public record CreateOrEditSalaryRecordRequest
 {
     public double Value { get; init; }
 

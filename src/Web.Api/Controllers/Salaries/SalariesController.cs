@@ -6,17 +6,20 @@ using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
+using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Services;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Dates;
 using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Errors.Model;
+using TechInterviewer.Controllers.Salaries.AdminChart;
 using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
-using TechInterviewer.Controllers.Salaries.UpdateSalary;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -62,6 +65,44 @@ public class SalariesController : ControllerBase
             .AsNoTracking()
             .OrderByDescending(x => x.CreatedAt)
             .AsPaginatedAsync(request, cancellationToken);
+    }
+
+    [HttpGet("salaries-adding-trend-chart")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<AdminChartResponse> AdminChart(
+        CancellationToken cancellationToken)
+    {
+        var currentDay = DateTime.UtcNow;
+        var fifteenDaysAgo = currentDay.AddDays(-20);
+        var salaries = await _context.Salaries
+            .Where(x => x.CreatedAt >= fifteenDaysAgo)
+            .Select(x => new
+            {
+                x.Id,
+                x.UserId,
+                x.CreatedAt
+            })
+            .AsNoTracking()
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var daysSplitter = new DateTimeRoundedRangeSplitter(fifteenDaysAgo, currentDay, 360);
+        var response = new AdminChartResponse
+        {
+            SalariesPerUser = (double)salaries.Count / salaries.GroupBy(x => x.UserId).Count()
+        };
+
+        foreach (var (start, end) in daysSplitter.ToList())
+        {
+            var count = salaries.Count(x =>
+                x.CreatedAt >= start &&
+                (x.CreatedAt < end || x.CreatedAt == end));
+
+            response.Items.Add(new AdminChartResponse.AdminChartItem(count, start));
+            response.Labels.Add(start.ToString(AdminChartResponse.DateTimeFormat));
+        }
+
+        return response;
     }
 
     [HttpGet("chart")]
@@ -114,8 +155,8 @@ public class SalariesController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<CreateSalaryRecordResponse> Create(
-        [FromBody] CreateSalaryRecordRequest request,
+    public async Task<CreateOrEditSalaryRecordResponse> Create(
+        [FromBody] CreateOrEditSalaryRecordRequest request,
         CancellationToken cancellationToken)
     {
         request.IsValidOrFail();
@@ -132,7 +173,7 @@ public class SalariesController : ControllerBase
 
         if (hasRecordsForTheQuarter)
         {
-            return CreateSalaryRecordResponse.Failure("You already have a record for this quarter");
+            return CreateOrEditSalaryRecordResponse.Failure("You already have a record for this quarter");
         }
 
         Skill skill = null;
@@ -155,15 +196,14 @@ public class SalariesController : ControllerBase
                 skill?.Id),
             cancellationToken);
 
-        return CreateSalaryRecordResponse.Success(
+        return CreateOrEditSalaryRecordResponse.Success(
             new UserSalaryDto(salary));
     }
 
     [HttpPost("{id:guid}")]
-    [HasAnyRole(Role.Admin)]
-    public async Task<IActionResult> Update(
+    public async Task<CreateOrEditSalaryRecordResponse> Update(
         [FromRoute] Guid id,
-        [FromBody] UpdateSalaryRequest request,
+        [FromBody] CreateOrEditSalaryRecordRequest request,
         CancellationToken cancellationToken)
     {
         request.IsValidOrFail();
@@ -171,12 +211,37 @@ public class SalariesController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
             ?? throw new ResourceNotFoundException("Salary record not found");
 
+        var currentUser = await _auth.CurrentUserAsync();
+
+        if (!currentUser.Has(Role.Admin) &&
+            salary.UserId != currentUser.Id)
+        {
+            throw new ForbiddenException("You can only edit your own salary records");
+        }
+
+        var anotherUserSalaryForThisQuarter = await _context.Salaries
+            .Where(x =>
+                x.UserId == salary.UserId &&
+                x.Quarter == request.Quarter &&
+                x.Year == request.Year)
+            .Where(x => x.Id != salary.Id)
+            .AnyAsync(cancellationToken);
+
+        if (anotherUserSalaryForThisQuarter)
+        {
+            return CreateOrEditSalaryRecordResponse.Failure($"You already have a record for this quarter: {request.Quarter}.{request.Year}");
+        }
+
         salary.Update(
+            request.Value,
+            request.Quarter,
+            request.Year,
+            request.Currency,
             request.Company,
             request.Grade);
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Ok(new UserSalaryDto(salary));
+        return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
     }
 
     [HttpDelete("{id:guid}")]
