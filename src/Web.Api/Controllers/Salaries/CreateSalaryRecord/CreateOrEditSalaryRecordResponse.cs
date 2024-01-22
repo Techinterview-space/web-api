@@ -2,7 +2,7 @@
 
 namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 
-public record CreateSalaryRecordResponse
+public record CreateOrEditSalaryRecordResponse
 {
     public bool IsSuccess { get; private init; }
 
@@ -10,7 +10,7 @@ public record CreateSalaryRecordResponse
 
     public UserSalaryDto CreatedSalary { get; private init; }
 
-    public static CreateSalaryRecordResponse Success(
+    public static CreateOrEditSalaryRecordResponse Success(
         UserSalaryDto createdSalary)
     {
         return new ()
@@ -21,7 +21,7 @@ public record CreateSalaryRecordResponse
         };
     }
 
-    public static CreateSalaryRecordResponse Failure(
+    public static CreateOrEditSalaryRecordResponse Failure(
         string errorMessage)
     {
         return new ()

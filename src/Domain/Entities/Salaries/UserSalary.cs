@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Domain.Attributes;
 using Domain.Entities.Enums;
 using Domain.Entities.Users;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Salaries;
 
@@ -26,9 +27,9 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Id = Guid.NewGuid();
         UserId = user.Id;
         User = user;
-        Value = value;
-        Quarter = quarter;
-        Year = year;
+        Value = NonNegativeValue(value);
+        Quarter = NonNegativeValue(quarter);
+        Year = NonNegativeValue(year);
         Currency = currency;
         Grade = grade;
         Company = company;
@@ -66,10 +67,39 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     public virtual Skill Skill { get; protected set; }
 
     public void Update(
+        double value,
+        int quarter,
+        int year,
+        Currency currency,
         CompanyType company,
         DeveloperGrade? grade)
     {
+        Value = NonNegativeValue(value);
+        Quarter = NonNegativeValue(quarter);
+        Year = NonNegativeValue(year);
+
+        Currency = currency;
         Company = company;
         Grade = grade;
+    }
+
+    private static double NonNegativeValue(double value)
+    {
+        if (value <= 0)
+        {
+            throw new BadRequestException("Value must be greater than 0");
+        }
+
+        return value;
+    }
+
+    private static int NonNegativeValue(int value)
+    {
+        if (value <= 0)
+        {
+            throw new BadRequestException("Value must be greater than 0");
+        }
+
+        return value;
     }
 }

@@ -33,7 +33,7 @@ public class SalariesControllerTests
                 createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
             .AsDomain());
 
-        var request = new CreateSalaryRecordRequest
+        var request = new CreateOrEditSalaryRecordRequest
         {
             Value = 100_000,
             Quarter = salary1.Quarter,
@@ -59,13 +59,13 @@ public class SalariesControllerTests
     [Theory]
     [InlineData(Role.Admin)]
     [InlineData(Role.Interviewer)]
-    public async Task Create_HasRecordForThisQuarterAlready_FailedResult(
+    public async Task Create_HasNoRecordForThisQuarterAlready_Ok(
         Role userRole)
     {
         await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(userRole).PleaseAsync(context);
 
-        var request = new CreateSalaryRecordRequest
+        var request = new CreateOrEditSalaryRecordRequest
         {
             Value = 100_000,
             Quarter = 1,
@@ -107,7 +107,7 @@ public class SalariesControllerTests
         await using var context = new SqliteContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
-        var request = new CreateSalaryRecordRequest
+        var request = new CreateOrEditSalaryRecordRequest
         {
             Value = 100_000,
             Quarter = quarter,
@@ -138,7 +138,7 @@ public class SalariesControllerTests
         await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
-        var request = new CreateSalaryRecordRequest
+        var request = new CreateOrEditSalaryRecordRequest
         {
             Value = 100_000,
             Quarter = 1,
@@ -168,7 +168,7 @@ public class SalariesControllerTests
         await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
-        var request = new CreateSalaryRecordRequest
+        var request = new CreateOrEditSalaryRecordRequest
         {
             Value = value,
             Quarter = 1,
@@ -187,6 +187,129 @@ public class SalariesControllerTests
                     default));
 
         Assert.Equal(0, context.Salaries.Count());
+    }
+
+    [Fact]
+    public async Task Update_HasNoRecordForNewQuarterAlready_Ok()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var salary = await new UserSalaryFake(user).PleaseAsync(context);
+
+        var request = new CreateOrEditSalaryRecordRequest
+        {
+            Value = 600_000,
+            Quarter = 3,
+            Year = 2023,
+            Currency = Currency.KZT,
+            Company = CompanyType.Foreign,
+            Grade = DeveloperGrade.Middle,
+            Profession = UserProfession.ProductOwner,
+        };
+
+        Assert.NotEqual(request.Value, salary.Value);
+        Assert.NotEqual(request.Quarter, salary.Quarter);
+        Assert.NotEqual(request.Year, salary.Year);
+        Assert.NotEqual(request.Company, salary.Company);
+        Assert.NotEqual(request.Grade, salary.Grade);
+
+        var result = await new SalariesController(new FakeAuth(user), context)
+            .Update(salary.Id, request, default);
+
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.ErrorMessage);
+
+        Assert.Equal(result.CreatedSalary.Value, salary.Value);
+        Assert.Equal(result.CreatedSalary.Quarter, salary.Quarter);
+        Assert.Equal(result.CreatedSalary.Year, salary.Year);
+        Assert.Equal(result.CreatedSalary.Currency, salary.Currency);
+        Assert.Equal(result.CreatedSalary.Company, salary.Company);
+        Assert.Equal(result.CreatedSalary.Grade, salary.Grade);
+
+        Assert.Equal(1, context.Salaries.Count());
+    }
+
+    [Fact]
+    public async Task Update_HasNoRecordForNewQuarterAlready_UpdateByAdmin_Ok()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user = await new FakeUser(Role.Admin).PleaseAsync(context);
+        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var salary = await new UserSalaryFake(user1).PleaseAsync(context);
+
+        var request = new CreateOrEditSalaryRecordRequest
+        {
+            Value = 600_000,
+            Quarter = 3,
+            Year = 2023,
+            Currency = Currency.KZT,
+            Company = CompanyType.Foreign,
+            Grade = DeveloperGrade.Middle,
+            Profession = UserProfession.ProductOwner,
+        };
+
+        Assert.NotEqual(request.Value, salary.Value);
+        Assert.NotEqual(request.Quarter, salary.Quarter);
+        Assert.NotEqual(request.Year, salary.Year);
+        Assert.NotEqual(request.Company, salary.Company);
+        Assert.NotEqual(request.Grade, salary.Grade);
+
+        var result = await new SalariesController(new FakeAuth(user), context)
+            .Update(salary.Id, request, default);
+
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.ErrorMessage);
+
+        Assert.Equal(result.CreatedSalary.Value, salary.Value);
+        Assert.Equal(result.CreatedSalary.Quarter, salary.Quarter);
+        Assert.Equal(result.CreatedSalary.Year, salary.Year);
+        Assert.Equal(result.CreatedSalary.Currency, salary.Currency);
+        Assert.Equal(result.CreatedSalary.Company, salary.Company);
+        Assert.Equal(result.CreatedSalary.Grade, salary.Grade);
+
+        Assert.Equal(1, context.Salaries.Count());
+    }
+
+    [Fact]
+    public async Task Update_HasRecordForNewQuarterAlready_ErrorReturned()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var salary1 = await new UserSalaryFake(
+            user,
+            quarter: 1,
+            year: 2024)
+            .PleaseAsync(context);
+
+        var salary2 = await new UserSalaryFake(
+                user,
+                quarter: 3,
+                year: 2023)
+            .PleaseAsync(context);
+
+        var request = new CreateOrEditSalaryRecordRequest
+        {
+            Value = 600_000,
+            Quarter = salary2.Quarter,
+            Year = salary2.Year,
+            Currency = Currency.KZT,
+            Company = CompanyType.Foreign,
+            Grade = DeveloperGrade.Middle,
+            Profession = UserProfession.ProductOwner,
+        };
+
+        Assert.NotEqual(request.Value, salary1.Value);
+        Assert.NotEqual(request.Quarter, salary1.Quarter);
+        Assert.NotEqual(request.Year, salary1.Year);
+        Assert.NotEqual(request.Company, salary1.Company);
+        Assert.NotEqual(request.Grade, salary1.Grade);
+
+        var result = await new SalariesController(new FakeAuth(user), context)
+            .Update(salary1.Id, request, default);
+
+        Assert.False(result.IsSuccess);
+        Assert.NotNull(result.ErrorMessage);
+        Assert.Null(result.CreatedSalary);
     }
 
     [Fact]
