@@ -1,11 +1,10 @@
 ﻿using System;
-using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Exceptions;
 
 namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 
-public record CreateOrEditSalaryRecordRequest
+public record CreateOrEditSalaryRecordRequest : EditSalaryRequest
 {
     public double Value { get; init; }
 
@@ -17,14 +16,12 @@ public record CreateOrEditSalaryRecordRequest
 
     public CompanyType Company { get; init; }
 
-    public DeveloperGrade? Grade { get; init; }
-
     public UserProfession Profession { get; init; }
 
-    public long? SkillId { get; init; }
-
-    public void IsValidOrFail()
+    public override void IsValidOrFail()
     {
+        base.IsValidOrFail();
+
         if (Value <= 0)
         {
             throw new BadRequestException("Value must be greater than 0");
@@ -49,11 +46,6 @@ public record CreateOrEditSalaryRecordRequest
         if (Company == default)
         {
             throw new BadRequestException("Company must be specified");
-        }
-
-        if (Grade == DeveloperGrade.Unknown)
-        {
-            throw new BadRequestException("Grade must be valid");
         }
 
         if (Profession == UserProfession.Undefined)
