@@ -67,19 +67,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     public virtual Skill Skill { get; protected set; }
 
     public void Update(
-        double value,
-        int quarter,
-        int year,
-        Currency currency,
-        CompanyType company,
-        DeveloperGrade? grade)
+        DeveloperGrade grade)
     {
-        Value = NonNegativeValue(value);
-        Quarter = NonNegativeValue(quarter);
-        Year = NonNegativeValue(year);
-
-        Currency = currency;
-        Company = company;
         Grade = grade;
     }
 

@@ -196,21 +196,11 @@ public class SalariesControllerTests
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
         var salary = await new UserSalaryFake(user).PleaseAsync(context);
 
-        var request = new CreateOrEditSalaryRecordRequest
+        var request = new EditSalaryRequest
         {
-            Value = 600_000,
-            Quarter = 3,
-            Year = 2023,
-            Currency = Currency.KZT,
-            Company = CompanyType.Foreign,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.ProductOwner,
         };
 
-        Assert.NotEqual(request.Value, salary.Value);
-        Assert.NotEqual(request.Quarter, salary.Quarter);
-        Assert.NotEqual(request.Year, salary.Year);
-        Assert.NotEqual(request.Company, salary.Company);
         Assert.NotEqual(request.Grade, salary.Grade);
 
         var result = await new SalariesController(new FakeAuth(user), context)

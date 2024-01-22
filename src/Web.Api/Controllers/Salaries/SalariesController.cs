@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -203,7 +202,7 @@ public class SalariesController : ControllerBase
     [HttpPost("{id:guid}")]
     public async Task<CreateOrEditSalaryRecordResponse> Update(
         [FromRoute] Guid id,
-        [FromBody] CreateOrEditSalaryRecordRequest request,
+        [FromBody] EditSalaryRequest request,
         CancellationToken cancellationToken)
     {
         request.IsValidOrFail();
@@ -219,26 +218,7 @@ public class SalariesController : ControllerBase
             throw new ForbiddenException("You can only edit your own salary records");
         }
 
-        var anotherUserSalaryForThisQuarter = await _context.Salaries
-            .Where(x =>
-                x.UserId == salary.UserId &&
-                x.Quarter == request.Quarter &&
-                x.Year == request.Year)
-            .Where(x => x.Id != salary.Id)
-            .AnyAsync(cancellationToken);
-
-        if (anotherUserSalaryForThisQuarter)
-        {
-            return CreateOrEditSalaryRecordResponse.Failure($"You already have a record for this quarter: {request.Quarter}.{request.Year}");
-        }
-
-        salary.Update(
-            request.Value,
-            request.Quarter,
-            request.Year,
-            request.Currency,
-            request.Company,
-            request.Grade);
+        salary.Update(request.Grade);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
