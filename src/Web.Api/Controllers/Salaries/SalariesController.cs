@@ -122,6 +122,8 @@ public class SalariesController : ControllerBase
             .Where(x => x.Profession != UserProfession.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
+            .When(request.ProfessionsToInclude.Any(), x => request.ProfessionsToInclude.Contains(x.Profession))
+            .When(request.ProfessionsToExclude.Any(), x => !request.ProfessionsToExclude.Contains(x.Profession))
             .Select(x => new UserSalaryDto
             {
                 Value = x.Value,
