@@ -20,6 +20,7 @@ using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TechInterviewer.Setup.Attributes;
+using BadRequestException = Domain.Exceptions.BadRequestException;
 
 namespace TechInterviewer.Controllers.Salaries;
 
@@ -227,6 +228,27 @@ public class SalariesController : ControllerBase
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
+    }
+
+    [HttpPost("{id:guid}/approve")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> Approve(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var salary = await _context.Salaries
+                         .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+                     ?? throw new ResourceNotFoundException("Salary record not found");
+
+        if (salary.UseInStats)
+        {
+            throw new BadRequestException("Salary record is already approved");
+        }
+
+        salary.Approve();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok();
     }
 
     [HttpDelete("{id:guid}")]

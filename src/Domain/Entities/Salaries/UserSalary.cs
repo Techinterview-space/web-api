@@ -74,6 +74,13 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         DeveloperGrade grade)
     {
         Grade = grade;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Approve()
+    {
+        UseInStats = true;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     private static double NonNegativeValue(double value)
