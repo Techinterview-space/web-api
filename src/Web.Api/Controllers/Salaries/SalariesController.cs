@@ -240,11 +240,6 @@ public class SalariesController : ControllerBase
                          .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
                      ?? throw new ResourceNotFoundException("Salary record not found");
 
-        if (salary.UseInStats)
-        {
-            throw new BadRequestException("Salary record is already approved");
-        }
-
         salary.Approve();
         await _context.SaveChangesAsync(cancellationToken);
 

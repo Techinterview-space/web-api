@@ -79,6 +79,11 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public void Approve()
     {
+        if (UseInStats)
+        {
+            throw new BadRequestException("Salary record is already approved");
+        }
+
         UseInStats = true;
         UpdatedAt = DateTime.UtcNow;
     }
