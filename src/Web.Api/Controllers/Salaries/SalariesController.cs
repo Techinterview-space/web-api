@@ -20,6 +20,7 @@ using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TechInterviewer.Setup.Attributes;
+using BadRequestException = Domain.Exceptions.BadRequestException;
 
 namespace TechInterviewer.Controllers.Salaries;
 
@@ -45,24 +46,17 @@ public class SalariesController : ControllerBase
         [FromQuery] GetAllSalariesRequest request,
         CancellationToken cancellationToken)
     {
-        return await _context.Salaries
-            .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
-            .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.Profession.HasValue, x => x.Profession == request.Profession.Value)
-            .Select(x => new UserSalaryAdminDto
-            {
-                Id = x.Id,
-                Value = x.Value,
-                Quarter = x.Quarter,
-                Year = x.Year,
-                Currency = x.Currency,
-                Company = x.Company,
-                Grade = x.Grade,
-                Profession = x.Profession,
-                CreatedAt = x.CreatedAt
-            })
-            .AsNoTracking()
-            .OrderByDescending(x => x.CreatedAt)
+        return await GetAllSalariesQuery(request, true)
+            .AsPaginatedAsync(request, cancellationToken);
+    }
+
+    [HttpGet("not-in-stats")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<Pageable<UserSalaryAdminDto>> AllNotShownInStatsAsync(
+        [FromQuery] GetAllSalariesRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await GetAllSalariesQuery(request, false)
             .AsPaginatedAsync(request, cancellationToken);
     }
 
@@ -122,13 +116,9 @@ public class SalariesController : ControllerBase
             .ThenByDescending(x => x.Quarter)
             .ToListAsync(cancellationToken);
 
-        if (!userSalariesForLastYear.Any())
-        {
-            return SalariesChartResponse.RequireOwnSalary();
-        }
-
         var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
-        var salaries = await _context.Salaries
+        var query = _context.Salaries
+            .Where(x => x.UseInStats)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .Select(x => new UserSalaryDto
@@ -143,14 +133,22 @@ public class SalariesController : ControllerBase
                 CreatedAt = x.CreatedAt
             })
             .OrderBy(x => x.Value)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+            .AsNoTracking();
+
+        if (!userSalariesForLastYear.Any())
+        {
+            return SalariesChartResponse.RequireOwnSalary(
+                await query.CountAsync(cancellationToken));
+        }
+
+        var salaries = await query.ToListAsync(cancellationToken);
 
         return new SalariesChartResponse(
             salaries,
             new UserSalaryAdminDto(userSalariesForLastYear.First()),
             yearAgoGap,
-            DateTimeOffset.Now);
+            DateTimeOffset.Now,
+            salaries.Count);
     }
 
     [HttpPost("")]
@@ -182,6 +180,13 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
         }
 
+        var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
+            _context,
+            request.Value,
+            request.Grade,
+            request.Company)
+            .DecideAsync(cancellationToken);
+
         var salary = await _context.SaveAsync(
             new UserSalary(
                 user,
@@ -192,7 +197,8 @@ public class SalariesController : ControllerBase
                 request.Grade,
                 request.Company,
                 request.Profession,
-                skill?.Id),
+                skill?.Id,
+                shouldShowInStats),
             cancellationToken);
 
         return CreateOrEditSalaryRecordResponse.Success(
@@ -224,6 +230,27 @@ public class SalariesController : ControllerBase
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
     }
 
+    [HttpPost("{id:guid}/approve")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> Approve(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var salary = await _context.Salaries
+                         .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+                     ?? throw new ResourceNotFoundException("Salary record not found");
+
+        if (salary.UseInStats)
+        {
+            throw new BadRequestException("Salary record is already approved");
+        }
+
+        salary.Approve();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+
     [HttpDelete("{id:guid}")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Delete(
@@ -238,5 +265,30 @@ public class SalariesController : ControllerBase
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok();
+    }
+
+    private IQueryable<UserSalaryAdminDto> GetAllSalariesQuery(
+        GetAllSalariesRequest request,
+        bool? showInStats)
+    {
+        return _context.Salaries
+            .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
+            .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
+            .When(request.Profession.HasValue, x => x.Profession == request.Profession.Value)
+            .When(showInStats.HasValue, x => x.UseInStats == showInStats.Value)
+            .Select(x => new UserSalaryAdminDto
+            {
+                Id = x.Id,
+                Value = x.Value,
+                Quarter = x.Quarter,
+                Year = x.Year,
+                Currency = x.Currency,
+                Company = x.Company,
+                Grade = x.Grade,
+                Profession = x.Profession,
+                CreatedAt = x.CreatedAt
+            })
+            .AsNoTracking()
+            .OrderByDescending(x => x.CreatedAt);
     }
 }

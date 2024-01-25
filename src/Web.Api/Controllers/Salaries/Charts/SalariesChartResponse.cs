@@ -13,13 +13,15 @@ public record SalariesChartResponse
         List<UserSalaryDto> salaries,
         UserSalaryAdminDto currentUserSalary,
         DateTimeOffset? rangeStart,
-        DateTimeOffset? rangeEnd)
+        DateTimeOffset? rangeEnd,
+        int totalCountInStats)
         : this(
             salaries,
             currentUserSalary,
             false,
             rangeStart,
-            rangeEnd)
+            rangeEnd,
+            totalCountInStats)
     {
     }
 
@@ -28,13 +30,15 @@ public record SalariesChartResponse
         UserSalaryAdminDto currentUserSalary,
         bool shouldAddOwnSalary,
         DateTimeOffset? rangeStart,
-        DateTimeOffset? rangeEnd)
+        DateTimeOffset? rangeEnd,
+        int totalCountInStats)
     {
         Salaries = salaries;
         CurrentUserSalary = currentUserSalary;
         ShouldAddOwnSalary = shouldAddOwnSalary;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
+        TotalCountInStats = totalCountInStats;
 
         var localSalaries = salaries
             .Where(x => x.Company == CompanyType.Local)
@@ -65,17 +69,21 @@ public record SalariesChartResponse
         }
     }
 
-    public static SalariesChartResponse RequireOwnSalary()
+    public static SalariesChartResponse RequireOwnSalary(
+        int totalCountInStats)
     {
         return new (
             new List<UserSalaryDto>(),
             null,
             true,
             null,
-            null);
+            null,
+            totalCountInStats);
     }
 
     public List<UserSalaryDto> Salaries { get; }
+
+    public int TotalCountInStats { get; }
 
     public UserSalaryAdminDto CurrentUserSalary { get; }
 

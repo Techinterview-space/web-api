@@ -22,7 +22,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         DeveloperGrade? grade,
         CompanyType company,
         UserProfession profession,
-        long? skillId)
+        long? skillId,
+        bool useInStats)
     {
         Id = Guid.NewGuid();
         UserId = user.Id;
@@ -35,6 +36,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Company = company;
         Profession = profession;
         SkillId = skillId;
+        UseInStats = useInStats;
     }
 
     public Guid Id { get; }
@@ -62,6 +64,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     [NotDefaultValue]
     public UserProfession Profession { get; protected set; }
 
+    public bool UseInStats { get; protected set; }
+
     public long? SkillId { get; protected set; }
 
     public virtual Skill Skill { get; protected set; }
@@ -70,6 +74,13 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         DeveloperGrade grade)
     {
         Grade = grade;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Approve()
+    {
+        UseInStats = true;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     private static double NonNegativeValue(double value)
