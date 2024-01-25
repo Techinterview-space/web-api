@@ -14,7 +14,7 @@ public record UserSalaryShowInStatsDecisionMaker
     private const int GapInPercentForMinimalSalary = 40;
     private const int GapInPercentForMaximalSalary = 20;
 
-    private const int MinCountOfSalariesToDoDecision = 10;
+    private const int MinCountOfSalariesToDoDecision = 5;
 
     private readonly DatabaseContext _context;
     private readonly double _salary;
