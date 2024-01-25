@@ -44,6 +44,7 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         const DeveloperGrade grade = DeveloperGrade.Middle;
         const CompanyType company = CompanyType.Local;
+        const UserProfession profession = UserProfession.Developer;
 
         foreach (var salaryValue in _salaryValues)
         {
@@ -60,7 +61,8 @@ public class UserSalaryShowInStatsDecisionMakerTests
             context,
             salaryToDecide,
             grade,
-            company);
+            company,
+            profession);
 
         var result = await decisionMaker.DecideAsync(default);
         Assert.Equal(expected, result);

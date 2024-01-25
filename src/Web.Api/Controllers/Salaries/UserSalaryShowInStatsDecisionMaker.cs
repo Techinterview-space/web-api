@@ -14,21 +14,26 @@ public record UserSalaryShowInStatsDecisionMaker
     private const int GapInPercentForMinimalSalary = 40;
     private const int GapInPercentForMaximalSalary = 20;
 
+    private const int MinCountOfSalariesToDoDecision = 10;
+
     private readonly DatabaseContext _context;
     private readonly double _salary;
     private readonly DeveloperGrade _salaryGrade;
     private readonly CompanyType _company;
+    private readonly UserProfession _profession;
 
     public UserSalaryShowInStatsDecisionMaker(
         DatabaseContext context,
         double salary,
         DeveloperGrade salaryGrade,
-        CompanyType company)
+        CompanyType company,
+        UserProfession profession)
     {
         _context = context;
         _salary = salary;
         _salaryGrade = salaryGrade;
         _company = company;
+        _profession = profession;
     }
 
     public async Task<bool> DecideAsync(
@@ -40,12 +45,13 @@ public record UserSalaryShowInStatsDecisionMaker
             .Where(x =>
                 x.Company == _company &&
                 x.Grade == _salaryGrade &&
+                x.Profession == _profession &&
                 x.UseInStats)
             .OrderBy(x => x.Value)
             .Select(x => x.Value)
             .ToListAsync(cancellationToken);
 
-        if (salaryValues.Count < 10)
+        if (salaryValues.Count < MinCountOfSalariesToDoDecision)
         {
             return true;
         }

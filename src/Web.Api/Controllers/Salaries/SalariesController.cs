@@ -119,6 +119,7 @@ public class SalariesController : ControllerBase
         var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
         var query = _context.Salaries
             .Where(x => x.UseInStats)
+            .Where(x => x.Profession != UserProfession.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .Select(x => new UserSalaryDto
@@ -184,7 +185,8 @@ public class SalariesController : ControllerBase
             _context,
             request.Value,
             request.Grade,
-            request.Company)
+            request.Company,
+            request.Profession)
             .DecideAsync(cancellationToken);
 
         var salary = await _context.SaveAsync(
