@@ -10,9 +10,9 @@ public record SalariesChartQueryParams
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }
 
-    [FromQuery(Name = "prof_include")]
+    [FromQuery(Name = "profsInclude")]
     public List<UserProfession> ProfessionsToInclude { get; init; } = new ();
 
-    [FromQuery(Name = "prof_exclude")]
+    [FromQuery(Name = "profsExclude")]
     public List<UserProfession> ProfessionsToExclude { get; init; } = new ();
 }
