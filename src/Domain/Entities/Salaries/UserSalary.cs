@@ -71,9 +71,12 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     public virtual Skill Skill { get; protected set; }
 
     public void Update(
-        DeveloperGrade grade)
+        DeveloperGrade grade,
+        UserProfession profession)
     {
         Grade = grade;
+        Profession = profession;
+
         UpdatedAt = DateTime.UtcNow;
     }
 
