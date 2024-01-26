@@ -16,8 +16,6 @@ public record CreateOrEditSalaryRecordRequest : EditSalaryRequest
 
     public CompanyType Company { get; init; }
 
-    public UserProfession Profession { get; init; }
-
     public override void IsValidOrFail()
     {
         base.IsValidOrFail();
@@ -46,11 +44,6 @@ public record CreateOrEditSalaryRecordRequest : EditSalaryRequest
         if (Company == default)
         {
             throw new BadRequestException("Company must be specified");
-        }
-
-        if (Profession == UserProfession.Undefined)
-        {
-            throw new BadRequestException("Profession must be valid");
         }
     }
 }

@@ -228,7 +228,9 @@ public class SalariesController : ControllerBase
             throw new ForbiddenException("You can only edit your own salary records");
         }
 
-        salary.Update(request.Grade);
+        salary.Update(
+            request.Grade,
+            request.Profession);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
