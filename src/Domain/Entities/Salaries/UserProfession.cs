@@ -57,4 +57,36 @@ public enum UserProfession
     ProductDesigner = 26,
 
     HrNonIt = 27,
+
+    OneCDeveloper = 28,
+
+    ThreeDModeler = 29,
+
+    AndroidDeveloper = 30,
+
+    IosDeveloper = 31,
+
+    MobileDeveloper = 32,
+
+    FrontendDeveloper = 33,
+
+    BackendDeveloper = 34,
+
+    FullstackDeveloper = 35,
+
+    GameDeveloper = 36,
+
+    EmbeddedDeveloper = 37,
+
+    MachineLearningDeveloper = 38,
+
+    Pentester = 39,
+
+    SecurityEngineer = 40,
+
+    SecurityAnalyst = 41,
+
+    TechnicalWriter = 42,
+
+    BiDeveloper = 43,
 }
