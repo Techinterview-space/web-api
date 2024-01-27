@@ -293,6 +293,76 @@ public class SalariesControllerTests
     }
 
     [Fact]
+    public async Task Chart_NoCurrentUser_Ok()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user3 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
+        var salary11 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary12 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 700_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1))
+            .AsDomain());
+
+        var salary21 = await context.SaveAsync(new UserSalaryFake(
+                user2,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary22 = await context.SaveAsync(new UserSalaryFake(
+                user2,
+                value: 600_000,
+                profession: UserProfession.BusinessAnalyst,
+                createdAt: DateTimeOffset.Now.AddDays(-4))
+            .AsDomain());
+
+        var salary31 = await context.SaveAsync(new UserSalaryFake(
+                user3,
+                value: 400_000,
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            .AsDomain());
+
+        var salary32 = await context.SaveAsync(new UserSalaryFake(
+                user3,
+                value: 650_000,
+                profession: UserProfession.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2))
+            .AsDomain());
+
+        var salary33 = await context.SaveAsync(new UserSalaryFake(
+                user3,
+                value: 1_260_000,
+                profession: UserProfession.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2))
+            .AsDomain());
+
+        var createdSalaries = context.Salaries.ToList();
+        Assert.Equal(7, createdSalaries.Count);
+
+        var salariesResponse = await new SalariesController(
+                new FakeAuth(null),
+                context)
+            .ChartAsync(new SalariesChartQueryParams(), default);
+
+        Assert.True(salariesResponse.ShouldAddOwnSalary);
+        Assert.Equal(4, salariesResponse.TotalCountInStats);
+        Assert.Empty(salariesResponse.Salaries);
+        Assert.Equal(802_500, salariesResponse.AverageSalary);
+        Assert.Equal(675_000, salariesResponse.MedianSalary);
+
+        Assert.Null(salariesResponse.SalariesByMoneyBarChart);
+    }
+
+    [Fact]
     public async Task Chart_UserHasSalaryForLastQuarter_Ok()
     {
         await using var context = new InMemoryDatabaseContext();

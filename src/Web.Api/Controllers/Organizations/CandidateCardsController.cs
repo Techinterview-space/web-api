@@ -61,7 +61,7 @@ public class CandidateCardsController : ControllerBase
         [FromRoute] Guid organizationId,
         [FromQuery] CandidateCardsFilterRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(organizationId))
         {
             return Forbid();
@@ -79,7 +79,7 @@ public class CandidateCardsController : ControllerBase
     public async Task<IActionResult> AvailableCandidatesAsync(
         [FromRoute] Guid organizationId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(organizationId))
         {
             return Forbid();
@@ -97,7 +97,7 @@ public class CandidateCardsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ByIdAsync([FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var candidateCard = await _context.CandidateCards
             .Include(x => x.Candidate)
@@ -122,7 +122,7 @@ public class CandidateCardsController : ControllerBase
     public async Task<IActionResult> CreateAsync(
         [FromBody] EditCandidateCardRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(request.OrganizationId))
         {
             return Forbid();
@@ -168,7 +168,7 @@ public class CandidateCardsController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] EditCandidateCardRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(request.OrganizationId))
         {
             return Forbid();
@@ -203,7 +203,7 @@ public class CandidateCardsController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] EditCandidateCardEmploymentStatusRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(request.OrganizationId))
         {
             return Forbid();
@@ -223,7 +223,7 @@ public class CandidateCardsController : ControllerBase
     public async Task<IActionResult> ArchiveAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var card = await _context.CandidateCards.ByIdOrFailAsync(id);
 
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(card.OrganizationId))
@@ -245,7 +245,7 @@ public class CandidateCardsController : ControllerBase
     public async Task<IActionResult> RestoreAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var card = await _context.CandidateCards.ByIdOrFailAsync(id);
 
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(card.OrganizationId))
@@ -267,7 +267,7 @@ public class CandidateCardsController : ControllerBase
     public async Task<IActionResult> RemoveAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var card = await _context.CandidateCards
             .Include(x => x.Comments)
             .Include(x => x.Interviews)
@@ -297,7 +297,7 @@ public class CandidateCardsController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] AddCommentRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var card = await _context.CandidateCards
             .Include(x => x.Comments)
             .ByIdOrFailAsync(id);
@@ -326,7 +326,7 @@ public class CandidateCardsController : ControllerBase
         [FromRoute] Guid id,
         [FromRoute] long commentId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var card = await _context.CandidateCards
             .Include(x => x.Comments)
             .ByIdOrFailAsync(id);

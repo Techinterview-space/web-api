@@ -87,7 +87,7 @@ public class OrganizationsController : ControllerBase
     [HttpGet("created-by-me")]
     public async Task<IEnumerable<OrganizationDto>> CreatedByMeAsync()
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         return await _context.Organizations
             .Where(x => x.ManagerId == currentUser.Id)
@@ -97,7 +97,7 @@ public class OrganizationsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<OrganizationDto> ByIdAsync([FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var query = _context.Organizations
             .Include(x => x.Manager);
@@ -121,7 +121,7 @@ public class OrganizationsController : ControllerBase
     [HttpGet("{id:guid}/simple")]
     public async Task<IActionResult> ByIdSimpleAsync([FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (currentUser.Has(Role.Admin) || currentUser.IsMyOrganization(id))
         {
             return Ok(new OrganizationSimpleDto(
@@ -136,7 +136,7 @@ public class OrganizationsController : ControllerBase
     [HttpPost("")]
     public async Task<IActionResult> CreateAsync([FromBody] CreateOrganizationRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var entry = await _context.Organizations.AddAsync(new Organization(
             request.Name,
@@ -150,7 +150,7 @@ public class OrganizationsController : ControllerBase
     [HttpPut("")]
     public async Task<IActionResult> UpdateAsync([FromBody] UpdateOrganizationRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var organization = await _context.Organizations.ByIdOrFailAsync(request.Id);
         if (!organization.CouldBeModifiedBy(currentUser))
@@ -172,7 +172,7 @@ public class OrganizationsController : ControllerBase
             .Include(x => x.Users)
             .ByIdOrFailAsync(organizationId);
 
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!organization.HasUser(currentUser))
         {
             return BadRequest("User is not a member of this organization");
@@ -231,7 +231,7 @@ public class OrganizationsController : ControllerBase
         [FromRoute] Guid organizationId,
         [FromRoute] long userId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var organization = await _context.Organizations
             .Include(x => x.Users)
             .ByIdOrFailAsync(organizationId);
@@ -259,7 +259,7 @@ public class OrganizationsController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var organization = await _context.Organizations
             .Include(x => x.Invitations)
@@ -333,7 +333,7 @@ public class OrganizationsController : ControllerBase
         [FromQuery] PageModel pagination)
     {
         pagination ??= PageModel.Default;
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (currentUser.IsMyOrganization(organizationId) || currentUser.Has(Role.Admin))
         {
             return Ok(
@@ -353,7 +353,7 @@ public class OrganizationsController : ControllerBase
         [FromQuery] PageModel pagination)
     {
         pagination ??= PageModel.Default;
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (currentUser.IsMyOrganization(organizationId) || currentUser.Has(Role.Admin))
         {
             return Ok(
@@ -372,7 +372,7 @@ public class OrganizationsController : ControllerBase
         [FromRoute] Guid organizationId,
         [FromQuery] CandidateCardsFilterPaginatedRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(organizationId))
         {
             return Forbid();
@@ -391,7 +391,7 @@ public class OrganizationsController : ControllerBase
         [FromRoute] Guid organizationId,
         [FromQuery] PageModel request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(organizationId))
         {
             return Forbid();

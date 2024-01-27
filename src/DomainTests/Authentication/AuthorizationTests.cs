@@ -27,7 +27,7 @@ public class AuthorizationTests
 
         Assert.False(await context.Users.AnyAsync());
 
-        var currentUser = await target.CurrentUserAsync();
+        var currentUser = await target.CurrentUserOrNullAsync();
         Assert.Equal(1, await context.Users.CountAsync());
 
         Assert.Equal("42", currentUser.IdentityId);
@@ -54,7 +54,7 @@ public class AuthorizationTests
             context);
 
         Assert.Equal(1, await context.Users.CountAsync());
-        var currentUser = await target.CurrentUserAsync();
+        var currentUser = await target.CurrentUserOrNullAsync();
         Assert.Equal(1, await context.Users.CountAsync());
 
         Assert.Equal(oldUser.Id, currentUser.Id);

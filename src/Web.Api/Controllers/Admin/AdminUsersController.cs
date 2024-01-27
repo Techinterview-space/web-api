@@ -124,7 +124,7 @@ public class AdminUsersController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete([FromRoute] long id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         currentUser.HasAnyOrFail(Role.Admin);
 
         var user = (await _context.Users
@@ -146,7 +146,7 @@ public class AdminUsersController : ControllerBase
     [HttpPut("{id:long}/restore")]
     public async Task<IActionResult> Restore([FromRoute] long id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         currentUser.HasAnyOrFail(Role.Admin);
 
         var user = (await _context.Users

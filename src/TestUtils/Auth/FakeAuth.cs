@@ -18,7 +18,12 @@ public class FakeAuth : IAuthorization
         _user = user;
     }
 
-    public Task<User> CurrentUserAsync()
+    public Task<User> CurrentUserOrFailAsync()
+    {
+        return CurrentUserOrNullAsync();
+    }
+
+    public Task<User> CurrentUserOrNullAsync()
     {
         return Task.FromResult(_user);
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,13 +21,11 @@ using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TechInterviewer.Setup.Attributes;
-using BadRequestException = Domain.Exceptions.BadRequestException;
 
 namespace TechInterviewer.Controllers.Salaries;
 
 [ApiController]
 [Route("api/salaries")]
-[HasAnyRole]
 public class SalariesController : ControllerBase
 {
     private readonly IAuthorization _auth;
@@ -103,18 +102,23 @@ public class SalariesController : ControllerBase
         [FromQuery] SalariesChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserAsync();
-        var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
-        var currentQuarter = DateQuarter.Current;
-        var userSalariesForLastYear = await _context.Salaries
-            .Where(x => x.UserId == user.Id)
-            .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
-            .AsNoTracking()
-            .OrderByDescending(x => x.Year)
-            .ThenByDescending(x => x.Quarter)
-            .ToListAsync(cancellationToken);
+        var userSalariesForLastYear = new List<UserSalary>();
+        if (currentUser != null)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
+
+            var currentQuarter = DateQuarter.Current;
+            userSalariesForLastYear = await _context.Salaries
+                .Where(x => x.UserId == user.Id)
+                .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
+                .AsNoTracking()
+                .OrderByDescending(x => x.Year)
+                .ThenByDescending(x => x.Quarter)
+                .ToListAsync(cancellationToken);
+        }
 
         var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
         var query = _context.Salaries
@@ -138,7 +142,7 @@ public class SalariesController : ControllerBase
             .OrderBy(x => x.Value)
             .AsNoTracking();
 
-        if (!userSalariesForLastYear.Any())
+        if (currentUser == null || !userSalariesForLastYear.Any())
         {
             var salaryValues = await query
                 .Select(x => x.Value)
@@ -158,13 +162,14 @@ public class SalariesController : ControllerBase
     }
 
     [HttpPost("")]
+    [HasAnyRole]
     public async Task<CreateOrEditSalaryRecordResponse> Create(
         [FromBody] CreateOrEditSalaryRecordRequest request,
         CancellationToken cancellationToken)
     {
         request.IsValidOrFail();
 
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
@@ -213,6 +218,7 @@ public class SalariesController : ControllerBase
     }
 
     [HttpPost("{id:guid}")]
+    [HasAnyRole]
     public async Task<CreateOrEditSalaryRecordResponse> Update(
         [FromRoute] Guid id,
         [FromBody] EditSalaryRequest request,
@@ -223,7 +229,7 @@ public class SalariesController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
             ?? throw new ResourceNotFoundException("Salary record not found");
 
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         if (!currentUser.Has(Role.Admin) &&
             salary.UserId != currentUser.Id)

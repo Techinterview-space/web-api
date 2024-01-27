@@ -62,7 +62,7 @@ public class InterviewTemplateController : ControllerBase
     [HasAnyRole]
     public async Task<IEnumerable<InterviewTemplateDto>> AvailableForInterviewAsync()
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var query = _context.InterviewTemplates
             .Include(x => x.Author)
             .Include(x => x.Labels);
@@ -88,7 +88,7 @@ public class InterviewTemplateController : ControllerBase
     [HasAnyRole]
     public async Task<IEnumerable<InterviewTemplateDto>> MyTemplatesAsync()
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         return await _context.InterviewTemplates
             .Include(x => x.Labels)
             .Where(x => x.AuthorId == currentUser.Id)
@@ -112,7 +112,7 @@ public class InterviewTemplateController : ControllerBase
             return Ok(new InterviewTemplateDto(template));
         }
 
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (template.CouldBeOpenBy(currentUser))
         {
             return Ok(new InterviewTemplateDto(template));
@@ -125,7 +125,7 @@ public class InterviewTemplateController : ControllerBase
     [HasAnyRole]
     public async Task<IActionResult> CreateAsync([FromBody] InterviewTemplateCreateRequest createRequest)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (createRequest.OrganizationId != null &&
             !currentUser.IsMyOrganization(createRequest.OrganizationId.Value))
         {
@@ -151,7 +151,7 @@ public class InterviewTemplateController : ControllerBase
     [HasAnyRole]
     public async Task<IActionResult> UpdateAsync([FromBody] InterviewTemplateUpdateRequest updateRequest)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var interviewTemplate = await _context.InterviewTemplates
             .Include(x => x.Labels)
             .ByIdOrFailAsync(updateRequest.Id);
@@ -186,7 +186,7 @@ public class InterviewTemplateController : ControllerBase
     public async Task<IActionResult> DeleteAsync(Guid id)
     {
         var interviewTemplate = await _context.InterviewTemplates.ByIdOrFailAsync(id);
-        if (!interviewTemplate.CouldBeEditBy(await _auth.CurrentUserAsync()))
+        if (!interviewTemplate.CouldBeEditBy(await _auth.CurrentUserOrNullAsync()))
         {
             return StatusCode(StatusCodes.Status403Forbidden);
         }

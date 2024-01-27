@@ -41,7 +41,7 @@ public class CandidatesController : ControllerBase
     public async Task<IActionResult> ByIdAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var candidate = await _context.Candidates
             .Include(x => x.Organization)
@@ -60,7 +60,7 @@ public class CandidatesController : ControllerBase
     public async Task<IActionResult> ArchiveAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var candidate = await _context.Candidates
             .ByIdOrFailAsync(id);
@@ -84,7 +84,7 @@ public class CandidatesController : ControllerBase
     public async Task<IActionResult> RestoreAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var candidate = await _context.Candidates
             .ByIdOrFailAsync(id);
@@ -108,7 +108,7 @@ public class CandidatesController : ControllerBase
     public async Task<IActionResult> DeleteAsync(
         [FromRoute] Guid id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var candidate = await _context.Candidates
             .ByIdOrFailAsync(id);

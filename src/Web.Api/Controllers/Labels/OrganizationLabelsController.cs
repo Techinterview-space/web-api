@@ -31,7 +31,7 @@ public class OrganizationLabelsController : ControllerBase
     [HttpGet("{organizationId:guid}")]
     public async Task<IActionResult> OrgLabelsAsync([FromRoute] Guid organizationId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.Has(Role.Admin) && !currentUser.IsMyOrganization(organizationId))
         {
             return Forbid();
@@ -45,7 +45,7 @@ public class OrganizationLabelsController : ControllerBase
     [HttpPost("")]
     public async Task<IActionResult> CreateAsync([FromBody] LabelDto createRequest)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!createRequest.OrganizationId.HasValue)
         {
             return BadRequest("OrganizationId is required");
@@ -77,7 +77,7 @@ public class OrganizationLabelsController : ControllerBase
     [HttpPut("")]
     public async Task<IActionResult> UpdateAsync([FromBody] LabelDto updateRequest)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var label = await _context.OrganizationLabels.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault());
         label.CouldBeUpdatedByOrFail(currentUser);
 
@@ -92,7 +92,7 @@ public class OrganizationLabelsController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteAsync([FromRoute] long id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var label = await _context.OrganizationLabels
             .Include(x => x.Organization)
             .ByIdOrFailAsync(id);

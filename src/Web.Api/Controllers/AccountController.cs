@@ -21,6 +21,6 @@ public class AccountController : ControllerBase
     [HttpGet("me")]
     public async Task<UserDto> MeAsync()
     {
-        return new (await _auth.CurrentUserAsync());
+        return new (await _auth.CurrentUserOrNullAsync());
     }
 }

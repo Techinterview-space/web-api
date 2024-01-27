@@ -25,11 +25,22 @@ public class Authorization : IAuthorization
         _withinBackgroundJob = !_http.Exists;
     }
 
-    public async Task<User> CurrentUserAsync()
+    public async Task<User> CurrentUserOrFailAsync()
+    {
+        return await CurrentUserOrNullAsync()
+            ?? throw new InvalidOperationException("The current user is not authenticated");
+    }
+
+    public async Task<User> CurrentUserOrNullAsync()
     {
         if (_withinBackgroundJob)
         {
             throw new InvalidOperationException("The current user is not available within background class");
+        }
+
+        if (!_http.HasUserClaims)
+        {
+            return null;
         }
 
         return _userFromDatabase ??= await new CurrentUserProvider(_context, _http.CurrentUser).GetOrCreateAsync();
@@ -37,13 +48,13 @@ public class Authorization : IAuthorization
 
     public async Task<IReadOnlyCollection<Guid>> MyOrganizationsAsync()
     {
-        var user = await CurrentUserAsync();
+        var user = await CurrentUserOrNullAsync();
         return user.OrganizationUsers.Select(x => x.OrganizationId).ToArray();
     }
 
     public async Task<bool> IsMyOrganizationAsync(Guid organizationId)
     {
-        var user = await CurrentUserAsync();
+        var user = await CurrentUserOrNullAsync();
         return user.IsMyOrganization(organizationId);
     }
 
@@ -62,11 +73,11 @@ public class Authorization : IAuthorization
 
     public async Task HasRoleOrFailAsync(Role role)
     {
-        (await CurrentUserAsync()).HasOrFail(role);
+        (await CurrentUserOrNullAsync()).HasOrFail(role);
     }
 
     public async Task HasAnyRoleOrFailAsync(params Role[] roles)
     {
-        (await CurrentUserAsync()).HasAnyOrFail(roles);
+        (await CurrentUserOrNullAsync()).HasAnyOrFail(roles);
     }
 }

@@ -9,7 +9,9 @@ namespace Domain.Authentication.Abstract;
 
 public interface IAuthorization
 {
-    Task<User> CurrentUserAsync();
+    Task<User> CurrentUserOrFailAsync();
+
+    Task<User> CurrentUserOrNullAsync();
 
     Task<IReadOnlyCollection<Guid>> MyOrganizationsAsync();
 

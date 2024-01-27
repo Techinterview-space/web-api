@@ -39,7 +39,7 @@ public class OrganizationInvitationsController : ControllerBase
     [HttpGet("for-me")]
     public async Task<IEnumerable<JoinToOrgInvitationDto>> ForMeAsync()
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         return await _context.JoinToOrgInvitations
             .Include(o => o.Organization)
             .Include(x => x.Inviter)
@@ -51,7 +51,7 @@ public class OrganizationInvitationsController : ControllerBase
     public async Task<IEnumerable<JoinToOrgInvitationDto>> ForOrganizationAsync(
         [FromRoute] Guid organizationId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var organization = await _context.Organizations
             .Include(o => o.Invitations)
             .ByIdOrFailAsync(organizationId);
@@ -70,7 +70,7 @@ public class OrganizationInvitationsController : ControllerBase
     public async Task<IActionResult> InviteUserAsync(
         [FromBody] InviteUserToOrganizationRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         if (!currentUser.IsMyOrganization(request.OrganizationId))
         {
             return StatusCode(StatusCodes.Status403Forbidden);
@@ -118,7 +118,7 @@ public class OrganizationInvitationsController : ControllerBase
     public async Task<IActionResult> DeleteInvitationAsync(
         [FromRoute] Guid invitationId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var invitation = await _context.JoinToOrgInvitations
             .Include(x => x.Organization)
             .ByIdOrFailAsync(invitationId);
@@ -137,7 +137,7 @@ public class OrganizationInvitationsController : ControllerBase
     public async Task<IActionResult> AcceptInvitationAsync(
         [FromRoute] Guid invitationId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var invitation = await _context.JoinToOrgInvitations
             .Include(x => x.Organization)
             .Include(x => x.InvitedUser)
@@ -183,7 +183,7 @@ public class OrganizationInvitationsController : ControllerBase
     public async Task<IActionResult> DeclineInvitationAsync(
         [FromRoute] Guid invitationId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var invitation = await _context.JoinToOrgInvitations
             .Include(x => x.Organization)
             .Include(x => x.InvitedUser)

@@ -69,7 +69,7 @@ public class SkillsController : ControllerBase
         [FromBody] SkillEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.Skills.AnyAsync(
@@ -95,7 +95,7 @@ public class SkillsController : ControllerBase
         [FromBody] SkillEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var skill = await _context.Skills.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
         skill.CouldBeUpdatedByOrFail(currentUser);
 
@@ -112,7 +112,7 @@ public class SkillsController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var skill = await _context.Skills.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
         skill.CouldBeUpdatedByOrFail(currentUser);

@@ -16,10 +16,13 @@ public class FakeHttpContext : IHttpContext
     {
         currentUser.ThrowIfNull(nameof(currentUser));
         Exists = true;
+        HasUserClaims = currentUser != null;
         CurrentUser = currentUser;
     }
 
     public CurrentUser CurrentUser { get; }
 
     public bool Exists { get; }
+
+    public bool HasUserClaims { get; }
 }

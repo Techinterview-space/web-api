@@ -33,7 +33,7 @@ public class CandidateCvController : ControllerBase
         [FromRoute] Guid cardId,
         [FromForm] FileUploadRequest request)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var candidateCard = await _context.CandidateCards.ByIdOrFailAsync(cardId);
 
         if (!currentUser.Has(Role.Admin) &&
@@ -61,7 +61,7 @@ public class CandidateCvController : ControllerBase
         [FromRoute] Guid cardId,
         [FromRoute] Guid fileId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var candidateCard = await _context.CandidateCards.ByIdOrFailAsync(cardId);
 
         if (!currentUser.Has(Role.Admin) &&
@@ -85,7 +85,7 @@ public class CandidateCvController : ControllerBase
         [FromRoute] Guid cardId,
         [FromRoute] Guid fileId)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var candidateCard = await _context.CandidateCards.ByIdOrFailAsync(cardId);
 
         if (!currentUser.Has(Role.Admin) &&

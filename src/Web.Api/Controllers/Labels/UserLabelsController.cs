@@ -31,7 +31,7 @@ public class UserLabelsController : ControllerBase
     [HttpGet("my")]
     public async Task<IEnumerable<LabelDto>> MyLabelsAsync()
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         return await _context.UserLabels
             .Where(x => x.CreatedById == currentUser.Id)
             .AllAsync(x => new LabelDto(x));
@@ -49,7 +49,7 @@ public class UserLabelsController : ControllerBase
     [HttpPost("")]
     public async Task<IActionResult> CreateAsync([FromBody] LabelDto createRequest)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var titleUpper = createRequest.Title.ToUpperInvariant();
         if (await _context.UserLabels.AnyAsync(x =>
@@ -70,7 +70,7 @@ public class UserLabelsController : ControllerBase
     [HttpPut("")]
     public async Task<IActionResult> UpdateAsync([FromBody] LabelDto updateRequest)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var label = await _context.UserLabels.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault());
         label.CouldBeUpdatedByOrFail(currentUser);
 
@@ -85,7 +85,7 @@ public class UserLabelsController : ControllerBase
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> DeleteAsync([FromRoute] long id)
     {
-        var currentUser = await _auth.CurrentUserAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
         var label = await _context.UserLabels.ByIdOrFailAsync(id);
 
         label.CouldBeUpdatedByOrFail(currentUser);
