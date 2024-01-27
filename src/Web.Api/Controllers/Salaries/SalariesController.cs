@@ -140,8 +140,11 @@ public class SalariesController : ControllerBase
 
         if (!userSalariesForLastYear.Any())
         {
-            return SalariesChartResponse.RequireOwnSalary(
-                await query.CountAsync(cancellationToken));
+            var salaryValues = await query
+                .Select(x => x.Value)
+                .ToListAsync(cancellationToken);
+
+            return SalariesChartResponse.RequireOwnSalary(salaryValues);
         }
 
         var salaries = await query.ToListAsync(cancellationToken);

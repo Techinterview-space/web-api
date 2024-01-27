@@ -70,7 +70,7 @@ public record SalariesChartResponse
     }
 
     public static SalariesChartResponse RequireOwnSalary(
-        int totalCountInStats)
+        List<double> salaryValues)
     {
         return new (
             new List<UserSalaryDto>(),
@@ -78,7 +78,11 @@ public record SalariesChartResponse
             true,
             null,
             null,
-            totalCountInStats);
+            salaryValues.Count)
+        {
+            AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
+            MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
+        };
     }
 
     public List<UserSalaryDto> Salaries { get; }
@@ -89,9 +93,9 @@ public record SalariesChartResponse
 
     public bool ShouldAddOwnSalary { get; }
 
-    public double AverageSalary { get; }
+    public double AverageSalary { get; private set; }
 
-    public double MedianSalary { get; }
+    public double MedianSalary { get; private set; }
 
     public double? AverageRemoteSalary { get; }
 
