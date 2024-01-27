@@ -18,9 +18,7 @@ public class AppHttpContext : IHttpContext
         ?? throw new InvalidOperationException("The Http Context does not exist"));
 
     public bool Exists =>
-        _http.HttpContext != null &&
-        _http.HttpContext.User != null &&
-        _http.HttpContext.User.Claims.Any();
+        _http.HttpContext != null;
 
     public bool HasUserClaims
         => Exists &&
