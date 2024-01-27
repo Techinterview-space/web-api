@@ -281,7 +281,7 @@ public class SalariesController : ControllerBase
         GetAllSalariesRequest request,
         bool? showInStats)
     {
-        return _context.Salaries
+        var query = _context.Salaries
             .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .When(request.Profession.HasValue, x => x.Profession == request.Profession.Value)
@@ -298,7 +298,27 @@ public class SalariesController : ControllerBase
                 Profession = x.Profession,
                 CreatedAt = x.CreatedAt
             })
-            .AsNoTracking()
-            .OrderByDescending(x => x.CreatedAt);
+            .AsNoTracking();
+
+        switch (request.OrderType)
+        {
+            case GetAllSalariesOrderType.CreatedAtAsc:
+                query = query.OrderBy(x => x.CreatedAt);
+                break;
+
+            case GetAllSalariesOrderType.CreatedAtDesc:
+                query = query.OrderByDescending(x => x.CreatedAt);
+                break;
+
+            case GetAllSalariesOrderType.ValueAsc:
+                query = query.OrderBy(x => x.Value);
+                break;
+
+            case GetAllSalariesOrderType.ValueDesc:
+                query = query.OrderByDescending(x => x.Value);
+                break;
+        }
+
+        return query;
     }
 }
