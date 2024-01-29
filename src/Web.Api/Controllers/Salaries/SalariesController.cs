@@ -261,6 +261,22 @@ public class SalariesController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("{id:guid}/exclude-from-stats")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> ExcludeFromStats(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var salary = await _context.Salaries
+                         .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
+                     ?? throw new ResourceNotFoundException("Salary record not found");
+
+        salary.ExcludeFromStats();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+
     [HttpDelete("{id:guid}")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Delete(

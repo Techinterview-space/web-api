@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -42,6 +43,7 @@ public record UserSalaryShowInStatsDecisionMaker
         var yearAgoGap = DateTime.UtcNow.AddYears(-1);
         var salaryValues = await _context.Salaries
             .Where(x => x.CreatedAt >= yearAgoGap)
+            .Where(x => x.UseInStats)
             .Where(x =>
                 x.Company == _company &&
                 x.Grade == _salaryGrade &&

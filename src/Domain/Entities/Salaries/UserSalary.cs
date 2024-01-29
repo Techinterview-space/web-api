@@ -91,6 +91,17 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void ExcludeFromStats()
+    {
+        if (!UseInStats)
+        {
+            throw new BadRequestException("Salary record is already excluded");
+        }
+
+        UseInStats = false;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
     private static double NonNegativeValue(double value)
     {
         if (value <= 0)
