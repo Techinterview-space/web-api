@@ -9,7 +9,9 @@ namespace Domain.Database;
 
 public static class DatabaseConfigExtensions
 {
-    public static DbContextOptionsBuilder IgnoreMultipleCollectionIncludeWarningWhen(this DbContextOptionsBuilder options, bool conditionToIgnore)
+    public static DbContextOptionsBuilder IgnoreMultipleCollectionIncludeWarningWhen(
+        this DbContextOptionsBuilder options,
+        bool conditionToIgnore)
     {
         options.ConfigureWarnings(w =>
         {
@@ -24,7 +26,8 @@ public static class DatabaseConfigExtensions
         return options;
     }
 
-    public static PropertyBuilder<T> HasJsonConversion<T>(this PropertyBuilder<T> propertyBuilder)
+    public static PropertyBuilder<T> HasJsonConversion<T>(
+        this PropertyBuilder<T> propertyBuilder)
     {
         var converter = new ValueConverter<T, string>(
             v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),

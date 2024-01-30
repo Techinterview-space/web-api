@@ -27,14 +27,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DO_TOKEN: ${{ secrets.DO_TOKEN }}
+      AUTH0_AUDIENCE: ${{ env.AUTH0_AUDIENCE }}
+      DATABASE_CONNECTION_STRING: ${{ env.DATABASE_CONNECTION_STRING }}
+      PROD_ELASTICSEARCH_LINK: ${{ env.PROD_ELASTICSEARCH_LINK }}
+      S3_ACCESS_KEY: ${{ env.S3_ACCESS_KEY }}
+      S3_ACCESS_SECRET: ${{ env.S3_ACCESS_SECRET }}
+      S3_BUCKET_NAME: ${{ env.S3_BUCKET_NAME }}
+      SENDGRID_API_KEY: ${{ env.SENDGRID_API_KEY }}
     container:
       image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     steps:
       - uses: actions/checkout@v3
       - name: Docker build and push
         run: |
-          docker infos
-          - sed -i "s,{DATABASE_HOST},${DATABASE_HOST},g;s,{DATABASE_PORT},${DATABASE_PORT},g;s,{DATABASE_STAGING},${DATABASE_STAGING},g;s,{DATABASE_PROD},${DATABASE_PROD},g;s,{DATABASE_USER},${DATABASE_USER},g;s,{DATABASE_PASS},${DATABASE_PASS},g;s,{ELASTIC_HOST},${ELASTIC_HOST},g;s,{ELASTIC_PASS},${ELASTIC_PASS},g;s,{S3_ACCESS_KEY},${S3_ACCESS_KEY},g;s,{S3_ACCESS_SECRET},${S3_ACCESS_SECRET},g" src/Web.Api/appsettings*.json
+          docker info
+          sed -i "s,{AUTH0_AUDIENCE},${{env.AUTH0_AUDIENCE}},g;" src/Web.Api/appsettings.Production.json
           cd src
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
           docker build -f Dockerfile -t ${{ secrets.CR }}/backend:${{ github.sha }} .
