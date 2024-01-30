@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AspNetCore.Aws.S3.Simple.Models;
+using Domain.Enums;
 using Domain.Files;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Files;
 
 [ApiController]
 [Route("api/debug/file/")]
+[HasAnyRole(Role.Admin)]
 public class FilesDebugController : ControllerBase
 {
     private readonly IPublicStorage _storage;
 
     public FilesDebugController(
-        IPublicStorage storage,
-        IHostEnvironment environment)
+        IPublicStorage storage)
     {
-        if (environment.IsProduction())
-        {
-            throw new InvalidOperationException("This controller is not allowed in production.");
-        }
-
         _storage = storage;
     }
 

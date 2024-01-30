@@ -52,7 +52,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("my")]
     public async Task<IEnumerable<InterviewDto>> MyInterviewsAsync()
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         return await _context.Interviews
             .Include(x => x.Labels)
             .Where(x => x.InterviewerId == currentUser.Id)
@@ -65,7 +65,7 @@ public class InterviewsController : ControllerBase
         [FromRoute] Guid organizationId,
         [FromQuery] PageModel pagination)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         if (currentUser.Has(Role.Admin) ||
             currentUser.IsMyOrganization(organizationId))
         {
@@ -82,7 +82,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ByIdAsync(Guid id)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -104,7 +104,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/download")]
     public async Task<FileContentResult> PdfAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -119,7 +119,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/markdown")]
     public async Task<IActionResult> MarkdownAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
@@ -136,7 +136,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/download-sync")]
     public async Task<FileContentResult> DownloadSyncAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -151,7 +151,7 @@ public class InterviewsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateAsync([FromBody] InterviewCreateRequest createRequest)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
 
         CandidateCard card = null;
         if (createRequest.CandidateCardId.HasValue)
@@ -196,7 +196,7 @@ public class InterviewsController : ControllerBase
             .Include(x => x.CandidateInterview)
             .ByIdOrFailAsync(updateRequest.Id);
 
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         CheckPermissions(interview, currentUser);
 
         if (interview.CandidateInterview is null &&
@@ -228,7 +228,7 @@ public class InterviewsController : ControllerBase
             .Include(x => x.CandidateInterview)
             .ByIdOrFailAsync(id);
 
-        CheckPermissions(interview, await _auth.CurrentUserOrNullAsync());
+        CheckPermissions(interview, await _auth.CurrentUserOrFailAsync());
 
         _context.Interviews.Remove(interview);
 

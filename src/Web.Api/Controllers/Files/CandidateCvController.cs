@@ -7,11 +7,13 @@ using Domain.Enums;
 using Domain.Files;
 using Domain.Services.Organizations;
 using Microsoft.AspNetCore.Mvc;
+using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Files;
 
 [ApiController]
 [Route("api/candidate-cv")]
+[HasAnyRole]
 public class CandidateCvController : ControllerBase
 {
     private readonly ICvStorage _storage;
@@ -33,7 +35,7 @@ public class CandidateCvController : ControllerBase
         [FromRoute] Guid cardId,
         [FromForm] FileUploadRequest request)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var candidateCard = await _context.CandidateCards.ByIdOrFailAsync(cardId);
 
         if (!currentUser.Has(Role.Admin) &&
@@ -61,7 +63,7 @@ public class CandidateCvController : ControllerBase
         [FromRoute] Guid cardId,
         [FromRoute] Guid fileId)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var candidateCard = await _context.CandidateCards.ByIdOrFailAsync(cardId);
 
         if (!currentUser.Has(Role.Admin) &&
@@ -85,7 +87,7 @@ public class CandidateCvController : ControllerBase
         [FromRoute] Guid cardId,
         [FromRoute] Guid fileId)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var candidateCard = await _context.CandidateCards.ByIdOrFailAsync(cardId);
 
         if (!currentUser.Has(Role.Admin) &&
