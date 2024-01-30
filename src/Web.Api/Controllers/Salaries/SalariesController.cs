@@ -137,6 +137,8 @@ public class SalariesController : ControllerBase
                 Company = x.Company,
                 Grade = x.Grade,
                 Profession = x.Profession,
+                City = x.City,
+                SkillId = x.SkillId,
                 CreatedAt = x.CreatedAt
             })
             .OrderBy(x => x.Value)
@@ -210,6 +212,7 @@ public class SalariesController : ControllerBase
                 request.Company,
                 request.Profession,
                 skill?.Id,
+                request.City,
                 shouldShowInStats),
             cancellationToken);
 
@@ -239,7 +242,8 @@ public class SalariesController : ControllerBase
 
         salary.Update(
             request.Grade,
-            request.Profession);
+            request.Profession,
+            request.City);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
@@ -312,6 +316,8 @@ public class SalariesController : ControllerBase
                 Company = x.Company,
                 Grade = x.Grade,
                 Profession = x.Profession,
+                City = x.City,
+                SkillId = x.SkillId,
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking();

@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.Enums;
 using Domain.Exceptions;
 
 namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
@@ -9,6 +10,8 @@ public record EditSalaryRequest
     public DeveloperGrade Grade { get; init; }
 
     public UserProfession Profession { get; init; }
+
+    public KazakhstanCity? City { get; init; }
 
     public long? SkillId { get; init; }
 
@@ -22,6 +25,11 @@ public record EditSalaryRequest
         if (Profession == UserProfession.Undefined)
         {
             throw new BadRequestException("Profession must be valid");
+        }
+
+        if (City == KazakhstanCity.Undefined)
+        {
+            throw new BadRequestException("City must be valid");
         }
     }
 }

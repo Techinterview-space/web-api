@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Domain.Attributes;
 using Domain.Entities.Enums;
 using Domain.Entities.Users;
+using Domain.Enums;
 using Domain.Exceptions;
 
 namespace Domain.Entities.Salaries;
@@ -23,6 +24,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         CompanyType company,
         UserProfession profession,
         long? skillId,
+        KazakhstanCity? city,
         bool useInStats)
     {
         Id = Guid.NewGuid();
@@ -36,6 +38,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Company = company;
         Profession = profession;
         SkillId = skillId;
+        City = city;
         UseInStats = useInStats;
     }
 
@@ -64,6 +67,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     [NotDefaultValue]
     public UserProfession Profession { get; protected set; }
 
+    public KazakhstanCity? City { get; protected set; }
+
     public bool UseInStats { get; protected set; }
 
     public long? SkillId { get; protected set; }
@@ -72,10 +77,12 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public void Update(
         DeveloperGrade grade,
-        UserProfession profession)
+        UserProfession profession,
+        KazakhstanCity? city)
     {
         Grade = grade;
         Profession = profession;
+        City = city;
 
         UpdatedAt = DateTime.UtcNow;
     }

@@ -4,6 +4,7 @@ using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace TestUtils.Fakes;
@@ -21,6 +22,7 @@ public class UserSalaryFake : UserSalary
         UserProfession profession = UserProfession.Developer,
         DateTimeOffset? createdAt = null,
         Skill skill = null,
+        KazakhstanCity? kazakhstanCity = null,
         bool useInStats = true)
         : base(
             user,
@@ -32,6 +34,7 @@ public class UserSalaryFake : UserSalary
             company,
             profession,
             skill?.Id,
+            kazakhstanCity,
             useInStats)
     {
         if (createdAt.HasValue)

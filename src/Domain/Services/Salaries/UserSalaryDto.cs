@@ -1,6 +1,7 @@
 ﻿using System;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.Enums;
 
 namespace Domain.Services.Salaries;
 
@@ -20,6 +21,8 @@ public record UserSalaryDto
         Company = salary.Company;
         Grade = salary.Grade;
         Profession = salary.Profession;
+        City = salary.City;
+        SkillId = salary.SkillId;
         CreatedAt = salary.CreatedAt;
     }
 
@@ -36,6 +39,10 @@ public record UserSalaryDto
     public DeveloperGrade? Grade { get; init; }
 
     public UserProfession Profession { get; init; }
+
+    public KazakhstanCity? City { get; init; }
+
+    public long? SkillId { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
 }
