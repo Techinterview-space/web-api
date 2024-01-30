@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Items", "Items", "{0613B82A
 		..\infrastructure.ps1 = ..\infrastructure.ps1
 		stylecop.json = stylecop.json
 		standard.ruleset = standard.ruleset
+		.env.example = .env.example
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{73034202-C61B-4D23-BE4E-0A6391940BB7}"

@@ -1,6 +1,7 @@
 ﻿using Domain.Database;
 using Domain.Enums;
 using Domain.Services.Global;
+using Infrastructure.Configs;
 using MaximGorbatyuk.DatabaseSqlEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -20,34 +21,35 @@ namespace TechInterviewer;
 public class Startup
 {
     private const string CorsPolicyName = "CorsPolicy";
+    private const string AppName = "Tech.Interview.API";
 
-    private const string _appName = "Tech.Interview.API";
     private readonly IGlobal _global;
+    private readonly IConfiguration _configuration;
+    private readonly IHostEnvironment _environment;
 
-    public Startup(IConfiguration configuration, IHostEnvironment environment)
+    public Startup(
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
-        Configuration = configuration;
-        Environment = environment;
+        _configuration = configuration;
+        _environment = environment;
         _global = new Global(configuration);
     }
-
-    public IConfiguration Configuration { get; }
-
-    public IHostEnvironment Environment { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+        DotEnvConfig.LoadEnvFileIfExists();
         new ElkSerilog(
-            config: Configuration,
-            appName: _appName,
-            connectionString: Configuration.GetConnectionString("Elasticsearch"),
-            environmentName: Environment.EnvironmentName).Setup();
+            config: _configuration,
+            appName: AppName,
+            connectionString: _configuration.GetConnectionString("Elasticsearch"),
+            environmentName: _environment.EnvironmentName).Setup();
 
         services.AddControllersWithViews();
         services.AddRazorPages();
 
-        services.AddSwaggerGen(c => SwaggerConfig.Apply(c, _appName, _global.FrontendBaseUrl));
+        services.AddSwaggerGen(c => SwaggerConfig.Apply(c, AppName, _global.FrontendBaseUrl));
 
         services.AddCors(options =>
         {
@@ -58,11 +60,11 @@ public class Startup
         });
 
         services
-            .SetupDatabase(Configuration, Environment)
-            .SetupAppServices(Configuration)
-            .SetupEmailIntegration(Environment)
-            .SetupHealthCheck(Configuration)
-            .SetupAuthentication(Configuration)
+            .SetupDatabase(_configuration, _environment)
+            .SetupAppServices(_configuration)
+            .SetupEmailIntegration(_environment)
+            .SetupHealthCheck(_configuration)
+            .SetupAuthentication(_configuration)
             .SetupScheduler();
 
         services.AddHostedService<AppInitializeService>();
@@ -71,7 +73,7 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
     {
-        if (Environment.IsDevelopment())
+        if (_environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
             IdentityModelEventSource.ShowPII = true;
@@ -84,7 +86,7 @@ public class Startup
             .UseLoggingMiddleware();
 
         app.UseSwagger();
-        app.UseSwaggerUI(c => SwaggerConfig.ApplyUI(c, _appName));
+        app.UseSwaggerUI(c => SwaggerConfig.ApplyUI(c, AppName));
 
         app.UseHttpsRedirection();
         app.UseRouting();

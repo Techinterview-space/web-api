@@ -33,3 +33,4 @@ msbuild.wrn
 src/.idea
 src/Frontend/.angular
 volume
+src/.env

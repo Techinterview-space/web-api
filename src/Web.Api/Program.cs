@@ -28,6 +28,7 @@
 #pragma warning restore SA1005, SA1515
 using System;
 using System.Threading.Tasks;
+using Infrastructure.Configs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
