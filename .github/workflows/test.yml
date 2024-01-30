@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       solution-file: ./src/Petrel.Taxer.sln
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Backend build and test
@@ -19,3 +20,6 @@ jobs:
         run: dotnet restore ${{env.solution-file}}
       - name: Test
         run: dotnet test ${{env.solution-file}} --no-restore --verbosity normal
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+          
