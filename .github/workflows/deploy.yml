@@ -27,13 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DO_TOKEN: ${{ secrets.DO_TOKEN }}
-      AUTH0_AUDIENCE: ${{ env.AUTH0_AUDIENCE }}
-      DATABASE_CONNECTION_STRING: ${{ env.DATABASE_CONNECTION_STRING }}
-      PROD_ELASTICSEARCH_LINK: ${{ env.PROD_ELASTICSEARCH_LINK }}
-      S3_ACCESS_KEY: ${{ env.S3_ACCESS_KEY }}
-      S3_ACCESS_SECRET: ${{ env.S3_ACCESS_SECRET }}
-      S3_BUCKET_NAME: ${{ env.S3_BUCKET_NAME }}
-      SENDGRID_API_KEY: ${{ env.SENDGRID_API_KEY }}
+      PRODUCTION_SETTINGS_FILE: src/Web.Api/appsettings.Production.json
     container:
       image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     steps:
@@ -41,7 +35,13 @@ jobs:
       - name: Docker build and push
         run: |
           docker info
-          sed -i "s,{AUTH0_AUDIENCE},${{env.AUTH0_AUDIENCE}},g;" src/Web.Api/appsettings.Production.json
+          sed -i "'s/"{AUTH0_AUDIENCE}",/"${{ vars.AUTH0_AUDIENCE }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i "'s/"{DATABASE_CONNECTION_STRING}",/"${{ vars.DATABASE_CONNECTION_STRING }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i "'s/"{PROD_ELASTICSEARCH_LINK}",/"${{ vars.PROD_ELASTICSEARCH_LINK }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i "'s/"{S3_ACCESS_KEY}",/"${{ vars.S3_ACCESS_KEY }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i "'s/"{S3_ACCESS_SECRET}",/"${{ vars.S3_ACCESS_SECRET }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i "'s/"{S3_BUCKET_NAME}",/"${{ vars.S3_BUCKET_NAME }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i "'s/"{SENDGRID_API_KEY}",/"${{ vars.SENDGRID_API_KEY }}",/'" ${{env.PRODUCTION_SETTINGS_FILE}}
           cd src
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
           docker build -f Dockerfile -t ${{ secrets.CR }}/backend:${{ github.sha }} .
