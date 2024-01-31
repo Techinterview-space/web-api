@@ -32,39 +32,41 @@ public enum KazakhstanCity : long
 
     Kostanay = 14,
 
-    Janaozen = 15,
+    Konaev = 15,
 
-    Pavlodar = 16,
+    Janaozen = 16,
 
-    Petropavl = 17,
+    Pavlodar = 17,
 
-    Ridder = 18,
+    Petropavl = 18,
 
-    Saran = 19,
+    Ridder = 19,
 
-    Satpaev = 20,
+    Saran = 20,
 
-    Semey = 21,
+    Satpaev = 21,
 
-    Stepnogorsk = 22,
+    Semey = 22,
 
-    Taldykorgan = 23,
+    Stepnogorsk = 23,
 
-    Taraz = 24,
+    Taldykorgan = 24,
 
-    Temirtau = 25,
+    Taraz = 25,
 
-    Turkestan = 26,
+    Temirtau = 26,
 
-    Oral = 27,
+    Turkestan = 27,
 
-    Oskemen = 28,
+    Oral = 28,
 
-    Shymkent = 29,
+    Oskemen = 29,
 
-    Shakhtinsk = 30,
+    Shymkent = 30,
 
-    Schuschinsk = 31,
+    Shakhtinsk = 31,
 
-    Ekibastuz = 32,
+    Schuschinsk = 32,
+
+    Ekibastuz = 33,
 }
