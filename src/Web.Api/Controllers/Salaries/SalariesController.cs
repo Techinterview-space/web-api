@@ -9,6 +9,7 @@ using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Extensions;
 using Domain.Services;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Dates;
@@ -127,7 +128,7 @@ public class SalariesController : ControllerBase
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .When(request.ProfessionsToInclude.Any(), x => request.ProfessionsToInclude.Contains(x.Profession))
-            .When(request.ProfessionsToExclude.Any(), x => !request.ProfessionsToExclude.Contains(x.Profession))
+            .FilterByCitiesIfNecessary(request.Cities)
             .Select(x => new UserSalaryDto
             {
                 Value = x.Value,
