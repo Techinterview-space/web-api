@@ -9,4 +9,6 @@ public record SkillDto
     public string Title { get; init; }
 
     public HexColor HexColor { get; init; }
+
+    public string HexColorAsString => HexColor.ToString();
 }
