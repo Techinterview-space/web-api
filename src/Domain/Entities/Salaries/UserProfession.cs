@@ -89,4 +89,12 @@ public enum UserProfession
     TechnicalWriter = 42,
 
     BiDeveloper = 43,
+
+    ChiefTechnicalOfficer = 44,
+
+    ChiefExecutiveOfficer = 45,
+
+    HeadOfDepartment = 46,
+
+    DeliveryManager = 47,
 }

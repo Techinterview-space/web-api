@@ -212,7 +212,7 @@ public class SalariesController : ControllerBase
                 request.Grade,
                 request.Company,
                 request.Profession,
-                skill?.Id,
+                skill,
                 request.City,
                 shouldShowInStats),
             cancellationToken);
@@ -241,10 +241,18 @@ public class SalariesController : ControllerBase
             throw new ForbiddenException("You can only edit your own salary records");
         }
 
+        Skill skill = null;
+        if (request.SkillId is > 0)
+        {
+            skill = await _context.Skills
+                .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
+        }
+
         salary.Update(
             request.Grade,
             request.Profession,
-            request.City);
+            request.City,
+            skill);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
