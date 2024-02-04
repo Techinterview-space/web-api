@@ -19,7 +19,6 @@ namespace TechInterviewer.Controllers.Skills;
 
 [ApiController]
 [Route("api/skills")]
-[HasAnyRole]
 public class SkillsController : ControllerBase
 {
     private readonly IAuthorization _auth;
@@ -29,6 +28,21 @@ public class SkillsController : ControllerBase
     {
         _auth = auth;
         _context = context;
+    }
+
+    [HttpGet("for-select-boxes")]
+    public async Task<IEnumerable<SkillDto>> ForSelectBoxes(
+        CancellationToken cancellationToken)
+    {
+        return await _context.Skills
+            .Select(x => new SkillDto
+            {
+                Id = x.Id,
+                Title = x.Title,
+                HexColor = x.HexColor,
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 
     [HttpGet("all")]
@@ -49,27 +63,13 @@ public class SkillsController : ControllerBase
             .ToListAsync(cancellationToken);
     }
 
-    [HttpGet("for-form")]
-    public async Task<IEnumerable<SkillDto>> ForForm(
-        CancellationToken cancellationToken)
-    {
-        return await _context.Skills
-            .Select(x => new SkillDto
-            {
-                Id = x.Id,
-                Title = x.Title,
-                HexColor = x.HexColor,
-            })
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-    }
-
     [HttpPost("")]
+    [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Create(
         [FromBody] SkillEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.Skills.AnyAsync(
@@ -91,11 +91,12 @@ public class SkillsController : ControllerBase
     }
 
     [HttpPut("")]
+    [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Update(
         [FromBody] SkillEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var skill = await _context.Skills.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
         skill.CouldBeUpdatedByOrFail(currentUser);
 
@@ -108,11 +109,12 @@ public class SkillsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Delete(
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync();
         var skill = await _context.Skills.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
         skill.CouldBeUpdatedByOrFail(currentUser);
