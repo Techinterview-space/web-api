@@ -73,7 +73,7 @@ public class SkillsController : ControllerBase
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.Skills.AnyAsync(
-                x => x.CreatedById == currentUser.Id && x.Title.ToUpperInvariant() == titleUpper,
+                x => x.CreatedById == currentUser.Id && x.Title.ToUpper() == titleUpper,
                 cancellationToken: cancellationToken))
         {
             throw new BadRequestException("Skill with this title already exists");
