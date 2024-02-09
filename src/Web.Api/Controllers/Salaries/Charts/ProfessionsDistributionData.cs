@@ -9,7 +9,7 @@ public record ProfessionsDistributionData
 {
     public int All { get; }
 
-    public List<(UserProfession Profession, int Count)> Items { get; }
+    public List<Item> Items { get; }
 
     public ProfessionsDistributionData(
         List<UserSalaryDto> salaries)
@@ -17,7 +17,18 @@ public record ProfessionsDistributionData
         All = salaries.Count;
         Items = salaries
             .GroupBy(x => x.Profession)
-            .Select(x => (x.Key, x.Count()))
+            .Select(x => new Item
+            {
+                Profession = x.Key,
+                Count = x.Count(),
+            })
             .ToList();
+    }
+
+    public record Item
+    {
+        public UserProfession Profession { get; init; }
+
+        public int Count { get; init; }
     }
 }
