@@ -28,8 +28,6 @@ public record SalariesByMoneyBarChart
 
         Items = splitter
             .Select(x => new ItemsByValuePeriods(
-                x.Start,
-                x.End,
                 values.Count(y =>
                     y >= x.Start &&
                     (y < x.End || (Math.Abs(x.End - maxSalary) < 0.01 && Math.Abs(y - maxSalary) < 0.01)))))
@@ -41,8 +39,6 @@ public record SalariesByMoneyBarChart
                 x.Key,
                 splitter
                     .Select(y => new ItemsByValuePeriods(
-                        y.Start,
-                        y.End,
                         x.Count(z =>
                             z.Value >= y.Start &&
                             (z.Value < y.End || (Math.Abs(y.End - maxSalary) < 0.01 && Math.Abs(z.Value - maxSalary) < 0.01)))))
@@ -66,8 +62,6 @@ public record SalariesByMoneyBarChart
         List<ItemsByValuePeriods> Items);
 
     public record ItemsByValuePeriods(
-        double Start,
-        double End,
         int Count);
 #pragma warning restore SA1313
 }
