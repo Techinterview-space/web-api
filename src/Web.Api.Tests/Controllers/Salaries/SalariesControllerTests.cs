@@ -431,7 +431,7 @@ public class SalariesControllerTests
         Assert.NotNull(salariesResponse.SalariesByMoneyBarChart);
         Assert.Equal(4, salariesResponse.SalariesByMoneyBarChart.Items.Count);
         Assert.Equal(250_000, salariesResponse.SalariesByMoneyBarChart.Step);
-        Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.Items[0].Count);
+        Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.Items[0]);
 
         Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.ItemsByProfession.Count);
         Assert.Equal(

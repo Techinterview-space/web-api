@@ -67,6 +67,12 @@ public record SalariesChartResponse
 
             SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
         }
+
+        DevelopersByGradeDistributionDataForLocal = new DevelopersByGradeDistributionData(localSalaries);
+        DevelopersByGradeDistributionDataForRemote = new DevelopersByGradeDistributionData(remoteSalaries);
+
+        ProfessionsDistributionDataForLocal = new ProfessionsDistributionData(localSalaries);
+        ProfessionsDistributionDataForRemote = new ProfessionsDistributionData(remoteSalaries);
     }
 
     public static SalariesChartResponse RequireOwnSalary(
@@ -108,4 +114,12 @@ public record SalariesChartResponse
     public SalariesByMoneyBarChart SalariesByMoneyBarChart { get; }
 
     public SalariesByMoneyBarChart SalariesByMoneyBarChartForRemote { get; }
+
+    public DevelopersByGradeDistributionData DevelopersByGradeDistributionDataForLocal { get; }
+
+    public DevelopersByGradeDistributionData DevelopersByGradeDistributionDataForRemote { get; }
+
+    public ProfessionsDistributionData ProfessionsDistributionDataForLocal { get; }
+
+    public ProfessionsDistributionData ProfessionsDistributionDataForRemote { get; }
 }
