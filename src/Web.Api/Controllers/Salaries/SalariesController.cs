@@ -252,6 +252,7 @@ public class SalariesController : ControllerBase
             request.Grade,
             request.Profession,
             request.City,
+            request.Company,
             skill);
 
         await _context.SaveChangesAsync(cancellationToken);

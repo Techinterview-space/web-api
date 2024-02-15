@@ -79,12 +79,14 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         DeveloperGrade grade,
         UserProfession profession,
         KazakhstanCity? city,
+        CompanyType companyType,
         Skill skillOrNull)
     {
         Grade = grade;
         Profession = profession;
         City = city;
         SkillId = skillOrNull?.Id;
+        Company = companyType;
 
         UpdatedAt = DateTime.UtcNow;
     }

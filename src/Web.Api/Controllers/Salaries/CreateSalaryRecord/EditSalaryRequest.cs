@@ -15,6 +15,8 @@ public record EditSalaryRequest
 
     public long? SkillId { get; init; }
 
+    public CompanyType Company { get; init; }
+
     public virtual void IsValidOrFail()
     {
         if (Grade == DeveloperGrade.Unknown)
@@ -30,6 +32,11 @@ public record EditSalaryRequest
         if (City == KazakhstanCity.Undefined)
         {
             throw new BadRequestException("City must be valid");
+        }
+
+        if (Company == default)
+        {
+            throw new BadRequestException("Company must be specified");
         }
     }
 }

@@ -201,6 +201,7 @@ public class SalariesControllerTests
         {
             Grade = DeveloperGrade.Middle,
             Profession = salary.Profession,
+            Company = salary.Company,
         };
 
         Assert.NotEqual(request.Grade, salary.Grade);
