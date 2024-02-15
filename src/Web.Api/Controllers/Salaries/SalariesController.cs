@@ -121,13 +121,13 @@ public class SalariesController : ControllerBase
                 .ToListAsync(cancellationToken);
         }
 
-        var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
+        var yearAgoGap = DateTimeOffset.Now.AddMonths(-6);
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.Profession != UserProfession.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.ProfessionsToInclude.Any(), x => request.ProfessionsToInclude.Contains(x.Profession))
+            .When(request.ProfessionsToInclude.Count > 0, x => request.ProfessionsToInclude.Contains(x.Profession))
             .FilterByCitiesIfNecessary(request.Cities)
             .Select(x => new UserSalaryDto
             {
