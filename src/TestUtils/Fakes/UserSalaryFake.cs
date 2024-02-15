@@ -22,6 +22,7 @@ public class UserSalaryFake : UserSalary
         UserProfession profession = UserProfession.Developer,
         DateTimeOffset? createdAt = null,
         Skill skillOrNull = null,
+        WorkIndustry workIndustryOrNull = null,
         KazakhstanCity? kazakhstanCity = null,
         bool useInStats = true)
         : base(
@@ -34,6 +35,7 @@ public class UserSalaryFake : UserSalary
             company,
             profession,
             skillOrNull,
+            workIndustryOrNull,
             kazakhstanCity,
             useInStats)
     {

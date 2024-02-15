@@ -49,6 +49,8 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
 
     public DbSet<Skill> Skills { get; set; }
 
+    public DbSet<WorkIndustry> WorkIndustries { get; set; }
+
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel

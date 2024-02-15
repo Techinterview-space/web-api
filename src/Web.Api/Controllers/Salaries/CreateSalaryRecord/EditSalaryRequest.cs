@@ -15,6 +15,8 @@ public record EditSalaryRequest
 
     public long? SkillId { get; init; }
 
+    public long? WorkIndustryId { get; init; }
+
     public CompanyType Company { get; init; }
 
     public virtual void IsValidOrFail()

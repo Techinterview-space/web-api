@@ -23,6 +23,7 @@ public record UserSalaryDto
         Profession = salary.Profession;
         City = salary.City;
         SkillId = salary.SkillId;
+        WorkIndustryId = salary.WorkIndustryId;
         CreatedAt = salary.CreatedAt;
     }
 
@@ -43,6 +44,8 @@ public record UserSalaryDto
     public KazakhstanCity? City { get; init; }
 
     public long? SkillId { get; init; }
+
+    public long? WorkIndustryId { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
 }

@@ -140,6 +140,7 @@ public class SalariesController : ControllerBase
                 Profession = x.Profession,
                 City = x.City,
                 SkillId = x.SkillId,
+                WorkIndustryId = x.WorkIndustryId,
                 CreatedAt = x.CreatedAt
             })
             .OrderBy(x => x.Value)
@@ -194,6 +195,13 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
         }
 
+        WorkIndustry workIndustry = null;
+        if (request.WorkIndustryId is > 0)
+        {
+            workIndustry = await _context.WorkIndustries
+                .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
+        }
+
         var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
             _context,
             request.Value,
@@ -213,6 +221,7 @@ public class SalariesController : ControllerBase
                 request.Company,
                 request.Profession,
                 skill,
+                workIndustry,
                 request.City,
                 shouldShowInStats),
             cancellationToken);
@@ -248,12 +257,20 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
         }
 
+        WorkIndustry workIndustry = null;
+        if (request.WorkIndustryId is > 0)
+        {
+            workIndustry = await _context.WorkIndustries
+                .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
+        }
+
         salary.Update(
             request.Grade,
             request.Profession,
             request.City,
             request.Company,
-            skill);
+            skill,
+            workIndustry);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
@@ -328,6 +345,7 @@ public class SalariesController : ControllerBase
                 Profession = x.Profession,
                 City = x.City,
                 SkillId = x.SkillId,
+                WorkIndustryId = x.WorkIndustryId,
                 CreatedAt = x.CreatedAt
             })
             .AsNoTracking();

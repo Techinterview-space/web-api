@@ -24,6 +24,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         CompanyType company,
         UserProfession profession,
         Skill skillOrNull,
+        WorkIndustry workIndustryOrNull,
         KazakhstanCity? city,
         bool useInStats)
     {
@@ -38,6 +39,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Company = company;
         Profession = profession;
         SkillId = skillOrNull?.Id;
+        WorkIndustryId = workIndustryOrNull?.Id;
         City = city;
         UseInStats = useInStats;
     }
@@ -75,17 +77,23 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public virtual Skill Skill { get; protected set; }
 
+    public long? WorkIndustryId { get; protected set; }
+
+    public virtual WorkIndustry WorkIndustry { get; protected set; }
+
     public void Update(
         DeveloperGrade grade,
         UserProfession profession,
         KazakhstanCity? city,
         CompanyType companyType,
-        Skill skillOrNull)
+        Skill skillOrNull,
+        WorkIndustry workIndustryOrNull)
     {
         Grade = grade;
         Profession = profession;
         City = city;
         SkillId = skillOrNull?.Id;
+        WorkIndustryId = workIndustryOrNull?.Id;
         Company = companyType;
 
         UpdatedAt = DateTime.UtcNow;
