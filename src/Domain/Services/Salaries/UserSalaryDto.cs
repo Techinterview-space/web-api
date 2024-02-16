@@ -25,6 +25,7 @@ public record UserSalaryDto
         SkillId = salary.SkillId;
         WorkIndustryId = salary.WorkIndustryId;
         CreatedAt = salary.CreatedAt;
+        UpdatedAt = salary.UpdatedAt;
     }
 
     public double Value { get; init; }
@@ -47,5 +48,7 @@ public record UserSalaryDto
 
     public long? WorkIndustryId { get; init; }
 
-    public DateTimeOffset CreatedAt { get; init; }
+    public DateTimeOffset? CreatedAt { get; init; }
+
+    public DateTimeOffset? UpdatedAt { get; init; }
 }

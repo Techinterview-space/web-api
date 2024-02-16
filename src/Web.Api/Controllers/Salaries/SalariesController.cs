@@ -141,7 +141,6 @@ public class SalariesController : ControllerBase
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
-                CreatedAt = x.CreatedAt
             })
             .OrderBy(x => x.Value)
             .AsNoTracking();
@@ -346,7 +345,8 @@ public class SalariesController : ControllerBase
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
-                CreatedAt = x.CreatedAt
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
             })
             .AsNoTracking();
 
