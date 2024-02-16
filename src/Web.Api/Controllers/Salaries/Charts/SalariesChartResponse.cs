@@ -54,6 +54,7 @@ public record SalariesChartResponse
             MedianSalary = localSalaries.Select(x => x.Value).Median();
 
             SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
+            PeopleByGradesChartDataForLocal = new PeopleByGradesChartData(localSalaries);
         }
 
         if (remoteSalaries.Any())
@@ -66,6 +67,7 @@ public record SalariesChartResponse
             MedianRemoteSalary = values.Median();
 
             SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
+            PeopleByGradesChartDataForRemote = new PeopleByGradesChartData(remoteSalaries);
         }
 
         DevelopersByGradeDistributionDataForLocal = new DevelopersByGradeDistributionData(localSalaries);
@@ -122,4 +124,8 @@ public record SalariesChartResponse
     public ProfessionsDistributionData ProfessionsDistributionDataForLocal { get; }
 
     public ProfessionsDistributionData ProfessionsDistributionDataForRemote { get; }
+
+    public PeopleByGradesChartData PeopleByGradesChartDataForLocal { get; }
+
+    public PeopleByGradesChartData PeopleByGradesChartDataForRemote { get; }
 }
