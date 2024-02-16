@@ -11,14 +11,14 @@ public record EmailContent
     }
 
     public EmailContent(
-        string @from,
+        string from,
         string subject,
         string htmlBody,
         ICollection<string> recipients,
         ICollection<string> cc = null,
         ICollection<string> hiddenCc = null)
     {
-        From = @from;
+        From = from;
         Subject = subject;
         HtmlBody = htmlBody;
         Recipients = recipients;

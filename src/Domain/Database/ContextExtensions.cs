@@ -21,7 +21,10 @@ public static class ContextExtensions
         return set.Where(x => x.DeletedAt == null);
     }
 
-    public static async Task<TEntity> AddEntityAsync<TContext, TEntity>(this TContext set, TEntity entity, CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task<TEntity> AddEntityAsync<TContext, TEntity>(
+        this TContext set,
+        TEntity entity,
+        CancellationToken cancellationToken = default)
         where TContext : DbContext
         where TEntity : class
     {
@@ -30,7 +33,10 @@ public static class ContextExtensions
         return entry.Entity;
     }
 
-    public static async Task AddRangeAsync<TContext, TEntity>(this TContext set, IEnumerable<TEntity> entity, CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task AddRangeAsync<TContext, TEntity>(
+        this TContext set,
+        IEnumerable<TEntity> entity,
+        CancellationToken cancellationToken = default)
         where TContext : DbContext
         where TEntity : class
     {
@@ -44,7 +50,9 @@ public static class ContextExtensions
     /// <param name="query">Query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Array.</returns>
-    public static Task<T[]> AllAsync<T>(this IQueryable<T> query, CancellationToken cancellationToken = default(CancellationToken))
+    public static Task<T[]> AllAsync<T>(
+        this IQueryable<T> query,
+        CancellationToken cancellationToken = default)
         where T : class
     {
         return query
@@ -53,7 +61,9 @@ public static class ContextExtensions
     }
 
     public static async Task<IEnumerable<TResultEntity>> AllAsync<TEntity, TResultEntity>(
-        this IQueryable<TEntity> query, Func<TEntity, TResultEntity> transform, CancellationToken cancellationToken = default(CancellationToken))
+        this IQueryable<TEntity> query,
+        Func<TEntity, TResultEntity> transform,
+        CancellationToken cancellationToken = default)
         where TEntity : class
         where TResultEntity : class
     {
@@ -62,15 +72,24 @@ public static class ContextExtensions
             .Select(transform);
     }
 
-    public static Task<T> ByIdOrNullAsync<T>(this IQueryable<T> query, long id, CancellationToken cancellationToken = default(CancellationToken))
+    public static Task<T> ByIdOrNullAsync<T>(
+        this IQueryable<T> query,
+        long id,
+        CancellationToken cancellationToken = default)
         where T : class, IHasId =>
         query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-    public static Task<T> ByIdOrNullAsync<T>(this IQueryable<T> query, Guid id, CancellationToken cancellationToken = default(CancellationToken))
+    public static Task<T> ByIdOrNullAsync<T>(
+        this IQueryable<T> query,
+        Guid id,
+        CancellationToken cancellationToken = default)
         where T : class, IHasIdBase<Guid> =>
         query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-    public static async Task HasEntityOrFailAsync<T>(this IQueryable<T> query, long id, CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task HasEntityOrFailAsync<T>(
+        this IQueryable<T> query,
+        long id,
+        CancellationToken cancellationToken = default)
         where T : class, IHasId
     {
         if (!await query.AnyAsync(x => x.Id == id, cancellationToken))
@@ -79,7 +98,10 @@ public static class ContextExtensions
         }
     }
 
-    public static async Task HasEntitiesOrFailAsync<T>(this IQueryable<T> query, IReadOnlyCollection<long> ids, CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task HasEntitiesOrFailAsync<T>(
+        this IQueryable<T> query,
+        IReadOnlyCollection<long> ids,
+        CancellationToken cancellationToken = default)
         where T : class, IHasId
     {
         if (ids.Except(await query.Select(x => x.Id).ToArrayAsync(cancellationToken)).Any())
