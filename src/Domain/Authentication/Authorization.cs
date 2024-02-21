@@ -46,18 +46,6 @@ public class Authorization : IAuthorization
         return _userFromDatabase ??= await new CurrentUserProvider(_context, _http.CurrentUser).GetOrCreateAsync();
     }
 
-    public async Task<IReadOnlyCollection<Guid>> MyOrganizationsAsync()
-    {
-        var user = await CurrentUserOrNullAsync();
-        return user.OrganizationUsers.Select(x => x.OrganizationId).ToArray();
-    }
-
-    public async Task<bool> IsMyOrganizationAsync(Guid organizationId)
-    {
-        var user = await CurrentUserOrNullAsync();
-        return user.IsMyOrganization(organizationId);
-    }
-
     public CurrentUser CurrentUser
     {
         get

@@ -50,8 +50,6 @@ public class AdminUsersController : ControllerBase
         await _auth.HasRoleOrFailAsync(Role.Admin);
         return new UserDto(await _context.Users
             .Include(x => x.UserRoles)
-            .Include(x => x.OrganizationUsers)
-            .ThenInclude(x => x.Organization)
             .AsNoTracking()
             .ByIdOrFailAsync(id));
     }

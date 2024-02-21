@@ -26,8 +26,6 @@ public record InterviewTemplateDto : InterviewTemplateUpdateRequest
         UpdatedAt = interviewTemplate.UpdatedAt;
         IsPublic = interviewTemplate.IsPublic;
         Labels = interviewTemplate.Labels.Select(x => new LabelDto(x)).ToList();
-        OrganizationId = interviewTemplate.OrganizationId;
-        Organization = OrganizationSimpleDto.CreateFromEntityOrNull(interviewTemplate.Organization);
     }
 
     public long AuthorId { get; init; }
@@ -37,6 +35,4 @@ public record InterviewTemplateDto : InterviewTemplateUpdateRequest
     public DateTimeOffset CreatedAt { get; init; }
 
     public DateTimeOffset UpdatedAt { get; init; }
-
-    public OrganizationSimpleDto Organization { get; init; }
 }

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Entities.Employments;
 using Domain.Entities.Enums;
 using Domain.Entities.Labels;
-using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 
 namespace Domain.Entities.Interviews;
@@ -51,15 +49,8 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
 
     public List<InterviewSubject> Subjects { get; protected set; } = new ();
 
-    public Guid? OrganizationId { get; protected set; }
-
-    public virtual Organization Organization { get; protected set; }
-
-    public virtual CandidateInterview CandidateInterview { get; protected set; }
-
     public bool CouldBeOpenBy(User user)
-        => InterviewerId == user.Id ||
-           (OrganizationId.HasValue && user.IsMyOrganization(OrganizationId.Value));
+        => InterviewerId == user.Id;
 
     public Interview Update(
         string candidateName,

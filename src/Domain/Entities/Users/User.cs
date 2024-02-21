@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
-using Domain.Entities.Organizations;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.Services;
@@ -72,10 +71,6 @@ public class User : BaseModel, IHasDeletedAt
     public DateTimeOffset? LastLoginAt { get; protected set; }
 
     [JsonIgnore]
-    public virtual ICollection<OrganizationUser> OrganizationUsers { get; protected set; } =
-        new List<OrganizationUser>();
-
-    [JsonIgnore]
     public virtual ICollection<UserRole> UserRoles { get; protected set; } = new List<UserRole>();
 
     [NotMapped]
@@ -135,18 +130,6 @@ public class User : BaseModel, IHasDeletedAt
         UserRoles.Add(new UserRole(role, this));
     }
 
-    public User AttachToOrganization(
-        Organization organization)
-    {
-        if (OrganizationUsers.Any(x => x.OrganizationId == organization.Id))
-        {
-            throw new InvalidOperationException("The user is already attached to the organization");
-        }
-
-        OrganizationUsers.Add(new OrganizationUser(this, organization));
-        return this;
-    }
-
     public void SyncRoles(IReadOnlyCollection<Role> roles)
     {
         roles.ThrowIfNull(nameof(roles));
@@ -202,13 +185,4 @@ public class User : BaseModel, IHasDeletedAt
             LastName = lastName;
         }
     }
-
-    public ICollection<Guid> GetMyOrganizationIds() =>
-        OrganizationUsers?
-            .Select(x => x.OrganizationId)
-            .ToList() ?? new List<Guid>();
-
-    public bool IsMyOrganization(
-        Guid organizationId) =>
-        OrganizationUsers != null && OrganizationUsers.Any(x => x.OrganizationId == organizationId);
 }

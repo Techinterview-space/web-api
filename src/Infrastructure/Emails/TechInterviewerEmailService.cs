@@ -1,8 +1,6 @@
 ﻿using System.Text;
 using Domain.Emails.Requests;
 using Domain.Emails.Services;
-using Domain.Entities.Organizations;
-using Domain.Entities.Users;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.MD;
@@ -12,57 +10,18 @@ namespace Infrastructure.Emails;
 
 public class TechInterviewerEmailService : IEmailService
 {
-    private readonly IEmailSender _sender;
     private readonly IHostEnvironment _env;
     private readonly IGlobal _global;
     private readonly ITechInterviewHtmlGenerator _html;
 
     public TechInterviewerEmailService(
-        IEmailSender sender,
         IHostEnvironment env,
         IGlobal global,
         ITechInterviewHtmlGenerator html)
     {
-        _sender = sender;
         _env = env;
         _global = global;
         _html = html;
-    }
-
-    public async Task SendEmailAsync(EmailSendRequest emailContent)
-    {
-        if (_global.EnableEmailPublishing)
-        {
-            await _sender.SendAsync(Prepare(emailContent));
-        }
-    }
-
-    public Task InvitationAsync(
-        Organization organization, User invitedPerson, User inviter)
-    {
-        return SendEmailAsync(new OrganizationUserInviteRequest(
-            _global,
-            organization,
-            invitedPerson,
-            inviter));
-    }
-
-    public Task InvitationAcceptedAsync(Organization organization, User invitedPerson, User inviter)
-    {
-        return SendEmailAsync(new InvitationAcceptedEmailRequest(
-            _global,
-            invitedPerson,
-            inviter,
-            organization));
-    }
-
-    public Task InvitationDeclinedAsync(Organization organization, User invitedPerson, User inviter)
-    {
-        return SendEmailAsync(new InvitationDeclinedEmailRequest(
-            _global,
-            invitedPerson,
-            inviter,
-            organization));
     }
 
     public EmailContent Prepare(EmailSendRequest emailContent) =>

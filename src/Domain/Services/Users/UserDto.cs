@@ -21,7 +21,6 @@ public record UserDto
         EmailConfirmed = user.EmailConfirmed;
         CreatedAt = user.CreatedAt;
         DeletedAt = user.DeletedAt;
-        Organizations = user.OrganizationUsers?.Select(x => new OrganizationUserDto(x, false, true)) ?? Array.Empty<OrganizationUserDto>();
     }
 
     public long Id { get; }
@@ -41,8 +40,6 @@ public record UserDto
     public DateTimeOffset CreatedAt { get; }
 
     public DateTimeOffset? DeletedAt { get; }
-
-    public IEnumerable<OrganizationUserDto> Organizations { get; }
 
     public static UserDto CreateFromEntityOrNull(User user)
     {

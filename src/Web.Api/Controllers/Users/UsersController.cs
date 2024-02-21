@@ -27,8 +27,6 @@ public class UsersController : ControllerBase
     {
         return new UserDto(await _context.Users
             .Include(x => x.UserRoles)
-            .Include(x => x.OrganizationUsers)
-            .ThenInclude(x => x.Organization)
             .AsNoTracking()
             .ByIdOrFailAsync(id));
     }

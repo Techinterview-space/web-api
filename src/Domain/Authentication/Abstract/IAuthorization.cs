@@ -13,10 +13,6 @@ public interface IAuthorization
 
     Task<User> CurrentUserOrNullAsync();
 
-    Task<IReadOnlyCollection<Guid>> MyOrganizationsAsync();
-
-    Task<bool> IsMyOrganizationAsync(Guid organizationId);
-
     CurrentUser CurrentUser { get; }
 
     Task HasRoleOrFailAsync(Role role);

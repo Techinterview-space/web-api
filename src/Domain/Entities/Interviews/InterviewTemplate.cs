@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entities.Labels;
-using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Enums;
 
@@ -21,7 +20,6 @@ public class InterviewTemplate : HasLabelsEntity<InterviewTemplate, UserLabel>, 
         bool isPublic,
         List<InterviewTemplateSubject> subjects,
         User author,
-        Guid? organizationId,
         ICollection<UserLabel> labels = null)
     {
         Title = title;
@@ -29,7 +27,6 @@ public class InterviewTemplate : HasLabelsEntity<InterviewTemplate, UserLabel>, 
         Subjects = subjects;
         AuthorId = author.Id;
         IsPublic = isPublic;
-        OrganizationId = organizationId;
         Labels = labels ?? new List<UserLabel>();
     }
 
@@ -50,39 +47,31 @@ public class InterviewTemplate : HasLabelsEntity<InterviewTemplate, UserLabel>, 
 
     public bool IsPublic { get; protected set; }
 
-    public Guid? OrganizationId { get; protected set; }
-
-    public virtual Organization Organization { get; protected set; }
-
     public List<InterviewTemplateSubject> Subjects { get; protected set; } = new ();
 
     public bool CouldBeEditBy(User user)
     {
         return AuthorId == user.Id ||
-               user.Has(Role.Admin) ||
-               (OrganizationId.HasValue && user.IsMyOrganization(OrganizationId.Value));
+               user.Has(Role.Admin);
     }
 
     public bool CouldBeOpenBy(User user)
     {
         return AuthorId == user.Id ||
                user.Has(Role.Admin) ||
-               IsPublic ||
-               (OrganizationId.HasValue && user.IsMyOrganization(OrganizationId.Value));
+               IsPublic;
     }
 
     public InterviewTemplate Update(
         string title,
         string overallOpinion,
         bool isPublic,
-        List<InterviewTemplateSubject> subjects,
-        Guid? organizationId)
+        List<InterviewTemplateSubject> subjects)
     {
         Title = title ?? throw new ArgumentNullException(nameof(title));
         OverallOpinion = overallOpinion;
         Subjects = subjects;
         IsPublic = isPublic;
-        OrganizationId = organizationId;
 
         return this;
     }

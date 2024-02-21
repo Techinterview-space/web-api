@@ -21,8 +21,6 @@ public class CurrentUserProvider
     {
         var user = await _context.Users
             .Include(x => x.UserRoles)
-            .Include(x => x.OrganizationUsers)
-            .ThenInclude(x => x.Organization)
             .ByEmailOrNullAsync(_currentUser.Email);
 
         if (user == null)
