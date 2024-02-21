@@ -21,8 +21,4 @@ public record InterviewCreateRequest
     public List<InterviewSubject> Subjects { get; init; } = new ();
 
     public List<LabelDto> Labels { get; init; } = new ();
-
-    public Guid? OrganizationId { get; init; }
-
-    public Guid? CandidateCardId { get; init; }
 }

@@ -26,7 +26,6 @@ public record InterviewDto : InterviewUpdateRequest
         CreatedAt = interview.CreatedAt;
         UpdatedAt = interview.UpdatedAt;
         Labels = interview.Labels.Select(x => new LabelDto(x)).ToList();
-        OrganizationId = interview.OrganizationId;
         Organization = OrganizationSimpleDto.CreateFromEntityOrNull(interview.Organization);
         CandidateInterview = CandidateInterviewDto.CreateFromEntityOrNull(interview.CandidateInterview);
     }

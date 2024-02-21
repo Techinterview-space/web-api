@@ -23,15 +23,13 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
         string overallOpinion,
         DeveloperGrade? grade,
         List<InterviewSubject> subjects,
-        User interviewer,
-        Guid? organizationId)
+        User interviewer)
     {
         CandidateName = candidateName;
         OverallOpinion = overallOpinion;
         CandidateGrade = grade;
         InterviewerId = interviewer.Id;
         Subjects = subjects;
-        OrganizationId = organizationId;
     }
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -67,28 +65,12 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
         string candidateName,
         string overallOpinion,
         DeveloperGrade? grade,
-        List<InterviewSubject> subjects,
-        Guid? organizationId)
+        List<InterviewSubject> subjects)
     {
         CandidateName = candidateName;
         OverallOpinion = overallOpinion;
         CandidateGrade = grade;
         Subjects = subjects;
-        OrganizationId = organizationId;
-
-        return this;
-    }
-
-    public Interview AddCardInterview(
-        CandidateCard card,
-        User currentUser)
-    {
-        CandidateInterview = new CandidateInterview(
-            card,
-            null,
-            card.EmploymentStatus,
-            this,
-            currentUser);
 
         return this;
     }

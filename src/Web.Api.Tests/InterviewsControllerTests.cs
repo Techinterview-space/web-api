@@ -108,50 +108,6 @@ public class InterviewsControllerTests
     }
 
     [Fact]
-    public async Task CreateAsync_AttachedToCandidateCard_ValidData_OkAsync()
-    {
-        await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var organization = await new FakeOrganization(currentUser).WithUser(currentUser).PleaseAsync(context);
-
-        var candidate = await new FakeCandidate(organization, currentUser).PleaseAsync(context);
-        var card = await new FakeCandidateCard(
-            candidate,
-            currentUser,
-            EmploymentStatus.TechnicalInterview).PleaseAsync(context);
-
-        var target = new InterviewsController(
-            new FakeAuth(currentUser),
-            context,
-            new Mock<IInterviewPdf>().Object);
-
-        Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>(),
-            CandidateCardId = card.Id,
-        });
-
-        var interviews = await context.Interviews
-            .Include(x => x.Labels)
-            .Include(x => x.CandidateInterview)
-            .AllAsync();
-
-        Assert.Single(interviews);
-
-        var interview = interviews[0];
-        Assert.Equal(organization.Id, interview.OrganizationId);
-        Assert.NotNull(interview.CandidateInterview);
-
-        Assert.Equal(card.Id, interview.CandidateInterview.CandidateCardId);
-        Assert.Equal(card.EmploymentStatus, interview.CandidateInterview.ConductedDuringStatus);
-        Assert.Equal(currentUser.Id, interview.CandidateInterview.OrganizedById);
-    }
-
-    [Fact]
     public async Task CreateAsync_ValidData_OkAsync()
     {
         await using var context = new SqliteContext();

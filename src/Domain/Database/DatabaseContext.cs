@@ -31,8 +31,6 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
 
     public DbSet<UserLabel> UserLabels { get; set; }
 
-    public DbSet<OrganizationLabel> OrganizationLabels { get; set; }
-
     public DbSet<CandidateCard> CandidateCards { get; set; }
 
     public DbSet<Candidate> Candidates { get; set; }
