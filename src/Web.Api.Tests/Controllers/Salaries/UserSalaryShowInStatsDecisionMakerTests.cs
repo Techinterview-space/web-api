@@ -5,6 +5,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using TechInterviewer.Controllers.Salaries;
+using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using Xunit;
@@ -59,6 +60,7 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         var decisionMaker = new UserSalaryShowInStatsDecisionMaker(
             context,
+            new FakeCurrentUser(),
             salaryToDecide,
             grade,
             company,
@@ -66,5 +68,42 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         var result = await decisionMaker.DecideAsync(default);
         Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData(140_000)]
+    [InlineData(200_000)]
+    [InlineData(700_000)]
+    public async Task DecideAsync_ValidCasesButEmailsIsNotVerified_ReturnFalseAsync(
+        double salaryToDecide)
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
+        const DeveloperGrade grade = DeveloperGrade.Middle;
+        const CompanyType company = CompanyType.Local;
+        const UserProfession profession = UserProfession.Developer;
+
+        foreach (var salaryValue in _salaryValues)
+        {
+            await context.SaveAsync(new UserSalaryFake(
+                    user,
+                    value: salaryValue,
+                    grade: grade,
+                    company: company,
+                    createdAt: DateTimeOffset.Now.AddDays(-1))
+                .AsDomain());
+        }
+
+        var decisionMaker = new UserSalaryShowInStatsDecisionMaker(
+            context,
+            new FakeCurrentUser(isEmailVerified: false),
+            salaryToDecide,
+            grade,
+            company,
+            profession);
+
+        var result = await decisionMaker.DecideAsync(default);
+        Assert.False(result);
     }
 }

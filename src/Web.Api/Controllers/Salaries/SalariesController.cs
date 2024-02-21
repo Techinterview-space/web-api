@@ -203,6 +203,7 @@ public class SalariesController : ControllerBase
 
         var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
             _context,
+            _auth.CurrentUser,
             request.Value,
             request.Grade,
             request.Company,

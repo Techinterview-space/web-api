@@ -26,7 +26,8 @@ public record CurrentUser
         }
 
         Id = principal.GetClaimValue(ClaimTypes.NameIdentifier);
-        Email = principal.GetClaimValue(ClaimTypes.Email);
+        Email = principal.GetClaimValue(ClaimTypes.Email, false) ?? principal.GetClaimValue("email");
+        IsEmailVerified = principal.GetClaimValue("email_verified", false) == "true";
         FirstName = principal.GetClaimValue(ClaimTypes.GivenName, false);
         LastName = principal.GetClaimValue(ClaimTypes.Surname, false);
 
@@ -55,6 +56,8 @@ public record CurrentUser
     public string Id { get; protected set; }
 
     public string Email { get; protected set; }
+
+    public bool IsEmailVerified { get; protected set; }
 
     public string FirstName { get; protected set; }
 

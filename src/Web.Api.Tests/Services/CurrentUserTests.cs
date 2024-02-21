@@ -1,0 +1,59 @@
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using Domain.Services;
+using Xunit;
+
+namespace Web.Api.Tests.Services;
+
+public class CurrentUserTests
+{
+    private const string GoogleSocialBearer = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVQbVVhdlFyRHYwTXNuTkp0ZS1USSJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6Imdvb2dsZS1vYXV0aDJ8MTAyNTQ4MjYzNjE5MDA4Njg1NTQ5IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZ2l2ZW5uYW1lIjoiTWF4aW0iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9zdXJuYW1lIjoiR29yYmF0eXVrIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6Ik1heGltIEdvcmJhdHl1ayIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6WyJBZG1pbiIsIkludGVydmlld2VyIl0sImdpdmVuX25hbWUiOiJNYXhpbSIsImZhbWlseV9uYW1lIjoiR29yYmF0eXVrIiwibmlja25hbWUiOiJtYXhpbWdvcmJhdHl1azE5MTA5MyIsIm5hbWUiOiJNYXhpbSBHb3JiYXR5dWsiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jTDRiMGlFQ2s5VkZhQ0hzZkpIUzdfVmk0U1dxem5CeGVtcXdzY1lZUHdJaWpaaz1zOTYtYyIsImxvY2FsZSI6InJ1IiwidXBkYXRlZF9hdCI6IjIwMjQtMDItMjFUMTQ6NTE6NTUuOTE1WiIsImVtYWlsIjoibWF4aW1nb3JiYXR5dWsxOTEwOTNAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImlzcyI6Imh0dHBzOi8vdGVjaGludGVydmlldy1zcGFjZS5ldS5hdXRoMC5jb20vIiwiYXVkIjoianVORk5WcjB3eTF5YXlGZ00yS1RiazgzNzRvUDhNRGsiLCJpYXQiOjE3MDg1MjcxMTcsImV4cCI6MTcwODU2MzExNywic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDI1NDgyNjM2MTkwMDg2ODU1NDkiLCJzaWQiOiJEdEpBcWVGLTlTOEo0VG9McU9tcWVLNy10TmlxZzk2QyIsIm5vbmNlIjoiWXpOWlNuRk5SblZCVEVONVpVTmhlbXRZZFV4ZmJtOVhTMjVyV0hSMFV6Wk5ZVWxNYVVOV1UxVTJhZz09In0.hz6E3wV1oYn-yDAEbjPwnztWD4BTidK7wF7O3xnv4owEOX9NX3i91zeEz1PwzNXJK_741BHavnDXTBFtVJZ0XwO3MBBmd3T5InolX2hdCnSuomcFdpBu3yapvtAKZ_V6gPIdCsTAGHNSSLAuJGJMKVVUQVKfa9kpamCDNeo37KU1MlyzVeDx7u4mL4EK81Puo2xIobqNYobT2qz-RbWI4ZdPNYjYJChyG2Bn79OHS1-CZcLfUnB8TZhEl4MV92jj_G9l0h3DcSDxlsJ8hBrMR64l60-JOOwQ1Ikpel9VEPafN3p2r62M53Fqsnw4DIkg-5LGOYDot54ZUuXMNB3THQ";
+    private const string EmailPassBearer = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVQbVVhdlFyRHYwTXNuTkp0ZS1USSJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImF1dGgwfDY1ZDYwZDA1MjE3ZGZiN2NjODZlMmZjZSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiI5ODc2NTQzMjExMW1heEBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiSW50ZXJ2aWV3ZXIiXSwibmlja25hbWUiOiI5ODc2NTQzMjExMW1heCIsIm5hbWUiOiI5ODc2NTQzMjExMW1heEBnbWFpbC5jb20iLCJwaWN0dXJlIjoiaHR0cHM6Ly9zLmdyYXZhdGFyLmNvbS9hdmF0YXIvMzU0NmNiMTk5ZGZlOWM2ZDNkMGE1NWVhNTI5YmJkMzA_cz00ODAmcj1wZyZkPWh0dHBzJTNBJTJGJTJGY2RuLmF1dGgwLmNvbSUyRmF2YXRhcnMlMkY5OC5wbmciLCJ1cGRhdGVkX2F0IjoiMjAyNC0wMi0yMVQxNjozNDoyNi4yODRaIiwiZW1haWwiOiI5ODc2NTQzMjExMW1heEBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImlzcyI6Imh0dHBzOi8vdGVjaGludGVydmlldy1zcGFjZS5ldS5hdXRoMC5jb20vIiwiYXVkIjoianVORk5WcjB3eTF5YXlGZ00yS1RiazgzNzRvUDhNRGsiLCJpYXQiOjE3MDg1MzMyNjgsImV4cCI6MTcwODU2OTI2OCwic3ViIjoiYXV0aDB8NjVkNjBkMDUyMTdkZmI3Y2M4NmUyZmNlIiwic2lkIjoidU1ITkZYcFBNWjM5Vk44blRidU9NWWt1aXdMOExWYVAiLCJub25jZSI6ImRqbHlMWEZHWXk0elpYTlFRMnAzZEZWT04wZFpZV3BtZWxkcFdISlhRVFJKTjA1RmJreHpNREpNYkE9PSJ9.M5Ol_OTACtXNPfJQIhEY_w9RdOAY8eMXP1FS4rAdeVxBSuXMxSHGEwLEF0Pm8BnX9K-6ozjQYBBiZUtDL3nSI06hKDAZAQQSnbK-RQVZBr52z8Pys3pEKEAF-rotGWfm0ZojFnJYpIbD83-3xoiMTjPuxWEegS_to9Y2oUAUYimdGhdOMvGlpFBI87Y3Tk6QZb8kAU-jykjpr-9q4Rscd9PctP1j4VHre_eFXDXhFw-nFYDFEdmqBNi3oGN8yvTjgiQ0-s2x38-6mWEzBPj-bvZWKntV1U-gTjE5Rxl6Cqr5QINvmTXljtvTlMvFtNR5lnukaJ-Ll590T_x7EwtixQ";
+    private const string GithubSocialBearer = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVQbVVhdlFyRHYwTXNuTkp0ZS1USSJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImdpdGh1YnwxMzM0ODY4NSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJNYXhpbSBHb3JiYXR5dWsiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiSW50ZXJ2aWV3ZXIiXSwibmlja25hbWUiOiJtYXhpbWdvcmJhdHl1ayIsIm5hbWUiOiJNYXhpbSBHb3JiYXR5dWsiLCJwaWN0dXJlIjoiaHR0cHM6Ly9hdmF0YXJzLmdpdGh1YnVzZXJjb250ZW50LmNvbS91LzEzMzQ4Njg1P3Y9NCIsInVwZGF0ZWRfYXQiOiIyMDI0LTAyLTIxVDE2OjM2OjQyLjYzNloiLCJlbWFpbCI6Im1heGltLmdvcmJhdHl1a0BvdXRsb29rLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL3RlY2hpbnRlcnZpZXctc3BhY2UuZXUuYXV0aDAuY29tLyIsImF1ZCI6Imp1TkZOVnIwd3kxeWF5RmdNMktUYms4Mzc0b1A4TURrIiwiaWF0IjoxNzA4NTMzNDAzLCJleHAiOjE3MDg1Njk0MDMsInN1YiI6ImdpdGh1YnwxMzM0ODY4NSIsInNpZCI6ImZrd1RsQXhrZWY1VERCMXgxZUhqbEZ0V3Zsa2Z2bkZDIiwibm9uY2UiOiJUMlIrUm1aNFVHaGpaRWxVYW1oSFUxTlZaR293VlRWdmIxWnlPREJ2U25OR1RpNUxZM0pYU2xrMk1RPT0ifQ.W1CGqWz8xtcuoNPOe-EgRk3XXWyCZ2wt_vQhAihadihCFL4AzWS1eMujt1Od96sNzeCJQiDQkgje_dVQDW7xTEGJ4WZ8JfPMDVkgmOcN90C-xEss_ptrnJj46XTkc865yiUrA5rP70L3R_sUrm-0pBC9Q40radWPtXO_sTUzwP63iTzwkmIy9-2laEHD5Shmcpy_pF_iLxebjEQM9JetryzvEef_6OjakTK1OX2tHMKt973le6QYJspAvS_OgMrIXykw7OSCD8cgiAfX17CLE5V8xElKVpSQGjqNWY2BcKU4DFPoUj62jog6A1XZopsLTmgoHz9zQeOh2kLNikJ1WA";
+
+    [Fact]
+    public void Ctor_ValidGoogleBearer_Parsed()
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var principal = handler.ReadJwtToken(GoogleSocialBearer);
+
+        Assert.Equal(22, principal.Claims.Count());
+        var user = new CurrentUser(new ClaimsPrincipal(new ClaimsIdentity(principal.Claims)));
+
+        Assert.Equal("Maxim", user.FirstName);
+        Assert.Equal("Gorbatyuk", user.LastName);
+        Assert.Equal("maximgorbatyuk191093@gmail.com", user.Email);
+        Assert.True(user.IsEmailVerified);
+    }
+
+    [Fact]
+    public void Ctor_ValidEmailPassBearer_Parsed()
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var principal = handler.ReadJwtToken(EmailPassBearer);
+
+        Assert.Equal(16, principal.Claims.Count());
+        var user = new CurrentUser(new ClaimsPrincipal(new ClaimsIdentity(principal.Claims)));
+
+        Assert.Equal("98765432111max@gmail.com", user.FirstName);
+        Assert.Equal("-", user.LastName);
+        Assert.Equal("98765432111max@gmail.com", user.Email);
+        Assert.False(user.IsEmailVerified);
+    }
+
+    [Fact]
+    public void Ctor_ValidGithubBearer_Parsed()
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var principal = handler.ReadJwtToken(GithubSocialBearer);
+
+        Assert.Equal(16, principal.Claims.Count());
+        var user = new CurrentUser(new ClaimsPrincipal(new ClaimsIdentity(principal.Claims)));
+
+        Assert.Equal("Maxim", user.FirstName);
+        Assert.Equal("Gorbatyuk", user.LastName);
+        Assert.Equal("maxim.gorbatyuk@outlook.com", user.Email);
+        Assert.True(user.IsEmailVerified);
+    }
+}

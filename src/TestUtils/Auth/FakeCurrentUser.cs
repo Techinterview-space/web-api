@@ -23,7 +23,8 @@ public record FakeCurrentUser : CurrentUser
         Role role = Role.Interviewer,
         string firstName = null,
         string lastName = null,
-        string email = null)
+        string email = null,
+        bool isEmailVerified = true)
     {
         Id = id;
         FirstName = firstName ?? Faker.Name.First();
@@ -31,6 +32,7 @@ public record FakeCurrentUser : CurrentUser
 
         email ??= $"{FirstName.First()}.{LastName}_{DateTimeOffset.Now.Ticks}@example.com".ToLowerInvariant();
         Email = email;
+        IsEmailVerified = isEmailVerified;
         Roles = new List<Role>
         {
             role

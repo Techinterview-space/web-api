@@ -6,6 +6,7 @@ using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
+using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -18,6 +19,7 @@ public record UserSalaryShowInStatsDecisionMaker
     private const int MinCountOfSalariesToDoDecision = 5;
 
     private readonly DatabaseContext _context;
+    private readonly CurrentUser _currentUser;
     private readonly double _salary;
     private readonly DeveloperGrade _salaryGrade;
     private readonly CompanyType _company;
@@ -25,6 +27,7 @@ public record UserSalaryShowInStatsDecisionMaker
 
     public UserSalaryShowInStatsDecisionMaker(
         DatabaseContext context,
+        CurrentUser currentUser,
         double salary,
         DeveloperGrade salaryGrade,
         CompanyType company,
@@ -35,11 +38,17 @@ public record UserSalaryShowInStatsDecisionMaker
         _salaryGrade = salaryGrade;
         _company = company;
         _profession = profession;
+        _currentUser = currentUser;
     }
 
     public async Task<bool> DecideAsync(
         CancellationToken cancellationToken)
     {
+        if (!_currentUser.IsEmailVerified)
+        {
+            return false;
+        }
+
         var yearAgoGap = DateTime.UtcNow.AddYears(-1);
         var salaryValues = await _context.Salaries
             .Where(x => x.CreatedAt >= yearAgoGap)
