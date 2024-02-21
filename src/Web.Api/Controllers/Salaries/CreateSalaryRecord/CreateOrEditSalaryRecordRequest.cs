@@ -14,8 +14,6 @@ public record CreateOrEditSalaryRecordRequest : EditSalaryRequest
 
     public Currency Currency { get; init; }
 
-    public CompanyType Company { get; init; }
-
     public override void IsValidOrFail()
     {
         base.IsValidOrFail();
@@ -39,11 +37,6 @@ public record CreateOrEditSalaryRecordRequest : EditSalaryRequest
         if (Currency == default)
         {
             throw new BadRequestException("Currency must be specified");
-        }
-
-        if (Company == default)
-        {
-            throw new BadRequestException("Company must be specified");
         }
     }
 }

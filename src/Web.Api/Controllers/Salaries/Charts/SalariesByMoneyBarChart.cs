@@ -27,12 +27,10 @@ public record SalariesByMoneyBarChart
             .ToList();
 
         Items = splitter
-            .Select(x => new ItemsByValuePeriods(
-                x.Start,
-                x.End,
+            .Select(x =>
                 values.Count(y =>
                     y >= x.Start &&
-                    (y < x.End || (Math.Abs(x.End - maxSalary) < 0.01 && Math.Abs(y - maxSalary) < 0.01)))))
+                    (y < x.End || (Math.Abs(x.End - maxSalary) < 0.01 && Math.Abs(y - maxSalary) < 0.01))))
             .ToList();
 
         ItemsByProfession = salaries
@@ -40,12 +38,10 @@ public record SalariesByMoneyBarChart
             .Select(x => new ItemsByProfessionByValuePeriods(
                 x.Key,
                 splitter
-                    .Select(y => new ItemsByValuePeriods(
-                        y.Start,
-                        y.End,
+                    .Select(y =>
                         x.Count(z =>
                             z.Value >= y.Start &&
-                            (z.Value < y.End || (Math.Abs(y.End - maxSalary) < 0.01 && Math.Abs(z.Value - maxSalary) < 0.01)))))
+                            (z.Value < y.End || (Math.Abs(y.End - maxSalary) < 0.01 && Math.Abs(z.Value - maxSalary) < 0.01))))
                     .ToList()))
             .ToList();
 
@@ -54,7 +50,7 @@ public record SalariesByMoneyBarChart
 
     public List<string> Labels { get; }
 
-    public List<ItemsByValuePeriods> Items { get; }
+    public List<int> Items { get; }
 
     public List<ItemsByProfessionByValuePeriods> ItemsByProfession { get; }
 
@@ -63,11 +59,6 @@ public record SalariesByMoneyBarChart
 #pragma warning disable SA1313
     public record ItemsByProfessionByValuePeriods(
         UserProfession Profession,
-        List<ItemsByValuePeriods> Items);
-
-    public record ItemsByValuePeriods(
-        double Start,
-        double End,
-        int Count);
+        List<int> Items);
 #pragma warning restore SA1313
 }

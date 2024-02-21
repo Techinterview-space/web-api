@@ -9,6 +9,7 @@ using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Extensions;
 using Domain.Services;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Dates;
@@ -120,14 +121,14 @@ public class SalariesController : ControllerBase
                 .ToListAsync(cancellationToken);
         }
 
-        var yearAgoGap = DateTimeOffset.Now.AddYears(-1);
+        var yearAgoGap = DateTimeOffset.Now.AddMonths(-6);
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.Profession != UserProfession.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.ProfessionsToInclude.Any(), x => request.ProfessionsToInclude.Contains(x.Profession))
-            .When(request.ProfessionsToExclude.Any(), x => !request.ProfessionsToExclude.Contains(x.Profession))
+            .When(request.ProfessionsToInclude.Count > 0, x => request.ProfessionsToInclude.Contains(x.Profession))
+            .FilterByCitiesIfNecessary(request.Cities)
             .Select(x => new UserSalaryDto
             {
                 Value = x.Value,
@@ -139,7 +140,7 @@ public class SalariesController : ControllerBase
                 Profession = x.Profession,
                 City = x.City,
                 SkillId = x.SkillId,
-                CreatedAt = x.CreatedAt
+                WorkIndustryId = x.WorkIndustryId,
             })
             .OrderBy(x => x.Value)
             .AsNoTracking();
@@ -193,6 +194,13 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
         }
 
+        WorkIndustry workIndustry = null;
+        if (request.WorkIndustryId is > 0)
+        {
+            workIndustry = await _context.WorkIndustries
+                .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
+        }
+
         var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
             _context,
             request.Value,
@@ -211,7 +219,8 @@ public class SalariesController : ControllerBase
                 request.Grade,
                 request.Company,
                 request.Profession,
-                skill?.Id,
+                skill,
+                workIndustry,
                 request.City,
                 shouldShowInStats),
             cancellationToken);
@@ -240,10 +249,27 @@ public class SalariesController : ControllerBase
             throw new ForbiddenException("You can only edit your own salary records");
         }
 
+        Skill skill = null;
+        if (request.SkillId is > 0)
+        {
+            skill = await _context.Skills
+                .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
+        }
+
+        WorkIndustry workIndustry = null;
+        if (request.WorkIndustryId is > 0)
+        {
+            workIndustry = await _context.WorkIndustries
+                .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
+        }
+
         salary.Update(
             request.Grade,
             request.Profession,
-            request.City);
+            request.City,
+            request.Company,
+            skill,
+            workIndustry);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
@@ -318,7 +344,9 @@ public class SalariesController : ControllerBase
                 Profession = x.Profession,
                 City = x.City,
                 SkillId = x.SkillId,
-                CreatedAt = x.CreatedAt
+                WorkIndustryId = x.WorkIndustryId,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
             })
             .AsNoTracking();
 

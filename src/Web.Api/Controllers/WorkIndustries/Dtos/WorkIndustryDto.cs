@@ -1,8 +1,8 @@
 ﻿using Domain.ValueObjects;
 
-namespace TechInterviewer.Controllers.Skills.Dtos;
+namespace TechInterviewer.Controllers.WorkIndustries.Dtos;
 
-public record SkillDto
+public record WorkIndustryDto
 {
     public long Id { get; init; }
 

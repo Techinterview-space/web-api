@@ -54,6 +54,7 @@ public record SalariesChartResponse
             MedianSalary = localSalaries.Select(x => x.Value).Median();
 
             SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
+            PeopleByGradesChartDataForLocal = new PeopleByGradesChartData(localSalaries);
         }
 
         if (remoteSalaries.Any())
@@ -66,7 +67,14 @@ public record SalariesChartResponse
             MedianRemoteSalary = values.Median();
 
             SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
+            PeopleByGradesChartDataForRemote = new PeopleByGradesChartData(remoteSalaries);
         }
+
+        DevelopersByGradeDistributionDataForLocal = new DevelopersByGradeDistributionData(localSalaries);
+        DevelopersByGradeDistributionDataForRemote = new DevelopersByGradeDistributionData(remoteSalaries);
+
+        ProfessionsDistributionDataForLocal = new ProfessionsDistributionData(localSalaries);
+        ProfessionsDistributionDataForRemote = new ProfessionsDistributionData(remoteSalaries);
     }
 
     public static SalariesChartResponse RequireOwnSalary(
@@ -108,4 +116,16 @@ public record SalariesChartResponse
     public SalariesByMoneyBarChart SalariesByMoneyBarChart { get; }
 
     public SalariesByMoneyBarChart SalariesByMoneyBarChartForRemote { get; }
+
+    public DevelopersByGradeDistributionData DevelopersByGradeDistributionDataForLocal { get; }
+
+    public DevelopersByGradeDistributionData DevelopersByGradeDistributionDataForRemote { get; }
+
+    public ProfessionsDistributionData ProfessionsDistributionDataForLocal { get; }
+
+    public ProfessionsDistributionData ProfessionsDistributionDataForRemote { get; }
+
+    public PeopleByGradesChartData PeopleByGradesChartDataForLocal { get; }
+
+    public PeopleByGradesChartData PeopleByGradesChartDataForRemote { get; }
 }
