@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Core;
@@ -42,6 +43,13 @@ public class ElkSerilog
         }
         catch (Exception e)
         {
+            if (Debugger.IsAttached)
+            {
+                return new LoggerConfiguration()
+                    .WriteTo.Console()
+                    .CreateLogger();
+            }
+
             throw new InvalidOperationException("Could not create logger for ELK", e);
         }
     }
