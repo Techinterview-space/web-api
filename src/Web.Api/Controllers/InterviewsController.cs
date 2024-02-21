@@ -60,25 +60,6 @@ public class InterviewsController : ControllerBase
             .AllAsync(x => new InterviewDto(x));
     }
 
-    [HttpGet("organization/{organizationId:guid}")]
-    public async Task<IActionResult> OrganizationInterviewsAsync(
-        [FromRoute] Guid organizationId,
-        [FromQuery] PageModel pagination)
-    {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
-        if (currentUser.Has(Role.Admin) ||
-            currentUser.IsMyOrganization(organizationId))
-        {
-            return Ok(await _context.Interviews
-                .Include(x => x.Labels)
-                .Where(x => x.OrganizationId == organizationId)
-                .OrderByDescending(x => x.CreatedAt)
-                .AsPaginatedAsync(x => new InterviewDto(x), pagination ?? PageModel.Default));
-        }
-
-        return StatusCode(StatusCodes.Status403Forbidden);
-    }
-
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ByIdAsync(Guid id)
     {
@@ -86,10 +67,6 @@ public class InterviewsController : ControllerBase
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
-            .Include(x => x.Organization)
-            .Include(x => x.CandidateInterview)
-            .ThenInclude(x => x.CandidateCard)
-            .ThenInclude(x => x.Candidate)
             .ByIdOrFailAsync(id);
 
         if (interview.CouldBeOpenBy(currentUser) ||
@@ -153,36 +130,15 @@ public class InterviewsController : ControllerBase
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
 
-        CandidateCard card = null;
-        if (createRequest.CandidateCardId.HasValue)
-        {
-            card = await _context.CandidateCards
-                .ByIdOrFailAsync(createRequest.CandidateCardId.Value);
-        }
-
-        var organizationId = card?.OrganizationId ?? createRequest.OrganizationId;
-
-        if (organizationId != null &&
-            !currentUser.IsMyOrganization(organizationId.Value))
-        {
-            return BadRequest("You are not authorized to create interviews for this organization.");
-        }
-
         var interview = await _context.AddEntityAsync(new Interview(
             createRequest.CandidateName,
             createRequest.OverallOpinion,
             createRequest.CandidateGrade,
             createRequest.Subjects,
-            currentUser,
-            organizationId));
+            currentUser));
 
         interview.Sync(await new UserLabelsCollection(_context, currentUser, createRequest.Labels).PrepareAsync());
         interview.ThrowIfInvalid();
-
-        if (card is not null)
-        {
-            interview.AddCardInterview(card, currentUser);
-        }
 
         await _context.TrySaveChangesAsync();
         return Ok(interview.Id);
@@ -193,26 +149,17 @@ public class InterviewsController : ControllerBase
     {
         var interview = await _context.Interviews
             .Include(x => x.Labels)
-            .Include(x => x.CandidateInterview)
             .ByIdOrFailAsync(updateRequest.Id);
 
         var currentUser = await _auth.CurrentUserOrFailAsync();
         CheckPermissions(interview, currentUser);
-
-        if (interview.CandidateInterview is null &&
-            updateRequest.OrganizationId != null &&
-            !currentUser.IsMyOrganization(updateRequest.OrganizationId.Value))
-        {
-            return BadRequest("You are not authorized to attach interviews for this organization.");
-        }
 
         interview
             .Update(
                 updateRequest.CandidateName,
                 updateRequest.OverallOpinion,
                 updateRequest.CandidateGrade,
-                updateRequest.Subjects,
-                updateRequest.OrganizationId)
+                updateRequest.Subjects)
             .Sync(await new UserLabelsCollection(_context, currentUser, updateRequest.Labels).PrepareAsync())
             .ThrowIfInvalid();
 
@@ -225,17 +172,11 @@ public class InterviewsController : ControllerBase
     {
         var interview = await _context.Interviews
             .Include(x => x.Labels)
-            .Include(x => x.CandidateInterview)
             .ByIdOrFailAsync(id);
 
         CheckPermissions(interview, await _auth.CurrentUserOrFailAsync());
 
         _context.Interviews.Remove(interview);
-
-        if (interview.CandidateInterview is not null)
-        {
-            _context.Remove(interview.CandidateInterview);
-        }
 
         await _context.TrySaveChangesAsync();
         return Ok();

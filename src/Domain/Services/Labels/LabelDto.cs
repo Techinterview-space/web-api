@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Labels;
 using Domain.ValueObjects;
 
@@ -18,13 +17,6 @@ public record LabelDto
     {
         Title = title;
         HexColor = (color ?? ValueObjects.HexColor.Random()).ToString();
-    }
-
-    public LabelDto(
-        OrganizationLabel label)
-        : this((EntityLabelBase)label)
-    {
-        OrganizationId = label.OrganizationId;
     }
 
     public LabelDto(
@@ -47,6 +39,4 @@ public record LabelDto
     public string HexColor { get; init; }
 
     public long? CreatedById { get; init; }
-
-    public Guid? OrganizationId { get; init; }
 }

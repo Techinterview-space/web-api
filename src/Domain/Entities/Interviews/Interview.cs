@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Entities.Employments;
 using Domain.Entities.Enums;
 using Domain.Entities.Labels;
-using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 
 namespace Domain.Entities.Interviews;
@@ -23,15 +21,13 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
         string overallOpinion,
         DeveloperGrade? grade,
         List<InterviewSubject> subjects,
-        User interviewer,
-        Guid? organizationId)
+        User interviewer)
     {
         CandidateName = candidateName;
         OverallOpinion = overallOpinion;
         CandidateGrade = grade;
         InterviewerId = interviewer.Id;
         Subjects = subjects;
-        OrganizationId = organizationId;
     }
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -53,42 +49,19 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
 
     public List<InterviewSubject> Subjects { get; protected set; } = new ();
 
-    public Guid? OrganizationId { get; protected set; }
-
-    public virtual Organization Organization { get; protected set; }
-
-    public virtual CandidateInterview CandidateInterview { get; protected set; }
-
     public bool CouldBeOpenBy(User user)
-        => InterviewerId == user.Id ||
-           (OrganizationId.HasValue && user.IsMyOrganization(OrganizationId.Value));
+        => InterviewerId == user.Id;
 
     public Interview Update(
         string candidateName,
         string overallOpinion,
         DeveloperGrade? grade,
-        List<InterviewSubject> subjects,
-        Guid? organizationId)
+        List<InterviewSubject> subjects)
     {
         CandidateName = candidateName;
         OverallOpinion = overallOpinion;
         CandidateGrade = grade;
         Subjects = subjects;
-        OrganizationId = organizationId;
-
-        return this;
-    }
-
-    public Interview AddCardInterview(
-        CandidateCard card,
-        User currentUser)
-    {
-        CandidateInterview = new CandidateInterview(
-            card,
-            null,
-            card.EmploymentStatus,
-            this,
-            currentUser);
 
         return this;
     }

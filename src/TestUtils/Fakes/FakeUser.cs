@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Database;
-using Domain.Entities.Organizations;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -30,13 +29,6 @@ public class FakeUser : User, IPlease<User>
         {
             new UserRole(role, this)
         };
-    }
-
-    public new FakeUser AttachToOrganization(
-        Organization organization)
-    {
-        base.AttachToOrganization(organization);
-        return this;
     }
 
     public async Task<User> PleaseAsync(DatabaseContext context)

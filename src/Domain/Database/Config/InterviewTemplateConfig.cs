@@ -17,11 +17,6 @@ internal class InterviewTemplateConfig : IEntityTypeConfiguration<InterviewTempl
             .HasForeignKey(x => x.AuthorId);
 
         builder
-            .HasOne(x => x.Organization)
-            .WithMany(x => x.InterviewTemplates)
-            .HasForeignKey(x => x.OrganizationId);
-
-        builder
             .Property(x => x.Subjects)
             .HasJsonConversion();
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Interviews;
 using Domain.Services.Labels;
@@ -20,6 +19,4 @@ public record InterviewTemplateCreateRequest
     public List<InterviewTemplateSubject> Subjects { get; init; } = new ();
 
     public List<LabelDto> Labels { get; init; } = new ();
-
-    public Guid? OrganizationId { get; init; }
 }

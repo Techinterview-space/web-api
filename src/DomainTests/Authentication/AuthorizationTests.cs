@@ -66,37 +66,4 @@ public class AuthorizationTests
         Assert.Single(currentUser.UserRoles);
         Assert.Equal(Role.Interviewer, currentUser.UserRoles.Single().RoleId);
     }
-
-    [Fact]
-    public async Task MyOrganizationsAsync_HasOrganizations_ReturnAsync()
-    {
-        await using var context = new SqliteContext();
-        var organization1 = await new FakeOrganization().PleaseAsync(context);
-        var organization2 = await new FakeOrganization().PleaseAsync(context);
-        var organization3 = await new FakeOrganization().PleaseAsync(context);
-
-        var user = await new FakeUser(
-                role: Role.Interviewer,
-                firstName: "John",
-                lastName: "Smith")
-            .AttachToOrganization(organization1)
-            .AttachToOrganization(organization2)
-            .AttachToOrganization(organization3)
-            .PleaseAsync(context);
-
-        var target = new Authorization(
-            new FakeHttpContext(new FakeCurrentUser(user)),
-            context);
-
-        var organizations = await target.MyOrganizationsAsync();
-
-        var expected = new[]
-        {
-            organization1.Id,
-            organization2.Id,
-            organization3.Id,
-        };
-
-        Assert.Equal(expected, organizations);
-    }
 }

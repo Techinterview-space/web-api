@@ -63,23 +63,11 @@ public class InterviewTemplateController : ControllerBase
     public async Task<IEnumerable<InterviewTemplateDto>> AvailableForInterviewAsync()
     {
         var currentUser = await _auth.CurrentUserOrNullAsync();
-        var query = _context.InterviewTemplates
-            .Include(x => x.Author)
-            .Include(x => x.Labels);
-
-        Expression<Func<InterviewTemplate, bool>> whereExpression = x => x.IsPublic || x.AuthorId == currentUser.Id;
-        if (currentUser.OrganizationUsers.Any())
-        {
-            var organization = currentUser.GetMyOrganizationIds();
-
-            whereExpression = whereExpression.Or(
-                x => x.OrganizationId != null && organization.Contains(x.OrganizationId.Value));
-        }
 
         return await _context.InterviewTemplates
             .Include(x => x.Author)
             .Include(x => x.Labels)
-            .Where(whereExpression)
+            .Where(x => x.IsPublic || x.AuthorId == currentUser.Id)
             .OrderByDescending(x => x.CreatedAt)
             .AllAsync(x => new InterviewTemplateDto(x));
     }
@@ -89,6 +77,7 @@ public class InterviewTemplateController : ControllerBase
     public async Task<IEnumerable<InterviewTemplateDto>> MyTemplatesAsync()
     {
         var currentUser = await _auth.CurrentUserOrNullAsync();
+
         return await _context.InterviewTemplates
             .Include(x => x.Labels)
             .Where(x => x.AuthorId == currentUser.Id)
@@ -103,7 +92,6 @@ public class InterviewTemplateController : ControllerBase
         var template = await _context.InterviewTemplates
             .Include(x => x.Labels)
             .Include(x => x.Author)
-            .Include(x => x.Organization)
             .AsNoTracking()
             .ByIdOrFailAsync(id);
 
@@ -126,19 +114,13 @@ public class InterviewTemplateController : ControllerBase
     public async Task<IActionResult> CreateAsync([FromBody] InterviewTemplateCreateRequest createRequest)
     {
         var currentUser = await _auth.CurrentUserOrNullAsync();
-        if (createRequest.OrganizationId != null &&
-            !currentUser.IsMyOrganization(createRequest.OrganizationId.Value))
-        {
-            return BadRequest("You are not authorized to create interview templates for this organization.");
-        }
 
         var interviewTemplate = await _context.AddEntityAsync(new InterviewTemplate(
             createRequest.Title,
             createRequest.OverallOpinion,
             createRequest.IsPublic,
             createRequest.Subjects,
-            currentUser,
-            createRequest.OrganizationId));
+            currentUser));
 
         interviewTemplate.Sync(await new UserLabelsCollection(_context, currentUser, createRequest.Labels).PrepareAsync());
 
@@ -161,19 +143,12 @@ public class InterviewTemplateController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden);
         }
 
-        if (updateRequest.OrganizationId != null &&
-            !currentUser.IsMyOrganization(updateRequest.OrganizationId.Value))
-        {
-            return BadRequest("You are not authorized to create interview templates for this organization.");
-        }
-
         interviewTemplate
             .Update(
                 updateRequest.Title,
                 updateRequest.OverallOpinion,
                 updateRequest.IsPublic,
-                updateRequest.Subjects,
-                updateRequest.OrganizationId)
+                updateRequest.Subjects)
             .Sync(await new UserLabelsCollection(_context, currentUser, updateRequest.Labels).PrepareAsync())
             .ThrowIfInvalid();
 

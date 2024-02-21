@@ -96,47 +96,6 @@ public class InterviewTemplateControllerTests
     }
 
     [Fact]
-    public async Task AvailableForInterviewAsync_AttachedToorganization_OkAsync()
-    {
-        await using var context = new InMemoryDatabaseContext();
-
-        var organization = await new FakeOrganization().PleaseAsync(context);
-        var currentUser = await new FakeUser(Role.Interviewer)
-            .AttachToOrganization(organization)
-            .PleaseAsync(context);
-
-        var otherPerson = await new FakeUser(Role.Interviewer)
-            .AttachToOrganization(organization)
-            .PleaseAsync(context);
-
-        var otherPersonService = new InterviewTemplateController(
-            new FakeAuth(otherPerson),
-            context);
-        await otherPersonService.CreateAsync(new InterviewTemplateCreateRequest
-        {
-            Title = "JAVA Developer private",
-            Subjects = new List<InterviewTemplateSubject>(),
-            OrganizationId = organization.Id,
-        });
-        await otherPersonService.CreateAsync(new InterviewTemplateCreateRequest
-        {
-            Title = "JAVA Developer public",
-            Subjects = new List<InterviewTemplateSubject>(),
-            IsPublic = false,
-            OrganizationId = organization.Id,
-        });
-
-        var target = new InterviewTemplateController(
-            new FakeAuth(currentUser),
-            context);
-
-        var forSelectBoxes = (await target.AvailableForInterviewAsync()).ToArray();
-        Assert.NotEmpty(forSelectBoxes);
-        Assert.Equal(2, forSelectBoxes.Length);
-        Assert.Equal(2, forSelectBoxes.Count(x => x.AuthorId != currentUser.Id));
-    }
-
-    [Fact]
     public async Task MyAsync_OnlyMyAreBeingReturned_OkAsync()
     {
         await using var context = new InMemoryDatabaseContext();
