@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Users;
-using Domain.Exceptions;
 using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,15 +55,6 @@ public class CurrentUserProvider
         if (save)
         {
             await _context.TrySaveChangesAsync();
-        }
-
-        // The mismatch identities may tell us that the User Identity id either SSO user Username was changed.
-        // Anyway, the case is not valid, so we should throw an error.
-        if (user.IdentityId != null && user.IdentityId != _currentUser.Id)
-        {
-            throw new BadRequestException(
-                message: "Your account data is invalid. Please, contact your system administrator",
-                innerException: new MismatchedIdentitiesException(user: user, identityUser: _currentUser));
         }
 
         return user;
