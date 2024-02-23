@@ -89,6 +89,7 @@ public class SalariesController : ControllerBase
         {
             SalariesPerUser = (double)salaries.Count / salaries.GroupBy(x => x.UserId).Count(),
             UsersWhoDidNotAddSalary = usersCount - salaries.GroupBy(x => x.UserId).Count(),
+            AllUsersCount = usersCount,
         };
 
         foreach (var (start, end) in daysSplitter.ToList())

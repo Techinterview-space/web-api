@@ -15,6 +15,8 @@ public record AdminChartResponse
 
     public int UsersWhoDidNotAddSalary { get; init; }
 
+    public int AllUsersCount { get; init; }
+
 #pragma warning disable SA1313
     public record AdminChartItem(
         int Count,
