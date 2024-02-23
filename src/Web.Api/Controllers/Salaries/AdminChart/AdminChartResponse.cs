@@ -13,7 +13,7 @@ public record AdminChartResponse
 
     public double SalariesPerUser { get; init; }
 
-    public int UsersWhoDidNotAddSalary { get; init; }
+    public int UsersWhoLeftSalary { get; init; }
 
     public int AllUsersCount { get; init; }
 

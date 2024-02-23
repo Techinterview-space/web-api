@@ -73,7 +73,6 @@ public class SalariesController : ControllerBase
             .CountAsync(cancellationToken);
 
         var salaries = await _context.Salaries
-            .Where(x => x.CreatedAt >= fifteenDaysAgo)
             .Select(x => new
             {
                 x.Id,
@@ -84,17 +83,24 @@ public class SalariesController : ControllerBase
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        var daysSplitter = new DateTimeRoundedRangeSplitter(fifteenDaysAgo, currentDay, 1440);
+        var usersWhoLeftSalaries = salaries.GroupBy(x => x.UserId).Count();
+
         var response = new AdminChartResponse
         {
-            SalariesPerUser = (double)salaries.Count / salaries.GroupBy(x => x.UserId).Count(),
-            UsersWhoDidNotAddSalary = usersCount - salaries.GroupBy(x => x.UserId).Count(),
+            SalariesPerUser = (double)salaries.Count / usersWhoLeftSalaries,
+            UsersWhoLeftSalary = usersWhoLeftSalaries,
             AllUsersCount = usersCount,
         };
 
+        var salariesFifteenDaysAgoAdded = salaries
+            .Where(x => x.CreatedAt >= fifteenDaysAgo)
+            .ToList();
+
+        var daysSplitter = new DateTimeRoundedRangeSplitter(fifteenDaysAgo, currentDay, 1440);
+
         foreach (var (start, end) in daysSplitter.ToList())
         {
-            var count = salaries.Count(x =>
+            var count = salariesFifteenDaysAgoAdded.Count(x =>
                 x.CreatedAt >= start &&
                 (x.CreatedAt < end || x.CreatedAt == end));
 
