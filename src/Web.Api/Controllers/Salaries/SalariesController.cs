@@ -67,6 +67,11 @@ public class SalariesController : ControllerBase
     {
         var currentDay = DateTime.UtcNow;
         var fifteenDaysAgo = currentDay.AddDays(-20);
+
+        var usersCount = await _context.Users
+            .AsNoTracking()
+            .CountAsync(cancellationToken);
+
         var salaries = await _context.Salaries
             .Where(x => x.CreatedAt >= fifteenDaysAgo)
             .Select(x => new
@@ -79,10 +84,11 @@ public class SalariesController : ControllerBase
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        var daysSplitter = new DateTimeRoundedRangeSplitter(fifteenDaysAgo, currentDay, 360);
+        var daysSplitter = new DateTimeRoundedRangeSplitter(fifteenDaysAgo, currentDay, 1440);
         var response = new AdminChartResponse
         {
-            SalariesPerUser = (double)salaries.Count / salaries.GroupBy(x => x.UserId).Count()
+            SalariesPerUser = (double)salaries.Count / salaries.GroupBy(x => x.UserId).Count(),
+            UsersWhoDidNotAddSalary = usersCount - salaries.GroupBy(x => x.UserId).Count(),
         };
 
         foreach (var (start, end) in daysSplitter.ToList())
