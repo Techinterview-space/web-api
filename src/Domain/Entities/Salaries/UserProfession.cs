@@ -97,4 +97,16 @@ public enum UserProfession
     HeadOfDepartment = 46,
 
     DeliveryManager = 47,
+
+    Copywriter = 48,
+
+    GameDesigner = 49,
+
+    SecOps = 50,
+
+    TalentAcquisition = 51,
+
+    CustomerSupport = 52,
+
+    TechnicalSupport = 53,
 }
