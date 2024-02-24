@@ -5,13 +5,23 @@ using Domain.ValueObjects;
 
 namespace Domain.Entities.Salaries;
 
-public class UserProfession : EntityLabelBase
+public class Profession : EntityLabelBase
 {
-    protected UserProfession()
+    protected Profession()
     {
     }
 
-    public UserProfession(
+    internal Profession(
+        long id,
+        string title,
+        HexColor hexcolor = null,
+        User createdBy = null)
+        : this(title, hexcolor, createdBy)
+    {
+        Id = id;
+    }
+
+    public Profession(
         string title,
         HexColor hexcolor = null,
         User createdBy = null)

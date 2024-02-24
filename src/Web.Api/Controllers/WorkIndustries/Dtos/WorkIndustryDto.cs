@@ -8,7 +8,7 @@ public record WorkIndustryDto
 
     public string Title { get; init; }
 
-    public HexColor HexColor { get; init; }
+    public HexColor HexColor { private get; init; }
 
     public string HexColorAsString => HexColor.ToString();
 }

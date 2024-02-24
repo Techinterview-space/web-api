@@ -56,7 +56,7 @@ public record UserSalaryShowInStatsDecisionMaker
             .Where(x =>
                 x.Company == _company &&
                 x.Grade == _salaryGrade &&
-                x.Profession == _profession &&
+                x.ProfessionEnum == _profession &&
                 x.UseInStats)
             .OrderBy(x => x.Value)
             .Select(x => x.Value)

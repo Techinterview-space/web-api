@@ -20,7 +20,7 @@ public record UserSalaryDto
         Currency = salary.Currency;
         Company = salary.Company;
         Grade = salary.Grade;
-        Profession = salary.Profession;
+        Profession = salary.ProfessionEnum;
         City = salary.City;
         SkillId = salary.SkillId;
         WorkIndustryId = salary.WorkIndustryId;

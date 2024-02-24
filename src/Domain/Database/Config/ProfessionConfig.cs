@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Database.Config;
 
-public class UserProfessionConfig : IEntityTypeConfiguration<UserProfession>
+public class ProfessionConfig : IEntityTypeConfiguration<Profession>
 {
-    public void Configure(EntityTypeBuilder<UserProfession> builder)
+    public void Configure(EntityTypeBuilder<Profession> builder)
     {
-        builder.ToTable("UserProfessions");
+        builder.ToTable("Professions");
 
         builder
             .Property(x => x.HexColor)
@@ -28,6 +28,6 @@ public class UserProfessionConfig : IEntityTypeConfiguration<UserProfession>
             EnumHelper
                 .Values<UserProfessionEnum>()
                 .Where(x => x != UserProfessionEnum.Undefined)
-                .Select(x => new UserProfession(x.ToString())));
+                .Select(x => new Profession((long)x, x.ToString())));
     }
 }

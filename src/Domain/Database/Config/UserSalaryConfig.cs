@@ -30,9 +30,9 @@ public class UserSalaryConfig : IEntityTypeConfiguration<UserSalary>
             .OnDelete(DeleteBehavior.SetNull);
 
         builder
-            .HasOne(x => x.UserProfession)
+            .HasOne(x => x.Profession)
             .WithMany(x => x.Salaries)
-            .HasForeignKey(x => x.UserProfessionId)
+            .HasForeignKey(x => x.ProfessionId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder

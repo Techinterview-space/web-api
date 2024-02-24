@@ -17,7 +17,7 @@ public record EditSalaryRequest
 
     public long? WorkIndustryId { get; init; }
 
-    public long? UserProfessionId { get; init; }
+    public long? ProfessionId { get; init; }
 
     public CompanyType Company { get; init; }
 

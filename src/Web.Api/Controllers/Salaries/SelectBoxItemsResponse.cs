@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
-using TechInterviewer.Controllers.Skills.Dtos;
-using TechInterviewer.Controllers.WorkIndustries.Dtos;
+using TechInterviewer.Controllers.Labels;
 
 namespace TechInterviewer.Controllers.Salaries;
 
 public record SelectBoxItemsResponse
 {
-    public List<SkillDto> Skills { get; init; }
+    public List<LabelEntityDto> Skills { get; init; }
 
-    public List<WorkIndustryDto> Industries { get; init; }
+    public List<LabelEntityDto> Industries { get; init; }
+
+    public List<LabelEntityDto> Professions { get; init; }
 }

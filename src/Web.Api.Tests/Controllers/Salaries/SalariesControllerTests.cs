@@ -200,7 +200,7 @@ public class SalariesControllerTests
         var request = new EditSalaryRequest
         {
             Grade = DeveloperGrade.Middle,
-            Profession = salary.Profession,
+            Profession = salary.ProfessionEnum,
             Company = salary.Company,
         };
 

@@ -25,7 +25,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         UserProfessionEnum profession,
         Skill skillOrNull,
         WorkIndustry workIndustryOrNull,
-        UserProfession userProfessionOrNull,
+        Profession professionOrNull,
         KazakhstanCity? city,
         bool useInStats)
     {
@@ -40,10 +40,10 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency = currency;
         Grade = grade;
         Company = company;
-        Profession = profession;
+        ProfessionEnum = profession;
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
-        UserProfessionId = userProfessionOrNull?.Id;
+        ProfessionId = professionOrNull?.Id;
 
         City = city;
         UseInStats = useInStats;
@@ -72,7 +72,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     public CompanyType Company { get; protected set; }
 
     [NotDefaultValue]
-    public UserProfessionEnum Profession { get; protected set; }
+    public UserProfessionEnum ProfessionEnum { get; protected set; }
 
     public KazakhstanCity? City { get; protected set; }
 
@@ -86,9 +86,9 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public virtual WorkIndustry WorkIndustry { get; protected set; }
 
-    public long? UserProfessionId { get; protected set; }
+    public long? ProfessionId { get; protected set; }
 
-    public virtual UserProfession UserProfession { get; protected set; }
+    public virtual Profession Profession { get; protected set; }
 
     public void Update(
         DeveloperGrade grade,
@@ -97,14 +97,14 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         CompanyType companyType,
         Skill skillOrNull,
         WorkIndustry workIndustryOrNull,
-        UserProfession userProfessionOrNull)
+        Profession professionOrNull)
     {
         Grade = grade;
-        Profession = profession;
+        ProfessionEnum = profession;
         City = city;
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
-        UserProfessionId = userProfessionOrNull?.Id;
+        ProfessionId = professionOrNull?.Id;
 
         Company = companyType;
 
