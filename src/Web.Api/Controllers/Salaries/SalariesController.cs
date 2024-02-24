@@ -254,8 +254,9 @@ public class SalariesController : ControllerBase
         Profession profession = null;
         if (request.ProfessionId is > 0)
         {
+            var professionEnumAsLong = (long)request.ProfessionId;
             profession = await _context.Professions
-                .FirstOrDefaultAsync(x => x.Id == request.ProfessionId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.ProfessionId || x.Id == professionEnumAsLong, cancellationToken);
         }
 
         var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
@@ -264,7 +265,7 @@ public class SalariesController : ControllerBase
             request.Value,
             request.Grade,
             request.Company,
-            request.Profession)
+            profession)
             .DecideAsync(cancellationToken);
 
         var salary = await _context.SaveAsync(

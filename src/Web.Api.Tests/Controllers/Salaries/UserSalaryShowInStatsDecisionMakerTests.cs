@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Salaries;
 using TestUtils.Auth;
 using TestUtils.Db;
@@ -45,8 +46,8 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         const DeveloperGrade grade = DeveloperGrade.Middle;
         const CompanyType company = CompanyType.Local;
-        const UserProfessionEnum profession = UserProfessionEnum.Developer;
 
+        var developerProfession = await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer);
         foreach (var salaryValue in _salaryValues)
         {
             await context.SaveAsync(new UserSalaryFake(
@@ -54,7 +55,8 @@ public class UserSalaryShowInStatsDecisionMakerTests
                     value: salaryValue,
                     grade: grade,
                     company: company,
-                    createdAt: DateTimeOffset.Now.AddDays(-1))
+                    createdAt: DateTimeOffset.Now.AddDays(-1),
+                    professionOrNull: developerProfession)
                 .AsDomain());
         }
 
@@ -64,7 +66,7 @@ public class UserSalaryShowInStatsDecisionMakerTests
             salaryToDecide,
             grade,
             company,
-            profession);
+            developerProfession);
 
         var result = await decisionMaker.DecideAsync(default);
         Assert.Equal(expected, result);
@@ -82,8 +84,8 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         const DeveloperGrade grade = DeveloperGrade.Middle;
         const CompanyType company = CompanyType.Local;
-        const UserProfessionEnum profession = UserProfessionEnum.Developer;
 
+        var developerProfession = await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer);
         foreach (var salaryValue in _salaryValues)
         {
             await context.SaveAsync(new UserSalaryFake(
@@ -91,7 +93,8 @@ public class UserSalaryShowInStatsDecisionMakerTests
                     value: salaryValue,
                     grade: grade,
                     company: company,
-                    createdAt: DateTimeOffset.Now.AddDays(-1))
+                    createdAt: DateTimeOffset.Now.AddDays(-1),
+                    professionOrNull: developerProfession)
                 .AsDomain());
         }
 
@@ -101,7 +104,7 @@ public class UserSalaryShowInStatsDecisionMakerTests
             salaryToDecide,
             grade,
             company,
-            profession);
+            developerProfession);
 
         var result = await decisionMaker.DecideAsync(default);
         Assert.False(result);
