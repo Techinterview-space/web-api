@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Labels;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.Skills;
+namespace TechInterviewer.Controllers.SelectBoxEntities;
 
 [ApiController]
 [Route("api/skills")]

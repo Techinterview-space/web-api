@@ -10,10 +10,10 @@ using Domain.Exceptions;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.WorkIndustries.Dtos;
+using TechInterviewer.Controllers.Labels;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.WorkIndustries;
+namespace TechInterviewer.Controllers.SelectBoxEntities;
 
 [ApiController]
 [Route("api/work-industries")]
@@ -31,11 +31,11 @@ public class WorkIndustriesController : ControllerBase
     }
 
     [HttpGet("for-select-boxes")]
-    public async Task<IEnumerable<WorkIndustryDto>> ForSelectBoxes(
+    public async Task<IEnumerable<LabelEntityDto>> ForSelectBoxes(
         CancellationToken cancellationToken)
     {
         return await _context.WorkIndustries
-            .Select(x => new WorkIndustryDto
+            .Select(x => new LabelEntityDto
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -47,11 +47,11 @@ public class WorkIndustriesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<IEnumerable<WorkIndustryAdminDto>> All(
+    public async Task<IEnumerable<LabelEntityAdminDto>> All(
         CancellationToken cancellationToken)
     {
         return await _context.WorkIndustries
-            .Select(x => new WorkIndustryAdminDto
+            .Select(x => new LabelEntityAdminDto
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -66,7 +66,7 @@ public class WorkIndustriesController : ControllerBase
     [HttpPost("")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Create(
-        [FromBody] WorkIndustryEditRequest createRequest,
+        [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
@@ -79,7 +79,7 @@ public class WorkIndustriesController : ControllerBase
             throw new BadRequestException("Skill with this title already exists");
         }
 
-        var industry = await _context.AddEntityAsync(
+        var item = await _context.AddEntityAsync(
             new WorkIndustry(
                 createRequest.Title,
                 new HexColor(createRequest.HexColor),
@@ -87,20 +87,20 @@ public class WorkIndustriesController : ControllerBase
             cancellationToken: cancellationToken);
 
         await _context.TrySaveChangesAsync(cancellationToken);
-        return Ok(industry.Id);
+        return Ok(item.Id);
     }
 
     [HttpPut("")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Update(
-        [FromBody] WorkIndustryEditRequest updateRequest,
+        [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
-        var industry = await _context.WorkIndustries.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
-        industry.CouldBeUpdatedByOrFail(currentUser);
+        var item = await _context.WorkIndustries.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
+        item.CouldBeUpdatedByOrFail(currentUser);
 
-        industry.Update(
+        item.Update(
             updateRequest.Title,
             new HexColor(updateRequest.HexColor));
 
@@ -115,11 +115,11 @@ public class WorkIndustriesController : ControllerBase
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
-        var industry = await _context.WorkIndustries.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+        var item = await _context.WorkIndustries.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
-        industry.CouldBeUpdatedByOrFail(currentUser);
+        item.CouldBeUpdatedByOrFail(currentUser);
 
-        _context.WorkIndustries.Remove(industry);
+        _context.WorkIndustries.Remove(item);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok();
