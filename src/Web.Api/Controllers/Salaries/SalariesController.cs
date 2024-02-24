@@ -191,6 +191,7 @@ public class SalariesController : ControllerBase
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
+                ProfessionId = x.ProfessionId,
             })
             .OrderBy(x => x.Value)
             .AsNoTracking();

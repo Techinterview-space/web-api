@@ -24,6 +24,7 @@ public record UserSalaryDto
         City = salary.City;
         SkillId = salary.SkillId;
         WorkIndustryId = salary.WorkIndustryId;
+        ProfessionId = salary.ProfessionId;
         CreatedAt = salary.CreatedAt;
         UpdatedAt = salary.UpdatedAt;
     }
@@ -40,13 +41,15 @@ public record UserSalaryDto
 
     public DeveloperGrade? Grade { get; init; }
 
-    public UserProfessionEnum Profession { get; init; }
+    public UserProfessionEnum Profession { get; init; } // TODO remove
 
     public KazakhstanCity? City { get; init; }
 
     public long? SkillId { get; init; }
 
     public long? WorkIndustryId { get; init; }
+
+    public long? ProfessionId { get; init; }
 
     public DateTimeOffset? CreatedAt { get; init; }
 
