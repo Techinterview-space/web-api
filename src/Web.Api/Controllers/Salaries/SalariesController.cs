@@ -411,6 +411,7 @@ public class SalariesController : ControllerBase
                 Company = x.Company,
                 Grade = x.Grade,
                 Profession = x.ProfessionEnum,
+                ProfessionId = x.ProfessionId,
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
