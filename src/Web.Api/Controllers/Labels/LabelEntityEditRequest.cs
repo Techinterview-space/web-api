@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TechInterviewer.Controllers.Skills.Dtos;
+namespace TechInterviewer.Controllers.Labels;
 
-public record SkillEditRequest
+public record LabelEntityEditRequest
 {
     public long? Id { get; init; }
 

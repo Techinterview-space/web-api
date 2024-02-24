@@ -20,7 +20,7 @@ public record UserSalaryDto
         Currency = salary.Currency;
         Company = salary.Company;
         Grade = salary.Grade;
-        Profession = salary.Profession;
+        Profession = salary.ProfessionEnum;
         City = salary.City;
         SkillId = salary.SkillId;
         WorkIndustryId = salary.WorkIndustryId;
@@ -40,7 +40,7 @@ public record UserSalaryDto
 
     public DeveloperGrade? Grade { get; init; }
 
-    public UserProfession Profession { get; init; }
+    public UserProfessionEnum Profession { get; init; }
 
     public KazakhstanCity? City { get; init; }
 

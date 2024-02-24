@@ -22,24 +22,29 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency currency,
         DeveloperGrade? grade,
         CompanyType company,
-        UserProfession profession,
+        UserProfessionEnum profession,
         Skill skillOrNull,
         WorkIndustry workIndustryOrNull,
+        Profession professionOrNull,
         KazakhstanCity? city,
         bool useInStats)
     {
         Id = Guid.NewGuid();
         UserId = user.Id;
         User = user;
+
         Value = NonNegativeValue(value);
         Quarter = NonNegativeValue(quarter);
         Year = NonNegativeValue(year);
+
         Currency = currency;
         Grade = grade;
         Company = company;
-        Profession = profession;
+        ProfessionEnum = profession;
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
+        ProfessionId = professionOrNull?.Id;
+
         City = city;
         UseInStats = useInStats;
     }
@@ -67,7 +72,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     public CompanyType Company { get; protected set; }
 
     [NotDefaultValue]
-    public UserProfession Profession { get; protected set; }
+    public UserProfessionEnum ProfessionEnum { get; protected set; }
 
     public KazakhstanCity? City { get; protected set; }
 
@@ -81,19 +86,26 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public virtual WorkIndustry WorkIndustry { get; protected set; }
 
+    public long? ProfessionId { get; protected set; }
+
+    public virtual Profession Profession { get; protected set; }
+
     public void Update(
         DeveloperGrade grade,
-        UserProfession profession,
+        UserProfessionEnum profession,
         KazakhstanCity? city,
         CompanyType companyType,
         Skill skillOrNull,
-        WorkIndustry workIndustryOrNull)
+        WorkIndustry workIndustryOrNull,
+        Profession professionOrNull)
     {
         Grade = grade;
-        Profession = profession;
+        ProfessionEnum = profession;
         City = city;
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
+        ProfessionId = professionOrNull?.Id;
+
         Company = companyType;
 
         UpdatedAt = DateTime.UtcNow;

@@ -30,6 +30,12 @@ public class UserSalaryConfig : IEntityTypeConfiguration<UserSalary>
             .OnDelete(DeleteBehavior.SetNull);
 
         builder
+            .HasOne(x => x.Profession)
+            .WithMany(x => x.Salaries)
+            .HasForeignKey(x => x.ProfessionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder
             .Property(x => x.UseInStats)
             .HasDefaultValue(true);
     }

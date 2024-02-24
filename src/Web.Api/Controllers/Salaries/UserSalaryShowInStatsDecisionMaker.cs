@@ -23,7 +23,7 @@ public record UserSalaryShowInStatsDecisionMaker
     private readonly double _salary;
     private readonly DeveloperGrade _salaryGrade;
     private readonly CompanyType _company;
-    private readonly UserProfession _profession;
+    private readonly Profession _professionOrNull;
 
     public UserSalaryShowInStatsDecisionMaker(
         DatabaseContext context,
@@ -31,13 +31,13 @@ public record UserSalaryShowInStatsDecisionMaker
         double salary,
         DeveloperGrade salaryGrade,
         CompanyType company,
-        UserProfession profession)
+        Profession professionOrNull)
     {
         _context = context;
         _salary = salary;
         _salaryGrade = salaryGrade;
         _company = company;
-        _profession = profession;
+        _professionOrNull = professionOrNull;
         _currentUser = currentUser;
     }
 
@@ -53,10 +53,10 @@ public record UserSalaryShowInStatsDecisionMaker
         var salaryValues = await _context.Salaries
             .Where(x => x.CreatedAt >= yearAgoGap)
             .Where(x => x.UseInStats)
+            .When(_professionOrNull != null, x => x.ProfessionId == _professionOrNull.Id)
             .Where(x =>
                 x.Company == _company &&
                 x.Grade == _salaryGrade &&
-                x.Profession == _profession &&
                 x.UseInStats)
             .OrderBy(x => x.Value)
             .Select(x => x.Value)

@@ -42,7 +42,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Local,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.Developer,
+            Profession = UserProfessionEnum.Developer,
         };
 
         Assert.Equal(1, context.Salaries.Count());
@@ -74,7 +74,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Local,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.ProductOwner,
+            Profession = UserProfessionEnum.ProductOwner,
         };
 
         var result = await new SalariesController(
@@ -200,7 +200,7 @@ public class SalariesControllerTests
         var request = new EditSalaryRequest
         {
             Grade = DeveloperGrade.Middle,
-            Profession = salary.Profession,
+            Profession = salary.ProfessionEnum,
             Company = salary.Company,
         };
 
@@ -238,7 +238,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Foreign,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.ProductOwner,
+            Profession = UserProfessionEnum.ProductOwner,
         };
 
         Assert.NotEqual(request.Value, salary.Value);
@@ -272,13 +272,15 @@ public class SalariesControllerTests
         var salary1 = await context.SaveAsync(new UserSalaryFake(
             user,
             value: 400_000,
-            createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+            createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+            professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary2 = await context.SaveAsync(new UserSalaryFake(
             user,
             value: 600_000,
-            createdAt: DateTimeOffset.Now.AddDays(-1))
+            createdAt: DateTimeOffset.Now.AddDays(-1),
+            professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var createdSalaries = context.Salaries.ToList();
@@ -304,46 +306,53 @@ public class SalariesControllerTests
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary12 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 700_000,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary21 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
-                profession: UserProfession.BusinessAnalyst,
-                createdAt: DateTimeOffset.Now.AddDays(-4))
+                profession: UserProfessionEnum.BusinessAnalyst,
+                createdAt: DateTimeOffset.Now.AddDays(-4),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary31 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 650_000,
-                profession: UserProfession.Tester,
-                createdAt: DateTimeOffset.Now.AddDays(-2))
+                profession: UserProfessionEnum.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
 
         var salary33 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 1_260_000,
-                profession: UserProfession.Tester,
-                createdAt: DateTimeOffset.Now.AddDays(-2))
+                profession: UserProfessionEnum.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
 
         var createdSalaries = context.Salaries.ToList();
@@ -374,46 +383,53 @@ public class SalariesControllerTests
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary12 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 700_000,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary21 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
-                profession: UserProfession.BusinessAnalyst,
-                createdAt: DateTimeOffset.Now.AddDays(-4))
+                profession: UserProfessionEnum.BusinessAnalyst,
+                createdAt: DateTimeOffset.Now.AddDays(-4),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.BusinessAnalyst))
             .AsDomain());
 
         var salary31 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 650_000,
-                profession: UserProfession.Tester,
-                createdAt: DateTimeOffset.Now.AddDays(-2))
+                profession: UserProfessionEnum.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
 
         var salary33 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 1_260_000,
-                profession: UserProfession.Tester,
-                createdAt: DateTimeOffset.Now.AddDays(-2))
+                profession: UserProfessionEnum.Tester,
+                createdAt: DateTimeOffset.Now.AddDays(-2),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
 
         var createdSalaries = context.Salaries.ToList();
@@ -436,14 +452,14 @@ public class SalariesControllerTests
 
         Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.ItemsByProfession.Count);
         Assert.Equal(
-            UserProfession.BusinessAnalyst,
-            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[0].Profession);
+            (long)UserProfessionEnum.BusinessAnalyst,
+            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[0].ProfessionId);
         Assert.Equal(
-            UserProfession.Tester,
-            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[1].Profession);
+            (long)UserProfessionEnum.Tester,
+            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[1].ProfessionId);
         Assert.Equal(
-            UserProfession.Developer,
-            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[2].Profession);
+            (long)UserProfessionEnum.Developer,
+            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[2].ProfessionId);
     }
 
     [Fact]
@@ -457,7 +473,8 @@ public class SalariesControllerTests
                 value: 400_000,
                 quarter: 2,
                 year: DateTimeOffset.Now.Year - 1,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary2 = await context.SaveAsync(new UserSalaryFake(
@@ -465,7 +482,8 @@ public class SalariesControllerTests
                 value: 300_000,
                 quarter: 1,
                 year: DateTimeOffset.Now.Year - 1,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary3 = await context.SaveAsync(new UserSalaryFake(
@@ -473,7 +491,8 @@ public class SalariesControllerTests
                 value: 450_000,
                 quarter: 4,
                 year: DateTimeOffset.Now.Year - 1,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary4 = await context.SaveAsync(new UserSalaryFake(
@@ -481,7 +500,8 @@ public class SalariesControllerTests
                 value: 500_000,
                 quarter: 1,
                 year: DateTimeOffset.Now.Year,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var createdSalaries = context.Salaries.ToList();
@@ -507,13 +527,15 @@ public class SalariesControllerTests
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var salary12 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 600_000,
-                createdAt: DateTimeOffset.Now.AddDays(-1))
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
         var createdSalaries = context.Salaries.ToList();

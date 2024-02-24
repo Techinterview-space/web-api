@@ -10,32 +10,30 @@ using Domain.Exceptions;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.WorkIndustries.Dtos;
+using TechInterviewer.Controllers.Labels;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.WorkIndustries;
+namespace TechInterviewer.Controllers.SelectBoxEntities;
 
 [ApiController]
-[Route("api/work-industries")]
-public class WorkIndustriesController : ControllerBase
+[Route("api/skills")]
+public class SkillsController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
 
-    public WorkIndustriesController(
-        IAuthorization auth,
-        DatabaseContext context)
+    public SkillsController(IAuthorization auth, DatabaseContext context)
     {
         _auth = auth;
         _context = context;
     }
 
     [HttpGet("for-select-boxes")]
-    public async Task<IEnumerable<WorkIndustryDto>> ForSelectBoxes(
+    public async Task<IEnumerable<LabelEntityDto>> ForSelectBoxes(
         CancellationToken cancellationToken)
     {
-        return await _context.WorkIndustries
-            .Select(x => new WorkIndustryDto
+        return await _context.Skills
+            .Select(x => new LabelEntityDto
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -47,11 +45,11 @@ public class WorkIndustriesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<IEnumerable<WorkIndustryAdminDto>> All(
+    public async Task<IEnumerable<LabelEntityAdminDto>> All(
         CancellationToken cancellationToken)
     {
-        return await _context.WorkIndustries
-            .Select(x => new WorkIndustryAdminDto
+        return await _context.Skills
+            .Select(x => new LabelEntityAdminDto
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -66,41 +64,41 @@ public class WorkIndustriesController : ControllerBase
     [HttpPost("")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Create(
-        [FromBody] WorkIndustryEditRequest createRequest,
+        [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
-        if (await _context.WorkIndustries.AnyAsync(
+        if (await _context.Skills.AnyAsync(
                 x => x.Title.ToUpper() == titleUpper,
                 cancellationToken: cancellationToken))
         {
             throw new BadRequestException("Skill with this title already exists");
         }
 
-        var industry = await _context.AddEntityAsync(
-            new WorkIndustry(
+        var label = await _context.AddEntityAsync(
+            new Skill(
                 createRequest.Title,
                 new HexColor(createRequest.HexColor),
                 currentUser),
             cancellationToken: cancellationToken);
 
         await _context.TrySaveChangesAsync(cancellationToken);
-        return Ok(industry.Id);
+        return Ok(label.Id);
     }
 
     [HttpPut("")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> Update(
-        [FromBody] WorkIndustryEditRequest updateRequest,
+        [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
-        var industry = await _context.WorkIndustries.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
-        industry.CouldBeUpdatedByOrFail(currentUser);
+        var skill = await _context.Skills.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
+        skill.CouldBeUpdatedByOrFail(currentUser);
 
-        industry.Update(
+        skill.Update(
             updateRequest.Title,
             new HexColor(updateRequest.HexColor));
 
@@ -115,11 +113,11 @@ public class WorkIndustriesController : ControllerBase
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
-        var industry = await _context.WorkIndustries.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+        var skill = await _context.Skills.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
-        industry.CouldBeUpdatedByOrFail(currentUser);
+        skill.CouldBeUpdatedByOrFail(currentUser);
 
-        _context.WorkIndustries.Remove(industry);
+        _context.Skills.Remove(skill);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok();

@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities.Salaries;
 
-public enum UserProfession
+public enum UserProfessionEnum
 {
     Undefined = 0,
 

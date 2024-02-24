@@ -17,12 +17,11 @@ using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
+using TechInterviewer.Controllers.Labels;
 using TechInterviewer.Controllers.Salaries.AdminChart;
 using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
-using TechInterviewer.Controllers.Skills.Dtos;
-using TechInterviewer.Controllers.WorkIndustries.Dtos;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -46,30 +45,35 @@ public class SalariesController : ControllerBase
     public async Task<SelectBoxItemsResponse> GetSelectBoxItems(
         CancellationToken cancellationToken)
     {
-        var skills = await _context.Skills
-            .Select(x => new SkillDto
-            {
-                Id = x.Id,
-                Title = x.Title,
-                HexColor = x.HexColor,
-            })
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
-        var industries = await _context.WorkIndustries
-            .Select(x => new WorkIndustryDto
-            {
-                Id = x.Id,
-                Title = x.Title,
-                HexColor = x.HexColor,
-            })
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-
         return new SelectBoxItemsResponse
         {
-            Skills = skills,
-            Industries = industries,
+            Skills = await _context.Skills
+                .Select(x => new LabelEntityDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    HexColor = x.HexColor,
+                })
+                .AsNoTracking()
+                .ToListAsync(cancellationToken),
+            Industries = await _context.WorkIndustries
+                .Select(x => new LabelEntityDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    HexColor = x.HexColor,
+                })
+                .AsNoTracking()
+                .ToListAsync(cancellationToken),
+            Professions = await _context.Professions
+                .Select(x => new LabelEntityDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    HexColor = x.HexColor,
+                })
+                .AsNoTracking()
+                .ToListAsync(cancellationToken),
         };
     }
 
@@ -170,10 +174,10 @@ public class SalariesController : ControllerBase
         var yearAgoGap = DateTimeOffset.Now.AddMonths(-6);
         var query = _context.Salaries
             .Where(x => x.UseInStats)
-            .Where(x => x.Profession != UserProfession.HrNonIt)
+            .Where(x => x.ProfessionEnum != UserProfessionEnum.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.ProfessionsToInclude.Count > 0, x => request.ProfessionsToInclude.Contains(x.Profession))
+            .When(request.ProfessionsToInclude.Count > 0, x => request.ProfessionsToInclude.Contains(x.ProfessionEnum))
             .FilterByCitiesIfNecessary(request.Cities)
             .Select(x => new UserSalaryDto
             {
@@ -183,7 +187,7 @@ public class SalariesController : ControllerBase
                 Currency = x.Currency,
                 Company = x.Company,
                 Grade = x.Grade,
-                Profession = x.Profession,
+                Profession = x.ProfessionEnum,
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
@@ -247,13 +251,21 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
         }
 
+        Profession profession = null;
+        if (request.ProfessionId is > 0)
+        {
+            var professionEnumAsLong = (long)request.ProfessionId;
+            profession = await _context.Professions
+                .FirstOrDefaultAsync(x => x.Id == request.ProfessionId || x.Id == professionEnumAsLong, cancellationToken);
+        }
+
         var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
             _context,
             _auth.CurrentUser,
             request.Value,
             request.Grade,
             request.Company,
-            request.Profession)
+            profession)
             .DecideAsync(cancellationToken);
 
         var salary = await _context.SaveAsync(
@@ -268,6 +280,7 @@ public class SalariesController : ControllerBase
                 request.Profession,
                 skill,
                 workIndustry,
+                profession,
                 request.City,
                 shouldShowInStats),
             cancellationToken);
@@ -310,13 +323,21 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
         }
 
+        Profession profession = null;
+        if (request.ProfessionId is > 0)
+        {
+            profession = await _context.Professions
+                .FirstOrDefaultAsync(x => x.Id == request.ProfessionId, cancellationToken);
+        }
+
         salary.Update(
             request.Grade,
             request.Profession,
             request.City,
             request.Company,
             skill,
-            workIndustry);
+            workIndustry,
+            profession);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
@@ -377,7 +398,7 @@ public class SalariesController : ControllerBase
         var query = _context.Salaries
             .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.Profession.HasValue, x => x.Profession == request.Profession.Value)
+            .When(request.Profession.HasValue, x => x.ProfessionEnum == request.Profession.Value)
             .When(showInStats.HasValue, x => x.UseInStats == showInStats.Value)
             .Select(x => new UserSalaryAdminDto
             {
@@ -388,7 +409,7 @@ public class SalariesController : ControllerBase
                 Currency = x.Currency,
                 Company = x.Company,
                 Grade = x.Grade,
-                Profession = x.Profession,
+                Profession = x.ProfessionEnum,
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,

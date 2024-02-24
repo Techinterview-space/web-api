@@ -36,7 +36,8 @@ public record SalariesByMoneyBarChart
         ItemsByProfession = salaries
             .GroupBy(x => x.Profession)
             .Select(x => new ItemsByProfessionByValuePeriods(
-                x.Key,
+                x.Key, // TODO mgorbatyuk: change to long key
+                (long)x.Key,
                 splitter
                     .Select(y =>
                         x.Count(z =>
@@ -58,7 +59,8 @@ public record SalariesByMoneyBarChart
 
 #pragma warning disable SA1313
     public record ItemsByProfessionByValuePeriods(
-        UserProfession Profession,
+        UserProfessionEnum Profession,
+        long ProfessionId,
         List<int> Items);
 #pragma warning restore SA1313
 }
