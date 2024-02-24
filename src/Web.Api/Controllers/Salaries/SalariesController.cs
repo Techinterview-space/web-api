@@ -21,6 +21,8 @@ using TechInterviewer.Controllers.Salaries.AdminChart;
 using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
+using TechInterviewer.Controllers.Skills.Dtos;
+using TechInterviewer.Controllers.WorkIndustries.Dtos;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers.Salaries;
@@ -38,6 +40,38 @@ public class SalariesController : ControllerBase
     {
         _auth = auth;
         _context = context;
+    }
+
+    [HttpGet("select-box-items")]
+    [HasAnyRole(Role.Interviewer)]
+    public async Task<SelectBoxItemsResponse> GetSelectBoxItems(
+        CancellationToken cancellationToken)
+    {
+        var skills = await _context.Skills
+            .Select(x => new SkillDto
+            {
+                Id = x.Id,
+                Title = x.Title,
+                HexColor = x.HexColor,
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        var industries = await _context.WorkIndustries
+            .Select(x => new WorkIndustryDto
+            {
+                Id = x.Id,
+                Title = x.Title,
+                HexColor = x.HexColor,
+            })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return new SelectBoxItemsResponse
+        {
+            Skills = skills,
+            Industries = industries,
+        };
     }
 
     [HttpGet("all")]
