@@ -43,7 +43,6 @@ public class SalariesController : ControllerBase
     }
 
     [HttpGet("select-box-items")]
-    [HasAnyRole(Role.Interviewer)]
     public async Task<SelectBoxItemsResponse> GetSelectBoxItems(
         CancellationToken cancellationToken)
     {
