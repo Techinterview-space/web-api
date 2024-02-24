@@ -27,7 +27,7 @@ public record ProfessionsDistributionData
 
     public record Item
     {
-        public UserProfession Profession { get; init; }
+        public UserProfessionEnum Profession { get; init; }
 
         public int Count { get; init; }
     }

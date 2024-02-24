@@ -58,7 +58,7 @@ public record SalariesByMoneyBarChart
 
 #pragma warning disable SA1313
     public record ItemsByProfessionByValuePeriods(
-        UserProfession Profession,
+        UserProfessionEnum Profession,
         List<int> Items);
 #pragma warning restore SA1313
 }

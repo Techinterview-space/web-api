@@ -45,7 +45,7 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         const DeveloperGrade grade = DeveloperGrade.Middle;
         const CompanyType company = CompanyType.Local;
-        const UserProfession profession = UserProfession.Developer;
+        const UserProfessionEnum profession = UserProfessionEnum.Developer;
 
         foreach (var salaryValue in _salaryValues)
         {
@@ -82,7 +82,7 @@ public class UserSalaryShowInStatsDecisionMakerTests
 
         const DeveloperGrade grade = DeveloperGrade.Middle;
         const CompanyType company = CompanyType.Local;
-        const UserProfession profession = UserProfession.Developer;
+        const UserProfessionEnum profession = UserProfessionEnum.Developer;
 
         foreach (var salaryValue in _salaryValues)
         {

@@ -40,7 +40,7 @@ public record UserSalaryDto
 
     public DeveloperGrade? Grade { get; init; }
 
-    public UserProfession Profession { get; init; }
+    public UserProfessionEnum Profession { get; init; }
 
     public KazakhstanCity? City { get; init; }
 

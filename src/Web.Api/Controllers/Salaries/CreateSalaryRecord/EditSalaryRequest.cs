@@ -9,13 +9,15 @@ public record EditSalaryRequest
 {
     public DeveloperGrade Grade { get; init; }
 
-    public UserProfession Profession { get; init; }
+    public UserProfessionEnum Profession { get; init; }
 
     public KazakhstanCity? City { get; init; }
 
     public long? SkillId { get; init; }
 
     public long? WorkIndustryId { get; init; }
+
+    public long? UserProfessionId { get; init; }
 
     public CompanyType Company { get; init; }
 
@@ -26,7 +28,7 @@ public record EditSalaryRequest
             throw new BadRequestException("Grade must be valid");
         }
 
-        if (Profession == UserProfession.Undefined)
+        if (Profession == UserProfessionEnum.Undefined)
         {
             throw new BadRequestException("Profession must be valid");
         }

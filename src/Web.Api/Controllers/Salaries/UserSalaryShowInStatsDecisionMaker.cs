@@ -23,7 +23,7 @@ public record UserSalaryShowInStatsDecisionMaker
     private readonly double _salary;
     private readonly DeveloperGrade _salaryGrade;
     private readonly CompanyType _company;
-    private readonly UserProfession _profession;
+    private readonly UserProfessionEnum _profession;
 
     public UserSalaryShowInStatsDecisionMaker(
         DatabaseContext context,
@@ -31,7 +31,7 @@ public record UserSalaryShowInStatsDecisionMaker
         double salary,
         DeveloperGrade salaryGrade,
         CompanyType company,
-        UserProfession profession)
+        UserProfessionEnum profession)
     {
         _context = context;
         _salary = salary;

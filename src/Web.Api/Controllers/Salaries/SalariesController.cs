@@ -170,7 +170,7 @@ public class SalariesController : ControllerBase
         var yearAgoGap = DateTimeOffset.Now.AddMonths(-6);
         var query = _context.Salaries
             .Where(x => x.UseInStats)
-            .Where(x => x.Profession != UserProfession.HrNonIt)
+            .Where(x => x.Profession != UserProfessionEnum.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .When(request.ProfessionsToInclude.Count > 0, x => request.ProfessionsToInclude.Contains(x.Profession))
@@ -247,6 +247,13 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
         }
 
+        UserProfession userProfession = null;
+        if (request.UserProfessionId is > 0)
+        {
+            userProfession = await _context.UserProfessions
+                .FirstOrDefaultAsync(x => x.Id == request.UserProfessionId, cancellationToken);
+        }
+
         var shouldShowInStats = await new UserSalaryShowInStatsDecisionMaker(
             _context,
             _auth.CurrentUser,
@@ -268,6 +275,7 @@ public class SalariesController : ControllerBase
                 request.Profession,
                 skill,
                 workIndustry,
+                userProfession,
                 request.City,
                 shouldShowInStats),
             cancellationToken);
@@ -310,13 +318,21 @@ public class SalariesController : ControllerBase
                 .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
         }
 
+        UserProfession userProfession = null;
+        if (request.UserProfessionId is > 0)
+        {
+            userProfession = await _context.UserProfessions
+                .FirstOrDefaultAsync(x => x.Id == request.UserProfessionId, cancellationToken);
+        }
+
         salary.Update(
             request.Grade,
             request.Profession,
             request.City,
             request.Company,
             skill,
-            workIndustry);
+            workIndustry,
+            userProfession);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));

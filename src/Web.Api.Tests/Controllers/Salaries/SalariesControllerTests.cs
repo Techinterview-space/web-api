@@ -42,7 +42,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Local,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.Developer,
+            Profession = UserProfessionEnum.Developer,
         };
 
         Assert.Equal(1, context.Salaries.Count());
@@ -74,7 +74,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Local,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.ProductOwner,
+            Profession = UserProfessionEnum.ProductOwner,
         };
 
         var result = await new SalariesController(
@@ -238,7 +238,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Foreign,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfession.ProductOwner,
+            Profession = UserProfessionEnum.ProductOwner,
         };
 
         Assert.NotEqual(request.Value, salary.Value);
@@ -322,7 +322,7 @@ public class SalariesControllerTests
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
-                profession: UserProfession.BusinessAnalyst,
+                profession: UserProfessionEnum.BusinessAnalyst,
                 createdAt: DateTimeOffset.Now.AddDays(-4))
             .AsDomain());
 
@@ -335,14 +335,14 @@ public class SalariesControllerTests
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 650_000,
-                profession: UserProfession.Tester,
+                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2))
             .AsDomain());
 
         var salary33 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 1_260_000,
-                profession: UserProfession.Tester,
+                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2))
             .AsDomain());
 
@@ -392,7 +392,7 @@ public class SalariesControllerTests
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
-                profession: UserProfession.BusinessAnalyst,
+                profession: UserProfessionEnum.BusinessAnalyst,
                 createdAt: DateTimeOffset.Now.AddDays(-4))
             .AsDomain());
 
@@ -405,14 +405,14 @@ public class SalariesControllerTests
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 650_000,
-                profession: UserProfession.Tester,
+                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2))
             .AsDomain());
 
         var salary33 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 1_260_000,
-                profession: UserProfession.Tester,
+                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2))
             .AsDomain());
 
@@ -436,13 +436,13 @@ public class SalariesControllerTests
 
         Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.ItemsByProfession.Count);
         Assert.Equal(
-            UserProfession.BusinessAnalyst,
+            UserProfessionEnum.BusinessAnalyst,
             salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[0].Profession);
         Assert.Equal(
-            UserProfession.Tester,
+            UserProfessionEnum.Tester,
             salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[1].Profession);
         Assert.Equal(
-            UserProfession.Developer,
+            UserProfessionEnum.Developer,
             salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[2].Profession);
     }
 

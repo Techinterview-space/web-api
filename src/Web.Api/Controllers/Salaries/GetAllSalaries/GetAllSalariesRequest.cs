@@ -14,7 +14,7 @@ public record GetAllSalariesRequest : PageModel
     public DeveloperGrade? Grade { get; init; }
 
     [FromQuery(Name = "profession")]
-    public UserProfession? Profession { get; init; }
+    public UserProfessionEnum? Profession { get; init; }
 
     [FromQuery(Name = "order_type")]
     public GetAllSalariesOrderType OrderType { get; init; }

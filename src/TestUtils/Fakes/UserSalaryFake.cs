@@ -19,10 +19,11 @@ public class UserSalaryFake : UserSalary
         Currency currency = Currency.KZT,
         DeveloperGrade? grade = null,
         CompanyType company = CompanyType.Local,
-        UserProfession profession = UserProfession.Developer,
+        UserProfessionEnum profession = UserProfessionEnum.Developer,
         DateTimeOffset? createdAt = null,
         Skill skillOrNull = null,
         WorkIndustry workIndustryOrNull = null,
+        UserProfession userProfessionOrNull = null,
         KazakhstanCity? kazakhstanCity = null,
         bool useInStats = true)
         : base(
@@ -36,6 +37,7 @@ public class UserSalaryFake : UserSalary
             profession,
             skillOrNull,
             workIndustryOrNull,
+            userProfessionOrNull,
             kazakhstanCity,
             useInStats)
     {
