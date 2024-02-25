@@ -42,7 +42,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Local,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfessionEnum.Developer,
+            ProfessionId = (long)UserProfessionEnum.Developer,
         };
 
         Assert.Equal(1, context.Salaries.Count());
@@ -74,7 +74,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Local,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfessionEnum.ProductOwner,
+            ProfessionId = (long)UserProfessionEnum.ProductOwner,
         };
 
         var result = await new SalariesController(
@@ -200,7 +200,7 @@ public class SalariesControllerTests
         var request = new EditSalaryRequest
         {
             Grade = DeveloperGrade.Middle,
-            Profession = salary.ProfessionEnum,
+            ProfessionId = salary.ProfessionId,
             Company = salary.Company,
         };
 
@@ -238,7 +238,7 @@ public class SalariesControllerTests
             Currency = Currency.KZT,
             Company = CompanyType.Foreign,
             Grade = DeveloperGrade.Middle,
-            Profession = UserProfessionEnum.ProductOwner,
+            ProfessionId = (long)UserProfessionEnum.ProductOwner,
         };
 
         Assert.NotEqual(request.Value, salary.Value);
@@ -327,7 +327,6 @@ public class SalariesControllerTests
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
-                profession: UserProfessionEnum.BusinessAnalyst,
                 createdAt: DateTimeOffset.Now.AddDays(-4),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
@@ -342,7 +341,6 @@ public class SalariesControllerTests
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 650_000,
-                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
@@ -350,7 +348,6 @@ public class SalariesControllerTests
         var salary33 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 1_260_000,
-                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
@@ -404,7 +401,6 @@ public class SalariesControllerTests
         var salary22 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 600_000,
-                profession: UserProfessionEnum.BusinessAnalyst,
                 createdAt: DateTimeOffset.Now.AddDays(-4),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.BusinessAnalyst))
             .AsDomain());
@@ -419,7 +415,6 @@ public class SalariesControllerTests
         var salary32 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 650_000,
-                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());
@@ -427,7 +422,6 @@ public class SalariesControllerTests
         var salary33 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 1_260_000,
-                profession: UserProfessionEnum.Tester,
                 createdAt: DateTimeOffset.Now.AddDays(-2),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
             .AsDomain());

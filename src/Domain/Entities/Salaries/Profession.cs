@@ -30,4 +30,6 @@ public class Profession : EntityLabelBase
     }
 
     public virtual List<UserSalary> Salaries { get; protected set; } = new ();
+
+    public UserProfessionEnum IdAsEnum => (UserProfessionEnum)Id;
 }

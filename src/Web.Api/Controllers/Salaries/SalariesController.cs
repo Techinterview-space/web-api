@@ -278,7 +278,6 @@ public class SalariesController : ControllerBase
                 request.Currency,
                 request.Grade,
                 request.Company,
-                request.Profession,
                 skill,
                 workIndustry,
                 profession,
@@ -333,7 +332,6 @@ public class SalariesController : ControllerBase
 
         salary.Update(
             request.Grade,
-            request.Profession,
             request.City,
             request.Company,
             skill,

@@ -9,8 +9,6 @@ public record EditSalaryRequest
 {
     public DeveloperGrade Grade { get; init; }
 
-    public UserProfessionEnum Profession { get; init; }
-
     public KazakhstanCity? City { get; init; }
 
     public long? SkillId { get; init; }
@@ -26,11 +24,6 @@ public record EditSalaryRequest
         if (Grade == DeveloperGrade.Unknown)
         {
             throw new BadRequestException("Grade must be valid");
-        }
-
-        if (Profession == UserProfessionEnum.Undefined)
-        {
-            throw new BadRequestException("Profession must be valid");
         }
 
         if (City == KazakhstanCity.Undefined)

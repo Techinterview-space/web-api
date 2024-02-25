@@ -22,7 +22,6 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency currency,
         DeveloperGrade? grade,
         CompanyType company,
-        UserProfessionEnum profession,
         Skill skillOrNull,
         WorkIndustry workIndustryOrNull,
         Profession professionOrNull,
@@ -40,7 +39,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency = currency;
         Grade = grade;
         Company = company;
-        ProfessionEnum = profession;
+        ProfessionEnum = professionOrNull?.IdAsEnum ?? UserProfessionEnum.Undefined; // TODO remove
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
         ProfessionId = professionOrNull?.Id;
@@ -71,7 +70,6 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     [NotDefaultValue]
     public CompanyType Company { get; protected set; }
 
-    [NotDefaultValue]
     public UserProfessionEnum ProfessionEnum { get; protected set; }
 
     public KazakhstanCity? City { get; protected set; }
@@ -92,7 +90,6 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public void Update(
         DeveloperGrade grade,
-        UserProfessionEnum profession,
         KazakhstanCity? city,
         CompanyType companyType,
         Skill skillOrNull,
@@ -100,7 +97,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Profession professionOrNull)
     {
         Grade = grade;
-        ProfessionEnum = profession;
+        ProfessionEnum = professionOrNull?.IdAsEnum ?? UserProfessionEnum.Undefined;
         City = city;
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
