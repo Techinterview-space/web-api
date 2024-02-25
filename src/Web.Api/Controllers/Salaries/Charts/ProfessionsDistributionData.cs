@@ -16,10 +16,10 @@ public record ProfessionsDistributionData
     {
         All = salaries.Count;
         Items = salaries
-            .GroupBy(x => x.Profession)
+            .GroupBy(x => x.ProfessionId)
             .Select(x => new Item
             {
-                Profession = x.Key,
+                Profession = x.Key.GetValueOrDefault(),
                 Count = x.Count(),
             })
             .ToList();
@@ -27,7 +27,7 @@ public record ProfessionsDistributionData
 
     public record Item
     {
-        public UserProfessionEnum Profession { get; init; }
+        public long Profession { get; init; }
 
         public int Count { get; init; }
     }
