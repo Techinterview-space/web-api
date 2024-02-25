@@ -172,9 +172,11 @@ public class SalariesController : ControllerBase
         }
 
         var yearAgoGap = DateTimeOffset.Now.AddMonths(-6);
+
+        // TODO add props to professions to exclude them from stats
         var query = _context.Salaries
             .Where(x => x.UseInStats)
-            .Where(x => x.ProfessionEnum != UserProfessionEnum.HrNonIt)
+            .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .When(
@@ -189,7 +191,6 @@ public class SalariesController : ControllerBase
                 Currency = x.Currency,
                 Company = x.Company,
                 Grade = x.Grade,
-                Profession = x.ProfessionEnum,
                 City = x.City,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
@@ -399,7 +400,7 @@ public class SalariesController : ControllerBase
         var query = _context.Salaries
             .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.Profession.HasValue, x => x.ProfessionEnum == request.Profession.Value)
+            .When(request.Profession.HasValue, x => x.ProfessionId == request.Profession.Value)
             .When(showInStats.HasValue, x => x.UseInStats == showInStats.Value)
             .Select(x => new UserSalaryAdminDto
             {
@@ -410,7 +411,6 @@ public class SalariesController : ControllerBase
                 Currency = x.Currency,
                 Company = x.Company,
                 Grade = x.Grade,
-                Profession = x.ProfessionEnum,
                 ProfessionId = x.ProfessionId,
                 City = x.City,
                 SkillId = x.SkillId,
