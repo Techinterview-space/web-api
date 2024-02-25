@@ -177,7 +177,9 @@ public class SalariesController : ControllerBase
             .Where(x => x.ProfessionEnum != UserProfessionEnum.HrNonIt)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.ProfessionsToInclude.Count > 0, x => request.ProfessionsToInclude.Contains(x.ProfessionEnum))
+            .When(
+                request.ProfessionsToInclude.Count > 0,
+                x => x.ProfessionId != null && request.ProfessionsToInclude.Contains(x.ProfessionId.Value))
             .FilterByCitiesIfNecessary(request.Cities)
             .Select(x => new UserSalaryDto
             {

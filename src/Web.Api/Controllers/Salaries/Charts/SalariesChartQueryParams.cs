@@ -12,7 +12,7 @@ public record SalariesChartQueryParams
     public DeveloperGrade? Grade { get; init; }
 
     [FromQuery(Name = "profsInclude")]
-    public List<UserProfessionEnum> ProfessionsToInclude { get; init; } = new ();
+    public List<long> ProfessionsToInclude { get; init; } = new ();
 
     [FromQuery(Name = "cities")]
     public List<KazakhstanCity> Cities { get; init; } = new ();
