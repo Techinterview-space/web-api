@@ -35,5 +35,10 @@ public record EditSalaryRequest
         {
             throw new BadRequestException("Company must be specified");
         }
+
+        if (ProfessionId is null or <= 0)
+        {
+            throw new BadRequestException("Profession must be specified");
+        }
     }
 }

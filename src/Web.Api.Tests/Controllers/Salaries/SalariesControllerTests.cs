@@ -195,7 +195,9 @@ public class SalariesControllerTests
     {
         await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var salary = await new UserSalaryFake(user).PleaseAsync(context);
+
+        var profession = await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer);
+        var salary = await new UserSalaryFake(user, professionOrNull: profession).PleaseAsync(context);
 
         var request = new EditSalaryRequest
         {
