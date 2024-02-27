@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Services.Organizations;
 using Domain.Validation;
+using TechInterviewer.Controllers.Salaries;
 
-namespace Domain.Services.Users;
+namespace TechInterviewer.Controllers.Users;
 
 public record UserDto
 {
-    public UserDto(User user)
+    public UserDto(
+        User user,
+        List<UserSalaryAdminDto> salaries = null)
     {
         user.ThrowIfNull(nameof(user));
         Id = user.Id;
@@ -36,6 +38,8 @@ public record UserDto
     public string Fullname => $"{FirstName} {LastName}";
 
     public IReadOnlyCollection<Role> Roles { get; }
+
+    public List<UserSalaryAdminDto> Salaries { get; init; }
 
     public DateTimeOffset CreatedAt { get; }
 

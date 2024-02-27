@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Domain.Entities.Interviews;
+using Domain.Services.Interviews.Dtos;
 using Domain.Services.Labels;
-using Domain.Services.Users;
+using TechInterviewer.Controllers.Users;
 
-namespace Domain.Services.Interviews.Dtos;
+namespace TechInterviewer.Controllers.Interviews;
 
 public record InterviewDto : InterviewUpdateRequest
 {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Domain.Entities.Interviews;
+using Domain.Services.InterviewTemplates;
 using Domain.Services.Labels;
-using Domain.Services.Organizations;
-using Domain.Services.Users;
+using TechInterviewer.Controllers.Users;
 
-namespace Domain.Services.InterviewTemplates;
+namespace TechInterviewer.Controllers.Interviews;
 
 public record InterviewTemplateDto : InterviewTemplateUpdateRequest
 {

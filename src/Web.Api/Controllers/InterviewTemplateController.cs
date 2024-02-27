@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Controllers.Interviews;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers;
