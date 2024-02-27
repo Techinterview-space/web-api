@@ -23,6 +23,7 @@ public record UserDto
         EmailConfirmed = user.EmailConfirmed;
         CreatedAt = user.CreatedAt;
         DeletedAt = user.DeletedAt;
+        Salaries = salaries;
     }
 
     public long Id { get; }
