@@ -21,6 +21,7 @@ public record UserSalaryDto
         Company = salary.Company;
         Grade = salary.Grade;
         City = salary.City;
+        Age = salary.Age;
         YearOfStartingWork = salary.YearOfStartingWork;
         Gender = salary.Gender;
         SkillId = salary.SkillId;
@@ -44,6 +45,8 @@ public record UserSalaryDto
 
     public KazakhstanCity? City { get; init; }
 
+    public int? Age { get; init; }
+
     public int? YearOfStartingWork { get; init; }
 
     public int? YearsOfExperience => YearOfStartingWork.HasValue
@@ -57,6 +60,14 @@ public record UserSalaryDto
     public long? WorkIndustryId { get; init; }
 
     public long? ProfessionId { get; init; }
+
+    private bool RequireAdditionalData =>
+        SkillId.HasValue ||
+        WorkIndustryId.HasValue ||
+        ProfessionId.HasValue ||
+        YearOfStartingWork.HasValue ||
+        Gender.HasValue ||
+        Grade.HasValue;
 
     public DateTimeOffset? CreatedAt { get; init; }
 

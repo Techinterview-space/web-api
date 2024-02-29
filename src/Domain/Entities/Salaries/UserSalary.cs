@@ -74,6 +74,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public KazakhstanCity? City { get; protected set; }
 
+    public int? Age { get; protected set; }
+
     public int? YearOfStartingWork { get; protected set; }
 
     public Gender? Gender { get; protected set; }
@@ -99,6 +101,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Skill skillOrNull,
         WorkIndustry workIndustryOrNull,
         Profession professionOrNull,
+        int? age,
         int? yearOfStartingWork,
         Gender? gender)
     {
@@ -109,6 +112,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         WorkIndustryId = workIndustryOrNull?.Id;
         ProfessionId = professionOrNull?.Id;
 
+        Age = age;
         Company = companyType;
         YearOfStartingWork = yearOfStartingWork;
         Gender = gender;

@@ -12,6 +12,8 @@ public record EditSalaryRequest
 
     public KazakhstanCity? City { get; init; }
 
+    public int? Age { get; init; }
+
     public int? YearOfStartingWork { get; init; }
 
     public Gender? Gender { get; init; }
@@ -49,6 +51,11 @@ public record EditSalaryRequest
         if (Gender == Domain.Enums.Gender.Undefined)
         {
             throw new BadRequestException("Gender must be specified");
+        }
+
+        if (Age is < 10 or > 120)
+        {
+            throw new BadRequestException("Invalid age");
         }
 
         if (YearOfStartingWork.HasValue)

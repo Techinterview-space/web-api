@@ -28,6 +28,6 @@ public class ProfessionConfig : IEntityTypeConfiguration<Profession>
             EnumHelper
                 .Values<UserProfessionEnum>()
                 .Where(x => x != UserProfessionEnum.Undefined)
-                .Select(x => new Profession((long)x, x.ToString())));
+                .Select(x => new Profession((long)x, x.ToString(), new HexColor("#C00C50"))));
     }
 }

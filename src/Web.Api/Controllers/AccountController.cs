@@ -42,6 +42,7 @@ public class AccountController : ControllerBase
                 Grade = x.Grade,
                 Company = x.Company,
                 SkillId = x.SkillId,
+                Age = x.Age,
                 YearOfStartingWork = x.YearOfStartingWork,
                 Gender = x.Gender,
                 WorkIndustryId = x.WorkIndustryId,
