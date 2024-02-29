@@ -21,6 +21,8 @@ public record UserSalaryDto
         Company = salary.Company;
         Grade = salary.Grade;
         City = salary.City;
+        YearOfStartingWork = salary.YearOfStartingWork;
+        Gender = salary.Gender;
         SkillId = salary.SkillId;
         WorkIndustryId = salary.WorkIndustryId;
         ProfessionId = salary.ProfessionId;
@@ -41,6 +43,14 @@ public record UserSalaryDto
     public DeveloperGrade? Grade { get; init; }
 
     public KazakhstanCity? City { get; init; }
+
+    public int? YearOfStartingWork { get; init; }
+
+    public int? YearsOfExperience => YearOfStartingWork.HasValue
+        ? (DateTimeOffset.UtcNow.Year - YearOfStartingWork) + 1
+        : null;
+
+    public Gender? Gender { get; init; }
 
     public long? SkillId { get; init; }
 

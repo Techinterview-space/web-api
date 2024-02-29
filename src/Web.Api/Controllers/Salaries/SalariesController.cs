@@ -194,6 +194,8 @@ public class SalariesController : ControllerBase
                 Company = x.Company,
                 Grade = x.Grade,
                 City = x.City,
+                YearOfStartingWork = x.YearOfStartingWork,
+                Gender = x.Gender,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
                 ProfessionId = x.ProfessionId,
@@ -341,7 +343,9 @@ public class SalariesController : ControllerBase
             request.Company,
             skill,
             workIndustry,
-            profession);
+            profession,
+            request.YearOfStartingWork,
+            request.Gender);
 
         await _context.SaveChangesAsync(cancellationToken);
         return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
@@ -415,6 +419,8 @@ public class SalariesController : ControllerBase
                 Grade = x.Grade,
                 ProfessionId = x.ProfessionId,
                 City = x.City,
+                YearOfStartingWork = x.YearOfStartingWork,
+                Gender = x.Gender,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
                 CreatedAt = x.CreatedAt,

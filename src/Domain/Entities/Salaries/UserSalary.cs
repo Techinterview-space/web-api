@@ -74,6 +74,10 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
     public KazakhstanCity? City { get; protected set; }
 
+    public int? YearOfStartingWork { get; protected set; }
+
+    public Gender? Gender { get; protected set; }
+
     public bool UseInStats { get; protected set; }
 
     public long? SkillId { get; protected set; }
@@ -94,7 +98,9 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         CompanyType companyType,
         Skill skillOrNull,
         WorkIndustry workIndustryOrNull,
-        Profession professionOrNull)
+        Profession professionOrNull,
+        int? yearOfStartingWork,
+        Gender? gender)
     {
         Grade = grade;
         ProfessionEnum = professionOrNull?.IdAsEnum ?? UserProfessionEnum.Undefined;
@@ -104,6 +110,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         ProfessionId = professionOrNull?.Id;
 
         Company = companyType;
+        YearOfStartingWork = yearOfStartingWork;
+        Gender = gender;
 
         UpdatedAt = DateTime.UtcNow;
     }
