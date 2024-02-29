@@ -156,12 +156,13 @@ public class SalariesController : ControllerBase
         var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var userSalariesForLastYear = new List<UserSalary>();
+        var currentQuarter = DateQuarter.Current;
+
         if (currentUser != null)
         {
             var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
-            var currentQuarter = DateQuarter.Current;
             userSalariesForLastYear = await _context.Salaries
                 .Where(x => x.UserId == user.Id)
                 .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
@@ -177,6 +178,7 @@ public class SalariesController : ControllerBase
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
+            .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
             .Where(x => x.CreatedAt >= yearAgoGap)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
             .When(
