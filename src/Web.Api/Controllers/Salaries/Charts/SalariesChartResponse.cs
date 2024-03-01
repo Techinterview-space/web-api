@@ -78,7 +78,8 @@ public record SalariesChartResponse
     }
 
     public static SalariesChartResponse RequireOwnSalary(
-        List<double> salaryValues)
+        List<double> salaryValues,
+        bool onlyLocalCompanySalaries)
     {
         return new (
             new List<UserSalaryDto>(),
@@ -90,6 +91,7 @@ public record SalariesChartResponse
         {
             AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
             MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
+            OnlyLocalCompanySalaries = onlyLocalCompanySalaries
         };
     }
 
@@ -98,6 +100,8 @@ public record SalariesChartResponse
     public int TotalCountInStats { get; }
 
     public UserSalaryAdminDto CurrentUserSalary { get; }
+
+    public bool OnlyLocalCompanySalaries { get; private set; }
 
     public bool ShouldAddOwnSalary { get; }
 

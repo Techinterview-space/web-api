@@ -7,8 +7,8 @@ namespace DomainTests.ValueObjects.Dates
     public class DateTest
     {
         [Theory]
-        [InlineData("2020-09-01T00:00:00.00+0{0}:00", "yyyy-MM-ddTHH:mm:ss.ffzzzz")]
-        [InlineData("2020-09-01", "yyyy-MM-dd")]
+        [InlineData("2024-09-01T00:00:00.00+0{0}:00", "yyyy-MM-ddTHH:mm:ss.ffzzzz")]
+        [InlineData("2024-09-01", "yyyy-MM-dd")]
         public void ToFormat_DifferentFormats(string expected, string format)
         {
             var timezone = DateTimeOffset.Now.Offset.Hours;
@@ -16,15 +16,15 @@ namespace DomainTests.ValueObjects.Dates
 
             Assert.Equal(
                 expected,
-                new Date(2020, 9, 1).ToString(format));
+                new Date(2024, 9, 1).ToString(format));
         }
 
         [Fact]
         public void ToJiraIso_Ok()
         {
             Assert.Equal(
-                $"2020-09-01T00:00:00.00+0{DateTimeOffset.Now.Offset.Hours}:00",
-                new Date(2020, 9, 1).ToJiraIso());
+                $"2024-09-01T00:00:00.00+0{DateTimeOffset.Now.Offset.Hours}:00",
+                new Date(2024, 9, 1).ToJiraIso());
         }
 
         [Fact]

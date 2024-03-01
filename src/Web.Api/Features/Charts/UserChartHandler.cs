@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
+using Domain.Enums;
 using Domain.Extensions;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Dates;
@@ -74,10 +75,13 @@ public class UserChartHandler(
         if (currentUser == null || !userSalariesForLastYear.Any())
         {
             var salaryValues = await query
+                .When(request.HasAnyFilter, x => x.Company == CompanyType.Local)
                 .Select(x => x.Value)
                 .ToListAsync(cancellationToken);
 
-            return SalariesChartResponse.RequireOwnSalary(salaryValues);
+            return SalariesChartResponse.RequireOwnSalary(
+                salaryValues,
+                request.HasAnyFilter);
         }
 
         var salaries = await query.ToListAsync(cancellationToken);

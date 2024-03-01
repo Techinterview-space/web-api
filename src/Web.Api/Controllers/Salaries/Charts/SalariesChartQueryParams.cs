@@ -16,4 +16,7 @@ public record SalariesChartQueryParams
 
     [FromQuery(Name = "cities")]
     public List<KazakhstanCity> Cities { get; init; } = new ();
+
+    public bool HasAnyFilter =>
+        Grade.HasValue || ProfessionsToInclude.Count > 0 || Cities.Count > 0;
 }
