@@ -31,15 +31,13 @@ public class ChartShareRedirectPageContentResultHandler
     }
 
     public async Task<ContentResult> CreateAsync(
-        HttpResponse response,
-        string queryStringOrNull,
         CancellationToken cancellationToken)
     {
         const string title = "Зарплаты в IT в Казахстане";
 
-        var frontendUrl = _global.FrontendBaseUrl + "/salaries" + queryStringOrNull;
+        var frontendUrl = _global.FrontendBaseUrl + "/salaries";
+        string queryParams = null;
 
-        // response.Redirect(frontendUrl);
         string description;
         string contentDescription;
 
@@ -55,12 +53,17 @@ public class ChartShareRedirectPageContentResultHandler
 
                 description += string.Join(", ", professions);
                 contentDescription += $"<span class=\"fw-bold\">{string.Join(", ", professions)}</span>";
+
+                queryParams += $"?profsInclude={string.Join(",", _requestParams.ProfessionsToInclude)}";
             }
 
             if (_requestParams.Grade.HasValue)
             {
                 description += $" уровня {_requestParams.Grade.ToString()}";
                 contentDescription += $" уровня <span class=\"fw-bold\">{_requestParams.Grade.ToString()}</span>";
+
+                queryParams = queryParams != null ? queryParams + "&" : "?";
+                queryParams += $"grade={_requestParams.Grade}";
             }
 
             description += " зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
@@ -72,6 +75,7 @@ public class ChartShareRedirectPageContentResultHandler
             description = "Специалисты IT в Казахстане зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
         }
 
+        frontendUrl += queryParams;
         description += $" Более подробно на сайте {frontendUrl}";
 
         return new ContentResult

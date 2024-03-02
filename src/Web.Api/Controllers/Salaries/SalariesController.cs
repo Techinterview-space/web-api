@@ -174,10 +174,7 @@ public class SalariesController : ControllerBase
             _context,
             _global);
 
-        return await contentResultProvider.CreateAsync(
-            Response,
-            Request.QueryString.Value,
-            cancellationToken);
+        return await contentResultProvider.CreateAsync(cancellationToken);
     }
 
     [HttpPost("")]
