@@ -63,7 +63,7 @@ public class ChartShareRedirectPageContentResultHandler
                 contentDescription += $" уровня <span class=\"fw-bold\">{_requestParams.Grade.ToString()}</span>";
 
                 queryParams = queryParams != null ? queryParams + "&" : "?";
-                queryParams += $"grade={_requestParams.Grade}";
+                queryParams += $"grade={(int)_requestParams.Grade.Value}";
             }
 
             description += " зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
