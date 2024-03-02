@@ -38,12 +38,14 @@ public class ChartShareRedirectPageContentResultHandler
         const string title = "Зарплаты в IT в Казахстане";
 
         var frontendUrl = _global.FrontendBaseUrl + "/salaries" + queryStringOrNull;
-        response.Redirect(frontendUrl);
+
+        // response.Redirect(frontendUrl);
         string description;
+        string contentDescription;
 
         if (_requestParams.HasAnyFilter)
         {
-            description = "Специалисты ";
+            description = contentDescription = "Специалисты ";
             if (_requestParams.ProfessionsToInclude.Count > 0)
             {
                 var professions = await _context.Professions
@@ -52,17 +54,21 @@ public class ChartShareRedirectPageContentResultHandler
                     .ToListAsync(cancellationToken);
 
                 description += string.Join(", ", professions);
+                contentDescription += $"<span class=\"fw-bold\">{string.Join(", ", professions)}</span>";
             }
 
             if (_requestParams.Grade.HasValue)
             {
                 description += $" уровня {_requestParams.Grade.ToString()}";
+                contentDescription += $" уровня <span class=\"fw-bold\">{_requestParams.Grade.ToString()}</span>";
             }
 
             description += " зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
+            contentDescription += " зарабатывают в среднем:";
         }
         else
         {
+            contentDescription = "Специалисты IT в Казахстане зарабатывают в среднем:";
             description = "Специалисты IT в Казахстане зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
         }
 
@@ -71,7 +77,7 @@ public class ChartShareRedirectPageContentResultHandler
         return new ContentResult
         {
             ContentType = "text/html",
-            StatusCode = (int)HttpStatusCode.Redirect,
+            StatusCode = (int)HttpStatusCode.OK,
             Content = $@"<!doctype html>
 <html lang=""en"">
   <head>
@@ -96,11 +102,23 @@ public class ChartShareRedirectPageContentResultHandler
     <meta name=""twitter:creator"" content=""@maximgorbatyuk"" />
 
     <!-- Bootstrap CSS -->
-    <link rel=""stylesheet"" href=""https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"" integrity=""sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"" crossorigin=""anonymous"">
+    <link href=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"" rel=""stylesheet"" integrity=""sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"" crossorigin=""anonymous"">
 
     <title>{title}</title>
   </head>
   <body>
+    <div class=""container"">
+        <div class=""mt-5 mb-5 display-3"">Зарплаты в IT в Казахстане</div>
+        <div class=""mb-3 fs-3 fw-light"">{contentDescription}</div>
+        <div class=""mb-3"">
+            <span class=""display-1"">{_chartResponse.MedianSalary:n0}</span>
+            <span class=""ms-2"">тенге</span>
+        </div>
+        <div class=""mt-3 mb-3 fs-3 fw-light"">
+            Подробнее на сайте <a href=""{frontendUrl}"">techinterview.space</a>
+        </div>
+    </div>
+  <script src=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"" integrity=""sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"" crossorigin=""anonymous""></script>
   </body>
 </html>"
         };
