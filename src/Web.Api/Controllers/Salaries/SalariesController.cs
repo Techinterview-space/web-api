@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
@@ -11,6 +12,7 @@ using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Extensions;
 using Domain.Services;
+using Domain.Services.Global;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Dates;
 using Domain.ValueObjects.Pagination;
@@ -33,13 +35,16 @@ public class SalariesController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
+    private readonly IGlobal _global;
 
     public SalariesController(
         IAuthorization auth,
-        DatabaseContext context)
+        DatabaseContext context,
+        IGlobal global)
     {
         _auth = auth;
         _context = context;
+        _global = global;
     }
 
     [HttpGet("select-box-items")]
@@ -155,6 +160,24 @@ public class SalariesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return new UserChartHandler(_auth, _context).Handle(request, cancellationToken);
+    }
+
+    [HttpGet("chart-share")]
+    public async Task<IActionResult> ChartShareAsync(
+        [FromQuery] SalariesChartQueryParams request,
+        CancellationToken cancellationToken)
+    {
+        var result = await new UserChartHandler(_auth, _context).Handle(request, cancellationToken);
+        var contentResultProvider = new ChartShareRedirectPageContentResultHandler(
+            result,
+            request,
+            _context,
+            _global);
+
+        return await contentResultProvider.CreateAsync(
+            Response,
+            Request.QueryString.Value,
+            cancellationToken);
     }
 
     [HttpPost("")]

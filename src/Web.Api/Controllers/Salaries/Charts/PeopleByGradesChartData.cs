@@ -9,7 +9,7 @@ public record PeopleByGradesChartData
 {
     public int AllCount { get; }
 
-    public List<Item> Data { get; }
+    public List<PeopleByGradesChartDataItem> Data { get; }
 
     public PeopleByGradesChartData(
         List<UserSalaryDto> salaries)
@@ -18,7 +18,7 @@ public record PeopleByGradesChartData
         Data = salaries
             .Select(x => x.Grade ?? DeveloperGrade.Unknown)
             .GroupBy(x => x)
-            .Select(x => new Item
+            .Select(x => new PeopleByGradesChartDataItem
             {
                 Grade = x.Key,
                 Count = x.Count(),
@@ -26,7 +26,7 @@ public record PeopleByGradesChartData
             .ToList();
     }
 
-    public record Item
+    public record PeopleByGradesChartDataItem
     {
         public DeveloperGrade Grade { get; init; }
 

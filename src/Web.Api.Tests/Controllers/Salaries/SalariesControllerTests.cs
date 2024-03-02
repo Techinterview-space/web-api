@@ -48,7 +48,10 @@ public class SalariesControllerTests
         Assert.Equal(1, context.Salaries.Count());
 
         context.ChangeTracker.Clear();
-        var result = await new SalariesController(new FakeAuth(user), context)
+        var result = await new SalariesController(
+                new FakeAuth(user),
+                context,
+                new GlobalFake())
             .Create(request, default);
 
         Assert.Equal(1, context.Salaries.Count());
@@ -79,7 +82,8 @@ public class SalariesControllerTests
 
         var result = await new SalariesController(
                 new FakeAuth(user),
-                context)
+                context,
+                new GlobalFake())
             .Create(
                 request,
                 default);
@@ -121,7 +125,8 @@ public class SalariesControllerTests
         await Assert.ThrowsAsync<BadRequestException>(() =>
             new SalariesController(
                     new FakeAuth(user),
-                    context)
+                    context,
+                    new GlobalFake())
                 .Create(
                     request,
                     default));
@@ -152,7 +157,8 @@ public class SalariesControllerTests
         await Assert.ThrowsAsync<BadRequestException>(() =>
             new SalariesController(
                     new FakeAuth(user),
-                    context)
+                    context,
+                    new GlobalFake())
                 .Create(
                     request,
                     default));
@@ -182,7 +188,8 @@ public class SalariesControllerTests
         await Assert.ThrowsAsync<BadRequestException>(() =>
             new SalariesController(
                     new FakeAuth(user),
-                    context)
+                    context,
+                    new GlobalFake())
                 .Create(
                     request,
                     default));
@@ -208,7 +215,10 @@ public class SalariesControllerTests
 
         Assert.NotEqual(request.Grade, salary.Grade);
 
-        var result = await new SalariesController(new FakeAuth(user), context)
+        var result = await new SalariesController(
+                new FakeAuth(user),
+                context,
+                new GlobalFake())
             .Update(salary.Id, request, default);
 
         Assert.True(result.IsSuccess);
@@ -249,7 +259,10 @@ public class SalariesControllerTests
         Assert.NotEqual(request.Company, salary.Company);
         Assert.NotEqual(request.Grade, salary.Grade);
 
-        var result = await new SalariesController(new FakeAuth(user), context)
+        var result = await new SalariesController(
+                new FakeAuth(user),
+                context,
+                new GlobalFake())
             .Update(salary.Id, request, default);
 
         Assert.True(result.IsSuccess);
@@ -288,7 +301,10 @@ public class SalariesControllerTests
         var createdSalaries = context.Salaries.ToList();
         Assert.Equal(2, createdSalaries.Count);
 
-        var salaries = await new SalariesController(new FakeAuth(user), context)
+        var salaries = await new SalariesController(
+                new FakeAuth(user),
+                context,
+                new GlobalFake())
             .AllAsync(
                 new GetAllSalariesRequest(),
                 default);
@@ -359,7 +375,8 @@ public class SalariesControllerTests
 
         var salariesResponse = await new SalariesController(
                 new FakeAuth(null),
-                context)
+                context,
+                new GlobalFake())
             .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
@@ -433,7 +450,8 @@ public class SalariesControllerTests
 
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user1),
-                context)
+                context,
+                new GlobalFake())
             .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
@@ -505,7 +523,8 @@ public class SalariesControllerTests
 
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user1),
-                context)
+                context,
+                new GlobalFake())
             .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
@@ -539,7 +558,8 @@ public class SalariesControllerTests
 
         var salariesResponse = await new SalariesController(
                 new FakeAuth(user2),
-                context)
+                context,
+                new GlobalFake())
             .ChartAsync(new SalariesChartQueryParams(), default);
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
@@ -560,7 +580,10 @@ public class SalariesControllerTests
 
         Assert.False(salary.UseInStats);
         context.ChangeTracker.Clear();
-        await new SalariesController(new FakeAuth(user1), context)
+        await new SalariesController(
+                new FakeAuth(user1),
+                context,
+                new GlobalFake())
             .Approve(salary.Id, default);
 
         salary = await context.Salaries.FirstOrDefaultAsync(x => x.Id == salary.Id);
@@ -588,7 +611,10 @@ public class SalariesControllerTests
         var allSalaries = context.Salaries.ToList();
         Assert.Equal(2, allSalaries.Count);
 
-        await new SalariesController(new FakeAuth(user1), context)
+        await new SalariesController(
+                new FakeAuth(user1),
+                context,
+                new GlobalFake())
             .Delete(salary12.Id, default);
 
         allSalaries = context.Salaries.ToList();

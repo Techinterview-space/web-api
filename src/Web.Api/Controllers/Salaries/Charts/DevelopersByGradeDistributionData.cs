@@ -9,7 +9,7 @@ public record DevelopersByGradeDistributionData
 {
     public int All { get; }
 
-    public List<Item> Items { get; }
+    public List<ResponseItem> Items { get; }
 
     public DevelopersByGradeDistributionData(
         List<UserSalaryDto> salaries)
@@ -20,10 +20,10 @@ public record DevelopersByGradeDistributionData
             .Distinct()
             .ToList();
 
-        Items = new List<Item>();
+        Items = new List<ResponseItem>();
         foreach (var grade in grades)
         {
-            Items.Add(new Item
+            Items.Add(new ResponseItem
             {
                 Grade = grade,
                 Count = salaries.Count(x => x.Grade == grade),
@@ -31,7 +31,7 @@ public record DevelopersByGradeDistributionData
         }
     }
 
-    public record Item
+    public record ResponseItem
     {
         public DeveloperGrade? Grade { get; init; }
 
