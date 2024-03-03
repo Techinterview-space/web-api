@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Services.Global;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Salaries.Charts;
@@ -114,9 +113,12 @@ public class ChartShareRedirectPageContentResultHandler
     <div class=""container"">
         <div class=""mt-5 mb-5 display-3"">Зарплаты в IT в Казахстане</div>
         <div class=""mb-3 fs-3 fw-light"">{contentDescription}</div>
-        <div class=""mb-3"">
+        <div class=""mb-2"">
             <span class=""display-1"">{_chartResponse.MedianSalary:n0}</span>
             <span class=""ms-2"">тенге</span>
+        </div>
+        <div class=""mb-3 fst-italic text-muted"">
+            Рассчитано на основе {_chartResponse.Salaries.Count} анкет(ы).
         </div>
         <div class=""mt-3 mb-3 fs-3 fw-light"">
             Подробнее на сайте <a href=""{frontendUrl}"">techinterview.space/salaries</a>
