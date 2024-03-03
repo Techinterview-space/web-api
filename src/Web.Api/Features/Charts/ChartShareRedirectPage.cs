@@ -118,7 +118,7 @@ public class ChartShareRedirectPageContentResultHandler
             <span class=""ms-2"">тенге</span>
         </div>
         <div class=""mb-3 fst-italic text-muted"">
-            Рассчитано на основе {_chartResponse.Salaries.Count} анкет(ы).
+            Рассчитано на основе {_chartResponse.TotalCountInStats} анкет(ы).
         </div>
         <div class=""mt-3 mb-3 fs-3 fw-light"">
             Подробнее на сайте <a href=""{frontendUrl}"">techinterview.space/salaries</a>
