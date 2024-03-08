@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Domain.ValueObjects.Ranges;
 
 namespace Domain.Services;
 
-public record ValuesByRangesSplitter : IEnumerable<(double Start, double End)>
+public record ValuesByRangesSplitter : IEnumerable<DoublesRange>
 {
     private readonly double _min;
     private readonly double _max;
     private readonly int _step;
 
-    private List<(double Start, double End)> _ranges;
+    private List<DoublesRange> _ranges;
 
     public ValuesByRangesSplitter(
         double min,
@@ -22,7 +23,7 @@ public record ValuesByRangesSplitter : IEnumerable<(double Start, double End)>
         _step = step;
     }
 
-    public IEnumerator<(double Start, double End)> GetEnumerator()
+    public IEnumerator<DoublesRange> GetEnumerator()
     {
         if (_ranges != null)
         {
@@ -38,7 +39,7 @@ public record ValuesByRangesSplitter : IEnumerable<(double Start, double End)>
         return GetEnumerator();
     }
 
-    public List<(double Start, double End)> ToList()
+    public List<DoublesRange> ToList()
     {
         if (_ranges != null)
         {
@@ -49,21 +50,21 @@ public record ValuesByRangesSplitter : IEnumerable<(double Start, double End)>
         return _ranges;
     }
 
-    private List<(double Start, double End)> PrepareData()
+    private List<DoublesRange> PrepareData()
     {
-        var ranges = new List<(double Start, double End)>();
+        var ranges = new List<DoublesRange>();
         var start = _min;
         var end = start + _step;
         while (end <= _max)
         {
-            ranges.Add((start, end));
+            ranges.Add(new DoublesRange(start, end));
             start = end;
             end += _step;
         }
 
         if (Math.Abs(start - _max) > 0.01)
         {
-            ranges.Add((start, _max));
+            ranges.Add(new DoublesRange(start, _max));
         }
 
         return ranges;

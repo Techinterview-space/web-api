@@ -40,6 +40,9 @@ public record SalariesChartResponse
         RangeEnd = rangeEnd;
         TotalCountInStats = totalCountInStats;
 
+        DevelopersByAgeChartData = new DevelopersByAgeChartData(salaries);
+        DevelopersByExperienceYearsChartData = new DevelopersByExperienceYears(salaries);
+
         var localSalaries = salaries
             .Where(x => x.Company == CompanyType.Local)
             .ToList();
@@ -132,4 +135,8 @@ public record SalariesChartResponse
     public PeopleByGradesChartData PeopleByGradesChartDataForLocal { get; }
 
     public PeopleByGradesChartData PeopleByGradesChartDataForRemote { get; }
+
+    public DevelopersByAgeChartData DevelopersByAgeChartData { get; }
+
+    public DevelopersByExperienceYears DevelopersByExperienceYearsChartData { get; }
 }
