@@ -26,7 +26,7 @@ public record DevelopersByExperienceYears
             .Select(x => x.YearsOfExperience.Value)
             .ToList();
 
-        var splitter = new ValuesByRangesSplitter(0, DefaultMaxExperience, 5);
+        var splitter = new ValuesByRangesSplitter(0, 15, 1);
         var ranges = splitter.ToList();
 
         for (var index = 0; index < ranges.Count; index++)
