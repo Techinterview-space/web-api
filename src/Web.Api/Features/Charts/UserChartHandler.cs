@@ -98,9 +98,48 @@ public class UserChartHandler(
         IQueryable<UserSalary> query,
         SalariesChartQueryParams request)
     {
+        var professionsToInclude = request.ProfessionsToInclude;
+        if (professionsToInclude.Count > 0 && professionsToInclude.Contains((long)UserProfessionEnum.Developer))
+        {
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.BackendDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.BackendDeveloper);
+            }
+
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.FrontendDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.FrontendDeveloper);
+            }
+
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.FullstackDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.FullstackDeveloper);
+            }
+
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.MobileDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.MobileDeveloper);
+            }
+
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.IosDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.IosDeveloper);
+            }
+
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.AndroidDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.AndroidDeveloper);
+            }
+
+            if (!professionsToInclude.Contains((long)UserProfessionEnum.GameDeveloper))
+            {
+                professionsToInclude.Add((long)UserProfessionEnum.GameDeveloper);
+            }
+        }
+
         return query
             .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.ProfessionsToInclude.Count > 0, x => x.ProfessionId != null && request.ProfessionsToInclude.Contains(x.ProfessionId.Value))
+            .When(professionsToInclude.Count > 0, x => x.ProfessionId != null && professionsToInclude.Contains(x.ProfessionId.Value))
             .FilterByCitiesIfNecessary(request.Cities);
     }
 }
