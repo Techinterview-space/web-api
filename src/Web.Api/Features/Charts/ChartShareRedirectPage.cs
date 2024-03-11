@@ -29,6 +29,9 @@ public class ChartShareRedirectPageContentResultHandler
         _global = global;
     }
 
+    public static string SalaryFormat(
+        double salary) => salary.ToString("n0");
+
     public async Task<ContentResult> CreateAsync(
         CancellationToken cancellationToken)
     {
@@ -37,6 +40,8 @@ public class ChartShareRedirectPageContentResultHandler
         var frontendUrl = _global.FrontendBaseUrl + "/salaries";
         string queryParams = null;
 
+        var formattedMedianSalary = SalaryFormat(_chartResponse.MedianSalary);
+        var ogTitle = "Медианная зп: " + formattedMedianSalary;
         string description;
         string contentDescription;
 
@@ -51,7 +56,7 @@ public class ChartShareRedirectPageContentResultHandler
                     .ToListAsync(cancellationToken);
 
                 description += string.Join(", ", professions);
-                contentDescription += $"<span class=\"fw-bold\">{string.Join(", ", professions)}</span>";
+                contentDescription += $"<span class=\"\">{string.Join(", ", professions)}</span>";
 
                 queryParams += $"?profsInclude={string.Join(",", _requestParams.ProfessionsToInclude)}";
             }
@@ -65,13 +70,13 @@ public class ChartShareRedirectPageContentResultHandler
                 queryParams += $"grade={(int)_requestParams.Grade.Value}";
             }
 
-            description += " зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
+            description += $" зарабатывают в среднем {formattedMedianSalary} тг.";
             contentDescription += " зарабатывают в среднем:";
         }
         else
         {
             contentDescription = "Специалисты IT в Казахстане зарабатывают в среднем:";
-            description = "Специалисты IT в Казахстане зарабатывают в среднем " + _chartResponse.MedianSalary + " тенге.";
+            description = $"Специалисты IT в Казахстане зарабатывают в среднем {formattedMedianSalary} тг.";
         }
 
         frontendUrl += queryParams;
@@ -90,7 +95,7 @@ public class ChartShareRedirectPageContentResultHandler
     <meta name=""keywords"" content=""зарплата, казахстан, it, salary"" />
     <meta name=""copyright"" content=""Maxim Gorbatyuk"" />
 
-    <meta property=""og:title"" content=""{title}"" />
+    <meta property=""og:title"" content=""{ogTitle}"" />
     <meta property=""og:description"" content=""{description}"" />
     <meta property=""og:type"" content=""website"" />
     <meta property=""og:url"" content=""{frontendUrl}"" />
@@ -99,7 +104,7 @@ public class ChartShareRedirectPageContentResultHandler
 
     <meta name=""twitter:card"" content=""summary_large_image"" />
     <meta name=""twitter:image"" content=""https://techinterview.space/assets/img/ti_logo_mini.png"" />
-    <meta name=""twitter:title"" content=""{title}"" />
+    <meta name=""twitter:title"" content=""{ogTitle}"" />
     <meta name=""twitter:description"" content=""{description}"" />
     <meta name=""twitter:site"" content=""@techinterview"" />
     <meta name=""twitter:creator"" content=""@maximgorbatyuk"" />
