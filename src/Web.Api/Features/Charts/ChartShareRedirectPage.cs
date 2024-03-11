@@ -41,7 +41,7 @@ public class ChartShareRedirectPageContentResultHandler
         string queryParams = null;
 
         var formattedMedianSalary = SalaryFormat(_chartResponse.MedianSalary);
-        var ogTitle = "Медианная зп: " + formattedMedianSalary;
+        var ogTitle = $"Медианная зп: {formattedMedianSalary} тг | techinterview.space";
         string description;
         string contentDescription;
 
