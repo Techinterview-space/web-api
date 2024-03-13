@@ -25,9 +25,6 @@ public class AppInitializeService : AppInitializeServiceBase
     {
         var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
         await MigrateAsync(database, cancellationToken);
-
-        var telegramBotService = scope.ServiceProvider.GetRequiredService<TelegramBotService>();
-        telegramBotService.StartReceiving(cancellationToken);
     }
 
     private async Task MigrateAsync(
