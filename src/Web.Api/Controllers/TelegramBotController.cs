@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Domain.Telegram;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace TechInterviewer.Controllers;
@@ -10,33 +10,25 @@ namespace TechInterviewer.Controllers;
 [Route("telegram")]
 public class TelegramBotController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
+    private readonly TelegramBotService _telegram;
 
     public TelegramBotController(
-        IConfiguration configuration)
+        TelegramBotService telegram)
     {
-        _configuration = configuration;
+        _telegram = telegram;
     }
 
     [HttpPost("webhook")]
     public async Task<IActionResult> AcceptWebhook(
-        Update updateRequest)
+        [FromBody] Update updateRequest,
+        CancellationToken cancellationToken)
     {
         if (updateRequest.Message is null)
         {
             return Ok();
         }
 
-        var token = _configuration["Telegram:BotToken"];
-        if (string.IsNullOrEmpty(token))
-        {
-            return BadRequest("Token is not set");
-        }
-
-        var client = new TelegramBotClient(token);
-        var chatId = updateRequest.Message.Chat.Id;
-
-        await client.SendTextMessageAsync(chatId, "Hello " + updateRequest.Message.From?.Username ?? "stranger");
+        await _telegram.ProcessMessageAsync(updateRequest, cancellationToken);
         return Ok("Message sent!");
     }
 }
