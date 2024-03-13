@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,11 @@ public class ChartShareRedirectPageContentResultHandler
     }
 
     public static string SalaryFormat(
-        double salary) => salary.ToString("n0");
+        double salary)
+    {
+        var ci = CultureInfo.InvariantCulture;
+        return salary.ToString("N0", ci);
+    }
 
     public async Task<ContentResult> CreateAsync(
         CancellationToken cancellationToken)

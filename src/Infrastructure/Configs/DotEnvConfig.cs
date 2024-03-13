@@ -9,6 +9,12 @@ public class DotEnvConfig
         var parentDir = Directory.GetParent(Directory.GetCurrentDirectory());
         var envFilePath = Path.Combine(parentDir!.FullName, ".env");
 
-        DotEnv.Load(options: new DotEnvOptions(true, new[] { envFilePath }));
+        DotEnv.Fluent()
+            .WithExceptions()
+            .WithEnvFiles(envFilePath)
+            .WithTrimValues()
+            .WithOverwriteExistingVars()
+            .WithProbeForEnv(probeLevelsToSearch: 6)
+            .Load();
     }
 }

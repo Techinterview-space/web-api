@@ -29,7 +29,7 @@ public static class ServiceRegistration
         services.AddScoped<IGlobal, Global>();
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
         services.AddScoped<IPdf, PdfRenderer>();
-        services.AddScoped<TelegramBotService>();
+        services.AddTransient<TelegramBotService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

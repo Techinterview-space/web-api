@@ -1,35 +1,77 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Database;
 using Domain.Entities.Enums;
+using Domain.Entities.Salaries;
 using Domain.Exceptions;
+using Domain.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
+using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
 
 namespace Domain.Telegram;
 
 public class TelegramBotService
 {
-    private static readonly Dictionary<DeveloperGrade, string> _options = new ()
+    private static readonly List<DeveloperGrade> _grades = new ()
     {
-        { DeveloperGrade.Junior, DeveloperGrade.Junior.ToString() },
-        { DeveloperGrade.Middle, "Middle" },
-        { DeveloperGrade.Senior, "Senior" },
-        { DeveloperGrade.Lead, "Lead" },
+        DeveloperGrade.Junior,
+        DeveloperGrade.Middle,
+        DeveloperGrade.Senior,
+        DeveloperGrade.Lead,
     };
 
     private readonly IConfiguration _configuration;
+    private readonly ILogger<TelegramBotService> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public TelegramBotService(
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<TelegramBotService> logger,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _configuration = configuration;
+        _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
-    public async Task ProcessMessageAsync(
+    public void StartReceiving(
+        CancellationToken cancellationToken)
+    {
+        var client = CreateClient();
+
+        // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
+        ReceiverOptions receiverOptions = new ()
+        {
+            AllowedUpdates = Array.Empty<UpdateType>() // receive all update types except ChatMember related updates
+        };
+
+        client.StartReceiving(
+            updateHandler: HandleUpdateAsync,
+            pollingErrorHandler: HandlePollingErrorAsync,
+            receiverOptions: receiverOptions,
+            cancellationToken: cancellationToken);
+    }
+
+    private Task HandlePollingErrorAsync(
+        ITelegramBotClient client,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        _logger.LogError(exception, "An error occurred while polling: {Message}", exception.Message);
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleUpdateAsync(
+        ITelegramBotClient client,
         Update updateRequest,
         CancellationToken cancellationToken)
     {
@@ -38,36 +80,70 @@ public class TelegramBotService
             return;
         }
 
-        var client = CreateClient();
-        var chatId = updateRequest.Message.Chat.Id;
+        using var scope = _serviceScopeFactory.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-        switch (updateRequest.Type)
+        var chatId = updateRequest.Message.Chat.Id;
+        var message = updateRequest.Message;
+
+        if (message.Entities?.Length > 0 && message.Entities[0].Type == MessageEntityType.Mention)
         {
-            case UpdateType.InlineQuery:
-                var results = new List<InlineQueryResult>();
-                var counter = 0;
-                foreach (var option in _options)
+            var messageParts = message.Text?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var grade = GetGrade(messageParts);
+
+            const long notHrIt = (long)UserProfessionEnum.HrNonIt;
+            var salaries = await context.Salaries
+                .Where(x =>
+                    x.ProfessionId != notHrIt &&
+                    x.Company == CompanyType.Local &&
+                    x.UseInStats)
+                .When(grade.HasValue, x => x.Grade == grade.Value)
+                .Select(x => x.Value)
+                .ToListAsync(cancellationToken);
+
+            if (salaries.Count > 0)
+            {
+                var reply = $"Специалисты ";
+                if (grade.HasValue)
                 {
-                    results.Add(new InlineQueryResultArticle(
-                            $"{counter}", // we use the counter as an id for inline query results
-                            option.Key.ToString(), // inline query result title
-                            new InputTextMessageContent(option.Value)));
-                    counter++;
+                    reply += $" уровня {grade.Value}";
                 }
 
-                var inlineQueryId = updateRequest.InlineQuery!.Id;
-                await client.AnswerInlineQueryAsync(inlineQueryId, results, cancellationToken: cancellationToken);
-                break;
+                reply += $" получают в среднем {salaries.Average():N0} тг. Подробно на сайте https://techinterview.space/salaries";
+                await client.SendTextMessageAsync(chatId, reply, cancellationToken: cancellationToken);
+                return;
+            }
 
-            default:
-                await client.SendTextMessageAsync(chatId, "Hello " + updateRequest.Message.From?.Username ?? "stranger", cancellationToken: cancellationToken);
-                break;
+            await client.SendTextMessageAsync(chatId, "Нет информации о зарплатах =(", cancellationToken: cancellationToken);
+            return;
         }
+
+        await client.SendTextMessageAsync(chatId, "Неизвестная команда", cancellationToken: cancellationToken);
+    }
+
+    private DeveloperGrade? GetGrade(
+        string[] parts)
+    {
+        if (parts.Length == 0)
+        {
+            return null;
+        }
+
+        foreach (var part in parts)
+        {
+            var grade = _grades.FirstOrDefault(x => x.ToString().Equals(part, StringComparison.InvariantCultureIgnoreCase));
+            if (grade != default)
+            {
+                return grade;
+            }
+        }
+
+        return null;
     }
 
     private TelegramBotClient CreateClient()
     {
-        var token = _configuration["Telegram:BotToken"];
+        var token = Environment.GetEnvironmentVariable("Telegram__BotToken") ?? _configuration["Telegram:BotToken"];
         if (string.IsNullOrEmpty(token))
         {
             throw new BadRequestException("Token is not set");

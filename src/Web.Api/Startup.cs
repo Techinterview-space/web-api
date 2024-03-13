@@ -67,7 +67,8 @@ public class Startup
             .SetupAuthentication(_configuration)
             .SetupScheduler();
 
-        services.AddHostedService<AppInitializeService>();
+        services
+            .AddHostedService<AppInitializeService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
