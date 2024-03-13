@@ -6,6 +6,7 @@ using Domain.Files;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.Interviews;
+using Domain.Telegram;
 using Infrastructure.Emails;
 using Infrastructure.Services.Files;
 using Infrastructure.Services.Http;
@@ -27,8 +28,8 @@ public static class ServiceRegistration
         services.AddScoped<IAuthorization, Authorization>();
         services.AddScoped<IGlobal, Global>();
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
-
         services.AddScoped<IPdf, PdfRenderer>();
+        services.AddScoped<TelegramBotService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
