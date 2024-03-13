@@ -104,7 +104,7 @@ public class SalariesController : ControllerBase
     public async Task<AdminChartResponse> AdminChart(
         CancellationToken cancellationToken)
     {
-        var currentDay = DateTime.UtcNow;
+        var currentDay = DateTime.UtcNow.Date;
         var fifteenDaysAgo = currentDay.AddDays(-20);
 
         var usersCount = await _context.Users

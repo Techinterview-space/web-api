@@ -50,7 +50,7 @@ public record UserSalaryDto
     public int? YearOfStartingWork { get; init; }
 
     public int? YearsOfExperience => YearOfStartingWork.HasValue
-        ? (DateTimeOffset.UtcNow.Year - YearOfStartingWork) + 1
+        ? DateTimeOffset.UtcNow.Year - YearOfStartingWork
         : null;
 
     public Gender? Gender { get; init; }
