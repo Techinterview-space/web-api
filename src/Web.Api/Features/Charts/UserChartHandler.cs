@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
-using Domain.Enums;
 using Domain.Extensions;
 using Domain.Services.Salaries;
+using Domain.Tools;
 using Domain.ValueObjects.Dates;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Controllers.Salaries;
@@ -16,25 +16,34 @@ using TechInterviewer.Controllers.Salaries.Charts;
 
 namespace TechInterviewer.Features.Charts;
 
-public class UserChartHandler(
-    IAuthorization auth,
-    DatabaseContext context)
+public class UserChartHandler
 {
+    private readonly IAuthorization _auth;
+    private readonly DatabaseContext _context;
+
+    public UserChartHandler(
+        IAuthorization auth,
+        DatabaseContext context)
+    {
+        _auth = auth;
+        _context = context;
+    }
+
     public async Task<SalariesChartResponse> Handle(
         SalariesChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var userSalariesForLastYear = new List<UserSalary>();
         var currentQuarter = DateQuarter.Current;
 
         if (currentUser != null)
         {
-            var user = await context.Users
+            var user = await _context.Users
                 .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
-            userSalariesForLastYear = await context.Salaries
+            userSalariesForLastYear = await _context.Salaries
                 .Where(x => x.UserId == user.Id)
                 .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
                 .AsNoTracking()
@@ -47,7 +56,7 @@ public class UserChartHandler(
 
         var query =
             ApplyFilters(
-                    context.Salaries
+                    _context.Salaries
                         .Where(x => x.UseInStats)
                         .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
                         .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
@@ -101,40 +110,14 @@ public class UserChartHandler(
         var professionsToInclude = request.ProfessionsToInclude;
         if (professionsToInclude.Count > 0 && professionsToInclude.Contains((long)UserProfessionEnum.Developer))
         {
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.BackendDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.BackendDeveloper);
-            }
-
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.FrontendDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.FrontendDeveloper);
-            }
-
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.FullstackDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.FullstackDeveloper);
-            }
-
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.MobileDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.MobileDeveloper);
-            }
-
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.IosDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.IosDeveloper);
-            }
-
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.AndroidDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.AndroidDeveloper);
-            }
-
-            if (!professionsToInclude.Contains((long)UserProfessionEnum.GameDeveloper))
-            {
-                professionsToInclude.Add((long)UserProfessionEnum.GameDeveloper);
-            }
+            professionsToInclude.AddIfDoesNotExist(
+                (long)UserProfessionEnum.BackendDeveloper,
+                (long)UserProfessionEnum.FrontendDeveloper,
+                (long)UserProfessionEnum.FullstackDeveloper,
+                (long)UserProfessionEnum.MobileDeveloper,
+                (long)UserProfessionEnum.IosDeveloper,
+                (long)UserProfessionEnum.AndroidDeveloper,
+                (long)UserProfessionEnum.GameDeveloper);
         }
 
         return query
