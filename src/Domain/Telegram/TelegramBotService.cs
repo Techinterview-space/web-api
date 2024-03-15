@@ -14,12 +14,13 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Domain.Telegram;
 
 public class TelegramBotService
 {
-    private const string TgLineBreaker = "%0A";
+    private const string TgLineBreaker = "\n";
 
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
@@ -109,10 +110,15 @@ public class TelegramBotService
                     replyText += $" уровня {requestParams.Grade.Value}";
                 }
 
-                replyText += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте " + frontendLink;
+                replyText += $" получают в среднем *{salaries.Average():N0} тг*. {TgLineBreaker}{TgLineBreaker}Подробно на сайте " + frontendLink;
                 await client.SendTextMessageAsync(
                     chatId,
                     replyText,
+                    parseMode: ParseMode.MarkdownV2,
+                    replyMarkup: new InlineKeyboardMarkup(
+                        InlineKeyboardButton.WithUrl(
+                            text: "Check sendMessage method",
+                            url: frontendLink.ToString())),
                     cancellationToken: cancellationToken);
                 return;
             }
