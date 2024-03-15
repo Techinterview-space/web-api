@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
-using Domain.Entities.Enums;
-using Domain.Entities.Salaries;
 using Domain.Exceptions;
-using Domain.Extensions;
 using Domain.Salaries;
 using Domain.Services.Global;
 using Microsoft.EntityFrameworkCore;
@@ -82,47 +78,47 @@ public class TelegramBotService
         var chatId = updateRequest.Message.Chat.Id;
         var message = updateRequest.Message;
 
-        if (message.Entities?.Length > 0 && message.Entities[0].Type == MessageEntityType.Mention)
+        var requestParams = new TelegramMessageSalariesParams(message.Text);
+        var salariesQuery = new SalariesForChartQuery(
+            context,
+            requestParams);
+
+        var salaries = await salariesQuery
+            .ToQueryable()
+            .Select(x => x.Value)
+            .ToListAsync(cancellationToken);
+
+        var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
+        var frontendLink = new SalariesChartPageLink(global, requestParams);
+
+        if (salaries.Count > 0)
         {
-            var requestParams = new TelegramMessageSalariesParams(message.Text);
-            var salariesQuery = new SalariesForChartQuery(
-                context,
-                requestParams);
-
-            var salaries = await salariesQuery
-                .ToQueryable()
-                .Select(x => x.Value)
-                .ToListAsync(cancellationToken);
-
-            var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
-            var frontendLink = new SalariesChartPageLink(global, requestParams);
-
-            if (salaries.Count > 0)
+            var replyText = "Специалисты ";
+            if (requestParams.Grade.HasValue)
             {
-                var reply = "Специалисты ";
-                if (requestParams.Grade.HasValue)
-                {
-                    reply += $" уровня {requestParams.Grade.Value}";
-                }
-
-                reply += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте " + frontendLink;
-                await client.SendTextMessageAsync(chatId, reply, cancellationToken: cancellationToken);
-                return;
+                replyText += $" уровня {requestParams.Grade.Value}";
             }
 
-            await client.SendTextMessageAsync(chatId, "Нет информации о зарплатах =(", cancellationToken: cancellationToken);
+            replyText += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте " + frontendLink;
+            await client.SendTextMessageAsync(
+                chatId,
+                replyText,
+                cancellationToken: cancellationToken);
             return;
         }
 
-        await client.SendTextMessageAsync(chatId, "Неизвестная команда", cancellationToken: cancellationToken);
+        await client.SendTextMessageAsync(
+            chatId,
+            "Нет информации о зарплатах =(",
+            cancellationToken: cancellationToken);
     }
 
     private TelegramBotClient CreateClient()
     {
-        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
+        var token = Environment.GetEnvironmentVariable("TelegramBotToken");
         if (string.IsNullOrEmpty(token))
         {
-            token = _configuration["Telegram:BotToken"];
+            token = _configuration["TelegramBotToken"];
         }
 
         Console.WriteLine(token);
