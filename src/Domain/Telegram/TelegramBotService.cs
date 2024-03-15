@@ -8,6 +8,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Exceptions;
 using Domain.Extensions;
+using Domain.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,8 @@ namespace Domain.Telegram;
 
 public class TelegramBotService
 {
+    private const string TgLineBreaker = "%0A";
+
     private static readonly List<DeveloperGrade> _grades = new ()
     {
         DeveloperGrade.Junior,
@@ -91,25 +94,26 @@ public class TelegramBotService
             var messageParts = message.Text?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var grade = GetGrade(messageParts);
 
-            const long notHrIt = (long)UserProfessionEnum.HrNonIt;
-            var salaries = await context.Salaries
-                .Where(x =>
-                    x.ProfessionId != notHrIt &&
-                    x.Company == CompanyType.Local &&
-                    x.UseInStats)
-                .When(grade.HasValue, x => x.Grade == grade.Value)
+            var salariesQuery = new SalariesForChartQuery(
+                context,
+                grade,
+                null,
+                null);
+
+            var salaries = await salariesQuery
+                .ToQueryable()
                 .Select(x => x.Value)
                 .ToListAsync(cancellationToken);
 
             if (salaries.Count > 0)
             {
-                var reply = $"Специалисты ";
+                var reply = "Специалисты ";
                 if (grade.HasValue)
                 {
                     reply += $" уровня {grade.Value}";
                 }
 
-                reply += $" получают в среднем {salaries.Average():N0} тг. Подробно на сайте https://techinterview.space/salaries";
+                reply += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте https://techinterview.space/salaries";
                 await client.SendTextMessageAsync(chatId, reply, cancellationToken: cancellationToken);
                 return;
             }

@@ -7,6 +7,7 @@ using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
+using Domain.Queries;
 using Domain.Services.Salaries;
 using Domain.Tools;
 using Domain.ValueObjects.Dates;
@@ -36,7 +37,12 @@ public class UserChartHandler
         var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var userSalariesForLastYear = new List<UserSalary>();
-        var currentQuarter = DateQuarter.Current;
+
+        var salariesQuery = new SalariesForChartQuery(
+            _context,
+            request.Grade,
+            request.ProfessionsToInclude,
+            request.Cities);
 
         if (currentUser != null)
         {
@@ -45,42 +51,14 @@ public class UserChartHandler
 
             userSalariesForLastYear = await _context.Salaries
                 .Where(x => x.UserId == user.Id)
-                .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
+                .Where(x => x.Year == salariesQuery.CurrentQuarter.Year || x.Year == salariesQuery.CurrentQuarter.Year - 1)
                 .AsNoTracking()
                 .OrderByDescending(x => x.Year)
                 .ThenByDescending(x => x.Quarter)
                 .ToListAsync(cancellationToken);
         }
 
-        var yearAgoGap = DateTimeOffset.Now.AddMonths(-6);
-
-        var query =
-            ApplyFilters(
-                    _context.Salaries
-                        .Where(x => x.UseInStats)
-                        .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
-                        .Where(x => x.Year == currentQuarter.Year || x.Year == currentQuarter.Year - 1)
-                        .Where(x => x.CreatedAt >= yearAgoGap),
-                    request)
-            .Select(x => new UserSalaryDto
-            {
-                Value = x.Value,
-                Quarter = x.Quarter,
-                Year = x.Year,
-                Currency = x.Currency,
-                Company = x.Company,
-                Grade = x.Grade,
-                City = x.City,
-                Age = x.Age,
-                YearOfStartingWork = x.YearOfStartingWork,
-                Gender = x.Gender,
-                SkillId = x.SkillId,
-                WorkIndustryId = x.WorkIndustryId,
-                ProfessionId = x.ProfessionId,
-            })
-            .OrderBy(x => x.Value)
-            .AsNoTracking();
-
+        var query = salariesQuery.ToQueryable();
         if (currentUser == null || !userSalariesForLastYear.Any())
         {
             var salaryValues = await query
@@ -101,7 +79,7 @@ public class UserChartHandler
         return new SalariesChartResponse(
             salaries,
             new UserSalaryAdminDto(userSalariesForLastYear.First()),
-            yearAgoGap,
+            salariesQuery.SalaryAddedEdge,
             DateTimeOffset.Now,
             salaries.Count);
     }
