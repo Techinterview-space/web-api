@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Exceptions;
+using Domain.Extensions;
 using Domain.Salaries;
 using Domain.Services.Global;
 using Microsoft.EntityFrameworkCore;
@@ -110,7 +111,7 @@ public class TelegramBotService
                     replyText += $" уровня {requestParams.Grade.Value}";
                 }
 
-                replyText += $" получают в среднем *{salaries.Average():N0} тг*. {TgLineBreaker}{TgLineBreaker}Подробно на сайте " + frontendLink;
+                replyText += $" получают в среднем *{salaries.Median():N0} тг*. {TgLineBreaker}{TgLineBreaker}Подробно на сайте " + frontendLink;
                 await client.SendTextMessageAsync(
                     chatId,
                     replyText,
