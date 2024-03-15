@@ -84,13 +84,16 @@ public class UserChartHandler
         if (currentUser == null || !userSalariesForLastYear.Any())
         {
             var salaryValues = await query
-                .When(request.HasAnyFilter, x => x.Company == CompanyType.Local)
+                .Where(x => x.Company == CompanyType.Local)
                 .Select(x => x.Value)
                 .ToListAsync(cancellationToken);
 
+            var totalCount = await query.CountAsync(cancellationToken);
             return SalariesChartResponse.RequireOwnSalary(
                 salaryValues,
-                request.HasAnyFilter);
+                totalCount,
+                true,
+                currentUser is not null);
         }
 
         var salaries = await query.ToListAsync(cancellationToken);

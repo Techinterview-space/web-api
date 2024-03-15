@@ -82,7 +82,9 @@ public record SalariesChartResponse
 
     public static SalariesChartResponse RequireOwnSalary(
         List<double> salaryValues,
-        bool onlyLocalCompanySalaries)
+        int salariesCount,
+        bool onlyLocalCompanySalaries,
+        bool hasAuthentication)
     {
         return new (
             new List<UserSalaryDto>(),
@@ -90,11 +92,12 @@ public record SalariesChartResponse
             true,
             null,
             null,
-            salaryValues.Count)
+            salariesCount)
         {
             AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
             MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
-            OnlyLocalCompanySalaries = onlyLocalCompanySalaries
+            OnlyLocalCompanySalaries = onlyLocalCompanySalaries,
+            HasAuthentication = hasAuthentication,
         };
     }
 
@@ -107,6 +110,8 @@ public record SalariesChartResponse
     public bool OnlyLocalCompanySalaries { get; private set; }
 
     public bool ShouldAddOwnSalary { get; }
+
+    public bool HasAuthentication { get; private set; }
 
     public double AverageSalary { get; private set; }
 
