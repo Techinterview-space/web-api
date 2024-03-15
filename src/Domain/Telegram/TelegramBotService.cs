@@ -94,6 +94,7 @@ public class TelegramBotService
                 context,
                 requestParams);
 
+            var totalCount = await salariesQuery.ToQueryable().CountAsync(cancellationToken);
             var salaries = await salariesQuery
                 .ToQueryable(CompanyType.Local)
                 .Select(x => x.Value)
@@ -104,7 +105,7 @@ public class TelegramBotService
 
             if (salaries.Count > 0)
             {
-                var replyText = "Специалисты";
+                var replyText = "В Казахстане специалисты IT ";
                 if (requestParams.Grade.HasValue)
                 {
                     replyText += $" уровня {requestParams.Grade.Value}";
@@ -112,7 +113,7 @@ public class TelegramBotService
 
                 replyText += @$" получают в среднем <b>{salaries.Median():N0}</b> тг.
 
-<em>Расчитано на основе {salaries.Count} анкет(ы)</em>
+<em>Расчитано на основе {totalCount} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">techinterview.space/salaries</a></em>";
                 await client.SendTextMessageAsync(
                     chatId,
