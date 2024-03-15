@@ -21,7 +21,8 @@ public record SalariesChartResponse
             false,
             rangeStart,
             rangeEnd,
-            totalCountInStats)
+            totalCountInStats,
+            true)
     {
     }
 
@@ -31,7 +32,8 @@ public record SalariesChartResponse
         bool shouldAddOwnSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
-        int totalCountInStats)
+        int totalCountInStats,
+        bool hasAuthentication)
     {
         Salaries = salaries;
         CurrentUserSalary = currentUserSalary;
@@ -39,6 +41,7 @@ public record SalariesChartResponse
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
         TotalCountInStats = totalCountInStats;
+        HasAuthentication = hasAuthentication;
 
         DevelopersByAgeChartData = new DevelopersByAgeChartData(salaries);
         DevelopersByExperienceYearsChartData = new DevelopersByExperienceYears(salaries);
@@ -92,12 +95,12 @@ public record SalariesChartResponse
             true,
             null,
             null,
-            salariesCount)
+            salariesCount,
+            hasAuthentication)
         {
             AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
             MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
             OnlyLocalCompanySalaries = onlyLocalCompanySalaries,
-            HasAuthentication = hasAuthentication,
         };
     }
 
@@ -111,7 +114,7 @@ public record SalariesChartResponse
 
     public bool ShouldAddOwnSalary { get; }
 
-    public bool HasAuthentication { get; private set; }
+    public bool HasAuthentication { get; }
 
     public double AverageSalary { get; private set; }
 
