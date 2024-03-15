@@ -119,7 +119,13 @@ public class TelegramBotService
 
     private TelegramBotClient CreateClient()
     {
-        var token = Environment.GetEnvironmentVariable("Telegram__BotToken") ?? _configuration["Telegram:BotToken"];
+        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            token = _configuration["Telegram:BotToken"];
+        }
+
+        Console.WriteLine(token);
         if (string.IsNullOrEmpty(token))
         {
             throw new BadRequestException("Token is not set");
