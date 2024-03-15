@@ -111,14 +111,14 @@ public class TelegramBotService
                     replyText += $" уровня {requestParams.Grade.Value}";
                 }
 
-                replyText += $" получают в среднем *{salaries.Median():N0} тг*. {TgLineBreaker}{TgLineBreaker}Подробно на сайте " + frontendLink;
+                replyText += @$" получают в среднем *{salaries.Median():N0} тг*\.{TgLineBreaker}{TgLineBreaker}Подробно на сайте " + frontendLink;
                 await client.SendTextMessageAsync(
                     chatId,
                     replyText,
                     parseMode: ParseMode.MarkdownV2,
                     replyMarkup: new InlineKeyboardMarkup(
                         InlineKeyboardButton.WithUrl(
-                            text: "Check sendMessage method",
+                            text: "techinterview.space/salaries",
                             url: frontendLink.ToString())),
                     cancellationToken: cancellationToken);
                 return;
