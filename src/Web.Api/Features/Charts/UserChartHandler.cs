@@ -7,7 +7,7 @@ using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
-using Domain.Queries;
+using Domain.Salaries;
 using Domain.Services.Salaries;
 using Domain.Tools;
 using Domain.ValueObjects.Dates;
@@ -31,18 +31,14 @@ public class UserChartHandler
     }
 
     public async Task<SalariesChartResponse> Handle(
-        SalariesChartQueryParams request,
+        ISalariesChartQueryParams request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrNullAsync();
 
         var userSalariesForLastYear = new List<UserSalary>();
 
-        var salariesQuery = new SalariesForChartQuery(
-            _context,
-            request.Grade,
-            request.ProfessionsToInclude,
-            request.Cities);
+        var salariesQuery = new SalariesForChartQuery(_context, request);
 
         if (currentUser != null)
         {

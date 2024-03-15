@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
+using Domain.Salaries;
 using Domain.Services.Global;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,8 +41,7 @@ public class ChartShareRedirectPageContentResultHandler
     public async Task<ContentResult> CreateAsync(
         CancellationToken cancellationToken)
     {
-        var frontendUrl = _global.FrontendBaseUrl + "/salaries";
-        string queryParams = null;
+        var frontendLink = new SalariesChartPageLink(_global, _requestParams);
 
         var formattedMedianSalary = SalaryFormat(_chartResponse.MedianSalary);
         var ogTitle = $"Медианная зп: {formattedMedianSalary} тг | techinterview.space";
@@ -60,17 +60,12 @@ public class ChartShareRedirectPageContentResultHandler
 
                 description += string.Join(", ", professions);
                 contentDescription += $"<span class=\"\">{string.Join(", ", professions)}</span>";
-
-                queryParams += $"?profsInclude={string.Join(",", _requestParams.ProfessionsToInclude)}";
             }
 
             if (_requestParams.Grade.HasValue)
             {
                 description += $" уровня {_requestParams.Grade.ToString()}";
                 contentDescription += $" уровня <span class=\"fw-bold\">{_requestParams.Grade.ToString()}</span>";
-
-                queryParams = queryParams != null ? queryParams + "&" : "?";
-                queryParams += $"grade={(int)_requestParams.Grade.Value}";
             }
 
             description += $" зарабатывают в среднем {formattedMedianSalary} тг.";
@@ -82,8 +77,7 @@ public class ChartShareRedirectPageContentResultHandler
             description = $"Специалисты IT в Казахстане зарабатывают в среднем {formattedMedianSalary} тг.";
         }
 
-        frontendUrl += queryParams;
-        description += $" Более подробно на сайте {frontendUrl}";
+        description += $" Более подробно на сайте {frontendLink}";
 
         return new ContentResult
         {
@@ -101,7 +95,7 @@ public class ChartShareRedirectPageContentResultHandler
     <meta property=""og:title"" content=""{ogTitle}"" />
     <meta property=""og:description"" content=""{description}"" />
     <meta property=""og:type"" content=""website"" />
-    <meta property=""og:url"" content=""{frontendUrl}"" />
+    <meta property=""og:url"" content=""{frontendLink}"" />
     <meta property=""og:image"" content=""https://techinterview.space/assets/img/ti_logo_mini.png"" />
     <meta property=""og:site_name"" content=""techinterview.space"" />
 
@@ -129,7 +123,7 @@ public class ChartShareRedirectPageContentResultHandler
             Рассчитано на основе {_chartResponse.TotalCountInStats} анкет(ы).
         </div>
         <div class=""mt-3 mb-3 fs-3 fw-light"">
-            Подробнее на сайте <a href=""{frontendUrl}"">techinterview.space/salaries</a>
+            Подробнее на сайте <a href=""{frontendLink}"">techinterview.space/salaries</a>
         </div>
     </div>
   <script src=""https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"" integrity=""sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"" crossorigin=""anonymous""></script>

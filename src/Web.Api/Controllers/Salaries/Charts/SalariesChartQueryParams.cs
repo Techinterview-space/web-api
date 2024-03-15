@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Enums;
-using Domain.Entities.Salaries;
 using Domain.Enums;
+using Domain.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Controllers.Salaries.Charts;
 
-public record SalariesChartQueryParams
+public record SalariesChartQueryParams : ISalariesChartQueryParams
 {
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }

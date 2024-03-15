@@ -11,7 +11,7 @@ using Domain.Tools;
 using Domain.ValueObjects.Dates;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Queries;
+namespace Domain.Salaries;
 
 public record SalariesForChartQuery
 {
@@ -29,15 +29,13 @@ public record SalariesForChartQuery
 
     public SalariesForChartQuery(
         DatabaseContext context,
-        DeveloperGrade? grade,
-        List<long> professionsToInclude,
-        List<KazakhstanCity> cities)
+        ISalariesChartQueryParams request)
     {
         _context = context;
 
-        Grade = grade;
-        ProfessionsToInclude = professionsToInclude ?? new List<long>();
-        Cities = cities ?? new List<KazakhstanCity>();
+        Grade = request.Grade;
+        ProfessionsToInclude = request.ProfessionsToInclude ?? new List<long>();
+        Cities = request.Cities ?? new List<KazakhstanCity>();
 
         CurrentQuarter = DateQuarter.Current;
         SalaryAddedEdge = DateTimeOffset.Now.AddMonths(-6);

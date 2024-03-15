@@ -8,7 +8,8 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Exceptions;
 using Domain.Extensions;
-using Domain.Queries;
+using Domain.Salaries;
+using Domain.Services.Global;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,14 +24,6 @@ namespace Domain.Telegram;
 public class TelegramBotService
 {
     private const string TgLineBreaker = "%0A";
-
-    private static readonly List<DeveloperGrade> _grades = new ()
-    {
-        DeveloperGrade.Junior,
-        DeveloperGrade.Middle,
-        DeveloperGrade.Senior,
-        DeveloperGrade.Lead,
-    };
 
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
@@ -91,29 +84,28 @@ public class TelegramBotService
 
         if (message.Entities?.Length > 0 && message.Entities[0].Type == MessageEntityType.Mention)
         {
-            var messageParts = message.Text?.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var grade = GetGrade(messageParts);
-
+            var requestParams = new TelegramMessageSalariesParams(message.Text);
             var salariesQuery = new SalariesForChartQuery(
                 context,
-                grade,
-                null,
-                null);
+                requestParams);
 
             var salaries = await salariesQuery
                 .ToQueryable()
                 .Select(x => x.Value)
                 .ToListAsync(cancellationToken);
 
+            var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
+            var frontendLink = new SalariesChartPageLink(global, requestParams);
+
             if (salaries.Count > 0)
             {
                 var reply = "Специалисты ";
-                if (grade.HasValue)
+                if (requestParams.Grade.HasValue)
                 {
-                    reply += $" уровня {grade.Value}";
+                    reply += $" уровня {requestParams.Grade.Value}";
                 }
 
-                reply += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте https://techinterview.space/salaries";
+                reply += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте " + frontendLink;
                 await client.SendTextMessageAsync(chatId, reply, cancellationToken: cancellationToken);
                 return;
             }
@@ -123,26 +115,6 @@ public class TelegramBotService
         }
 
         await client.SendTextMessageAsync(chatId, "Неизвестная команда", cancellationToken: cancellationToken);
-    }
-
-    private DeveloperGrade? GetGrade(
-        string[] parts)
-    {
-        if (parts.Length == 0)
-        {
-            return null;
-        }
-
-        foreach (var part in parts)
-        {
-            var grade = _grades.FirstOrDefault(x => x.ToString().Equals(part, StringComparison.InvariantCultureIgnoreCase));
-            if (grade != default)
-            {
-                return grade;
-            }
-        }
-
-        return null;
     }
 
     private TelegramBotClient CreateClient()
