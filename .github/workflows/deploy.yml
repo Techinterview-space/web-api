@@ -25,7 +25,7 @@ jobs:
           sed -i 's/"__S3_ACCESS_KEY",/"${{ vars.S3_ACCESS_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__S3_ACCESS_SECRET",/"${{ vars.S3_ACCESS_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__S3_BUCKET_NAME",/"${{ vars.S3_BUCKET_NAME }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
-          sed -i 's/"__TELEGRAM_BOT_TOKEN",/"${{ secrets.TELEGRAM_BOT_TOKEN }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__TELEGRAM_BOT_KEY",/"${{ secrets.TELEGRAM_BOT_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__SENDGRID_API_KEY",/"${{ secrets.SENDGRID_API_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           cd src
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
