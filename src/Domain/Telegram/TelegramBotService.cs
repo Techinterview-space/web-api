@@ -78,39 +78,50 @@ public class TelegramBotService
         var chatId = updateRequest.Message.Chat.Id;
         var message = updateRequest.Message;
 
-        var requestParams = new TelegramMessageSalariesParams(message.Text);
-        var salariesQuery = new SalariesForChartQuery(
-            context,
-            requestParams);
+        var messageText = message.Text ?? string.Empty;
+        var mentionedInGroupChat =
+            message.Entities?.Length > 0 &&
+            message.Entities[0].Type == MessageEntityType.Mention &&
+            messageText.StartsWith("@techinterview_salaries_bot");
 
-        var salaries = await salariesQuery
-            .ToQueryable()
-            .Select(x => x.Value)
-            .ToListAsync(cancellationToken);
+        var privateMessage = message.Chat.Type == ChatType.Private;
 
-        var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
-        var frontendLink = new SalariesChartPageLink(global, requestParams);
-
-        if (salaries.Count > 0)
+        if (mentionedInGroupChat || privateMessage)
         {
-            var replyText = "Специалисты ";
-            if (requestParams.Grade.HasValue)
+            var requestParams = new TelegramMessageSalariesParams(message.Text);
+            var salariesQuery = new SalariesForChartQuery(
+                context,
+                requestParams);
+
+            var salaries = await salariesQuery
+                .ToQueryable()
+                .Select(x => x.Value)
+                .ToListAsync(cancellationToken);
+
+            var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
+            var frontendLink = new SalariesChartPageLink(global, requestParams);
+
+            if (salaries.Count > 0)
             {
-                replyText += $" уровня {requestParams.Grade.Value}";
+                var replyText = "Специалисты ";
+                if (requestParams.Grade.HasValue)
+                {
+                    replyText += $" уровня {requestParams.Grade.Value}";
+                }
+
+                replyText += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте " + frontendLink;
+                await client.SendTextMessageAsync(
+                    chatId,
+                    replyText,
+                    cancellationToken: cancellationToken);
+                return;
             }
 
-            replyText += $" получают в среднем {salaries.Average():N0} тг. {TgLineBreaker}Подробно на сайте " + frontendLink;
             await client.SendTextMessageAsync(
                 chatId,
-                replyText,
+                "Нет информации о зарплатах =(",
                 cancellationToken: cancellationToken);
-            return;
         }
-
-        await client.SendTextMessageAsync(
-            chatId,
-            "Нет информации о зарплатах =(",
-            cancellationToken: cancellationToken);
     }
 
     private TelegramBotClient CreateClient()
