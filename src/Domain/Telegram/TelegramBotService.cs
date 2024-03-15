@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
+using Domain.Entities.Salaries;
 using Domain.Exceptions;
 using Domain.Extensions;
 using Domain.Salaries;
@@ -94,7 +95,7 @@ public class TelegramBotService
                 requestParams);
 
             var salaries = await salariesQuery
-                .ToQueryable()
+                .ToQueryable(CompanyType.Local)
                 .Select(x => x.Value)
                 .ToListAsync(cancellationToken);
 
@@ -103,7 +104,7 @@ public class TelegramBotService
 
             if (salaries.Count > 0)
             {
-                var replyText = "Специалисты ";
+                var replyText = "Специалисты";
                 if (requestParams.Grade.HasValue)
                 {
                     replyText += $" уровня {requestParams.Grade.Value}";
@@ -111,6 +112,7 @@ public class TelegramBotService
 
                 replyText += @$" получают в среднем <b>{salaries.Median():N0}</b> тг.
 
+<em>Расчитано на основе {salaries.Count} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">techinterview.space/salaries</a></em>";
                 await client.SendTextMessageAsync(
                     chatId,

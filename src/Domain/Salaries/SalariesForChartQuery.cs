@@ -41,13 +41,15 @@ public record SalariesForChartQuery
         SalaryAddedEdge = DateTimeOffset.Now.AddMonths(-6);
     }
 
-    public IQueryable<UserSalaryDto> ToQueryable()
+    public IQueryable<UserSalaryDto> ToQueryable(
+        CompanyType? companyType = null)
     {
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
             .Where(x => x.Year == CurrentQuarter.Year || x.Year == CurrentQuarter.Year - 1)
             .Where(x => x.CreatedAt >= SalaryAddedEdge)
+            .When(companyType.HasValue, x => x.Company == companyType.Value)
             .FilterByCitiesIfNecessary(Cities)
             .When(Grade.HasValue, x => x.Grade == Grade.Value);
 

@@ -9,12 +9,12 @@ namespace Domain.Telegram;
 
 public class TelegramMessageSalariesParams : ISalariesChartQueryParams
 {
-    private static readonly List<DeveloperGrade> _grades = new ()
+    private static readonly List<(DeveloperGrade Grade, List<string> PossibleOptions)> _grades = new ()
     {
-        DeveloperGrade.Junior,
-        DeveloperGrade.Middle,
-        DeveloperGrade.Senior,
-        DeveloperGrade.Lead,
+        (DeveloperGrade.Junior, new List<string> { "джуниор", "джун", "джуны" }),
+        (DeveloperGrade.Middle, new List<string> { "мидл", "миддл", "мид", "миддлы" }),
+        (DeveloperGrade.Senior, new List<string> { "сеньор", "сеньоры", "синьор", "синьоры", "помидор", "помидоры" }),
+        (DeveloperGrade.Lead, new List<string> { "лид" }),
     };
 
     public DeveloperGrade? Grade { get; } = null;
@@ -39,10 +39,13 @@ public class TelegramMessageSalariesParams : ISalariesChartQueryParams
 
         foreach (var part in messageParts)
         {
-            var grade = _grades.FirstOrDefault(x => x.ToString().Equals(part, StringComparison.InvariantCultureIgnoreCase));
+            var grade = _grades.FirstOrDefault(x =>
+                x.Grade.ToString().Equals(part, StringComparison.InvariantCultureIgnoreCase) ||
+                x.PossibleOptions.Any(y => y.Equals(part, StringComparison.InvariantCultureIgnoreCase)));
+
             if (grade != default)
             {
-                Grade = grade;
+                Grade = grade.Grade;
                 break;
             }
         }
