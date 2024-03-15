@@ -21,8 +21,6 @@ namespace Domain.Telegram;
 
 public class TelegramBotService
 {
-    private const string TgLineBreaker = "\n";
-
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -111,11 +109,13 @@ public class TelegramBotService
                     replyText += $" уровня {requestParams.Grade.Value}";
                 }
 
-                replyText += @$" получают в среднем *{salaries.Median():N0} тг*\.{TgLineBreaker}{TgLineBreaker}Подробно на сайте " + frontendLink;
+                replyText += @$" получают в среднем <b>{salaries.Median():N0}</b> тг.
+
+<em>Подробно на сайте <a href=""{frontendLink}"">techinterview.space/salaries</a></em>";
                 await client.SendTextMessageAsync(
                     chatId,
                     replyText,
-                    parseMode: ParseMode.MarkdownV2,
+                    parseMode: ParseMode.Html,
                     replyMarkup: new InlineKeyboardMarkup(
                         InlineKeyboardButton.WithUrl(
                             text: "techinterview.space/salaries",
