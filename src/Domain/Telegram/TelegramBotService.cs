@@ -44,7 +44,7 @@ public class TelegramBotService
     public void StartReceiving(
         CancellationToken cancellationToken)
     {
-        var enabled = _configuration["Telegram:Enabled"]?.ToLowerInvariant();
+        var enabled = _configuration["Telegram:Enable"]?.ToLowerInvariant();
         var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
         if (!parsedEnabled || !isEnabled)
         {
