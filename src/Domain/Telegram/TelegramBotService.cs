@@ -25,7 +25,7 @@ namespace Domain.Telegram;
 
 public class TelegramBotService
 {
-    private const string TelegramBotName = "@mgorbatyuk_bot";
+    private const string TelegramBotName = "@techinterview_salaries_bot";
 
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
