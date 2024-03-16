@@ -44,6 +44,13 @@ public class TelegramBotService
     public void StartReceiving(
         CancellationToken cancellationToken)
     {
+        var enabled = _configuration["Telegram:Enabled"];
+        if (string.IsNullOrEmpty(enabled) || !bool.Parse(enabled))
+        {
+            _logger.LogInformation("Telegram bot is disabled");
+            return;
+        }
+
         var client = CreateClient();
 
         // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
@@ -228,10 +235,10 @@ public class TelegramBotService
 
     private TelegramBotClient CreateClient()
     {
-        var token = Environment.GetEnvironmentVariable("TelegramBotToken");
+        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
         if (string.IsNullOrEmpty(token))
         {
-            token = _configuration["TelegramBotToken"];
+            token = _configuration["Telegram:BotToken"];
         }
 
         Console.WriteLine(token);
