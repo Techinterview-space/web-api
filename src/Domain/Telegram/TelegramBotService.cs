@@ -44,10 +44,11 @@ public class TelegramBotService
     public void StartReceiving(
         CancellationToken cancellationToken)
     {
-        var enabled = _configuration["Telegram:Enabled"];
-        if (string.IsNullOrEmpty(enabled) || !bool.Parse(enabled))
+        var enabled = _configuration["Telegram:Enabled"]?.ToLowerInvariant();
+        var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
+        if (!parsedEnabled)
         {
-            _logger.LogInformation("Telegram bot is disabled");
+            _logger.LogWarning("Telegram bot is disabled");
             return;
         }
 
