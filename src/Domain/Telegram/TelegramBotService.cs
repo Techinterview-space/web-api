@@ -30,6 +30,7 @@ public class TelegramBotService
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly DateTime _startedToListenTo;
 
     public TelegramBotService(
         IConfiguration configuration,
@@ -39,6 +40,7 @@ public class TelegramBotService
         _configuration = configuration;
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
+        _startedToListenTo = DateTime.UtcNow;
     }
 
     public void StartReceiving(
@@ -89,6 +91,16 @@ public class TelegramBotService
     {
         if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
         {
+            return;
+        }
+
+        var messageSent = updateRequest.Message?.Date;
+        if (messageSent < _startedToListenTo)
+        {
+            _logger.LogWarning(
+                "Ignoring message sent at {MessageSentDate} because it was sent before the bot started listening at {StartedToListenTo}",
+                messageSent.Value.ToString("O"),
+                _startedToListenTo.ToString("O"));
             return;
         }
 
