@@ -144,9 +144,11 @@ public class TelegramBotService
             return;
         }
 
+/*
         if (updateRequest.Type == UpdateType.ChosenInlineResult && updateRequest.ChosenInlineResult != null)
         {
             var selectedGrade = updateRequest.ChosenInlineResult.ResultId.ToEnum<DeveloperGrade>();
+            var chatId = updateRequest.ChosenInlineResult.From.Id;
             await ReplyWithSalariesAsync(
                 client,
                 updateRequest,
@@ -156,7 +158,7 @@ public class TelegramBotService
                 cancellationToken);
 
             return;
-        }
+        }*/
 
         if (updateRequest.Message == null)
         {
