@@ -46,9 +46,10 @@ public class TelegramBotService
     {
         var enabled = _configuration["Telegram:Enabled"]?.ToLowerInvariant();
         var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
-        if (!parsedEnabled)
+        if (!parsedEnabled || !isEnabled)
         {
-            _logger.LogWarning("Telegram bot is disabled");
+            _logger.LogWarning(
+                "Telegram bot is disabled. Value {Value}. Parsed: {Parsed}", enabled, parsedEnabled);
             return;
         }
 
