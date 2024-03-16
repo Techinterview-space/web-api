@@ -13,7 +13,9 @@ public static class EnumHelper
         return Enum.GetValues(typeof(T)).Cast<T>();
     }
 
-    public static TEnum ToEnum<TEnum>(this string value, TEnum defaultValue = default)
+    public static TEnum ToEnum<TEnum>(
+        this string value,
+        TEnum defaultValue = default)
         where TEnum : struct
     {
         if (string.IsNullOrEmpty(value))

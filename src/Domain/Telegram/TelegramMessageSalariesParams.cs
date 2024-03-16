@@ -11,10 +11,10 @@ public class TelegramMessageSalariesParams : ISalariesChartQueryParams
 {
     private static readonly List<(DeveloperGrade Grade, List<string> PossibleOptions)> _grades = new ()
     {
-        (DeveloperGrade.Junior, new List<string> { "джуниор", "джун", "джуны" }),
-        (DeveloperGrade.Middle, new List<string> { "мидл", "миддл", "мид", "миддлы" }),
-        (DeveloperGrade.Senior, new List<string> { "сеньор", "сеньоры", "синьор", "синьоры", "помидор", "помидоры" }),
-        (DeveloperGrade.Lead, new List<string> { "лид" }),
+        (DeveloperGrade.Junior, new List<string> { "джуниоров", "джуниор", "джун", "джуны" }),
+        (DeveloperGrade.Middle, new List<string> { "мидлов", "мидл", "миддл", "мид", "миддлы" }),
+        (DeveloperGrade.Senior, new List<string> { "миддлов", "сеньор", "сеньоры", "синьор", "синьоры", "помидор", "помидоры" }),
+        (DeveloperGrade.Lead, new List<string> { "лидов", "лид" }),
     };
 
     public DeveloperGrade? Grade { get; } = null;
@@ -49,5 +49,11 @@ public class TelegramMessageSalariesParams : ISalariesChartQueryParams
                 break;
             }
         }
+    }
+
+    public TelegramMessageSalariesParams(
+        DeveloperGrade grade)
+    {
+        Grade = grade == default ? null : grade;
     }
 }
