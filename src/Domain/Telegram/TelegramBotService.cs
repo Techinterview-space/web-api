@@ -31,14 +31,6 @@ public class TelegramBotService
     private const string CacheKey = "TelegramBotService_ReplyData";
     private const int CachingMinutes = 20;
 
-    private static readonly Dictionary<DeveloperGrade, string> _gradeOptions = new Dictionary<DeveloperGrade, string>()
-    {
-        { DeveloperGrade.Junior, "зарплата джуниоров" },
-        { DeveloperGrade.Middle, "зарплата миддлов" },
-        { DeveloperGrade.Senior, "зарплата сеньоров" },
-        { DeveloperGrade.Lead, "зарплата лидов" },
-    };
-
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -121,6 +113,17 @@ public class TelegramBotService
         var memoryCache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
         var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
 
+        var allProfessions = await memoryCache.GetOrCreateAsync(
+            CacheKey + "_AllProfessions",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(120);
+                return await context
+                    .Professions
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+            });
+
         if (updateRequest.Type == UpdateType.InlineQuery && updateRequest.InlineQuery != null)
         {
             await ProcessInlineQueryAsync(
@@ -128,6 +131,7 @@ public class TelegramBotService
                 context,
                 memoryCache,
                 global,
+                allProfessions,
                 updateRequest,
                 cancellationToken);
             return;
@@ -148,7 +152,7 @@ public class TelegramBotService
         var privateMessage = message.Chat.Type == ChatType.Private;
         if (mentionedInGroupChat || privateMessage)
         {
-            var parameters = new TelegramBotCommandParameters(message);
+            var parameters = new TelegramBotCommandParameters(messageText, allProfessions);
             var replyData = await memoryCache.GetOrCreateAsync(
                 CacheKey + "_" + parameters.GetKeyPostfix(),
                 async entry =>
@@ -158,6 +162,7 @@ public class TelegramBotService
                         parameters,
                         context,
                         global,
+                        null,
                         cancellationToken);
                 });
 
@@ -173,9 +178,10 @@ public class TelegramBotService
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
-        ISalariesChartQueryParams requestParams,
+        TelegramBotCommandParameters requestParams,
         DatabaseContext context,
         IGlobal global,
+        Profession professionOrNull,
         CancellationToken cancellationToken)
     {
         var salariesQuery = new SalariesForChartQuery(
@@ -185,7 +191,11 @@ public class TelegramBotService
         var totalCount = await salariesQuery.ToQueryable().CountAsync(cancellationToken);
         var salaries = await salariesQuery
             .ToQueryable(CompanyType.Local)
-            .Select(x => x.Value)
+            .Select(x => new
+            {
+                x.Grade,
+                x.Value,
+            })
             .ToListAsync(cancellationToken);
 
         var frontendLink = new SalariesChartPageLink(global, requestParams);
@@ -193,23 +203,56 @@ public class TelegramBotService
         const string frontendAppName = "techinterview.space/salaries";
         if (salaries.Count > 0 || Debugger.IsAttached)
         {
-            var replyText = @$"<b>{salaries.Median():N0}</b> тг.
-
-";
-            replyText += @$"Столько специалисты в IT в Казахстане";
-            if (requestParams.Grade.HasValue)
+            var replyText = string.Empty;
+            if (salaries.Count > 0)
             {
-                replyText += $" уровня <b>{requestParams.Grade.Value}</b>";
-            }
+                var juniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Junior).Select(x => x.Value).Median();
+                var middleMedian = salaries.Where(x => x.Grade == DeveloperGrade.Middle).Select(x => x.Value).Median();
+                var seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
+                var leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
 
-            var maximumSalary = salaries.Count > 0 ? salaries.Max() : 0;
-            replyText += @$" получают в среднем. Максимум: {maximumSalary:N0} тг.
+                if (juniorMedian > 0)
+                {
+                    replyText += @$"
+Джуны: <b>{juniorMedian:N0}</b> тг.";
+                }
+
+                if (middleMedian > 0)
+                {
+                    replyText += @$"
+Миддлы: <b>{middleMedian:N0}</b> тг.";
+                }
+
+                if (seniorMedian > 0)
+                {
+                    replyText += @$"
+Сеньоры: <b>{seniorMedian:N0}</b> тг.";
+                }
+
+                if (leadMedian > 0)
+                {
+                    replyText += @$"
+Лиды: <b>{leadMedian:N0}</b> тг.";
+                }
+
+                replyText += @$"Столько специалисты {professionOrNull?.Title ?? "в IT"} в Казахстане получают в среднем.
 
 <em>Расчитано на основе {totalCount} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
+            }
+            else
+            {
+                replyText = professionOrNull != null
+                    ? $"Пока никто не оставил информацию о зарплатах для {professionOrNull.Title}."
+                    : "Пока никто не оставлял информации о зарплатах.";
+
+                replyText += @$"
+
+<em>Посмотреть зарплаты по другим специальностям можно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
+            }
 
             return new TelegramBotReplyData(
-                replyText,
+                replyText.Trim(),
                 new InlineKeyboardMarkup(
                     InlineKeyboardButton.WithUrl(
                         text: frontendAppName,
@@ -225,6 +268,7 @@ public class TelegramBotService
         DatabaseContext context,
         IMemoryCache memoryCache,
         IGlobal global,
+        List<Profession> allProfessions,
         Update updateRequest,
         CancellationToken cancellationToken)
     {
@@ -232,15 +276,7 @@ public class TelegramBotService
 
         var counter = 0;
 
-        var parametersForAllSalaries = new TelegramBotCommandParameters(
-            null,
-            UserProfessionEnum.Developer,
-            UserProfessionEnum.FrontendDeveloper,
-            UserProfessionEnum.BackendDeveloper,
-            UserProfessionEnum.IosDeveloper,
-            UserProfessionEnum.AndroidDeveloper,
-            UserProfessionEnum.MobileDeveloper);
-
+        var parametersForAllSalaries = new TelegramBotCommandParameters();
         var replyDataForAllSalaries = await memoryCache.GetOrCreateAsync(
             CacheKey + "_" + parametersForAllSalaries.GetKeyPostfix(),
             async entry =>
@@ -250,52 +286,57 @@ public class TelegramBotService
                     parametersForAllSalaries,
                     context,
                     global,
+                    null,
                     cancellationToken);
             });
 
         results.Add(
             new InlineQueryResultArticle(
                 counter.ToString(),
-                "Вся статистика по зарплатам",
+                "Вся статистика без фильтра по специальности",
                 new InputTextMessageContent(replyDataForAllSalaries.ReplyText)
                 {
                     ParseMode = replyDataForAllSalaries.ParseMode,
                 }));
 
         counter++;
-        foreach (var grade in _gradeOptions)
+
+        if (updateRequest.InlineQuery?.Query != null &&
+            updateRequest.InlineQuery.Query.Length > 1)
         {
-            if (updateRequest.InlineQuery?.Query != null &&
-                !grade.Key.ToString().Contains(updateRequest.InlineQuery.Query, StringComparison.InvariantCultureIgnoreCase))
+            foreach (var profession in allProfessions)
             {
-                continue;
+                if (updateRequest.InlineQuery?.Query != null &&
+                    !profession.Title.Contains(updateRequest.InlineQuery.Query, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                var parameters = new TelegramBotCommandParameters(profession);
+
+                var replyData = await memoryCache.GetOrCreateAsync(
+                    CacheKey + "_" + parameters.GetKeyPostfix(),
+                    async entry =>
+                    {
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
+                        return await ReplyWithSalariesAsync(
+                            parameters,
+                            context,
+                            global,
+                            profession,
+                            cancellationToken);
+                    });
+
+                results.Add(new InlineQueryResultArticle(
+                    counter.ToString(),
+                    profession.Title,
+                    new InputTextMessageContent(replyData.ReplyText)
+                    {
+                        ParseMode = replyData.ParseMode,
+                    }));
+
+                counter++;
             }
-
-            var parameters = new TelegramBotCommandParameters(
-                null,
-                grade.Key);
-
-            var replyData = await memoryCache.GetOrCreateAsync(
-                CacheKey + "_" + parameters.GetKeyPostfix(),
-                async entry =>
-                {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-                    return await ReplyWithSalariesAsync(
-                        parameters,
-                        context,
-                        global,
-                        cancellationToken);
-                });
-
-            results.Add(new InlineQueryResultArticle(
-                counter.ToString(),
-                grade.Key.ToString(),
-                new InputTextMessageContent(replyData.ReplyText)
-                {
-                    ParseMode = replyData.ParseMode,
-                }));
-
-            counter++;
         }
 
         try
