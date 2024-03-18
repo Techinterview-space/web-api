@@ -214,13 +214,13 @@ public class TelegramBotService
                 if (juniorMedian > 0)
                 {
                     replyText += @$"
-Джуны: <b>{juniorMedian:N0}</b> тг.";
+Джуны:   <b>{juniorMedian:N0}</b> тг.";
                 }
 
                 if (middleMedian > 0)
                 {
                     replyText += @$"
-Миддлы: <b>{middleMedian:N0}</b> тг.";
+Миддлы:  <b>{middleMedian:N0}</b> тг.";
                 }
 
                 if (seniorMedian > 0)
@@ -232,10 +232,12 @@ public class TelegramBotService
                 if (leadMedian > 0)
                 {
                     replyText += @$"
-Лиды: <b>{leadMedian:N0}</b> тг.";
+Лиды:    <b>{leadMedian:N0}</b> тг.";
                 }
 
-                replyText += @$"Столько специалисты {professionOrNull?.Title ?? "в IT"} в Казахстане получают в среднем.
+                replyText += @$"
+
+Столько специалисты {professionOrNull?.Title ?? "в IT"} в Казахстане получают в среднем.
 
 <em>Расчитано на основе {totalCount} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
