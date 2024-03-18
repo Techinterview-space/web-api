@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
+using Domain.Salaries;
 using Domain.Services.Global;
 using Microsoft.AspNetCore.Mvc;
 using TechInterviewer.Controllers.Salaries.Charts;
@@ -32,10 +34,17 @@ public class ChartShareController : ControllerBase
         [FromQuery] SalariesChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        var result = await new UserChartHandler(_auth, _context).Handle(request, cancellationToken);
+        var parameters = new SalariesChartQueryParams
+        {
+            Grade = request.Grade,
+            ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+            Cities = request.Cities,
+        };
+
+        var result = await new UserChartHandler(_auth, _context).Handle(parameters, cancellationToken);
         var contentResultProvider = new ChartShareRedirectPageContentResultHandler(
             result,
-            request,
+            parameters,
             _context,
             _global);
 

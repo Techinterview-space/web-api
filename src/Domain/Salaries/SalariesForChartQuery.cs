@@ -7,7 +7,6 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.Services.Salaries;
-using Domain.Tools;
 using Domain.ValueObjects.Dates;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,16 +28,28 @@ public record SalariesForChartQuery
 
     public SalariesForChartQuery(
         DatabaseContext context,
-        ISalariesChartQueryParams request)
+        DeveloperGrade? grade,
+        List<long> professionsToInclude,
+        List<KazakhstanCity> cities)
     {
         _context = context;
-
-        Grade = request.Grade;
-        ProfessionsToInclude = request.ProfessionsToInclude ?? new List<long>();
-        Cities = request.Cities ?? new List<KazakhstanCity>();
+        Grade = grade;
+        ProfessionsToInclude = professionsToInclude;
+        Cities = cities;
 
         CurrentQuarter = DateQuarter.Current;
         SalaryAddedEdge = DateTimeOffset.Now.AddMonths(-6);
+    }
+
+    public SalariesForChartQuery(
+        DatabaseContext context,
+        ISalariesChartQueryParams request)
+        : this(
+            context,
+            request.Grade,
+            request.ProfessionsToInclude,
+            request.Cities)
+    {
     }
 
     public IQueryable<UserSalaryDto> ToQueryable(
@@ -52,18 +63,6 @@ public record SalariesForChartQuery
             .When(companyType.HasValue, x => x.Company == companyType.Value)
             .FilterByCitiesIfNecessary(Cities)
             .When(Grade.HasValue, x => x.Grade == Grade.Value);
-
-        if (ProfessionsToInclude.Count > 0 && ProfessionsToInclude.Contains((long)UserProfessionEnum.Developer))
-        {
-            ProfessionsToInclude.AddIfDoesNotExist(
-                (long)UserProfessionEnum.BackendDeveloper,
-                (long)UserProfessionEnum.FrontendDeveloper,
-                (long)UserProfessionEnum.FullstackDeveloper,
-                (long)UserProfessionEnum.MobileDeveloper,
-                (long)UserProfessionEnum.IosDeveloper,
-                (long)UserProfessionEnum.AndroidDeveloper,
-                (long)UserProfessionEnum.GameDeveloper);
-        }
 
         query = query
             .When(

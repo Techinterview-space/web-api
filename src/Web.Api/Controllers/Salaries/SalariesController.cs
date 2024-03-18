@@ -8,6 +8,7 @@ using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Salaries;
 using Domain.Services;
 using Domain.Services.Global;
 using Domain.Services.Salaries;
@@ -155,22 +156,14 @@ public class SalariesController : ControllerBase
         [FromQuery] SalariesChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        return new UserChartHandler(_auth, _context).Handle(request, cancellationToken);
-    }
+        var parameters = new SalariesChartQueryParams
+        {
+            Grade = request.Grade,
+            ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+            Cities = request.Cities,
+        };
 
-    [HttpGet("chart-share")]
-    public async Task<IActionResult> ChartShareAsync(
-        [FromQuery] SalariesChartQueryParams request,
-        CancellationToken cancellationToken)
-    {
-        var result = await new UserChartHandler(_auth, _context).Handle(request, cancellationToken);
-        var contentResultProvider = new ChartShareRedirectPageContentResultHandler(
-            result,
-            request,
-            _context,
-            _global);
-
-        return await contentResultProvider.CreateAsync(cancellationToken);
+        return new UserChartHandler(_auth, _context).Handle(parameters, cancellationToken);
     }
 
     [HttpPost("")]
