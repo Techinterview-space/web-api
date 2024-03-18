@@ -45,63 +45,35 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
         }),
     };
 
-    public DeveloperGrade? Grade
-    {
-        get
-        {
-            foreach (var part in _messageParts)
-            {
-                var grade = _grades.FirstOrDefault(x =>
-                    x.Grade.ToString().Equals(part, StringComparison.InvariantCultureIgnoreCase) ||
-                    x.PossibleOptions.Any(y => y.Equals(part, StringComparison.InvariantCultureIgnoreCase)));
+    public DeveloperGrade? Grade { get; }
 
-                if (grade != default)
-                {
-                    return grade.Grade;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    public List<long> ProfessionsToInclude
-    {
-        get
-        {
-            if (_messageParts.Count == 0)
-            {
-                return new List<long>(0);
-            }
-
-            var chatName = _message.Chat.Title?.ToLowerInvariant();
-            if (string.IsNullOrEmpty(chatName))
-            {
-                return new List<long>(0);
-            }
-
-            var professions = _chatProfessions
-                .FirstOrDefault(x => x.ChatName.Contains(chatName, StringComparison.InvariantCultureIgnoreCase));
-
-            if (professions == null)
-            {
-                return new List<long>(0);
-            }
-
-            return professions.Professions.Select(x => (long)x).ToList();
-        }
-    }
+    public List<long> ProfessionsToInclude { get; }
 
     public List<KazakhstanCity> Cities => new List<KazakhstanCity>(0);
 
-    private readonly IReadOnlyCollection<string> _messageParts;
-    private readonly Message _message;
+    public TelegramBotCommandParameters(
+        DeveloperGrade? grade,
+        params UserProfessionEnum[] professionsToInclude)
+    {
+        Grade = grade;
+        ProfessionsToInclude = professionsToInclude
+            .Select(x => (long)x)
+            .ToList();
+    }
+
+    public TelegramBotCommandParameters(
+        string chatName,
+        DeveloperGrade? grade)
+        : this(grade, GetProfessions(chatName).ToArray())
+    {
+    }
 
     public TelegramBotCommandParameters(
         Message message)
+        : this(
+            message.Chat.Title?.ToLowerInvariant() ?? string.Empty,
+            GetGrade(message.Text?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>()))
     {
-        _message = message;
-        _messageParts = message.Text?.Split(' ', System.StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
     }
 
     public string GetKeyPostfix()
@@ -109,6 +81,44 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
         var grade = Grade?.ToString() ?? "all";
         var professions = ProfessionsToInclude.Count == 0 ? "all" : string.Join("_", ProfessionsToInclude);
         return $"{grade}_{professions}";
+    }
+
+    private static DeveloperGrade? GetGrade(
+        IReadOnlyCollection<string> messageParts)
+    {
+        foreach (var part in messageParts)
+        {
+            var grade = _grades.FirstOrDefault(x =>
+                x.Grade.ToString().Equals(part, StringComparison.InvariantCultureIgnoreCase) ||
+                x.PossibleOptions.Any(y => y.Equals(part, StringComparison.InvariantCultureIgnoreCase)));
+
+            if (grade != default)
+            {
+                return grade.Grade;
+            }
+        }
+
+        return null;
+    }
+
+    private static List<UserProfessionEnum> GetProfessions(
+        string chatName)
+    {
+        chatName = chatName?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(chatName))
+        {
+            return new List<UserProfessionEnum>(0);
+        }
+
+        var professions = _chatProfessions
+            .FirstOrDefault(x => x.ChatName.Contains(chatName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (professions == null)
+        {
+            return new List<UserProfessionEnum>(0);
+        }
+
+        return professions.Professions;
     }
 
 #pragma warning disable SA1313
