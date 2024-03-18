@@ -68,9 +68,7 @@ public class TelegramBotService
         }
 
         var client = CreateClient();
-
-        // StartReceiving does not block the caller thread. Receiving is done on the ThreadPool.
-        ReceiverOptions receiverOptions = new ()
+        var receiverOptions = new ReceiverOptions()
         {
             AllowedUpdates = new List<UpdateType>
             {
@@ -155,11 +153,13 @@ public class TelegramBotService
                         cancellationToken);
                 });
 
+            var replyToMessageId = updateRequest.Message.ReplyToMessage?.MessageId ?? updateRequest.Message.MessageId;
             await client.SendTextMessageAsync(
                 updateRequest.Message!.Chat.Id,
                 replyData.ReplyText,
                 parseMode: replyData.ParseMode,
                 replyMarkup: replyData.InlineKeyboardMarkup,
+                replyToMessageId: replyToMessageId,
                 cancellationToken: cancellationToken);
         }
     }
@@ -184,15 +184,19 @@ public class TelegramBotService
         var frontendLink = new SalariesChartPageLink(global, requestParams);
 
         const string frontendAppName = "techinterview.space/salaries";
-        if (salaries.Count > 0)
+        if (salaries.Count > 0 || Debugger.IsAttached)
         {
-            var replyText = "В Казахстане специалисты IT ";
+            var replyText = @$"<b>{salaries.Median():N0}</b> тг.
+
+";
+            replyText += @$"Столько специалисты в IT в Казахстане";
             if (requestParams.Grade.HasValue)
             {
-                replyText += $" уровня {requestParams.Grade.Value}";
+                replyText += $" уровня <b>{requestParams.Grade.Value}</b>";
             }
 
-            replyText += @$" получают в среднем <b>{salaries.Median():N0}</b> тг.
+            var maximumSalary = salaries.Count > 0 ? salaries.Max() : 0;
+            replyText += @$" получают в среднем. Максимум: {maximumSalary:N0} тг.
 
 <em>Расчитано на основе {totalCount} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
