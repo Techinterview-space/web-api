@@ -211,6 +211,12 @@ public class TelegramBotService
                 var seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
                 var leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
 
+                replyText = professionOrNull != null
+                    ? @$"Зарплаты {professionOrNull.Title} по грейдам:"
+                    : "Зарплаты специалистов IT в Казахстане по грейдам:";
+
+                replyText += Environment.NewLine;
+
                 if (juniorMedian > 0)
                 {
                     replyText += @$"
@@ -236,8 +242,6 @@ public class TelegramBotService
                 }
 
                 replyText += @$"
-
-Столько специалисты {professionOrNull?.Title ?? "в IT"} в Казахстане получают в среднем.
 
 <em>Расчитано на основе {totalCount} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
