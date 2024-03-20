@@ -17,6 +17,13 @@ namespace TechInterviewer.Features.Telegram;
 
 public class TelegramBotService
 {
+    private static readonly UpdateType[] _updateTypes = new List<UpdateType>
+    {
+        UpdateType.InlineQuery,
+        UpdateType.Message,
+        UpdateType.ChosenInlineResult,
+    }.ToArray();
+
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -49,20 +56,14 @@ public class TelegramBotService
         }
 
         var client = CreateClient();
-        var receiverOptions = new ReceiverOptions
-        {
-            AllowedUpdates = new List<UpdateType>
-            {
-                UpdateType.InlineQuery,
-                UpdateType.Message,
-                UpdateType.ChosenInlineResult,
-            }.ToArray()
-        };
 
         client.StartReceiving(
             updateHandler: HandleUpdateAsync,
             pollingErrorHandler: HandlePollingErrorAsync,
-            receiverOptions: receiverOptions,
+            receiverOptions: new ReceiverOptions
+            {
+                AllowedUpdates = _updateTypes
+            },
             cancellationToken: cancellationToken);
     }
 
