@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 
 namespace Domain.Entities.Labels;

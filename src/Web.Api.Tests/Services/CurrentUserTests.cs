@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Domain.Services;
+using Domain.ValueObjects;
 using Xunit;
 
 namespace Web.Api.Tests.Services;

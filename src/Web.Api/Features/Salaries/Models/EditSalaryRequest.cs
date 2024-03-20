@@ -2,7 +2,7 @@
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 
 namespace TechInterviewer.Features.Salaries.Models;
 

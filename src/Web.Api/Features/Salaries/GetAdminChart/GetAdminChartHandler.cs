@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
-using Domain.Services;
+using Domain.ValueObjects;
+using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

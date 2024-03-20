@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 using TechInterviewer.Features.Salaries.AddSalary;
 using TestUtils.Auth;
 using TestUtils.Db;

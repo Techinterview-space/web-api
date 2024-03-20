@@ -1,16 +1,17 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
-using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Services.Salaries;
+using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
+using Infrastructure.Database.Extensions;
+using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 using TechInterviewer.Features.Salaries.Models;
-using NotFoundException = Domain.Exceptions.NotFoundException;
+using NotFoundException = Domain.Validation.Exceptions.NotFoundException;
 
 namespace TechInterviewer.Features.Salaries.UpdateSalary;
 

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.ValueObjects.Pagination;
+using Infrastructure.Database;
 using MediatR;
 using TechInterviewer.Features.Salaries.Models;
 

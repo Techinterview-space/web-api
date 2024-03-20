@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
-using Domain.Salaries;
-using Domain.Services.Global;
+using Infrastructure.Database;
+using Infrastructure.Salaries;
+using Infrastructure.Services.Global;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.GetSalariesChart;

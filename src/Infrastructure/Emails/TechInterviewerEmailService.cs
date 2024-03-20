@@ -1,9 +1,9 @@
 ﻿using System.Text;
-using Domain.Emails.Requests;
-using Domain.Emails.Services;
-using Domain.Services.Global;
-using Domain.Services.Html;
-using Domain.Services.MD;
+using Infrastructure.Emails.Contracts;
+using Infrastructure.Emails.Contracts.Requests;
+using Infrastructure.Services.Global;
+using Infrastructure.Services.Html;
+using Infrastructure.Services.PDF.Interviews;
 using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.Emails;
@@ -24,7 +24,8 @@ public class TechInterviewerEmailService : IEmailService
         _html = html;
     }
 
-    public EmailContent Prepare(EmailSendRequest emailContent) =>
+    public EmailContent Prepare(
+        EmailSendRequest emailContent) =>
         new EmailContent(
             _global.NoReplyEmail,
             PrepareSubject(emailContent.Subject),

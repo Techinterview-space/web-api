@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
-using Domain.Exceptions;
 using Domain.Validation;
+using Domain.Validation.Exceptions;
 
 namespace Domain.Extensions;
 
@@ -90,5 +90,29 @@ public static class CollectionExtensions
             : (sortedPNumbers[mid] + sortedPNumbers[mid - 1]) / 2;
 
         return median;
+    }
+
+    public static List<T> AddIfDoesNotExist<T>(
+        this List<T> list,
+        T item)
+    {
+        if (!list.Contains(item))
+        {
+            list.Add(item);
+        }
+
+        return list;
+    }
+
+    public static List<T> AddIfDoesNotExist<T>(
+        this List<T> list,
+        params T[] items)
+    {
+        foreach (var item in items)
+        {
+            list.AddIfDoesNotExist(item);
+        }
+
+        return list;
     }
 }

@@ -1,6 +1,6 @@
-﻿using Domain.Authentication.Abstract;
-using Domain.Services;
-using Domain.Validation;
+﻿using Domain.Validation;
+using Domain.ValueObjects;
+using Infrastructure.Authentication.Contracts;
 
 namespace TestUtils.Auth;
 

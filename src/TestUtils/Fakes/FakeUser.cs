@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using TestUtils.Db;
 

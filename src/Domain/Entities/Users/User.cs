@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Domain.Enums;
 using Domain.Extensions;
-using Domain.Services;
 using Domain.Validation;
+using Domain.Validation.Exceptions;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.Users;
 
@@ -184,5 +185,49 @@ public class User : BaseModel, IHasDeletedAt
         {
             LastName = lastName;
         }
+    }
+
+    public bool Has(Role role)
+    {
+        return UserRoles.Any(x => x.RoleId == role);
+    }
+
+    public void HasAnyOrFail(
+        params Role[] roles) =>
+        HasAnyOrFail(roles as IReadOnlyCollection<Role>);
+
+    public void HasAnyOrFail(
+        IReadOnlyCollection<Role> roles)
+    {
+        roles.ThrowIfNullOrEmpty(nameof(roles));
+
+        if (roles.Any(Has))
+        {
+            return;
+        }
+
+        throw new NoPermissionsException("Current user has no permission to do this operation");
+    }
+
+    public void HasOrFail(
+        Role role,
+        string messageOrNull = null)
+    {
+        if (Has(role))
+        {
+            return;
+        }
+
+        throw new NoPermissionsException(messageOrNull ?? "Current user has no permission to do this operation");
+    }
+
+    public User InactiveOrFail()
+    {
+        if (!this.Active())
+        {
+            return this;
+        }
+
+        throw new InvalidOperationException($"The user Id:{Id} is active");
     }
 }

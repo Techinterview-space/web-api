@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Domain.Services.Global;
+using Infrastructure.Services.Global;
 
 namespace TestUtils.Fakes;
 

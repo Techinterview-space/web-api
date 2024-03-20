@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using Domain.Enums;
-using Domain.Exceptions;
-using Domain.Services;
+using Domain.Validation.Exceptions;
+using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace TechInterviewer.Setup.Attributes;

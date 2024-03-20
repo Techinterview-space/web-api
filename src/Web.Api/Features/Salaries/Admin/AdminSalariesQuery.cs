@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Domain.Database;
+using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.Models;
 

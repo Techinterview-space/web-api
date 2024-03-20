@@ -1,6 +1,6 @@
 ﻿using System;
 using Domain.Entities.Salaries;
-using Domain.Services.Salaries;
+using Infrastructure.Salaries;
 
 namespace TechInterviewer.Features.Salaries.Models;
 

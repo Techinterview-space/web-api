@@ -1,6 +1,6 @@
-﻿using Domain.Emails.Requests;
-using Domain.Emails.Services;
-using Domain.Validation;
+﻿using Domain.Validation;
+using Infrastructure.Emails.Contracts;
+using Infrastructure.Emails.Contracts.Requests;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SendGrid;

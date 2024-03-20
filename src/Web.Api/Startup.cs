@@ -1,7 +1,7 @@
-﻿using Domain.Database;
-using Domain.Enums;
-using Domain.Services.Global;
+﻿using Domain.Enums;
 using Infrastructure.Configs;
+using Infrastructure.Database;
+using Infrastructure.Services.Global;
 using MaximGorbatyuk.DatabaseSqlEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using DinkToPdf.Contracts;
-using Domain.Files;
+using Infrastructure.Services.Files;
 using Infrastructure.Services.PDF;
 using Microsoft.Extensions.Logging;
 using Moq;

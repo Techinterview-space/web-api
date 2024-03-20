@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
-using Domain.Database;
 using Domain.Entities.Salaries;
-using Domain.Services.Salaries;
+using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
+using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.Models;

@@ -2,14 +2,12 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Enums;
-using Domain.Exceptions;
-using Domain.Salaries;
 using Domain.ValueObjects.Pagination;
+using Infrastructure.Database;
+using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.AddSalary;
 using TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
 using TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;

@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 using System.Threading.Tasks;
-using Domain.Database;
+using Infrastructure.Database;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

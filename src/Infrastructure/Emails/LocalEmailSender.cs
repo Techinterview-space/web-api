@@ -1,5 +1,5 @@
-﻿using Domain.Emails.Requests;
-using Domain.Emails.Services;
+﻿using Infrastructure.Emails.Contracts;
+using Infrastructure.Emails.Contracts.Requests;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Emails;

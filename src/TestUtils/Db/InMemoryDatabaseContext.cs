@@ -1,5 +1,5 @@
 ﻿using System;
-using Domain.Database;
+using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 

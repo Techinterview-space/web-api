@@ -1,21 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
-using Domain.Database;
-using Domain.Entities.Employments;
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Enums;
-using Domain.Exceptions;
-using Domain.Services.Interviews;
-using Domain.Services.Interviews.Dtos;
-using Domain.Services.Labels;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
+using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
+using Infrastructure.Services.PDF.Interviews;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using TechInterviewer.Controllers;
+using TechInterviewer.Features.Interviews;
+using TechInterviewer.Features.Interviews.Models;
+using TechInterviewer.Features.Labels.Models;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -32,7 +31,7 @@ public class InterviewsControllerTests
         var controller = new InterviewsController(
             new Mock<IAuthorization>().Object,
             new InMemoryDatabaseContext(),
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.True(controller.HasRole(nameof(InterviewsController.AllAsync), role));
     }
@@ -44,7 +43,7 @@ public class InterviewsControllerTests
         var controller = new InterviewsController(
             new Mock<IAuthorization>().Object,
             new InMemoryDatabaseContext(),
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(controller.HasRole(nameof(InterviewsController.AllAsync), role));
     }
@@ -57,7 +56,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -85,7 +84,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(otherPerson),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -101,7 +100,7 @@ public class InterviewsControllerTests
         target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
         var myTemplates = await target.MyInterviewsAsync();
         Assert.Empty(myTemplates);
         Assert.Single(await context.Interviews.AllAsync());
@@ -115,7 +114,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -168,7 +167,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -193,7 +192,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -224,7 +223,7 @@ public class InterviewsControllerTests
         target = new InterviewsController(
             new FakeAuth(otherPerson),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
         await Assert.ThrowsAsync<NoPermissionsException>(() => target.UpdateAsync(new InterviewUpdateRequest
         {
             Id = template.Id,
@@ -244,7 +243,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -314,7 +313,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -341,7 +340,7 @@ public class InterviewsControllerTests
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
         await target.CreateAsync(new InterviewCreateRequest
@@ -367,7 +366,7 @@ public class InterviewsControllerTests
         target = new InterviewsController(
             new FakeAuth(otherPerson),
             context,
-            new Mock<IInterviewPdf>().Object);
+            new Mock<IInterviewPdfService>().Object);
         await Assert.ThrowsAsync<NoPermissionsException>(() => target.DeleteAsync(template.Id));
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Enums;
-using Domain.Salaries;
+using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
