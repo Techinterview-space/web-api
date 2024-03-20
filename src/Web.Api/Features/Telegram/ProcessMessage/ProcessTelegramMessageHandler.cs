@@ -24,8 +24,11 @@ namespace TechInterviewer.Features.Telegram.ProcessMessage;
 
 public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, Unit>
 {
+    public const string ApplicationName = "techinterview.space/salaries";
+
     private const string TelegramBotName = "@techinterview_salaries_bot";
     private const string CacheKey = "TelegramBotService_ReplyData";
+
     private const int CachingMinutes = 20;
 
     private readonly ILogger<ProcessTelegramMessageHandler> _logger;
@@ -86,6 +89,19 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         var privateMessage = message.Chat.Type == ChatType.Private;
         if (mentionedInGroupChat || privateMessage)
         {
+            if (privateMessage && messageText.Equals("/start", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var startReplyData = new TelegramBotStartCommandReplyData(new SalariesChartPageLink(_global, null));
+                await request.BotClient.SendTextMessageAsync(
+                    message.Chat.Id,
+                    startReplyData.ReplyText,
+                    parseMode: startReplyData.ParseMode,
+                    replyMarkup: startReplyData.InlineKeyboardMarkup,
+                    cancellationToken: cancellationToken);
+
+                return Unit.Value;
+            }
+
             var parameters = TelegramBotCommandParameters.CreateFromMessage(
                 messageText,
                 allProfessions);
@@ -132,8 +148,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             .ToListAsync(cancellationToken);
 
         var frontendLink = new SalariesChartPageLink(_global, requestParams);
-
-        const string frontendAppName = "techinterview.space/salaries";
         var professions = requestParams.GetProfessionsTitleOrNull();
 
         if (salaries.Count > 0 || Debugger.IsAttached)
@@ -176,7 +190,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 replyText += @$"
 
 <em>Расчитано на основе {totalCount} анкет(ы)</em>
-<em>Подробно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
+<em>Подробно на сайте <a href=""{frontendLink}"">{ApplicationName}</a></em>";
             }
             else
             {
@@ -186,14 +200,14 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
                 replyText += @$"
 
-<em>Посмотреть зарплаты по другим специальностям можно на сайте <a href=""{frontendLink}"">{frontendAppName}</a></em>";
+<em>Посмотреть зарплаты по другим специальностям можно на сайте <a href=""{frontendLink}"">{ApplicationName}</a></em>";
             }
 
             return new TelegramBotReplyData(
                 replyText.Trim(),
                 new InlineKeyboardMarkup(
                     InlineKeyboardButton.WithUrl(
-                        text: frontendAppName,
+                        text: ApplicationName,
                         url: frontendLink.ToString())));
         }
 
