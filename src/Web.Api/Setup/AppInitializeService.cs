@@ -2,10 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Database;
-using Infrastructure.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using TechInterviewer.Features.Telegram;
 using TechInterviewer.Setup.HostedServices;
 
 namespace TechInterviewer.Setup;
