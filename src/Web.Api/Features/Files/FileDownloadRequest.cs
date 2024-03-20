@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TechInterviewer.Controllers.Files;
+namespace TechInterviewer.Features.Files;
 
 public record FileDownloadRequest
 {

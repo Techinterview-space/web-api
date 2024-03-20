@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AspNetCore.Aws.S3.Simple.Models;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Controllers.Files;
+namespace TechInterviewer.Features.Files;
 
 public record UploadFileServiceRequest : IUploadFileRequest
 {

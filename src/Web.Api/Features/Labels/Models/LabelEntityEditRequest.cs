@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TechInterviewer.Controllers.Labels;
+namespace TechInterviewer.Features.Labels.Models;
 
 public record LabelEntityEditRequest
 {

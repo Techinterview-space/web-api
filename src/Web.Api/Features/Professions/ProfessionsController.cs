@@ -10,10 +10,10 @@ using Domain.Exceptions;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Labels;
+using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.SelectBoxEntities;
+namespace TechInterviewer.Features.Professions;
 
 [ApiController]
 [Route("api/professions")]

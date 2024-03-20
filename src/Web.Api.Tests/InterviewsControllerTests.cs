@@ -15,7 +15,7 @@ using Domain.Services.Labels;
 using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using TechInterviewer.Controllers;
+using TechInterviewer.Features.Interviews;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;

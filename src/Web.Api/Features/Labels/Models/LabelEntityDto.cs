@@ -1,6 +1,6 @@
 ﻿using Domain.ValueObjects;
 
-namespace TechInterviewer.Controllers.Labels;
+namespace TechInterviewer.Features.Labels.Models;
 
 public record LabelEntityDto
 {

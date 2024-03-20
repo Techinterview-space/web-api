@@ -2,15 +2,13 @@
 using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
-using Domain.Services.Salaries;
-using Domain.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Users;
 using TechInterviewer.Features.Salaries.Models;
+using TechInterviewer.Features.Users.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers;
+namespace TechInterviewer.Features.Accounts;
 
 [ApiController]
 [Route("api/account")]

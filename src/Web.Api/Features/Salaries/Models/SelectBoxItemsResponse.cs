@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using TechInterviewer.Controllers.Labels;
+using TechInterviewer.Features.Labels.Models;
 
 namespace TechInterviewer.Features.Salaries.Models;
 

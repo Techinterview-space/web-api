@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
-using Domain.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Features.Users.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.Users;
+namespace TechInterviewer.Features.Users;
 
 [HasAnyRole]
 [ApiController]

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using TechInterviewer.Controllers;
+using TechInterviewer.Features.Interviews;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;

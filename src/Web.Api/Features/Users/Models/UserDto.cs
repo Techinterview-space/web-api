@@ -6,7 +6,7 @@ using Domain.Enums;
 using Domain.Validation;
 using TechInterviewer.Features.Salaries.Models;
 
-namespace TechInterviewer.Controllers.Users;
+namespace TechInterviewer.Features.Users.Models;
 
 public record UserDto
 {

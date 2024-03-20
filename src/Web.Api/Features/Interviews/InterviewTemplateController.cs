@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Interviews;
 using Domain.Enums;
-using Domain.Extensions;
 using Domain.Services.InterviewTemplates;
 using Domain.Services.Labels;
 using Domain.Validation;
@@ -16,10 +14,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Interviews;
+using TechInterviewer.Features.Interviews.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers;
+namespace TechInterviewer.Features.Interviews;
 
 [ApiController]
 [Route("api/interview-templates")]
@@ -28,7 +26,9 @@ public class InterviewTemplateController : ControllerBase
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
 
-    public InterviewTemplateController(IAuthorization auth, DatabaseContext context)
+    public InterviewTemplateController(
+        IAuthorization auth,
+        DatabaseContext context)
     {
         _auth = auth;
         _context = context;

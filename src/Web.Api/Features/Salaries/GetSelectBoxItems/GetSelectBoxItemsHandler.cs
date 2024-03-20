@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Domain.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Labels;
+using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.GetSelectBoxItems;

@@ -10,19 +10,21 @@ using Domain.Exceptions;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Labels;
+using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.SelectBoxEntities;
+namespace TechInterviewer.Features.WorkIndustries;
 
 [ApiController]
-[Route("api/skills")]
-public class SkillsController : ControllerBase
+[Route("api/work-industries")]
+public class WorkIndustriesController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
 
-    public SkillsController(IAuthorization auth, DatabaseContext context)
+    public WorkIndustriesController(
+        IAuthorization auth,
+        DatabaseContext context)
     {
         _auth = auth;
         _context = context;
@@ -32,7 +34,7 @@ public class SkillsController : ControllerBase
     public async Task<IEnumerable<LabelEntityDto>> ForSelectBoxes(
         CancellationToken cancellationToken)
     {
-        return await _context.Skills
+        return await _context.WorkIndustries
             .Select(x => new LabelEntityDto
             {
                 Id = x.Id,
@@ -48,7 +50,7 @@ public class SkillsController : ControllerBase
     public async Task<IEnumerable<LabelEntityAdminDto>> All(
         CancellationToken cancellationToken)
     {
-        return await _context.Skills
+        return await _context.WorkIndustries
             .Select(x => new LabelEntityAdminDto
             {
                 Id = x.Id,
@@ -70,22 +72,22 @@ public class SkillsController : ControllerBase
         var currentUser = await _auth.CurrentUserOrFailAsync();
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
-        if (await _context.Skills.AnyAsync(
+        if (await _context.WorkIndustries.AnyAsync(
                 x => x.Title.ToUpper() == titleUpper,
                 cancellationToken: cancellationToken))
         {
             throw new BadRequestException("Skill with this title already exists");
         }
 
-        var label = await _context.AddEntityAsync(
-            new Skill(
+        var item = await _context.AddEntityAsync(
+            new WorkIndustry(
                 createRequest.Title,
                 new HexColor(createRequest.HexColor),
                 currentUser),
             cancellationToken: cancellationToken);
 
         await _context.TrySaveChangesAsync(cancellationToken);
-        return Ok(label.Id);
+        return Ok(item.Id);
     }
 
     [HttpPut("")]
@@ -95,10 +97,10 @@ public class SkillsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
-        var skill = await _context.Skills.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
-        skill.CouldBeUpdatedByOrFail(currentUser);
+        var item = await _context.WorkIndustries.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
+        item.CouldBeUpdatedByOrFail(currentUser);
 
-        skill.Update(
+        item.Update(
             updateRequest.Title,
             new HexColor(updateRequest.HexColor));
 
@@ -113,11 +115,11 @@ public class SkillsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync();
-        var skill = await _context.Skills.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+        var item = await _context.WorkIndustries.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
-        skill.CouldBeUpdatedByOrFail(currentUser);
+        item.CouldBeUpdatedByOrFail(currentUser);
 
-        _context.Skills.Remove(skill);
+        _context.WorkIndustries.Remove(item);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok();

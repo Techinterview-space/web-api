@@ -4,7 +4,7 @@ using Domain.Emails.Requests;
 using Domain.Emails.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Controllers;
+namespace TechInterviewer.Features.Admin;
 
 [ApiController]
 [Route("api/debug")]

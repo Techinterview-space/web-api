@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.Labels;
+namespace TechInterviewer.Features.Labels;
 
 [ApiController]
 [Route("api/user-labels")]

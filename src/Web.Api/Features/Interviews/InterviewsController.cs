@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Authentication.Abstract;
 using Domain.Database;
-using Domain.Entities.Employments;
 using Domain.Entities.Interviews;
 using Domain.Entities.Users;
 using Domain.Enums;
@@ -14,14 +13,13 @@ using Domain.Services.Interviews;
 using Domain.Services.Interviews.Dtos;
 using Domain.Services.Labels;
 using Domain.Validation;
-using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Interviews;
+using TechInterviewer.Features.Interviews.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers;
+namespace TechInterviewer.Features.Interviews;
 
 [ApiController]
 [Route("api/interviews")]
@@ -32,7 +30,10 @@ public class InterviewsController : ControllerBase
     private readonly DatabaseContext _context;
     private readonly IInterviewPdf _pdf;
 
-    public InterviewsController(IAuthorization auth, DatabaseContext context, IInterviewPdf pdf)
+    public InterviewsController(
+        IAuthorization auth,
+        DatabaseContext context,
+        IInterviewPdf pdf)
     {
         _auth = auth;
         _context = context;

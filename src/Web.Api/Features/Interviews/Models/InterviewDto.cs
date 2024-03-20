@@ -3,9 +3,9 @@ using System.Linq;
 using Domain.Entities.Interviews;
 using Domain.Services.Interviews.Dtos;
 using Domain.Services.Labels;
-using TechInterviewer.Controllers.Users;
+using TechInterviewer.Features.Users.Models;
 
-namespace TechInterviewer.Controllers.Interviews;
+namespace TechInterviewer.Features.Interviews.Models;
 
 public record InterviewDto : InterviewUpdateRequest
 {

@@ -7,10 +7,10 @@ using Domain.Files;
 using Domain.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using TechInterviewer.Controllers.Admin.Dtos;
+using TechInterviewer.Features.Admin.Models;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers;
+namespace TechInterviewer.Features.Admin;
 
 [ApiController]
 [Route("api/admin-tools")]
