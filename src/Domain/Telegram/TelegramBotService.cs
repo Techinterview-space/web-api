@@ -203,7 +203,7 @@ public class TelegramBotService
         const string frontendAppName = "techinterview.space/salaries";
         if (salaries.Count > 0 || Debugger.IsAttached)
         {
-            var replyText = string.Empty;
+            string replyText;
             if (salaries.Count > 0)
             {
                 var juniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Junior).Select(x => x.Value).Median();
@@ -211,11 +211,8 @@ public class TelegramBotService
                 var seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
                 var leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
 
-                replyText = professionOrNull != null
-                    ? @$"Зарплаты {professionOrNull.Title} по грейдам:"
-                    : "Зарплаты специалистов IT в Казахстане по грейдам:";
-
-                replyText += Environment.NewLine;
+                replyText = @$"Зарплаты {professionOrNull?.Title ?? "специалистов IT в Казахстане"} по грейдам:
+";
 
                 if (juniorMedian > 0)
                 {
