@@ -1,0 +1,73 @@
+# Contributing to Techinterview.space
+
+First off, thank you for considering contributing to Techinterview.space. It's people like you that make Techinterview.space such a great website.
+
+## Code of Conduct
+
+Techinterview.space has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://github.com/Techinterview-space/web-api/CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
+
+## How Can I Contribute?
+
+### Reporting Bugs
+
+This section guides you through submitting a bug report for Techinterview.space. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior, and find related reports.
+
+**Before Submitting A Bug Report**
+
+* Check the FAQs on the forum for a list of common questions and problems.
+* Determine [which repository](https://github.com/Techinterview-space/web-api/issues) the problem should be reported in.
+* Check if the issue has already been reported. If it has and the issue is still open, add a comment to the existing issue instead of opening a new one.
+
+**How Do I Submit A (Good) Bug Report?**
+
+Bugs are tracked as [GitHub issues](https://github.com/Techinterview-space/web-api/issues). After you've determined which repository your bug is related to, create an issue on that repository and provide the following information by filling in [the template](https://github.com/Techinterview-space/web-api/tree/main/.github/templates/bug_report.md).
+
+Explain the problem and include additional details to help maintainers reproduce the problem:
+
+* **Use a clear and descriptive title** for the issue to identify the problem.
+* **Describe the exact steps which reproduce the problem** in as much detail as possible.
+* **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use Markdown code blocks.
+* **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
+* **Explain which behavior you expected to see instead and why.**
+* **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem.
+
+### Suggesting Enhancements
+
+This section guides you through submitting an enhancement suggestion for Techinterview.space, including completely new features and minor improvements to existing functionality.
+
+**Before Submitting An Enhancement Suggestion**
+
+* Check the issue tracker to see if the enhancement has already been suggested. If it has, add a thumbs-up reaction to that issue.
+* Determine [which repository](https://github.com/Techinterview-space/web-api/issues) the enhancement should be suggested in.
+
+**How Do I Submit A (Good) Enhancement Suggestion?**
+
+Enhancement suggestions are tracked as GitHub issues. After you've determined which repository your suggestion is related to, create an issue on that repository and provide the following information:
+
+* **Use a clear and descriptive title** for the issue to identify the suggestion.
+* **Provide a step-by-step description of the suggested enhancement** in as much detail as possible.
+* **Provide specific examples to demonstrate the steps**. Include copy/pasteable snippets which you use in those examples, as Markdown code blocks.
+* **Describe the current behavior** and **explain which behavior you expected to see instead** and why.
+* **Include screenshots and animated GIFs** which help you demonstrate the steps or point out the part of Techinterview.space which the suggestion is related to.
+* Use the [the template](https://github.com/Techinterview-space/web-api/tree/main/.github/templates/feature_request.md) to provide the necessary information.
+
+### Pull Requests
+
+The process described here has several goals:
+
+- Maintain Techinterview.space's quality
+- Fix problems that are important to users
+- Engage the community in working toward the best possible Techinterview.space
+- Enable a sustainable system for Techinterview.space's maintainers to review contributions
+
+Please follow these steps to have your contribution considered by the maintainers:
+
+1. Follow all instructions in [the template](https://github.com/Techinterview-space/web-api/tree/main/.github/templates/pull_request.md)
+2. Follow the [.NET styleguides](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions). Also, there is a linter for .NET that will disallow unapproved style of coding.
+3. After you submit your pull request, verify that all are passing
+
+### What if the status checks are failing?
+
+If a status check is failing, and you believe that the failure is unrelated to your change, please leave a comment on the pull request explaining why you believe the failure is unrelated. We will attempt to fix the problem.
+
+_Generated by Chat GPT. Adjusted by @maximgorbatyuk_
