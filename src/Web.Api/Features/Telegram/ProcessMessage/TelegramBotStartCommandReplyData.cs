@@ -1,5 +1,4 @@
 ﻿using Infrastructure.Salaries;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TechInterviewer.Features.Telegram.ProcessMessage;
 
@@ -8,11 +7,7 @@ public record TelegramBotStartCommandReplyData : TelegramBotReplyData
     public TelegramBotStartCommandReplyData(
         SalariesChartPageLink frontendLink)
         : base(
-            PrepareText(frontendLink),
-            new InlineKeyboardMarkup(
-                InlineKeyboardButton.WithUrl(
-                    text: ProcessTelegramMessageHandler.ApplicationName,
-                    url: frontendLink.ToString())))
+            PrepareText(frontendLink))
     {
     }
 
@@ -26,7 +21,9 @@ public record TelegramBotStartCommandReplyData : TelegramBotReplyData
 Попробуй тегнуть меня в груповом чате и ввести ""frontend"" и выбери вариант в выпадающем меню - в итоге в чат будет отправлена статистика по зарплатам фронтенд-разработчиков.
 
 <em>Вопросы и предложения: @maximgorbatyuk</em>
-<em>Github проекта: <a href=""https://github.com/Techinterview-space"">репозитории</a></em>
-<em>Поддержать копейкой: <a href=""https://boosty.to/ake111aa"">boosty.to</a></em>";
+<em>Посмотреть код: <a href=""https://github.com/Techinterview-space"">Github</a></em>
+<em>Поддержать денежкой: <a href=""https://boosty.to/ake111aa"">boosty.to</a></em>
+
+<em>Любая помощь приветствуется!</em>";
     }
 }
