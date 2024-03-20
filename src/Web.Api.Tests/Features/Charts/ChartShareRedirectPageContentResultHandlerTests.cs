@@ -1,9 +1,10 @@
-﻿using TechInterviewer.Features.Charts;
+﻿using TechInterviewer.Features.Salaries.GetSalariesChart;
+using TechInterviewer.Features.SalariesChartShare.GetChartSharePage;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Charts;
 
-public class ChartShareRedirectPageContentResultHandlerTests
+public class GetChartSharePageHandlerTests
 {
     [Theory]
     [InlineData(1000, "1,000")]
@@ -12,6 +13,6 @@ public class ChartShareRedirectPageContentResultHandlerTests
         double salary,
         string expected)
     {
-        Assert.Equal(expected, ChartShareRedirectPageContentResultHandler.SalaryFormat(salary));
+        Assert.Equal(expected, GetChartSharePageHandler.SalaryFormat(salary));
     }
 }

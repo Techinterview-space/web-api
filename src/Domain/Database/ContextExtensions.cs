@@ -94,7 +94,7 @@ public static class ContextExtensions
     {
         if (!await query.AnyAsync(x => x.Id == id, cancellationToken))
         {
-            throw ResourceNotFoundException.CreateFromEntity<T>(id);
+            throw NotFoundException.CreateFromEntity<T>(id);
         }
     }
 
@@ -123,14 +123,14 @@ public static class ContextExtensions
         where T : class, IHasId
     {
         return await query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
-               ?? throw ResourceNotFoundException.CreateFromEntity<T>(id);
+               ?? throw NotFoundException.CreateFromEntity<T>(id);
     }
 
     public static async Task<T> ByIdOrFailAsync<T>(this IQueryable<T> query, Guid id, CancellationToken cancellationToken = default(CancellationToken))
         where T : class, IHasIdBase<Guid>
     {
         return await query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
-               ?? throw ResourceNotFoundException.CreateFromEntity<T>(id);
+               ?? throw NotFoundException.CreateFromEntity<T>(id);
     }
 
     public static async Task<Pageable<TEntity>> AsPaginatedAsync<TEntity>(
@@ -203,7 +203,7 @@ public static class ContextExtensions
     {
         if (!await context.AnyAsync(expression, cancellationToken))
         {
-            throw new ResourceNotFoundException(errorMessage ?? "There is no item found by a passed condition");
+            throw new NotFoundException(errorMessage ?? "There is no item found by a passed condition");
         }
     }
 
