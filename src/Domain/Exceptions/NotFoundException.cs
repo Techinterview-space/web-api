@@ -2,24 +2,24 @@
 
 namespace Domain.Exceptions;
 
-public class ResourceNotFoundException : Exception
+public class NotFoundException : Exception
 {
-    public ResourceNotFoundException(string message)
+    public NotFoundException(string message)
         : base(message)
     {
     }
 
-    public static ResourceNotFoundException CreateFromEntity<TEntity>(long id)
+    public static NotFoundException CreateFromEntity<TEntity>(long id)
     {
         return new ($"Did not find any {typeof(TEntity).Name} by id={id}");
     }
 
-    public static ResourceNotFoundException CreateFromEntity<TEntity>(Guid id)
+    public static NotFoundException CreateFromEntity<TEntity>(Guid id)
     {
         return new ($"Did not find any {typeof(TEntity).Name} by id={id}");
     }
 
-    public static ResourceNotFoundException CreateFromEntity<TEntity>(string selector)
+    public static NotFoundException CreateFromEntity<TEntity>(string selector)
     {
         return new ($"Did not find any {typeof(TEntity).Name} by {selector}");
     }

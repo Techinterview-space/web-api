@@ -5,12 +5,12 @@ using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Exceptions;
 using Domain.Services.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 using TechInterviewer.Features.Salaries.Models;
+using NotFoundException = Domain.Exceptions.NotFoundException;
 
 namespace TechInterviewer.Features.Salaries.UpdateSalary;
 
@@ -34,7 +34,7 @@ public class UpdateSalaryHandler : IRequestHandler<UpdateSalaryCommand, CreateOr
         request.IsValidOrFail();
         var salary = await _context.Salaries
                          .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
-                     ?? throw new ResourceNotFoundException("Salary record not found");
+                     ?? throw new NotFoundException("Salary record not found");
 
         var currentUser = await _auth.CurrentUserOrNullAsync();
 

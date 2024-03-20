@@ -14,7 +14,7 @@ public static class CollectionExtensions
         where T : class, IHasId
     {
         return query.FirstOrDefault(x => x.Id == id)
-               ?? throw ResourceNotFoundException.CreateFromEntity<T>(id);
+               ?? throw NotFoundException.CreateFromEntity<T>(id);
     }
 
     public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)

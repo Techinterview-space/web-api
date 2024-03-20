@@ -10,13 +10,16 @@ using Domain.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Labels;
 using TechInterviewer.Features.Salaries.AddSalary;
 using TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
 using TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
+using TechInterviewer.Features.Salaries.ApproveSalary;
+using TechInterviewer.Features.Salaries.DeleteSalary;
+using TechInterviewer.Features.Salaries.ExcludeFromStats;
 using TechInterviewer.Features.Salaries.GetAdminChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+using TechInterviewer.Features.Salaries.GetSelectBoxItems;
 using TechInterviewer.Features.Salaries.Models;
 using TechInterviewer.Features.Salaries.UpdateSalary;
 using TechInterviewer.Setup.Attributes;
@@ -42,36 +45,7 @@ public class SalariesController : ControllerBase
     public async Task<SelectBoxItemsResponse> GetSelectBoxItems(
         CancellationToken cancellationToken)
     {
-        return new SelectBoxItemsResponse
-        {
-            Skills = await _context.Skills
-                .Select(x => new LabelEntityDto
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                    HexColor = x.HexColor,
-                })
-                .AsNoTracking()
-                .ToListAsync(cancellationToken),
-            Industries = await _context.WorkIndustries
-                .Select(x => new LabelEntityDto
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                    HexColor = x.HexColor,
-                })
-                .AsNoTracking()
-                .ToListAsync(cancellationToken),
-            Professions = await _context.Professions
-                .Select(x => new LabelEntityDto
-                {
-                    Id = x.Id,
-                    Title = x.Title,
-                    HexColor = x.HexColor,
-                })
-                .AsNoTracking()
-                .ToListAsync(cancellationToken),
-        };
+        return await _mediator.Send(new GetSelectBoxItemsQuery(), cancellationToken);
     }
 
     [HttpGet("all")]
@@ -152,13 +126,7 @@ public class SalariesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var salary = await _context.Salaries
-                         .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
-                     ?? throw new ResourceNotFoundException("Salary record not found");
-
-        salary.Approve();
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _mediator.Send(new ApproveSalaryCommand(id), cancellationToken);
         return Ok();
     }
 
@@ -168,13 +136,7 @@ public class SalariesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var salary = await _context.Salaries
-                         .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
-                     ?? throw new ResourceNotFoundException("Salary record not found");
-
-        salary.ExcludeFromStats();
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _mediator.Send(new ExcludeFromStatsCommand(id), cancellationToken);
         return Ok();
     }
 
@@ -184,13 +146,7 @@ public class SalariesController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        var salary = await _context.Salaries
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
-            ?? throw new ResourceNotFoundException("Salary record not found");
-
-        _context.Salaries.Remove(salary);
-        await _context.SaveChangesAsync(cancellationToken);
-
+        await _mediator.Send(new DeleteSalaryCommand(id), cancellationToken);
         return Ok();
     }
 }

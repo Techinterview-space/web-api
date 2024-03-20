@@ -16,7 +16,7 @@ public class ExceptionHttpMiddleware
         { typeof(UnauthorizedAccessException), StatusCodes.Status401Unauthorized },
         { typeof(AuthenticationException), StatusCodes.Status401Unauthorized },
         { typeof(NoPermissionsException), StatusCodes.Status403Forbidden },
-        { typeof(ResourceNotFoundException), StatusCodes.Status404NotFound },
+        { typeof(NotFoundException), StatusCodes.Status404NotFound },
         { typeof(BadRequestException), StatusCodes.Status400BadRequest },
         { typeof(EntityInvalidException), StatusCodes.Status400BadRequest },
         { typeof(InputValidationException), StatusCodes.Status422UnprocessableEntity },
