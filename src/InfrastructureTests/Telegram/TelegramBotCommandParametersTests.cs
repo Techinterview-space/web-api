@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Salaries;
-using Infrastructure.Telegram;
+using TechInterviewer.Features.Telegram;
+using TechInterviewer.Features.Telegram.ProcessMessage;
 using Xunit;
 
 namespace InfrastructureTests.Telegram;

@@ -1,143 +1,82 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
-using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Infrastructure.Telegram;
+namespace TechInterviewer.Features.Telegram.ProcessMessage;
 
-public class TelegramBotService
+public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, Unit>
 {
     private const string TelegramBotName = "@techinterview_salaries_bot";
     private const string CacheKey = "TelegramBotService_ReplyData";
     private const int CachingMinutes = 20;
 
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<TelegramBotService> _logger;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly DateTime _startedToListenTo;
+    private readonly ILogger<ProcessTelegramMessageHandler> _logger;
+    private readonly DatabaseContext _context;
+    private readonly IMemoryCache _cache;
+    private readonly IGlobal _global;
 
-    public TelegramBotService(
-        IConfiguration configuration,
-        ILogger<TelegramBotService> logger,
-        IServiceScopeFactory serviceScopeFactory)
+    public ProcessTelegramMessageHandler(
+        ILogger<ProcessTelegramMessageHandler> logger,
+        DatabaseContext context,
+        IMemoryCache cache,
+        IGlobal global)
     {
-        _configuration = configuration;
         _logger = logger;
-        _serviceScopeFactory = serviceScopeFactory;
-        _startedToListenTo = DateTime.UtcNow;
+        _context = context;
+        _cache = cache;
+        _global = global;
     }
 
-    public void StartReceiving(
+    public async Task<Unit> Handle(
+        ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
-        var enabled = _configuration["Telegram:Enable"]?.ToLowerInvariant();
-        var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
-        if (!parsedEnabled || !isEnabled)
-        {
-            _logger.LogWarning(
-                "Telegram bot is disabled. Value {Value}. Parsed: {Parsed}", enabled, parsedEnabled);
-            return;
-        }
-
-        var client = CreateClient();
-        var receiverOptions = new ReceiverOptions()
-        {
-            AllowedUpdates = new List<UpdateType>
-            {
-                UpdateType.InlineQuery,
-                UpdateType.Message,
-                UpdateType.ChosenInlineResult,
-            }.ToArray()
-        };
-
-        client.StartReceiving(
-            updateHandler: HandleUpdateAsync,
-            pollingErrorHandler: HandlePollingErrorAsync,
-            receiverOptions: receiverOptions,
-            cancellationToken: cancellationToken);
-    }
-
-    private Task HandlePollingErrorAsync(
-        ITelegramBotClient client,
-        Exception exception,
-        CancellationToken cancellationToken)
-    {
-        _logger.LogError(exception, "An error occurred while polling: {Message}", exception.Message);
-        return Task.CompletedTask;
-    }
-
-    private async Task HandleUpdateAsync(
-        ITelegramBotClient client,
-        Update updateRequest,
-        CancellationToken cancellationToken)
-    {
-        _logger.LogDebug("Received update of type {UpdateType}", updateRequest.Type);
-        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
-        {
-            return;
-        }
-
-        var messageSent = updateRequest.Message?.Date;
-        if (messageSent < _startedToListenTo)
-        {
-            _logger.LogWarning(
-                "Ignoring message sent at {MessageSentDate} because it was sent before the bot started listening at {StartedToListenTo}",
-                messageSent.Value.ToString("O"),
-                _startedToListenTo.ToString("O"));
-
-            return;
-        }
-
-        using var scope = _serviceScopeFactory.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-        var memoryCache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
-        var global = scope.ServiceProvider.GetRequiredService<IGlobal>();
-
-        var allProfessions = await memoryCache.GetOrCreateAsync(
+        var allProfessions = await _cache.GetOrCreateAsync(
             CacheKey + "_AllProfessions",
             async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(120);
-                return await context
+                return await _context
                     .Professions
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
             });
 
-        if (updateRequest.Type == UpdateType.InlineQuery && updateRequest.InlineQuery != null)
+        if (request.UpdateRequest.Type == UpdateType.InlineQuery && request.UpdateRequest.InlineQuery != null)
         {
             await ProcessInlineQueryAsync(
-                client,
-                context,
-                memoryCache,
-                global,
+                request.BotClient,
                 allProfessions,
-                updateRequest,
+                request.UpdateRequest,
                 cancellationToken);
-            return;
+
+            return Unit.Value;
         }
 
-        if (updateRequest.Message == null)
+        if (request.UpdateRequest.Message == null)
         {
-            return;
+            return Unit.Value;
         }
 
-        var message = updateRequest.Message;
+        var message = request.UpdateRequest.Message;
         var messageText = message.Text ?? string.Empty;
         var mentionedInGroupChat =
             message.Entities?.Length > 0 &&
@@ -151,37 +90,35 @@ public class TelegramBotService
                 messageText,
                 allProfessions);
 
-            var replyData = await memoryCache.GetOrCreateAsync(
+            var replyData = await _cache.GetOrCreateAsync(
                 CacheKey + "_" + parameters.GetKeyPostfix(),
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
                     return await ReplyWithSalariesAsync(
                         parameters,
-                        context,
-                        global,
                         cancellationToken);
                 });
 
-            var replyToMessageId = updateRequest.Message.ReplyToMessage?.MessageId ?? updateRequest.Message.MessageId;
-            await client.SendTextMessageAsync(
-                updateRequest.Message!.Chat.Id,
+            var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
+            await request.BotClient.SendTextMessageAsync(
+                request.UpdateRequest.Message!.Chat.Id,
                 replyData.ReplyText,
                 parseMode: replyData.ParseMode,
                 replyMarkup: replyData.InlineKeyboardMarkup,
                 replyToMessageId: replyToMessageId,
                 cancellationToken: cancellationToken);
         }
+
+        return Unit.Value;
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
         TelegramBotCommandParameters requestParams,
-        DatabaseContext context,
-        IGlobal global,
         CancellationToken cancellationToken)
     {
         var salariesQuery = new SalariesForChartQuery(
-            context,
+            _context,
             requestParams);
 
         var totalCount = await salariesQuery.ToQueryable().CountAsync(cancellationToken);
@@ -194,7 +131,7 @@ public class TelegramBotService
             })
             .ToListAsync(cancellationToken);
 
-        var frontendLink = new SalariesChartPageLink(global, requestParams);
+        var frontendLink = new SalariesChartPageLink(_global, requestParams);
 
         const string frontendAppName = "techinterview.space/salaries";
         var professions = requestParams.GetProfessionsTitleOrNull();
@@ -266,9 +203,6 @@ public class TelegramBotService
 
     private async Task ProcessInlineQueryAsync(
         ITelegramBotClient client,
-        DatabaseContext context,
-        IMemoryCache memoryCache,
-        IGlobal global,
         List<Profession> allProfessions,
         Update updateRequest,
         CancellationToken cancellationToken)
@@ -278,15 +212,13 @@ public class TelegramBotService
         var counter = 0;
 
         var parametersForAllSalaries = new TelegramBotCommandParameters();
-        var replyDataForAllSalaries = await memoryCache.GetOrCreateAsync(
+        var replyDataForAllSalaries = await _cache.GetOrCreateAsync(
             CacheKey + "_" + parametersForAllSalaries.GetKeyPostfix(),
             async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
                 return await ReplyWithSalariesAsync(
                     parametersForAllSalaries,
-                    context,
-                    global,
                     cancellationToken);
             });
 
@@ -314,15 +246,13 @@ public class TelegramBotService
 
                 var parameters = new TelegramBotCommandParameters(profession);
 
-                var replyData = await memoryCache.GetOrCreateAsync(
+                var replyData = await _cache.GetOrCreateAsync(
                     CacheKey + "_" + parameters.GetKeyPostfix(),
                     async entry =>
                     {
                         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
                         return await ReplyWithSalariesAsync(
                             parameters,
-                            context,
-                            global,
                             cancellationToken);
                     });
 
@@ -352,22 +282,5 @@ public class TelegramBotService
                 "An error occurred while answering inline query: {Message}",
                 e.Message);
         }
-    }
-
-    private TelegramBotClient CreateClient()
-    {
-        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            token = _configuration["Telegram:BotToken"];
-        }
-
-        Console.WriteLine(token);
-        if (string.IsNullOrEmpty(token))
-        {
-            throw new BadRequestException("Token is not set");
-        }
-
-        return new TelegramBotClient(token);
     }
 }

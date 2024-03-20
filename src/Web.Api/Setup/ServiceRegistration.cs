@@ -9,10 +9,10 @@ using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
-using Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TechInterviewer.Features.Telegram;
 
 namespace TechInterviewer.Setup;
 
