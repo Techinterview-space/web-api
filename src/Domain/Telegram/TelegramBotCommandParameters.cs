@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
@@ -47,6 +48,16 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
         return $"{grade}_{professions}";
     }
 
+    public string GetProfessionsTitleOrNull()
+    {
+        if (SelectedProfessions.Count == 0)
+        {
+            return null;
+        }
+
+        return string.Join(", ", SelectedProfessions.Select(x => x.Title));
+    }
+
     public static TelegramBotCommandParameters CreateFromMessage(
         string message,
         List<Profession> allProfessions)
@@ -63,9 +74,16 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
         {
             foreach (var profession in allProfessions)
             {
-                if (profession.Title.ToLowerInvariant().Contains(message))
+                var titleParts = profession.Title
+                    .ToLowerInvariant()
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var titlePart in titleParts)
                 {
-                    selectedProfessions.Add(profession);
+                    if (titlePart.StartsWith(message))
+                    {
+                        selectedProfessions.Add(profession);
+                    }
                 }
             }
         }

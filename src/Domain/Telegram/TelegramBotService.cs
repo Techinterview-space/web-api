@@ -202,7 +202,7 @@ public class TelegramBotService
         var frontendLink = new SalariesChartPageLink(global, requestParams);
 
         const string frontendAppName = "techinterview.space/salaries";
-        var professionOrNull = requestParams.SelectedProfessions.FirstOrDefault();
+        var professions = requestParams.GetProfessionsTitleOrNull();
 
         if (salaries.Count > 0 || Debugger.IsAttached)
         {
@@ -214,7 +214,7 @@ public class TelegramBotService
                 var seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
                 var leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
 
-                replyText = @$"Зарплаты {professionOrNull?.Title ?? "специалистов IT в Казахстане"} по грейдам:
+                replyText = @$"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:
 ";
 
                 if (juniorMedian > 0)
@@ -248,8 +248,8 @@ public class TelegramBotService
             }
             else
             {
-                replyText = professionOrNull != null
-                    ? $"Пока никто не оставил информацию о зарплатах для {professionOrNull.Title}."
+                replyText = professions != null
+                    ? $"Пока никто не оставил информацию о зарплатах для {professions}."
                     : "Пока никто не оставлял информации о зарплатах.";
 
                 replyText += @$"
