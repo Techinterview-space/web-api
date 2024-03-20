@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using TechInterviewer.Controllers.Salaries;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
-using TechInterviewer.Controllers.Salaries.GetAllSalaries;
 using TechInterviewer.Features.Salaries;
+using TechInterviewer.Features.Salaries.Admin;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using TestUtils.Auth;
 using TestUtils.Db;
@@ -317,7 +317,7 @@ public class SalariesControllerTests
                 new GlobalFake(),
                 new Mock<IMediator>().Object)
             .AllAsync(
-                new GetAllSalariesRequest(),
+                new GetAllSalariesQueryParams(),
                 default);
 
         Assert.Equal(2, salaries.TotalItems);

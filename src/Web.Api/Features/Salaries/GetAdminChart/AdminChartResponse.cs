@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TechInterviewer.Controllers.Salaries.AdminChart;
+namespace TechInterviewer.Features.Salaries.GetAdminChart;
 
 public record AdminChartResponse
 {

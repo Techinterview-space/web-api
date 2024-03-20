@@ -9,7 +9,6 @@ using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Salaries;
-using Domain.Services;
 using Domain.Services.Global;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Pagination;
@@ -19,9 +18,10 @@ using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 using TechInterviewer.Controllers.Labels;
 using TechInterviewer.Controllers.Salaries;
-using TechInterviewer.Controllers.Salaries.AdminChart;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
-using TechInterviewer.Controllers.Salaries.GetAllSalaries;
+using TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
+using TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
+using TechInterviewer.Features.Salaries.GetAdminChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using TechInterviewer.Setup.Attributes;
@@ -86,21 +86,23 @@ public class SalariesController : ControllerBase
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
     public async Task<Pageable<UserSalaryAdminDto>> AllAsync(
-        [FromQuery] GetAllSalariesRequest request,
+        [FromQuery] GetApprovedSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        return await GetAllSalariesQuery(request, true)
-            .AsPaginatedAsync(request, cancellationToken);
+        return await _mediator.Send(
+            request,
+            cancellationToken);
     }
 
     [HttpGet("not-in-stats")]
     [HasAnyRole(Role.Admin)]
     public async Task<Pageable<UserSalaryAdminDto>> AllNotShownInStatsAsync(
-        [FromQuery] GetAllSalariesRequest request,
+        [FromQuery] GetExcludedFromStatsSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        return await GetAllSalariesQuery(request, false)
-            .AsPaginatedAsync(request, cancellationToken);
+        return await _mediator.Send(
+            request,
+            cancellationToken);
     }
 
     [HttpGet("salaries-adding-trend-chart")]
@@ -108,50 +110,7 @@ public class SalariesController : ControllerBase
     public async Task<AdminChartResponse> AdminChart(
         CancellationToken cancellationToken)
     {
-        var currentDay = DateTime.UtcNow.Date;
-        var fifteenDaysAgo = currentDay.AddDays(-20);
-
-        var usersCount = await _context.Users
-            .AsNoTracking()
-            .CountAsync(cancellationToken);
-
-        var salaries = await _context.Salaries
-            .Select(x => new
-            {
-                x.Id,
-                x.UserId,
-                x.CreatedAt
-            })
-            .AsNoTracking()
-            .OrderBy(x => x.CreatedAt)
-            .ToListAsync(cancellationToken);
-
-        var usersWhoLeftSalaries = salaries.GroupBy(x => x.UserId).Count();
-
-        var response = new AdminChartResponse
-        {
-            SalariesPerUser = (double)salaries.Count / usersWhoLeftSalaries,
-            UsersWhoLeftSalary = usersWhoLeftSalaries,
-            AllUsersCount = usersCount,
-        };
-
-        var salariesFifteenDaysAgoAdded = salaries
-            .Where(x => x.CreatedAt >= fifteenDaysAgo)
-            .ToList();
-
-        var daysSplitter = new DateTimeRoundedRangeSplitter(fifteenDaysAgo, currentDay, 1440);
-
-        foreach (var (start, end) in daysSplitter.ToList())
-        {
-            var count = salariesFifteenDaysAgoAdded.Count(x =>
-                x.CreatedAt >= start &&
-                (x.CreatedAt < end || x.CreatedAt == end));
-
-            response.Items.Add(new AdminChartResponse.AdminChartItem(count, start));
-            response.Labels.Add(start.ToString(AdminChartResponse.DateTimeFormat));
-        }
-
-        return response;
+        return await _mediator.Send(new GetAdminChartQuery(), cancellationToken);
     }
 
     [HttpGet("chart")]
@@ -345,57 +304,5 @@ public class SalariesController : ControllerBase
         await _context.SaveChangesAsync(cancellationToken);
 
         return Ok();
-    }
-
-    private IQueryable<UserSalaryAdminDto> GetAllSalariesQuery(
-        GetAllSalariesRequest request,
-        bool? showInStats)
-    {
-        var query = _context.Salaries
-            .When(request.CompanyType.HasValue, x => x.Company == request.CompanyType.Value)
-            .When(request.Grade.HasValue, x => x.Grade == request.Grade.Value)
-            .When(request.Profession.HasValue, x => x.ProfessionId == request.Profession.Value)
-            .When(showInStats.HasValue, x => x.UseInStats == showInStats.Value)
-            .Select(x => new UserSalaryAdminDto
-            {
-                Id = x.Id,
-                Value = x.Value,
-                Quarter = x.Quarter,
-                Year = x.Year,
-                Currency = x.Currency,
-                Company = x.Company,
-                Grade = x.Grade,
-                ProfessionId = x.ProfessionId,
-                City = x.City,
-                Age = x.Age,
-                YearOfStartingWork = x.YearOfStartingWork,
-                Gender = x.Gender,
-                SkillId = x.SkillId,
-                WorkIndustryId = x.WorkIndustryId,
-                CreatedAt = x.CreatedAt,
-                UpdatedAt = x.UpdatedAt,
-            })
-            .AsNoTracking();
-
-        switch (request.OrderType)
-        {
-            case GetAllSalariesOrderType.CreatedAtAsc:
-                query = query.OrderBy(x => x.CreatedAt);
-                break;
-
-            case GetAllSalariesOrderType.CreatedAtDesc:
-                query = query.OrderByDescending(x => x.CreatedAt);
-                break;
-
-            case GetAllSalariesOrderType.ValueAsc:
-                query = query.OrderBy(x => x.Value);
-                break;
-
-            case GetAllSalariesOrderType.ValueDesc:
-                query = query.OrderByDescending(x => x.Value);
-                break;
-        }
-
-        return query;
     }
 }

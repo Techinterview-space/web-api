@@ -1,4 +1,4 @@
-﻿namespace TechInterviewer.Controllers.Salaries.GetAllSalaries;
+﻿namespace TechInterviewer.Features.Salaries.Admin;
 
 public enum GetAllSalariesOrderType
 {

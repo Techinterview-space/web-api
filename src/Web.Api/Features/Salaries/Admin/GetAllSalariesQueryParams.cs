@@ -3,9 +3,9 @@ using Domain.Entities.Salaries;
 using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Controllers.Salaries.GetAllSalaries;
+namespace TechInterviewer.Features.Salaries.Admin;
 
-public record GetAllSalariesRequest : PageModel
+public record GetAllSalariesQueryParams : PageModel
 {
     [FromQuery(Name = "company")]
     public CompanyType? CompanyType { get; init; }
