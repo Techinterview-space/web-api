@@ -4,7 +4,7 @@ using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.Services.Salaries;
-using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 

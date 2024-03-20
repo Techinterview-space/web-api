@@ -2,7 +2,7 @@
 using Domain.Entities.Salaries;
 using Domain.Services.Salaries;
 
-namespace TechInterviewer.Controllers.Salaries;
+namespace TechInterviewer.Features.Salaries.Models;
 
 public record UserSalaryAdminDto : UserSalaryDto
 {

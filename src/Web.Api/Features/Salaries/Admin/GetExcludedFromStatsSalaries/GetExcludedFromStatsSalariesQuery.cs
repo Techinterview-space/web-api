@@ -1,6 +1,6 @@
 ﻿using Domain.ValueObjects.Pagination;
 using MediatR;
-using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
 

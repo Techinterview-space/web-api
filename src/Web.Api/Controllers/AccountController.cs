@@ -6,8 +6,8 @@ using Domain.Services.Salaries;
 using Domain.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Salaries;
 using TechInterviewer.Controllers.Users;
+using TechInterviewer.Features.Salaries.Models;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Controllers;

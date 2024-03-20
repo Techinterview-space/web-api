@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TechInterviewer.Controllers.Labels;
 
-namespace TechInterviewer.Controllers.Salaries;
+namespace TechInterviewer.Features.Salaries.Models;
 
 public record SelectBoxItemsResponse
 {

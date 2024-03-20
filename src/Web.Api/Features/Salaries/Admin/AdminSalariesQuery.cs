@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Domain.Database;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.Admin;
 

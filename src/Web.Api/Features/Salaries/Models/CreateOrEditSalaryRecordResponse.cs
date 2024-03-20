@@ -1,6 +1,6 @@
 ﻿using Domain.Services.Salaries;
 
-namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
+namespace TechInterviewer.Features.Salaries.Models;
 
 public record CreateOrEditSalaryRecordResponse
 {

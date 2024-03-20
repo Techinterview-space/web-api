@@ -1,10 +1,11 @@
 ﻿using System;
 using Domain.Entities.Salaries;
 using Domain.Exceptions;
+using TechInterviewer.Features.Salaries.Models;
 
-namespace TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
+namespace TechInterviewer.Features.Salaries.AddSalary;
 
-public record CreateOrEditSalaryRecordRequest : EditSalaryRequest
+public record AddSalaryCommand : EditSalaryRequest, MediatR.IRequest<CreateOrEditSalaryRecordResponse>
 {
     public double Value { get; init; }
 

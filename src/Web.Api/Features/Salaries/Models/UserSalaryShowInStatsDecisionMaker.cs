@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
-using Domain.Extensions;
 using Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Controllers.Salaries;
+namespace TechInterviewer.Features.Salaries.Models;
 
 public record UserSalaryShowInStatsDecisionMaker
 {

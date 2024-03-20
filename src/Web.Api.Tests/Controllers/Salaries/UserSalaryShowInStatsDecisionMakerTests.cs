@@ -5,7 +5,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Features.Salaries.Models;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;

@@ -9,8 +9,8 @@ using Domain.Entities.Salaries;
 using Domain.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Controllers.Salaries;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesChart
 {

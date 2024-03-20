@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.GetSalariesChart;
 
-namespace TechInterviewer.Features.Salaries.GetChartSharePage
+namespace TechInterviewer.Features.SalariesChartShare.GetChartSharePage
 {
     public class GetChartSharePageHandler : IRequestHandler<GetChartSharePageQuery, string>
     {

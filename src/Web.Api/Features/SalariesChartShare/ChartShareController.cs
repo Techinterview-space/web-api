@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Features.Salaries.GetChartSharePage;
+using TechInterviewer.Features.SalariesChartShare.GetChartSharePage;
 
-namespace TechInterviewer.Features.Salaries;
+namespace TechInterviewer.Features.SalariesChartShare;
 
 [ApiController]
 [Route("chart-share")]

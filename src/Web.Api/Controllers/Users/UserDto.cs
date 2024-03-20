@@ -4,7 +4,7 @@ using System.Linq;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation;
-using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Controllers.Users;
 

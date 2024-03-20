@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.ValueObjects.Pagination;
 using MediatR;
-using TechInterviewer.Controllers.Salaries;
+using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
 
