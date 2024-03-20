@@ -4,7 +4,7 @@ First off, thank you for considering contributing to Techinterview.space. It's p
 
 ## Code of Conduct
 
-Techinterview.space has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://github.com/Techinterview-space/web-api/CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
+Techinterview.space has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://github.com/Techinterview-space/web-api/blob/main/CODE_OF_CONDUCT.md) so that you can understand what actions will and will not be tolerated.
 
 ## How Can I Contribute?
 
