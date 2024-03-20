@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Salaries;
-using Domain.Tools;
+using Domain.Extensions;
 
 namespace Domain.Salaries;
 

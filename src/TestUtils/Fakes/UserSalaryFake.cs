@@ -5,7 +5,6 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace TestUtils.Fakes;
 

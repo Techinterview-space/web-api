@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.ValueObjects;
+using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Labels.Models;

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Domain.Emails.Requests;
-using Domain.Emails.Services;
+using Infrastructure.Emails.Contracts;
+using Infrastructure.Emails.Contracts.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Features.Admin;

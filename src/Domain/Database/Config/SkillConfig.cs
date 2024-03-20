@@ -1,5 +1,4 @@
-﻿using Domain.Entities.Labels;
-using Domain.Entities.Salaries;
+﻿using Domain.Entities.Salaries;
 using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

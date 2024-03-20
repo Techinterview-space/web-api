@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Labels;
 using Domain.Enums;
 using Domain.Exceptions;
 using Domain.Services.Labels;
 using Domain.ValueObjects;
+using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Setup.Attributes;

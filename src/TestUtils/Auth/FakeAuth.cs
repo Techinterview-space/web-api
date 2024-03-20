@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Services;
+using Infrastructure.Authentication.Contracts;
 
 namespace TestUtils.Auth;
 

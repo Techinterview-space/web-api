@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Services.Salaries;
+using Infrastructure.Authentication.Contracts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;

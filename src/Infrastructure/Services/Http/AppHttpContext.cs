@@ -1,5 +1,5 @@
-﻿using Domain.Authentication.Abstract;
-using Domain.Services;
+﻿using Domain.Services;
+using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Services.Http;
@@ -8,7 +8,8 @@ public class AppHttpContext : IHttpContext
 {
     private readonly IHttpContextAccessor _http;
 
-    public AppHttpContext(IHttpContextAccessor http)
+    public AppHttpContext(
+        IHttpContextAccessor http)
     {
         _http = http;
     }

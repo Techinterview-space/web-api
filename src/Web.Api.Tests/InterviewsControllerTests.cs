@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Database;
-using Domain.Entities.Employments;
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
@@ -13,6 +11,7 @@ using Domain.Services.Interviews;
 using Domain.Services.Interviews.Dtos;
 using Domain.Services.Labels;
 using Domain.ValueObjects;
+using Infrastructure.Authentication.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using TechInterviewer.Features.Interviews;

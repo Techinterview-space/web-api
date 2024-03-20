@@ -1,4 +1,4 @@
-﻿namespace Domain.Services.Organizations;
+﻿namespace Domain.Services.Organizations.Requests;
 
 public record LeaveOrganizationRequest
 {

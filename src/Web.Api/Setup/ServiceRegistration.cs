@@ -1,13 +1,13 @@
 ﻿using AspNetCore.Aws.S3.Simple.Settings;
-using Domain.Authentication;
-using Domain.Authentication.Abstract;
-using Domain.Emails.Services;
 using Domain.Files;
 using Domain.Services.Global;
 using Domain.Services.Html;
 using Domain.Services.Interviews;
 using Domain.Telegram;
+using Infrastructure.Authentication;
+using Infrastructure.Authentication.Contracts;
 using Infrastructure.Emails;
+using Infrastructure.Emails.Contracts;
 using Infrastructure.Services.Files;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.PDF;
@@ -25,7 +25,7 @@ public static class ServiceRegistration
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IHttpContext, AppHttpContext>();
-        services.AddScoped<IAuthorization, Authorization>();
+        services.AddScoped<IAuthorization, AuthorizationService>();
         services.AddScoped<IGlobal, Global>();
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
         services.AddScoped<IPdf, PdfRenderer>();

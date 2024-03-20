@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Services.Organizations;
+namespace Domain.Services.Organizations.Requests;
 
 public record InviteUserToOrganizationRequest
 {

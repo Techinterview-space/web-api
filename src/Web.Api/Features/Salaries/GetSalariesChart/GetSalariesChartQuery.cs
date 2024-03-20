@@ -1,5 +1,4 @@
-﻿using Domain.Salaries;
-using MediatR;
+﻿using MediatR;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesChart;

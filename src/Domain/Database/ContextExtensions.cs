@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Exceptions;
-using Domain.Validation;
 using Domain.ValueObjects.Pagination;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;

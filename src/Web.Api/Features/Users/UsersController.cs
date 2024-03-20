@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Database;
+using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Users.Models;

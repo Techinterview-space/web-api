@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Authentication.Abstract;
 using Domain.Database;
 using Domain.Entities.Interviews;
 using Domain.Enums;
@@ -10,6 +9,7 @@ using Domain.Services.InterviewTemplates;
 using Domain.Services.Labels;
 using Domain.Validation;
 using Domain.ValueObjects.Pagination;
+using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
