@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Domain.Database;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.Models;

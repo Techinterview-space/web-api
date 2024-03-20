@@ -11,7 +11,8 @@ public class Profession : EntityLabelBase
     {
     }
 
-    internal Profession(
+    // only for EF
+    public Profession(
         long id,
         string title,
         HexColor hexcolor = null,

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Entities;
 using Domain.Entities.Users;
 using Domain.Enums;
@@ -10,6 +9,8 @@ using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
+using Infrastructure.Database.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Users.Models;

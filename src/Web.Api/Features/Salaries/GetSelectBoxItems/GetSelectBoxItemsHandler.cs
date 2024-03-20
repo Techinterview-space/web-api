@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
+using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Labels.Models;

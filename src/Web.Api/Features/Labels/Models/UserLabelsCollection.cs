@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Domain.Database;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
 using Domain.ValueObjects;
+using Infrastructure.Database;
 
 namespace TechInterviewer.Features.Labels.Models;
 

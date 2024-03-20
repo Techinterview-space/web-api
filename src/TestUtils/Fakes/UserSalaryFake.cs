@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Infrastructure.Database;
 
 namespace TestUtils.Fakes;
 

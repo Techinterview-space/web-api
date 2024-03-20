@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.ValueObjects.Dates;
+using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Salaries;

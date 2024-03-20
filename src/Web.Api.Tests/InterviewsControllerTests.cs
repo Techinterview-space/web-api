@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
@@ -9,6 +8,7 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
 using Infrastructure.Services.PDF.Interviews;
 using Microsoft.EntityFrameworkCore;
 using Moq;

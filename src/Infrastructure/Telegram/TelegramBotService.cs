@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
-using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.Validation.Exceptions;
+using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Microsoft.EntityFrameworkCore;

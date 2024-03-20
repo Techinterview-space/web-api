@@ -3,6 +3,7 @@ using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database.Extensions;
 
 namespace TestUtils.Auth;
 

@@ -1,8 +1,9 @@
-﻿using Domain.Database;
-using Domain.Entities.Users;
+﻿using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
+using Infrastructure.Database.Extensions;
 
 namespace Infrastructure.Authentication;
 

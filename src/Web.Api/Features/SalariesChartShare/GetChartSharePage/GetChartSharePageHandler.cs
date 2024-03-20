@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
+using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using MediatR;

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Entities.Interviews;
 using Domain.Enums;
 using Domain.Validation;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

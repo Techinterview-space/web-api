@@ -1,6 +1,7 @@
-﻿using Domain.Database;
-using Domain.Entities.Users;
+﻿using Domain.Entities.Users;
 using Domain.ValueObjects;
+using Infrastructure.Database;
+using Infrastructure.Database.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Authentication;

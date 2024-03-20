@@ -9,7 +9,9 @@ public class UserRole
     {
     }
 
-    public UserRole(Role role, User user)
+    public UserRole(
+        Role role,
+        User user)
     {
         user.ThrowIfNull(nameof(user));
 

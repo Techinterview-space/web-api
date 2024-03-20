@@ -1,10 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
+using Infrastructure.Database.Extensions;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
