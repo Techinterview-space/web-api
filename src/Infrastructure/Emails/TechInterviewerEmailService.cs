@@ -1,9 +1,9 @@
 ﻿using System.Text;
-using Domain.Services.Global;
-using Domain.Services.Html;
-using Domain.Services.MD;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Emails.Contracts.Requests;
+using Infrastructure.Services.Global;
+using Infrastructure.Services.Html;
+using Infrastructure.Services.PDF.Interviews;
 using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.Emails;

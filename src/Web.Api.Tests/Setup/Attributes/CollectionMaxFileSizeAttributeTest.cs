@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Domain.Validation;
-using Domain.Validation.Exception;
+using Domain.Validation.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using TechInterviewer.Setup.Attributes;

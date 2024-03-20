@@ -8,8 +8,8 @@ using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Salaries;
 using Domain.Entities.Users;
-using Domain.Exceptions;
 using Domain.Validation;
+using Domain.Validation.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Database;

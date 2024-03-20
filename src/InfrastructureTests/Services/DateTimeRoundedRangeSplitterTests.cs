@@ -1,5 +1,5 @@
 ﻿using System;
-using Domain.Services;
+using Domain.ValueObjects;
 using Xunit;
 
 namespace InfrastructureTests.Services;

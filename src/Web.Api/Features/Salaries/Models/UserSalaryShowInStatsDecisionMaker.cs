@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
-using Domain.Services;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace TechInterviewer.Features.Salaries.Models;

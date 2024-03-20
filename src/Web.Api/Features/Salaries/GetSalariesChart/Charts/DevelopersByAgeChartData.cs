@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Domain.Services;
-using Domain.Services.Salaries;
+using Domain.ValueObjects;
 using Domain.ValueObjects.Ranges;
+using Infrastructure.Salaries;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Database;
-using Domain.Telegram;
+using Infrastructure.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

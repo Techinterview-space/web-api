@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Domain.Enums;
-using Domain.Services.Interviews;
+using Infrastructure.Services.PDF.Interviews;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using Xunit;

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Domain.Enums;
 using Domain.Extensions;
-using Domain.Services;
 using Domain.Validation;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.Users;
 

@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Labels;
 using Domain.Enums;
-using Domain.Exceptions;
-using Domain.Services.Labels;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Features.Labels;

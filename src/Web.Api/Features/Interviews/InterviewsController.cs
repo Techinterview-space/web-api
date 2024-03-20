@@ -7,16 +7,15 @@ using Domain.Database;
 using Domain.Entities.Interviews;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Exceptions;
-using Domain.Services.Interviews;
-using Domain.Services.Interviews.Dtos;
-using Domain.Services.Labels;
 using Domain.Validation;
+using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Services.PDF.Interviews;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Interviews.Models;
+using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Features.Interviews;
@@ -28,12 +27,12 @@ public class InterviewsController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
-    private readonly IInterviewPdf _pdf;
+    private readonly IInterviewPdfService _pdf;
 
     public InterviewsController(
         IAuthorization auth,
         DatabaseContext context,
-        IInterviewPdf pdf)
+        IInterviewPdfService pdf)
     {
         _auth = auth;
         _context = context;

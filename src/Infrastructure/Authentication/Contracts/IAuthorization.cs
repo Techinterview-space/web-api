@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Services;
+using Domain.ValueObjects;
 
 namespace Infrastructure.Authentication.Contracts;
 

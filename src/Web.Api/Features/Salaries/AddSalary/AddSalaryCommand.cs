@@ -1,6 +1,6 @@
 ﻿using System;
 using Domain.Entities.Salaries;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Salaries.AddSalary;

@@ -1,5 +1,5 @@
 ﻿using DinkToPdf;
-using Domain.Files;
+using Infrastructure.Services.Files;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services.PDF;

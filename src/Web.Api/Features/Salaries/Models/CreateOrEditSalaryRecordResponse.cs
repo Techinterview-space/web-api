@@ -1,4 +1,4 @@
-﻿using Domain.Services.Salaries;
+﻿using Infrastructure.Salaries;
 
 namespace TechInterviewer.Features.Salaries.Models;
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Dates;
 using Domain.ValueObjects.Dates.Interfaces;
 
@@ -13,7 +13,7 @@ public static class EntityValidatorExtensions
     /// <typeparam name="T">Generic.</typeparam>
     /// <param name="entity">Entity instance.</param>
     /// <returns>The entity.</returns>
-    /// <exception cref="Validation.Exception.EntityInvalidException">If the entity is not valid.</exception>
+    /// <exception cref="EntityInvalidException">If the entity is not valid.</exception>
     public static T ThrowIfInvalid<T>(this T entity)
     {
         new EntityValidator<T>(entity).ThrowIfInvalid();

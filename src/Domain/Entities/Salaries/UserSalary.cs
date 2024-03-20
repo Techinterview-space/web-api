@@ -4,7 +4,7 @@ using Domain.Attributes;
 using Domain.Entities.Enums;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 
 namespace Domain.Entities.Salaries;
 

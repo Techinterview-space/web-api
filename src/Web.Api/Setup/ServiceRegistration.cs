@@ -1,16 +1,15 @@
 ﻿using AspNetCore.Aws.S3.Simple.Settings;
-using Domain.Files;
-using Domain.Services.Global;
-using Domain.Services.Html;
-using Domain.Services.Interviews;
-using Domain.Telegram;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Services.Files;
+using Infrastructure.Services.Global;
+using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.PDF;
+using Infrastructure.Services.PDF.Interviews;
+using Infrastructure.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,7 +32,7 @@ public static class ServiceRegistration
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
-        services.AddScoped<IInterviewPdf, InterviewPdf>();
+        services.AddScoped<IInterviewPdfService, InterviewPdfService>();
 
         services
             .AddS3Settings()

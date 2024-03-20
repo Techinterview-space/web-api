@@ -1,5 +1,5 @@
 ﻿using System;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Dates.Interfaces;
 
 namespace Domain.ValueObjects.Dates

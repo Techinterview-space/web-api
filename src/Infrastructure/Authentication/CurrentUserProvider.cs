@@ -1,6 +1,6 @@
 ﻿using Domain.Database;
 using Domain.Entities.Users;
-using Domain.Services;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Authentication;

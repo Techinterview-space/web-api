@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Domain.Database;
 using Domain.Entities.Salaries;
 using Domain.Enums;
-using Domain.Exceptions;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;

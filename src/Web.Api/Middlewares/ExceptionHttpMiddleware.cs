@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using Domain.Exceptions;
-using Domain.Validation.Exception;
+using Domain.Validation.Exceptions;
 using Microsoft.AspNetCore.Http;
 using TechInterviewer.Middlewares.Error;
 

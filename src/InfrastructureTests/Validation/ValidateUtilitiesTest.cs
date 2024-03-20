@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Exceptions;
 using Domain.Validation;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Dates;
 using Xunit;
 

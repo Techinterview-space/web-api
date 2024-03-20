@@ -1,7 +1,7 @@
 ﻿using Domain.Database;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Services;
+using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 
 namespace Infrastructure.Authentication;

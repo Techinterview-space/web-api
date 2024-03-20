@@ -1,6 +1,6 @@
 ﻿using System;
 using AspNetCore.Aws.S3.Simple.Models;
-using Domain.Files;
+using Infrastructure.Services.Files;
 using Moq;
 
 namespace TestUtils.Mocks;

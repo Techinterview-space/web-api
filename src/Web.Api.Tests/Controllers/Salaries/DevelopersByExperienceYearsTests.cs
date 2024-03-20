@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domain.Services.Salaries;
+using Infrastructure.Salaries;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using Xunit;
 

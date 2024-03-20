@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Domain.Entities.Interviews;
-using Domain.Services.InterviewTemplates;
-using Domain.Services.Labels;
+using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Features.Users.Models;
 
 namespace TechInterviewer.Features.Interviews.Models;

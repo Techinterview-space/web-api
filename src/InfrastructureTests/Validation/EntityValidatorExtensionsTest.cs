@@ -1,6 +1,6 @@
 ﻿using System;
-using Domain.Exceptions;
 using Domain.Validation;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Dates;
 using Domain.ValueObjects.Dates.Interfaces;
 using Xunit;

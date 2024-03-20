@@ -1,4 +1,4 @@
-﻿using Domain.Services;
+﻿using Domain.ValueObjects;
 
 namespace Infrastructure.Authentication.Contracts;
 

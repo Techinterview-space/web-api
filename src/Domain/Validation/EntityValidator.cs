@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using EntityInvalidException = Domain.Validation.Exception.EntityInvalidException;
+using EntityInvalidException = Domain.Validation.Exceptions.EntityInvalidException;
 
 namespace Domain.Validation;
 
@@ -32,7 +32,7 @@ public class EntityValidator<T>
     /// <summary>
     /// Asserts that a model entity is valid by it's annotation validation attributes.
     /// </summary>
-    /// <exception cref="Validation.Exception.EntityInvalidException">If the entity is not valid.</exception>
+    /// <exception cref="EntityInvalidException">If the entity is not valid.</exception>
     public void ThrowIfInvalid()
     {
         if (!Valid())
