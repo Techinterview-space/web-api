@@ -10,29 +10,26 @@ namespace Domain.Telegram;
 public record TelegramBotCommandParameters : ISalariesChartQueryParams
 {
     public TelegramBotCommandParameters()
-        : this(null, new List<long>())
+        : this(new List<Profession>())
     {
     }
 
     public TelegramBotCommandParameters(
-        string message,
-        List<Profession> allProfessions)
-        : this(null, DetectProfessions(message, allProfessions))
+        Profession professionToInclude)
+        : this(
+            new List<Profession>
+            {
+                professionToInclude
+            })
     {
     }
 
     public TelegramBotCommandParameters(
-        params Profession[] professionsToInclude)
-        : this(null, professionsToInclude.Select(x => x.Id).ToList())
+        List<Profession> professionsToInclude)
     {
-    }
-
-    private TelegramBotCommandParameters(
-        DeveloperGrade? grade,
-        List<long> professionsToInclude)
-    {
-        Grade = grade;
-        ProfessionsToInclude = professionsToInclude;
+        Grade = null;
+        SelectedProfessions = professionsToInclude;
+        ProfessionsToInclude = professionsToInclude.Select(x => x.Id).ToList();
     }
 
     public DeveloperGrade? Grade { get; }
@@ -41,6 +38,8 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
 
     public List<KazakhstanCity> Cities => new List<KazakhstanCity>(0);
 
+    public List<Profession> SelectedProfessions { get; }
+
     public string GetKeyPostfix()
     {
         var grade = Grade?.ToString() ?? "all";
@@ -48,25 +47,29 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
         return $"{grade}_{professions}";
     }
 
-    private static List<long> DetectProfessions(
+    public static TelegramBotCommandParameters CreateFromMessage(
         string message,
         List<Profession> allProfessions)
     {
         message = message?.Trim().ToLowerInvariant() ?? string.Empty;
+
+        var selectedProfessions = new List<Profession>();
+
         if (string.IsNullOrEmpty(message) || message.Length < 2)
         {
-            return new List<long>(0);
+            selectedProfessions = new List<Profession>(0);
         }
-
-        var professionsToReturn = new List<long>();
-        foreach (var profession in allProfessions)
+        else
         {
-            if (profession.Title.ToLowerInvariant().StartsWith(message))
+            foreach (var profession in allProfessions)
             {
-                professionsToReturn.Add(profession.Id);
+                if (profession.Title.ToLowerInvariant().Contains(message))
+                {
+                    selectedProfessions.Add(profession);
+                }
             }
         }
 
-        return professionsToReturn;
+        return new TelegramBotCommandParameters(selectedProfessions);
     }
 }

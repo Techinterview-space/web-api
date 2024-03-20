@@ -152,7 +152,10 @@ public class TelegramBotService
         var privateMessage = message.Chat.Type == ChatType.Private;
         if (mentionedInGroupChat || privateMessage)
         {
-            var parameters = new TelegramBotCommandParameters(messageText, allProfessions);
+            var parameters = TelegramBotCommandParameters.CreateFromMessage(
+                messageText,
+                allProfessions);
+
             var replyData = await memoryCache.GetOrCreateAsync(
                 CacheKey + "_" + parameters.GetKeyPostfix(),
                 async entry =>
@@ -162,7 +165,6 @@ public class TelegramBotService
                         parameters,
                         context,
                         global,
-                        null,
                         cancellationToken);
                 });
 
@@ -181,7 +183,6 @@ public class TelegramBotService
         TelegramBotCommandParameters requestParams,
         DatabaseContext context,
         IGlobal global,
-        Profession professionOrNull,
         CancellationToken cancellationToken)
     {
         var salariesQuery = new SalariesForChartQuery(
@@ -201,6 +202,8 @@ public class TelegramBotService
         var frontendLink = new SalariesChartPageLink(global, requestParams);
 
         const string frontendAppName = "techinterview.space/salaries";
+        var professionOrNull = requestParams.SelectedProfessions.FirstOrDefault();
+
         if (salaries.Count > 0 || Debugger.IsAttached)
         {
             string replyText;
@@ -289,7 +292,6 @@ public class TelegramBotService
                     parametersForAllSalaries,
                     context,
                     global,
-                    null,
                     cancellationToken);
             });
 
@@ -326,7 +328,6 @@ public class TelegramBotService
                             parameters,
                             context,
                             global,
-                            profession,
                             cancellationToken);
                     });
 
