@@ -4,8 +4,9 @@ using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.Services.Salaries;
+using TechInterviewer.Controllers.Salaries;
 
-namespace TechInterviewer.Controllers.Salaries.Charts;
+namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 public record SalariesChartResponse
 {

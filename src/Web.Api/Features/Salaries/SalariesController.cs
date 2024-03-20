@@ -13,18 +13,20 @@ using Domain.Services;
 using Domain.Services.Global;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Pagination;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 using TechInterviewer.Controllers.Labels;
+using TechInterviewer.Controllers.Salaries;
 using TechInterviewer.Controllers.Salaries.AdminChart;
-using TechInterviewer.Controllers.Salaries.Charts;
 using TechInterviewer.Controllers.Salaries.CreateSalaryRecord;
 using TechInterviewer.Controllers.Salaries.GetAllSalaries;
-using TechInterviewer.Features.Charts;
+using TechInterviewer.Features.Salaries.GetSalariesChart;
+using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using TechInterviewer.Setup.Attributes;
 
-namespace TechInterviewer.Controllers.Salaries;
+namespace TechInterviewer.Features.Salaries;
 
 [ApiController]
 [Route("api/salaries")]
@@ -32,16 +34,17 @@ public class SalariesController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
-    private readonly IGlobal _global;
+    private readonly IMediator _mediator;
 
     public SalariesController(
         IAuthorization auth,
         DatabaseContext context,
-        IGlobal global)
+        IGlobal global,
+        IMediator mediator)
     {
         _auth = auth;
         _context = context;
-        _global = global;
+        _mediator = mediator;
     }
 
     [HttpGet("select-box-items")]
@@ -153,17 +156,17 @@ public class SalariesController : ControllerBase
 
     [HttpGet("chart")]
     public Task<SalariesChartResponse> ChartAsync(
-        [FromQuery] SalariesChartQueryParams request,
+        [FromQuery] GetSalariesChartQuery request,
         CancellationToken cancellationToken)
     {
-        var parameters = new SalariesChartQueryParams
-        {
-            Grade = request.Grade,
-            ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
-            Cities = request.Cities,
-        };
-
-        return new UserChartHandler(_auth, _context).Handle(parameters, cancellationToken);
+        return _mediator.Send(
+            new GetSalariesChartQuery
+            {
+                Grade = request.Grade,
+                ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+                Cities = request.Cities,
+            },
+            cancellationToken);
     }
 
     [HttpPost("")]

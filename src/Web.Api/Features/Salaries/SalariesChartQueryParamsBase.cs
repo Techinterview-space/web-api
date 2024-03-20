@@ -4,9 +4,9 @@ using Domain.Enums;
 using Domain.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Controllers.Salaries.Charts;
+namespace TechInterviewer.Features.Salaries;
 
-public record SalariesChartQueryParams : ISalariesChartQueryParams
+public record SalariesChartQueryParamsBase : ISalariesChartQueryParams
 {
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }

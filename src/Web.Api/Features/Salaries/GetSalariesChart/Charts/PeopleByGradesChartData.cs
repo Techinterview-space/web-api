@@ -3,7 +3,7 @@ using System.Linq;
 using Domain.Entities.Enums;
 using Domain.Services.Salaries;
 
-namespace TechInterviewer.Controllers.Salaries.Charts;
+namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 public record PeopleByGradesChartData
 {

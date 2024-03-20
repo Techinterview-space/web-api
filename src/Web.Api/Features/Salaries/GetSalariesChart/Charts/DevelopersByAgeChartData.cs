@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Domain.Services;
 using Domain.Services.Salaries;
 using Domain.ValueObjects.Ranges;
 
-namespace TechInterviewer.Controllers.Salaries.Charts;
+namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 public record DevelopersByAgeChartData
 {

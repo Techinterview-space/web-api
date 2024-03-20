@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Services.Global;
-using TechInterviewer.Controllers.Salaries.Charts;
+using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 namespace TechInterviewer.Views;
 

@@ -49,7 +49,8 @@ public class Startup
         services.AddControllersWithViews();
         services.AddRazorPages();
 
-        services.AddSwaggerGen(c => SwaggerConfig.Apply(c, AppName, _global.FrontendBaseUrl));
+        services
+            .AddSwaggerGen(c => SwaggerConfig.Apply(c, AppName, _global.FrontendBaseUrl));
 
         services.AddCors(options =>
         {
@@ -60,6 +61,7 @@ public class Startup
         });
 
         services
+            .AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Startup>())
             .SetupDatabase(_configuration, _environment)
             .SetupAppServices(_configuration)
             .SetupEmailIntegration(_environment)
@@ -72,7 +74,9 @@ public class Startup
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+    public void Configure(
+        IApplicationBuilder app,
+        ILoggerFactory loggerFactory)
     {
         if (_environment.IsDevelopment())
         {

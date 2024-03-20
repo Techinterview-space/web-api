@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Entities.Salaries;
 using Domain.Services;
 using Domain.Services.Salaries;
 
-namespace TechInterviewer.Controllers.Salaries.Charts;
+namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 public record SalariesByMoneyBarChart
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Domain.Services.Salaries;
-using TechInterviewer.Controllers.Salaries.Charts;
+using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using Xunit;
 
 namespace Web.Api.Tests.Controllers.Salaries;
