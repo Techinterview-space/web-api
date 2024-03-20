@@ -4,16 +4,16 @@ namespace Infrastructure.Salaries;
 
 public record SalariesChartPageLink
 {
-    private readonly ISalariesChartQueryParams _request;
+    private readonly ISalariesChartQueryParams _requestOrNull;
     private readonly string _frontendBaseUrl;
 
     private string _result;
 
     public SalariesChartPageLink(
         IGlobal global,
-        ISalariesChartQueryParams request)
+        ISalariesChartQueryParams requestOrNull)
     {
-        _request = request;
+        _requestOrNull = requestOrNull;
         _frontendBaseUrl = global.FrontendBaseUrl + "/salaries";
     }
 
@@ -24,19 +24,27 @@ public record SalariesChartPageLink
             return _result;
         }
 
-        string queryParams = null;
-        if (_request.ProfessionsToInclude.Count > 0)
+        if (_requestOrNull != null)
         {
-            queryParams += $"?profsInclude={string.Join(",", _request.ProfessionsToInclude)}";
+            string queryParams = null;
+            if (_requestOrNull.ProfessionsToInclude.Count > 0)
+            {
+                queryParams += $"?profsInclude={string.Join(",", _requestOrNull.ProfessionsToInclude)}";
+            }
+
+            if (_requestOrNull.Grade.HasValue)
+            {
+                queryParams = queryParams != null ? queryParams + "&" : "?";
+                queryParams += $"grade={(int)_requestOrNull.Grade.Value}";
+            }
+
+            _result = _frontendBaseUrl + queryParams;
+        }
+        else
+        {
+            _result = _frontendBaseUrl;
         }
 
-        if (_request.Grade.HasValue)
-        {
-            queryParams = queryParams != null ? queryParams + "&" : "?";
-            queryParams += $"grade={(int)_request.Grade.Value}";
-        }
-
-        _result = _frontendBaseUrl + queryParams;
         return _result;
     }
 }
