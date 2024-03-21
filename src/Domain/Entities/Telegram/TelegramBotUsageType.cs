@@ -6,7 +6,9 @@ public enum TelegramBotUsageType
 
     DirectMessage = 1,
 
-    ChannelMention = 2,
+    GroupMention = 2,
 
-    InlineQuery = 3,
+    SupergroupMention = 3,
+
+    InlineQuery = 4,
 }

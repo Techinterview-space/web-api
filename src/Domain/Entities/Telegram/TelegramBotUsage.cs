@@ -20,11 +20,6 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
         string channelName,
         TelegramBotUsageType usageType)
     {
-        if (usageType is TelegramBotUsageType.Undefined)
-        {
-            throw new BadRequestException("Usage type is not defined.");
-        }
-
         username = username?.Trim().ToLowerInvariant();
         channelName = channelName?.Trim();
 
