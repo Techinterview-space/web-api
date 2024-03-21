@@ -140,6 +140,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 await GetOrCreateTelegramBotUsageAsync(
                     message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
                     message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
+                    messageText,
                     usageType,
                     cancellationToken);
             }
@@ -312,6 +313,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             await GetOrCreateTelegramBotUsageAsync(
                 userName,
                 null,
+                updateRequest.InlineQuery?.Query,
                 TelegramBotUsageType.InlineQuery,
                 cancellationToken);
         }
@@ -327,6 +329,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
     private async Task GetOrCreateTelegramBotUsageAsync(
         string username,
         string channelName,
+        string receivedMessageTextOrNull,
         TelegramBotUsageType usageType,
         CancellationToken cancellationToken)
     {
@@ -342,7 +345,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             _context.TelegramBotUsages.Add(usage);
         }
 
-        usage.IncrementUsageCount();
+        usage.IncrementUsageCount(receivedMessageTextOrNull);
         await _context.SaveChangesAsync(cancellationToken);
     }
 }

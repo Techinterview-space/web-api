@@ -28,6 +28,7 @@ public class GetTelegramBotUsagesHandler : IRequestHandler<GetTelegramBotUsagesQ
             .Select(x => new TelegramBotUsageDto
             {
                 Id = x.Id,
+                ReceivedMessageText = x.ReceivedMessageText,
                 UsageCount = x.UsageCount,
                 Username = x.Username,
                 ChannelName = x.ChannelName,

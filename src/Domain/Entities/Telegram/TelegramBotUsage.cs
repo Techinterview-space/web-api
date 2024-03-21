@@ -13,6 +13,8 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
 
     public string ChannelName { get; protected set; }
 
+    public string ReceivedMessageText { get; init; }
+
     public TelegramBotUsageType UsageType { get; protected set; }
 
     public TelegramBotUsage(
@@ -35,7 +37,8 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
         UsageType = usageType;
     }
 
-    public void IncrementUsageCount()
+    public void IncrementUsageCount(
+        string sentMessageText)
     {
         UsageCount++;
         UpdatedAt = DateTime.UtcNow;
