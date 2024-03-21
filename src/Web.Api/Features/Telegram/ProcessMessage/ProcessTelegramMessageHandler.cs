@@ -333,7 +333,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         var usage = await _context
             .TelegramBotUsages
             .FirstOrDefaultAsync(
-                x => x.Username == username && x.ChannelName == channelName,
+                x => x.Username == username && x.UsageType == usageType,
                 cancellationToken);
 
         if (usage == null)
