@@ -43,7 +43,6 @@ public class AdminToolsController : ControllerBase
     }
 
     [HttpGet("configs")]
-    [HttpGet]
     public IActionResult GetConfigs()
     {
         var configs = GetSectionValues(_configuration.GetChildren());
