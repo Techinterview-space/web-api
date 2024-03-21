@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.Entities.Telegram;
 using Domain.Extensions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
@@ -124,6 +125,24 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 replyMarkup: replyData.InlineKeyboardMarkup,
                 replyToMessageId: replyToMessageId,
                 cancellationToken: cancellationToken);
+
+            if (message.From! is not null)
+            {
+                var usageType = message.Chat.Type switch
+                {
+                    ChatType.Private => TelegramBotUsageType.DirectMessage,
+                    ChatType.Sender => TelegramBotUsageType.DirectMessage,
+                    ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
+                    ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
+                    _ => TelegramBotUsageType.Undefined,
+                };
+
+                await GetOrCreateTelegramBotUsageAsync(
+                    message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
+                    message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
+                    usageType,
+                    cancellationToken);
+            }
         }
 
         return Unit.Value;
@@ -288,6 +307,13 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 updateRequest.InlineQuery!.Id,
                 results,
                 cancellationToken: cancellationToken);
+
+            var userName = updateRequest.InlineQuery.From.Username ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
+            await GetOrCreateTelegramBotUsageAsync(
+                userName,
+                null,
+                TelegramBotUsageType.InlineQuery,
+                cancellationToken);
         }
         catch (Exception e)
         {
@@ -296,5 +322,27 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 "An error occurred while answering inline query: {Message}",
                 e.Message);
         }
+    }
+
+    private async Task GetOrCreateTelegramBotUsageAsync(
+        string username,
+        string channelName,
+        TelegramBotUsageType usageType,
+        CancellationToken cancellationToken)
+    {
+        var usage = await _context
+            .TelegramBotUsages
+            .FirstOrDefaultAsync(
+                x => x.Username == username && x.ChannelName == channelName,
+                cancellationToken);
+
+        if (usage == null)
+        {
+            usage = new TelegramBotUsage(username, channelName, usageType);
+            _context.TelegramBotUsages.Add(usage);
+        }
+
+        usage.IncrementUsageCount();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

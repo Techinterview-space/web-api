@@ -2,6 +2,7 @@
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Salaries;
+using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
@@ -31,6 +32,8 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
     public DbSet<WorkIndustry> WorkIndustries { get; set; }
 
     public DbSet<Profession> Professions { get; set; }
+
+    public DbSet<TelegramBotUsage> TelegramBotUsages { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

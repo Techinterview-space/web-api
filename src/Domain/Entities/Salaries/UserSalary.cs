@@ -48,7 +48,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         UseInStats = useInStats;
     }
 
-    public Guid Id { get; }
+    public Guid Id { get; protected set; }
 
     public long? UserId { get; protected set; }
 
