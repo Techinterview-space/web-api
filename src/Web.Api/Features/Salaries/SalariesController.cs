@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
 using TechInterviewer.Features.Salaries.ApproveSalary;
 using TechInterviewer.Features.Salaries.DeleteSalary;
 using TechInterviewer.Features.Salaries.ExcludeFromStats;
+using TechInterviewer.Features.Salaries.ExportCsv;
 using TechInterviewer.Features.Salaries.GetAdminChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
@@ -91,6 +93,18 @@ public class SalariesController : ControllerBase
                 Cities = request.Cities,
             },
             cancellationToken);
+    }
+
+    [HttpGet("export")]
+    public async Task<IActionResult> Export(
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new ExportCsvQuery(),
+            cancellationToken);
+
+        using var stream = new MemoryStream(response.GetAsByteArray());
+        return File(stream, response.FileContentType, response.Filename);
     }
 
     [HttpPost("")]

@@ -31,8 +31,8 @@ public record SalariesForChartQuery
     {
         _context = context;
         Grade = grade;
-        ProfessionsToInclude = professionsToInclude;
-        Cities = cities;
+        ProfessionsToInclude = professionsToInclude ?? new List<long>();
+        Cities = cities ?? new List<KazakhstanCity>();
 
         CurrentQuarter = DateQuarter.Current;
         SalaryAddedEdge = DateTimeOffset.Now.AddMonths(-6);
