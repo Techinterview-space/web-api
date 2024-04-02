@@ -49,7 +49,7 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (userCsvDownload is not null && !userCsvDownload.AllowsDownload())
+        if (userCsvDownload is not null && !userCsvDownload.AllowsDownload(currentUser))
         {
             throw new NoPermissionsException(
                 $"You have downloaded CSV file already withing last {UserCsvDownload.CountOfHoursToAllowDownload} hours.");

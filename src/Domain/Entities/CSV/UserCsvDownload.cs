@@ -1,5 +1,6 @@
 ﻿using System;
 using Domain.Entities.Users;
+using Domain.Enums;
 
 namespace Domain.Entities.CSV;
 
@@ -23,8 +24,14 @@ public class UserCsvDownload : HasDatesBase, IHasIdBase<Guid>
 
     public virtual User User { get; protected set; }
 
-    public bool AllowsDownload()
+    public bool AllowsDownload(
+        User currentUser)
     {
+        if (currentUser.Has(Role.Admin))
+        {
+            return true;
+        }
+
         return CreatedAt.AddHours(CountOfHoursToAllowDownload) < DateTime.UtcNow;
     }
 }
