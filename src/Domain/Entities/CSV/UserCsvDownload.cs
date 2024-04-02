@@ -6,7 +6,7 @@ namespace Domain.Entities.CSV;
 
 public class UserCsvDownload : HasDatesBase, IHasIdBase<Guid>
 {
-    public const int CountOfHoursToAllowDownload = 24;
+    public const int CountOfHoursToAllowDownload = 48;
 
     public UserCsvDownload()
     {
