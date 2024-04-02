@@ -61,6 +61,7 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
             null,
             null)
             .ToQueryable()
+            .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
         var labels = await _labelsProvider.GetAsync(cancellationToken);

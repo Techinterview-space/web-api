@@ -97,6 +97,7 @@ public record SalariesForChartQuery
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
                 ProfessionId = x.ProfessionId,
+                CreatedAt = x.CreatedAt,
             })
             .OrderBy(x => x.Value)
             .AsNoTracking();
