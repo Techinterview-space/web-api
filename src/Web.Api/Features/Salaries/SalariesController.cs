@@ -103,8 +103,7 @@ public class SalariesController : ControllerBase
             new ExportCsvQuery(),
             cancellationToken);
 
-        using var stream = new MemoryStream(response.GetAsByteArray());
-        return File(stream, response.FileContentType, response.Filename);
+        return File(response.GetAsByteArray(), response.FileContentType, response.Filename);
     }
 
     [HttpPost("")]
