@@ -57,7 +57,11 @@ public class ExceptionHttpMiddleware
             message = exception.Message;
         }
 
-        await WriteResponseAsync(context, statusCode, message, exception);
+        await WriteResponseAsync(
+            context,
+            statusCode,
+            message,
+            exception);
     }
 
     protected virtual Task WriteResponseAsync(
@@ -65,7 +69,7 @@ public class ExceptionHttpMiddleware
     {
         return new JsonErrorResponse(
             context: context,
-            serializedError: Serialize(new ErrorDetails(statusCode, message)),
+            serializedError: Serialize(new ErrorDetails(statusCode, message, exception)),
             statusCode: statusCode).WriteAsync();
     }
 

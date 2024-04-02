@@ -12,7 +12,7 @@ public record ErrorDetails
         Exception exception = null)
     {
         Status = status;
-        Message = message ?? DefaultServerErrorMessage;
+        Message = message ?? exception?.Message ?? DefaultServerErrorMessage;
         ExceptionType = exception?.GetType().FullName;
         StackTrace = exception?.StackTrace;
 
