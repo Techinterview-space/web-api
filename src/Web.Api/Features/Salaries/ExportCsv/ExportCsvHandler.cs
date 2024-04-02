@@ -10,6 +10,9 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using TechInterviewer.Features.Salaries.GetSelectBoxItems;
+using TechInterviewer.Features.Salaries.Providers;
 
 namespace TechInterviewer.Features.Salaries.ExportCsv;
 
@@ -19,13 +22,16 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
 
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
+    private readonly ISalaryLabelsProvider _labelsProvider;
 
     public ExportCsvHandler(
         IAuthorization auth,
-        DatabaseContext context)
+        DatabaseContext context,
+        ISalaryLabelsProvider labelsProvider)
     {
         _auth = auth;
         _context = context;
+        _labelsProvider = labelsProvider;
     }
 
     public async Task<SalariesCsvResponse> Handle(
@@ -57,25 +63,13 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
             .ToQueryable()
             .ToListAsync(cancellationToken);
 
-        var sb = new StringBuilder();
-        sb.AppendLine("Value,Quarter,Year,Age,Gender,Started,Profession,Grade,Company,City,Skill,Industry,Created");
+        var labels = await _labelsProvider.GetAsync(cancellationToken);
+        var sb = new SalariesCsvStringBuilder(labels);
+        sb.AppendHeader();
 
         foreach (var salary in salaries)
         {
-            sb.AppendLine(
-                $"{salary.Value}," +
-                $"{salary.Quarter}," +
-                $"{salary.Year}," +
-                $"{salary.Age?.ToString() ?? NoValue}," +
-                $"{salary.Gender?.ToString() ?? NoValue}," +
-                $"{salary.YearOfStartingWork?.ToString() ?? NoValue}," +
-                $"{salary.ProfessionId}," +
-                $"{salary.Grade?.ToString() ?? NoValue}," +
-                $"{salary.Company.ToString()}," +
-                $"{salary.City?.ToString() ?? NoValue}," +
-                $"{salary.SkillId}," +
-                $"{salary.WorkIndustryId}," +
-                $"{salary.CreatedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? NoValue}");
+            sb.AppendSalary(salary);
         }
 
         if (userCsvDownload is not null)

@@ -25,6 +25,6 @@ public class UserCsvDownload : HasDatesBase, IHasIdBase<Guid>
 
     public bool AllowsDownload()
     {
-        return CreatedAt.AddHours(CountOfHoursToAllowDownload) >= DateTime.UtcNow;
+        return CreatedAt.AddHours(CountOfHoursToAllowDownload) < DateTime.UtcNow;
     }
 }
