@@ -12,6 +12,7 @@ using Infrastructure.Services.PDF.Interviews;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TechInterviewer.Features.Salaries.Providers;
 using TechInterviewer.Features.Telegram;
 
 namespace TechInterviewer.Setup;
@@ -28,6 +29,7 @@ public static class ServiceRegistration
         services.AddScoped<IGlobal, Global>();
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
         services.AddScoped<IPdf, PdfRenderer>();
+        services.AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>();
         services.AddTransient<TelegramBotService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
