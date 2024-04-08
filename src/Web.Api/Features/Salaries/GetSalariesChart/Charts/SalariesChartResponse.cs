@@ -60,6 +60,14 @@ public record SalariesChartResponse
             AverageSalary = localSalaries.Select(x => x.Value).Average();
             MedianSalary = localSalaries.Select(x => x.Value).Median();
 
+            LocalSalariesByGrade = GetSalariesChartHandler.GradesToBeUsedInChart
+                .Select(x => new MedianAndAverageSalariesByGrade(
+                    x,
+                    localSalaries
+                        .Where(y => y.Grade == x)
+                        .ToList()))
+                .ToList();
+
             SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
             PeopleByGradesChartDataForLocal = new PeopleByGradesChartData(localSalaries);
         }
@@ -72,6 +80,14 @@ public record SalariesChartResponse
 
             AverageRemoteSalary = values.Average();
             MedianRemoteSalary = values.Median();
+
+            RemoteSalariesByGrade = GetSalariesChartHandler.GradesToBeUsedInChart
+                .Select(x => new MedianAndAverageSalariesByGrade(
+                    x,
+                    remoteSalaries
+                        .Where(y => y.Grade == x)
+                        .ToList()))
+                .ToList();
 
             SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
             PeopleByGradesChartDataForRemote = new PeopleByGradesChartData(remoteSalaries);
@@ -101,6 +117,8 @@ public record SalariesChartResponse
         {
             AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
             MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
+            LocalSalariesByGrade = new List<MedianAndAverageSalariesByGrade>(),
+            RemoteSalariesByGrade = new List<MedianAndAverageSalariesByGrade>(),
             OnlyLocalCompanySalaries = onlyLocalCompanySalaries,
         };
     }
@@ -120,6 +138,10 @@ public record SalariesChartResponse
     public double AverageSalary { get; private set; }
 
     public double MedianSalary { get; private set; }
+
+    public List<MedianAndAverageSalariesByGrade> LocalSalariesByGrade { get; private set; }
+
+    public List<MedianAndAverageSalariesByGrade> RemoteSalariesByGrade { get; private set; }
 
     public double? AverageRemoteSalary { get; }
 

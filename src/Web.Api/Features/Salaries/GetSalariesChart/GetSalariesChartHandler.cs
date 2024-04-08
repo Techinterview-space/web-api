@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
@@ -16,6 +17,14 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
 {
     public class GetSalariesChartHandler : IRequestHandler<GetSalariesChartQuery, SalariesChartResponse>
     {
+        public static readonly List<DeveloperGrade> GradesToBeUsedInChart = new ()
+        {
+            DeveloperGrade.Junior,
+            DeveloperGrade.Middle,
+            DeveloperGrade.Senior,
+            DeveloperGrade.Lead,
+        };
+
         private readonly IAuthorization _auth;
         private readonly DatabaseContext _context;
 
