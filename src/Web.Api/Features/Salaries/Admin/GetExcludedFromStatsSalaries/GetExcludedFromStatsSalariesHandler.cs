@@ -22,7 +22,12 @@ public class GetExcludedFromStatsSalariesHandler
         GetExcludedFromStatsSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        var query = new AdminSalariesQuery(_context).ToQueryable(request, false);
+        var query = new SalariesQuery(_context)
+            .ApplyFilters(request)
+            .ApplyShowInStats(false)
+            .ApplyOrder(request.OrderType)
+            .ToAdminDtoQueryable();
+
         return await query.AsPaginatedAsync(request, cancellationToken);
     }
 }

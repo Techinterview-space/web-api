@@ -22,7 +22,12 @@ public class GetApprovedSalariesHandler
         GetApprovedSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        var query = new AdminSalariesQuery(_context).ToQueryable(request, true);
+        var query = new SalariesQuery(_context)
+            .ApplyFilters(request)
+            .ApplyShowInStats(true)
+            .ApplyOrder(request.OrderType)
+            .ToAdminDtoQueryable();
+
         return await query.AsPaginatedAsync(request, cancellationToken);
     }
 }

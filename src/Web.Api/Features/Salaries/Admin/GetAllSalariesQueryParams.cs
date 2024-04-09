@@ -17,5 +17,5 @@ public record GetAllSalariesQueryParams : PageModel
     public long? Profession { get; init; }
 
     [FromQuery(Name = "order_type")]
-    public GetAllSalariesOrderType OrderType { get; init; }
+    public GetAllSalariesOrderType OrderType { get; init; } = GetAllSalariesOrderType.CreatedAtDesc;
 }
