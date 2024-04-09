@@ -104,6 +104,8 @@ public class SalariesController : ControllerBase
         return _mediator.Send(
             new GetSalariesPaginatedQuery
             {
+                Page = request.Page,
+                PageSize = request.PageSize,
                 Grade = request.Grade,
                 ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
                 Cities = request.Cities,
