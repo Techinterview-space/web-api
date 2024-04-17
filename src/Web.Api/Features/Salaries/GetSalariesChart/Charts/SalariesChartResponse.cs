@@ -101,11 +101,21 @@ public record SalariesChartResponse
     }
 
     public static SalariesChartResponse RequireOwnSalary(
-        List<double> salaryValues,
+        List<(CompanyType Company, double Value)> salaryValues,
         int salariesCount,
         bool onlyLocalCompanySalaries,
         bool hasAuthentication)
     {
+        var local = salaryValues
+            .Where(x => x.Company == CompanyType.Local)
+            .Select(x => x.Value)
+            .ToList();
+
+        var remote = salaryValues
+            .Where(x => x.Company == CompanyType.Foreign)
+            .Select(x => x.Value)
+            .ToList();
+
         return new (
             new List<UserSalaryDto>(),
             null,
@@ -115,8 +125,10 @@ public record SalariesChartResponse
             salariesCount,
             hasAuthentication)
         {
-            AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
-            MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
+            AverageSalary = local.Count > 0 ? local.Average() : 0,
+            MedianSalary = local.Count > 0 ? local.Median() : 0,
+            MedianRemoteSalary = remote.Count > 0 ? remote.Median() : 0,
+            AverageRemoteSalary = remote.Count > 0 ? remote.Average() : 0,
             LocalSalariesByGrade = new List<MedianAndAverageSalariesByGrade>(),
             RemoteSalariesByGrade = new List<MedianAndAverageSalariesByGrade>(),
             OnlyLocalCompanySalaries = onlyLocalCompanySalaries,
@@ -143,9 +155,9 @@ public record SalariesChartResponse
 
     public List<MedianAndAverageSalariesByGrade> RemoteSalariesByGrade { get; private set; }
 
-    public double? AverageRemoteSalary { get; }
+    public double? AverageRemoteSalary { get; private set; }
 
-    public double? MedianRemoteSalary { get; }
+    public double? MedianRemoteSalary { get; private set; }
 
     public DateTimeOffset? RangeStart { get; }
 

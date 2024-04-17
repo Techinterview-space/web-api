@@ -67,12 +67,12 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
             {
                 var salaryValues = await query
                     .Where(x => x.Company == CompanyType.Local)
-                    .Select(x => x.Value)
+                    .Select(x => new { x.Company, x.Value })
                     .ToListAsync(cancellationToken);
 
                 var totalCount = await query.CountAsync(cancellationToken);
                 return SalariesChartResponse.RequireOwnSalary(
-                    salaryValues,
+                    salaryValues.Select(x => (x.Company, x.Value)).ToList(),
                     totalCount,
                     true,
                     currentUser is not null);
