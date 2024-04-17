@@ -66,7 +66,6 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
             if (currentUser == null || !userSalariesForLastYear.Any())
             {
                 var salaryValues = await query
-                    .Where(x => x.Company == CompanyType.Local)
                     .Select(x => new { x.Company, x.Value })
                     .ToListAsync(cancellationToken);
 
