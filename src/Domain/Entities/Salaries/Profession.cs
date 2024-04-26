@@ -37,6 +37,8 @@ public class Profession : EntityLabelBase
 
     public List<string> SplitTitle() =>
         Title
+            .Replace("(", string.Empty)
+            .Replace(")", string.Empty)
             .Split(' ')
             .Select(x => x.ToLowerInvariant())
             .ToList();
