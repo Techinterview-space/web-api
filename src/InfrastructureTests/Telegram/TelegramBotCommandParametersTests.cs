@@ -2,6 +2,7 @@
 using Domain.Entities.Salaries;
 using TechInterviewer.Features.Telegram;
 using TechInterviewer.Features.Telegram.ProcessMessage;
+using TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 using Xunit;
 
 namespace InfrastructureTests.Telegram;
@@ -11,7 +12,7 @@ public class TelegramBotCommandParametersTests
     [Fact]
     public void GetProfessionsTitleOrNull_SeveralProfessions_ReturnsString()
     {
-        var target = new TelegramBotCommandParameters(
+        var target = new TelegramBotUserCommandParameters(
             new List<Profession>
             {
                 new Profession("Frontend Developer"),
@@ -27,7 +28,7 @@ public class TelegramBotCommandParametersTests
     [Fact]
     public void GetProfessionsTitleOrNull_OneProfession_ReturnsString()
     {
-        var target = new TelegramBotCommandParameters(
+        var target = new TelegramBotUserCommandParameters(
             new List<Profession>
             {
                 new Profession("QA"),
@@ -41,7 +42,7 @@ public class TelegramBotCommandParametersTests
     [Fact]
     public void GetProfessionsTitleOrNull_NoProfessions_ReturnsNull()
     {
-        var target = new TelegramBotCommandParameters();
+        var target = new TelegramBotUserCommandParameters();
         Assert.Null(target.GetProfessionsTitleOrNull());
     }
 }

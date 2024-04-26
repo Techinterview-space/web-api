@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
 using Domain.ValueObjects;
@@ -33,4 +34,10 @@ public class Profession : EntityLabelBase
     public virtual List<UserSalary> Salaries { get; protected set; } = new ();
 
     public UserProfessionEnum IdAsEnum => (UserProfessionEnum)Id;
+
+    public List<string> SplitTitle() =>
+        Title
+            .Split(' ')
+            .Select(x => x.ToLowerInvariant())
+            .ToList();
 }

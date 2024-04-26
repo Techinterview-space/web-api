@@ -15,6 +15,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -103,7 +104,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 return Unit.Value;
             }
 
-            var parameters = TelegramBotCommandParameters.CreateFromMessage(
+            var parameters = TelegramBotUserCommandParameters.CreateFromMessage(
                 messageText,
                 allProfessions);
 
@@ -150,7 +151,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
-        TelegramBotCommandParameters requestParams,
+        TelegramBotUserCommandParameters requestParams,
         CancellationToken cancellationToken)
     {
         var salariesQuery = new SalariesForChartQuery(
@@ -245,7 +246,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         var counter = 0;
 
-        var parametersForAllSalaries = new TelegramBotCommandParameters();
+        var parametersForAllSalaries = new TelegramBotUserCommandParameters();
         var replyDataForAllSalaries = await _cache.GetOrCreateAsync(
             CacheKey + "_" + parametersForAllSalaries.GetKeyPostfix(),
             async entry =>
@@ -270,15 +271,42 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         if (updateRequest.InlineQuery?.Query != null &&
             updateRequest.InlineQuery.Query.Length > 1)
         {
+            var requestedProfession = updateRequest.InlineQuery.Query.ToLowerInvariant();
+            if (requestedProfession.Equals(
+                    ProductManagersTelegramBotUserCommandParameters.ProductProfessionTitle,
+                    StringComparison.InvariantCultureIgnoreCase))
+            {
+                var productProfessionParams = new ProductManagersTelegramBotUserCommandParameters(allProfessions);
+                var productReplyData = await _cache.GetOrCreateAsync(
+                    CacheKey + "_" + productProfessionParams.GetKeyPostfix(),
+                    async entry =>
+                    {
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
+                        return await ReplyWithSalariesAsync(
+                            productProfessionParams,
+                            cancellationToken);
+                    });
+
+                results.Add(
+                    new InlineQueryResultArticle(
+                        counter.ToString(),
+                        "Все продакты (Product managers)",
+                        new InputTextMessageContent(productReplyData.ReplyText)
+                        {
+                            ParseMode = productReplyData.ParseMode,
+                        }));
+
+                counter++;
+            }
+
             foreach (var profession in allProfessions)
             {
-                if (updateRequest.InlineQuery?.Query != null &&
-                    !profession.Title.Contains(updateRequest.InlineQuery.Query, StringComparison.InvariantCultureIgnoreCase))
+                if (!profession.Title.Contains(requestedProfession, StringComparison.InvariantCultureIgnoreCase))
                 {
                     continue;
                 }
 
-                var parameters = new TelegramBotCommandParameters(profession);
+                var parameters = new TelegramBotUserCommandParameters(profession);
 
                 var replyData = await _cache.GetOrCreateAsync(
                     CacheKey + "_" + parameters.GetKeyPostfix(),
@@ -309,7 +337,8 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 results,
                 cancellationToken: cancellationToken);
 
-            var userName = updateRequest.InlineQuery.From.Username ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
+            var userName = updateRequest.InlineQuery.From.Username
+                           ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
             await GetOrCreateTelegramBotUsageAsync(
                 userName,
                 null,
