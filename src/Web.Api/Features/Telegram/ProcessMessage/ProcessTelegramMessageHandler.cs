@@ -272,29 +272,26 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             updateRequest.InlineQuery.Query.Length > 1)
         {
             var requestedProfession = updateRequest.InlineQuery.Query.ToLowerInvariant();
-            if (requestedProfession.Equals(
-                    ProductManagersTelegramBotUserCommandParameters.ProductProfessionTitle,
-                    StringComparison.InvariantCultureIgnoreCase))
+            if (ProductManagersTelegramBotUserCommandParameters.ShouldIncludeGroup(requestedProfession))
             {
-                var productProfessionParams = new ProductManagersTelegramBotUserCommandParameters(allProfessions);
-                var productReplyData = await _cache.GetOrCreateAsync(
-                    CacheKey + "_" + productProfessionParams.GetKeyPostfix(),
-                    async entry =>
-                    {
-                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-                        return await ReplyWithSalariesAsync(
-                            productProfessionParams,
-                            cancellationToken);
-                    });
-
                 results.Add(
-                    new InlineQueryResultArticle(
-                        counter.ToString(),
+                    await GetProfessionsGroupInlineResultAsync(
+                        counter,
+                        new ProductManagersTelegramBotUserCommandParameters(allProfessions),
                         "Все продакты (Product managers)",
-                        new InputTextMessageContent(productReplyData.ReplyText)
-                        {
-                            ParseMode = productReplyData.ParseMode,
-                        }));
+                        cancellationToken));
+
+                counter++;
+            }
+
+            if (QaAndTestersTelegramBotUserCommandParameters.ShouldIncludeGroup(requestedProfession))
+            {
+                results.Add(
+                    await GetProfessionsGroupInlineResultAsync(
+                        counter,
+                        new QaAndTestersTelegramBotUserCommandParameters(allProfessions),
+                        "Тестировщики, QA и автоматизаторы",
+                        cancellationToken));
 
                 counter++;
             }
@@ -353,6 +350,31 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 "An error occurred while answering inline query: {Message}",
                 e.Message);
         }
+    }
+
+    private async Task<InlineQueryResultArticle> GetProfessionsGroupInlineResultAsync(
+        int counter,
+        TelegramBotUserCommandParameters professionGroupParams,
+        string title,
+        CancellationToken cancellationToken)
+    {
+        var professionsGroupReplyData = await _cache.GetOrCreateAsync(
+            CacheKey + "_" + professionGroupParams.GetKeyPostfix(),
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
+                return await ReplyWithSalariesAsync(
+                    professionGroupParams,
+                    cancellationToken);
+            });
+
+        return new InlineQueryResultArticle(
+            counter.ToString(),
+            title,
+            new InputTextMessageContent(professionsGroupReplyData.ReplyText)
+            {
+                ParseMode = professionsGroupReplyData.ParseMode,
+            });
     }
 
     private async Task GetOrCreateTelegramBotUsageAsync(

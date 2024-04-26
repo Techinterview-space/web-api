@@ -4,12 +4,14 @@ using Domain.Entities.Salaries;
 
 namespace TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 
-public record ProductManagersTelegramBotUserCommandParameters
+public record QaAndTestersTelegramBotUserCommandParameters
     : TelegramBotUserCommandParameters
 {
-    public const string ProductProfessionTitle = "product";
+    public const string TesterProfessionTitle = "tester";
+    public const string QaProfessionTitle = "qa";
+    public const string AutomationTesterProfessionTitle = "automation";
 
-    public ProductManagersTelegramBotUserCommandParameters(
+    public QaAndTestersTelegramBotUserCommandParameters(
         List<Profession> professions)
         : base(GetProductProfessionIds(professions))
     {
@@ -17,7 +19,8 @@ public record ProductManagersTelegramBotUserCommandParameters
 
     public static bool ShouldIncludeGroup(
         string requestedProfession) =>
-        requestedProfession.Equals(ProductProfessionTitle, StringComparison.InvariantCultureIgnoreCase);
+        requestedProfession.Equals(TesterProfessionTitle, StringComparison.InvariantCultureIgnoreCase) ||
+        requestedProfession.Equals(QaProfessionTitle, StringComparison.InvariantCultureIgnoreCase);
 
     private static List<Profession> GetProductProfessionIds(
         List<Profession> professions)
@@ -26,7 +29,9 @@ public record ProductManagersTelegramBotUserCommandParameters
 
         foreach (var profession in professions)
         {
-            if (profession.SplitTitle().Contains(ProductProfessionTitle))
+            if (profession.SplitTitle().Contains(TesterProfessionTitle) ||
+                profession.SplitTitle().Contains(QaProfessionTitle) ||
+                profession.SplitTitle().Contains(AutomationTesterProfessionTitle))
             {
                 productProfessions.Add(profession);
             }
