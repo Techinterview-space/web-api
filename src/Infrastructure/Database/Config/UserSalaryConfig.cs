@@ -13,7 +13,7 @@ public class UserSalaryConfig : IEntityTypeConfiguration<UserSalary>
 
         builder
             .HasOne(x => x.User)
-            .WithMany()
+            .WithMany(x => x.Salaries)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.SetNull);
 

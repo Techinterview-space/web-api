@@ -10,7 +10,6 @@ using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Database.Extensions;
 using Infrastructure.Services.PDF.Interviews;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

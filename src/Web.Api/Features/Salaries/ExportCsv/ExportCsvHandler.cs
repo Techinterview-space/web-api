@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.CSV;
@@ -10,8 +8,6 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using TechInterviewer.Features.Salaries.GetSelectBoxItems;
 using TechInterviewer.Features.Salaries.Providers;
 
 namespace TechInterviewer.Features.Salaries.ExportCsv;

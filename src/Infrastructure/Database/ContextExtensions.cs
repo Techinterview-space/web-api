@@ -113,7 +113,10 @@ public static class ContextExtensions
             .ToArray();
     }
 
-    public static async Task<T> ByIdOrFailAsync<T>(this IQueryable<T> query, long id, CancellationToken cancellationToken = default(CancellationToken))
+    public static async Task<T> ByIdOrFailAsync<T>(
+        this IQueryable<T> query,
+        long id,
+        CancellationToken cancellationToken = default(CancellationToken))
         where T : class, IHasId
     {
         return await query.FirstOrDefaultAsync(x => x.Id == id, cancellationToken)

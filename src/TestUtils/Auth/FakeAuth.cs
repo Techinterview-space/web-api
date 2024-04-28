@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
-using Infrastructure.Database.Extensions;
 
 namespace TestUtils.Auth;
 
@@ -16,19 +16,24 @@ public class FakeAuth : IAuthorization
         _user = user;
     }
 
-    public Task<User> CurrentUserOrFailAsync()
+    public Task<User> CurrentUserOrFailAsync(
+        CancellationToken cancellationToken = default)
     {
-        return CurrentUserOrNullAsync();
+        return CurrentUserOrNullAsync(cancellationToken);
     }
 
-    public Task<User> CurrentUserOrNullAsync()
+    public Task<User> CurrentUserOrNullAsync(
+        CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_user);
     }
 
-    public CurrentUser CurrentUser => new FakeCurrentUser(_user);
+    public CurrentUser CurrentUser
+        => new FakeCurrentUser(_user);
 
-    public Task HasRoleOrFailAsync(Role role)
+    public Task HasRoleOrFailAsync(
+        Role role,
+        CancellationToken cancellationToken = default)
     {
         _user.HasOrFail(role);
         return Task.CompletedTask;

@@ -832,7 +832,7 @@ namespace Domain.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Domain.Entities.Users.User", "User")
-                        .WithMany()
+                        .WithMany("Salaries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -917,6 +917,8 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
                 {
+                    b.Navigation("Salaries");
+
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

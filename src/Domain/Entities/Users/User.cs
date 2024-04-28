@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.Validation;
@@ -72,7 +73,10 @@ public class User : BaseModel, IHasDeletedAt
     public DateTimeOffset? LastLoginAt { get; protected set; }
 
     [JsonIgnore]
-    public virtual ICollection<UserRole> UserRoles { get; protected set; } = new List<UserRole>();
+    public virtual List<UserRole> UserRoles { get; protected set; } = new ();
+
+    [JsonIgnore]
+    public virtual List<UserSalary> Salaries { get; protected set; } = new ();
 
     [NotMapped]
     public IReadOnlyCollection<Role> Roles

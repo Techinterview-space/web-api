@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.Database;
+﻿using System.Text;
 using Infrastructure.Salaries;
 using TechInterviewer.Features.Salaries.Models;
 

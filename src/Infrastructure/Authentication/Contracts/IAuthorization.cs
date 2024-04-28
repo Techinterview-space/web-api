@@ -6,13 +6,17 @@ namespace Infrastructure.Authentication.Contracts;
 
 public interface IAuthorization
 {
-    Task<User> CurrentUserOrFailAsync();
+    Task<User> CurrentUserOrFailAsync(
+        CancellationToken cancellationToken = default);
 
-    Task<User> CurrentUserOrNullAsync();
+    Task<User> CurrentUserOrNullAsync(
+        CancellationToken cancellationToken = default);
 
     CurrentUser CurrentUser { get; }
 
-    Task HasRoleOrFailAsync(Role role);
+    Task HasRoleOrFailAsync(
+        Role role,
+        CancellationToken cancellationToken = default);
 
     Task HasAnyRoleOrFailAsync(params Role[] roles);
 }
