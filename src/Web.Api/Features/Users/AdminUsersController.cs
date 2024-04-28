@@ -42,8 +42,10 @@ public class AdminUsersController : ControllerBase
         pageParams ??= PageModel.Default;
         return await _context.Users
             .Include(x => x.UserRoles)
+            .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
-            .AsPaginatedAsync(x => new UserAdminDto(x), pageParams);
+            .Select(UserAdminDto.Transformation)
+            .AsPaginatedAsync(pageParams);
     }
 
     [HttpGet("{id:long}")]
@@ -51,12 +53,11 @@ public class AdminUsersController : ControllerBase
         [FromRoute] long id)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
-        var user = await _context.Users
+        return await _context.Users
             .Include(x => x.UserRoles)
-            .AsNoTracking()
+            .Include(x => x.Salaries)
+            .Select(UserAdminDto.Transformation)
             .ByIdOrFailAsync(id);
-
-        return new UserAdminDto(user);
     }
 
     [HttpPost("")]
@@ -66,7 +67,7 @@ public class AdminUsersController : ControllerBase
     {
         request.ThrowIfInvalid();
 
-        await _auth.HasRoleOrFailAsync(Role.Admin);
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
         await _context.Users
             .NoItemsByConditionOrFailAsync(
                 x => x.Email == request.Email.ToUpper(),
