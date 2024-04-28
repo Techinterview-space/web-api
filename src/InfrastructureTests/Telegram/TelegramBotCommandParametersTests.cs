@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Salaries;
-using TechInterviewer.Features.Telegram;
-using TechInterviewer.Features.Telegram.ProcessMessage;
 using TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 using Xunit;
 

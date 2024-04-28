@@ -3,7 +3,6 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Database.Extensions;
 
 namespace Infrastructure.Authentication;
 
@@ -24,13 +23,15 @@ public record AuthorizationService : IAuthorization
         _withinBackgroundJob = !_http.Exists;
     }
 
-    public async Task<User> CurrentUserOrFailAsync()
+    public async Task<User> CurrentUserOrFailAsync(
+        CancellationToken cancellationToken = default)
     {
-        return await CurrentUserOrNullAsync()
+        return await CurrentUserOrNullAsync(cancellationToken)
             ?? throw new InvalidOperationException("The current user is not authenticated");
     }
 
-    public async Task<User> CurrentUserOrNullAsync()
+    public async Task<User> CurrentUserOrNullAsync(
+        CancellationToken cancellationToken = default)
     {
         if (_withinBackgroundJob)
         {
@@ -42,7 +43,9 @@ public record AuthorizationService : IAuthorization
             return null;
         }
 
-        return _userFromDatabase ??= await new CurrentUserProvider(_context, _http.CurrentUser).GetOrCreateAsync();
+        return _userFromDatabase
+            ??= await new CurrentUserProvider(_context, _http.CurrentUser)
+                .GetOrCreateAsync();
     }
 
     public CurrentUser CurrentUser
@@ -58,9 +61,11 @@ public record AuthorizationService : IAuthorization
         }
     }
 
-    public async Task HasRoleOrFailAsync(Role role)
+    public async Task HasRoleOrFailAsync(
+        Role role,
+        CancellationToken cancellationToken = default)
     {
-        (await CurrentUserOrNullAsync()).HasOrFail(role);
+        (await CurrentUserOrNullAsync(cancellationToken)).HasOrFail(role);
     }
 
     public async Task HasAnyRoleOrFailAsync(params Role[] roles)
