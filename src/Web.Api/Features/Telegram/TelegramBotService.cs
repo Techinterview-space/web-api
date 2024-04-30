@@ -45,7 +45,16 @@ public class TelegramBotService
     {
         var enabled = _configuration["Telegram:Enable"]?.ToLowerInvariant();
         var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
-        if (!parsedEnabled || !isEnabled)
+
+        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            token = _configuration["Telegram:BotToken"];
+        }
+
+        if (!parsedEnabled ||
+            !isEnabled ||
+            string.IsNullOrEmpty(token))
         {
             _logger.LogWarning(
                 "Telegram bot is disabled. Value {Value}. Parsed: {Parsed}",
@@ -55,7 +64,7 @@ public class TelegramBotService
             return;
         }
 
-        var client = CreateClient();
+        var client = CreateClient(token);
 
         client.StartReceiving(
             updateHandler: HandleUpdateAsync,
@@ -104,15 +113,9 @@ public class TelegramBotService
         await mediator.Send(new ProcessTelegramMessageCommand(client, updateRequest), cancellationToken);
     }
 
-    private TelegramBotClient CreateClient()
+    private TelegramBotClient CreateClient(
+        string token)
     {
-        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
-        if (string.IsNullOrEmpty(token))
-        {
-            token = _configuration["Telegram:BotToken"];
-        }
-
-        Console.WriteLine(token);
         if (string.IsNullOrEmpty(token))
         {
             throw new BadRequestException("Token is not set");
