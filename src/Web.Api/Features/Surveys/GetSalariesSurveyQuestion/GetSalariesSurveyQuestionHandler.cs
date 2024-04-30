@@ -14,6 +14,8 @@ namespace TechInterviewer.Features.Surveys.GetSalariesSurveyQuestion;
 public class GetSalariesSurveyQuestionHandler
     : IRequestHandler<GetSalariesSurveyQuestionQuery, GetSalariesSurveyQuestionResponse>
 {
+    public const int RecentRepliesDays = 92;
+
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 

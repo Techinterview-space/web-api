@@ -1,16 +1,23 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Questions;
+using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Surveys.Dtos;
+using TechInterviewer.Features.Surveys.GetSalariesSurveyQuestion;
 
 namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 
 public class ReplyOnSalariesSurveyHandler
     : IRequestHandler<ReplyOnSalariesSurveyCommand, SalariesSurveyReplyDto>
 {
+    public const int RecentRepliesDays = GetSalariesSurveyQuestionHandler.RecentRepliesDays;
+
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 
@@ -32,6 +39,20 @@ public class ReplyOnSalariesSurveyHandler
             .ByIdOrFailAsync(request.SalariesSurveyQuestionId, cancellationToken);
 
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
+
+        var createdAtEdge = DateTime.UtcNow.AddDays(-RecentRepliesDays);
+        var hasRecentReplies = await _context.SalariesSurveyReplies
+            .Where(x =>
+                x.SalariesSurveyQuestionId == question.Id &&
+                x.CreatedByUserId == currentUser.Id)
+            .Where(x => x.CreatedAt >= createdAtEdge)
+            .AnyAsync(cancellationToken);
+
+        if (hasRecentReplies)
+        {
+            throw new BadRequestException("You have already replied to this question.");
+        }
+
         var reply = new SalariesSurveyReply(
             request.ReplyType,
             question,
