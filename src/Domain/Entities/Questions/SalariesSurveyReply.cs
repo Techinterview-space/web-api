@@ -19,9 +19,11 @@ public class SalariesSurveyReply : HasDatesBase, IHasIdBase<Guid>
 
     public SalariesSurveyReply(
         SalariesSurveyReplyType replyType,
+        SalariesSurveyQuestion question,
         User createdByUser)
     {
         ReplyType = replyType;
+        SalariesSurveyQuestionId = question.Id;
         CreatedByUserId = createdByUser?.Id;
     }
 

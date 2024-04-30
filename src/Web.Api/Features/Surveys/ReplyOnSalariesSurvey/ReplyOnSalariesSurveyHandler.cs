@@ -34,9 +34,10 @@ public class ReplyOnSalariesSurveyHandler
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
         var reply = new SalariesSurveyReply(
             request.ReplyType,
+            question,
             currentUser);
 
-        question.Replies.Add(reply);
+        _context.Add(reply);
         await _context.TrySaveChangesAsync(cancellationToken);
 
         return new SalariesSurveyReplyDto(reply);
