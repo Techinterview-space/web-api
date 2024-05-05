@@ -22,7 +22,7 @@ public class SurveyController
         _mediator = mediator;
     }
 
-    [HttpGet("salaries-stat-page-reply")]
+    [HttpPost("salaries-stat-page-reply")]
     public async Task<SalariesSurveyReplyDto> ReplyOnSurveyQuestion(
         [FromBody] ReplyOnSalariesSurveyRequestBody requestBody,
         CancellationToken cancellationToken)
