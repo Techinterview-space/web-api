@@ -4,5 +4,7 @@ namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 
 public record ReplyOnSalariesSurveyRequestBody
 {
-    public SalariesSurveyReplyType ReplyType { get; init; }
+    public SurveyUsefulnessReplyType UsefulnessReply { get; init; }
+
+    public ExpectationReplyType ExpectationReply { get; init; }
 }

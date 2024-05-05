@@ -15,38 +15,33 @@ namespace Web.Api.Tests.Features.Survey.ReplyOnSalariesSurvey;
 public class ReplyOnSalariesSurveyHandlerTests
 {
     [Theory]
-    [InlineData(SalariesSurveyReplyType.Expected)]
-    [InlineData(SalariesSurveyReplyType.DidNotExpected)]
+    [InlineData(ExpectationReplyType.Expected)]
+    [InlineData(ExpectationReplyType.ExpectedHigher)]
     public async Task Handle_NoReplies_SavesReply(
-        SalariesSurveyReplyType replyType)
+        ExpectationReplyType replyType)
     {
         await using var context = new InMemoryDatabaseContext();
 
         var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
         var auth = new FakeAuth(currentUser);
 
-        Assert.Equal(1, context.SalariesSurveyQuestions.Count());
-        var question = context.SalariesSurveyQuestions.First();
-
         var handler = new ReplyOnSalariesSurveyHandler(context, auth);
 
         context.ChangeTracker.Clear();
-        Assert.Equal(1, context.SalariesSurveyQuestions.Count());
         Assert.Equal(0, context.SalariesSurveyReplies.Count());
 
         var result = await handler.Handle(
             new ReplyOnSalariesSurveyCommand
             {
-                SalariesSurveyQuestionId = question.Id,
-                ReplyType = replyType,
+                UsefulnessReply = SurveyUsefulnessReplyType.Yes,
+                ExpectationReply = replyType,
             },
             default);
 
         Assert.Equal(1, context.SalariesSurveyReplies.Count());
 
         Assert.NotNull(result);
-        Assert.Equal(question.Id, result.SalariesSurveyQuestionId);
-        Assert.Equal(replyType, result.ReplyType);
+        Assert.Equal(replyType, result.ExpectationReply);
         Assert.Equal(currentUser.Id, result.CreatedByUserId);
     }
 
@@ -58,27 +53,22 @@ public class ReplyOnSalariesSurveyHandlerTests
         var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
         var auth = new FakeAuth(currentUser);
 
-        Assert.Equal(1, context.SalariesSurveyQuestions.Count());
-        var question = context.SalariesSurveyQuestions.First();
-
         var reply = await new FakeSalariesSurveyReply(
-            SalariesSurveyReplyType.Expected,
-            question,
+            SurveyUsefulnessReplyType.Yes,
+            ExpectationReplyType.Expected,
             currentUser,
             DateTime.UtcNow.AddDays(-1)).PleaseAsync(context);
 
         var handler = new ReplyOnSalariesSurveyHandler(context, auth);
 
         context.ChangeTracker.Clear();
-        Assert.Equal(1, context.SalariesSurveyQuestions.Count());
         Assert.Equal(1, context.SalariesSurveyReplies.Count());
 
         await Assert.ThrowsAsync<BadRequestException>(() =>
             handler.Handle(
                 new ReplyOnSalariesSurveyCommand
                 {
-                    SalariesSurveyQuestionId = question.Id,
-                    ReplyType = SalariesSurveyReplyType.Expected,
+                    ExpectationReply = ExpectationReplyType.Expected,
                 },
                 default));
 
@@ -93,38 +83,33 @@ public class ReplyOnSalariesSurveyHandlerTests
         var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
         var auth = new FakeAuth(currentUser);
 
-        Assert.Equal(1, context.SalariesSurveyQuestions.Count());
-        var question = context.SalariesSurveyQuestions.First();
-
         var oldDate = DateTime.UtcNow
             .AddDays(-ReplyOnSalariesSurveyHandler.RecentRepliesDays)
             .AddDays(-1);
 
         var reply = await new FakeSalariesSurveyReply(
-            SalariesSurveyReplyType.Expected,
-            question,
+            SurveyUsefulnessReplyType.Yes,
+            ExpectationReplyType.Expected,
             currentUser,
             oldDate).PleaseAsync(context);
 
         var handler = new ReplyOnSalariesSurveyHandler(context, auth);
 
         context.ChangeTracker.Clear();
-        Assert.Equal(1, context.SalariesSurveyQuestions.Count());
         Assert.Equal(1, context.SalariesSurveyReplies.Count());
 
         var result = await handler.Handle(
             new ReplyOnSalariesSurveyCommand
             {
-                SalariesSurveyQuestionId = question.Id,
-                ReplyType = SalariesSurveyReplyType.Expected,
+                UsefulnessReply = SurveyUsefulnessReplyType.Yes,
+                ExpectationReply = ExpectationReplyType.Expected,
             },
             default);
 
         Assert.Equal(2, context.SalariesSurveyReplies.Count());
 
         Assert.NotNull(result);
-        Assert.Equal(question.Id, result.SalariesSurveyQuestionId);
-        Assert.Equal(SalariesSurveyReplyType.Expected, result.ReplyType);
+        Assert.Equal(ExpectationReplyType.Expected, result.ExpectationReply);
         Assert.Equal(currentUser.Id, result.CreatedByUserId);
     }
 }

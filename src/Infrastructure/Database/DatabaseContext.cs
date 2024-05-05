@@ -39,8 +39,6 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
 
     public DbSet<UserCsvDownload> UserCsvDownloads { get; set; }
 
-    public DbSet<SalariesSurveyQuestion> SalariesSurveyQuestions { get; set; }
-
     public DbSet<SalariesSurveyReply> SalariesSurveyReplies { get; set; }
 
     public async Task SaveAsync<TEntity>(

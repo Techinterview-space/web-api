@@ -9,18 +9,16 @@ namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 public record ReplyOnSalariesSurveyCommand
     : ReplyOnSalariesSurveyRequestBody, IRequest<SalariesSurveyReplyDto>
 {
-    public Guid SalariesSurveyQuestionId { get; init; }
-
     public void IsValidOrFail()
     {
-        if (ReplyType is SalariesSurveyReplyType.Undefined)
+        if (ExpectationReply is ExpectationReplyType.Undefined)
         {
-            throw new BadRequestException("Reply type is required");
+            throw new BadRequestException("Expectation reply is required");
         }
 
-        if (SalariesSurveyQuestionId == Guid.Empty)
+        if (UsefulnessReply is SurveyUsefulnessReplyType.Undefined)
         {
-            throw new BadRequestException("Salaries survey question id is required");
+            throw new BadRequestException("Usefulness reply is required");
         }
     }
 }
