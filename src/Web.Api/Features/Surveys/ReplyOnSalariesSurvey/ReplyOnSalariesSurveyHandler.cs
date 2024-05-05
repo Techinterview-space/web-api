@@ -9,14 +9,13 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Surveys.Dtos;
-using TechInterviewer.Features.Surveys.GetSalariesSurveyQuestion;
 
 namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 
 public class ReplyOnSalariesSurveyHandler
     : IRequestHandler<ReplyOnSalariesSurveyCommand, SalariesSurveyReplyDto>
 {
-    public const int RecentRepliesDays = GetSalariesSurveyQuestionHandler.RecentRepliesDays;
+    public const int RecentRepliesDays = 180;
 
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -35,17 +34,13 @@ public class ReplyOnSalariesSurveyHandler
     {
         request.IsValidOrFail();
 
-        var question = await _context.SalariesSurveyQuestions
-            .ByIdOrFailAsync(request.SalariesSurveyQuestionId, cancellationToken);
-
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
 
         var createdAtEdge = DateTime.UtcNow.AddDays(-RecentRepliesDays);
         var hasRecentReplies = await _context.SalariesSurveyReplies
             .Where(x =>
-                x.SalariesSurveyQuestionId == question.Id &&
-                x.CreatedByUserId == currentUser.Id)
-            .Where(x => x.CreatedAt >= createdAtEdge)
+                x.CreatedByUserId == currentUser.Id &&
+                x.CreatedAt >= createdAtEdge)
             .AnyAsync(cancellationToken);
 
         if (hasRecentReplies)
@@ -54,8 +49,8 @@ public class ReplyOnSalariesSurveyHandler
         }
 
         var reply = new SalariesSurveyReply(
-            request.ReplyType,
-            question,
+            request.UsefulnessReply,
+            request.ExpectationReply,
             currentUser);
 
         _context.Add(reply);

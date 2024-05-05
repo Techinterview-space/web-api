@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TechInterviewer.Features.Surveys.Dtos;
-using TechInterviewer.Features.Surveys.GetSalariesSurveyQuestion;
 using TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 using TechInterviewer.Setup.Attributes;
 
@@ -23,28 +22,16 @@ public class SurveyController
         _mediator = mediator;
     }
 
-    [HttpGet("salaries-survey-question")]
-    public async Task<GetSalariesSurveyQuestionResponse> GetSalariesSurveyQuestion(
-        CancellationToken cancellationToken)
-    {
-        var result = await _mediator.Send(
-            new GetSalariesSurveyQuestionQuery(),
-            cancellationToken);
-
-        return result;
-    }
-
-    [HttpGet("{question_id:guid}/reply")]
+    [HttpGet("salaries-stat-page-reply")]
     public async Task<SalariesSurveyReplyDto> ReplyOnSurveyQuestion(
-        [FromRoute(Name = "question_id")] Guid questionId,
         [FromBody] ReplyOnSalariesSurveyRequestBody requestBody,
         CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(
             new ReplyOnSalariesSurveyCommand
             {
-                SalariesSurveyQuestionId = questionId,
-                ReplyType = requestBody.ReplyType,
+                UsefulnessReply = requestBody.UsefulnessReply,
+                ExpectationReply = requestBody.ExpectationReply,
             },
             cancellationToken);
 

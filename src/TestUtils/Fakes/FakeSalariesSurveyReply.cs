@@ -9,11 +9,14 @@ namespace TestUtils.Fakes;
 public class FakeSalariesSurveyReply : SalariesSurveyReply
 {
     public FakeSalariesSurveyReply(
-        SalariesSurveyReplyType replyType,
-        SalariesSurveyQuestion question,
+        SurveyUsefulnessReplyType usefulnessReply,
+        ExpectationReplyType expectationReply,
         User user,
         DateTime? createdAt)
-        : base(replyType, question, user)
+        : base(
+            usefulnessReply,
+            expectationReply,
+            user)
     {
         CreatedAt = createdAt ?? DateTimeOffset.Now;
     }
