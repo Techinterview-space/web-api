@@ -12,6 +12,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using TechInterviewer.Features.Salaries.Models;
+using TechInterviewer.Features.Surveys.Services;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesChart
 {
@@ -40,7 +41,7 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
             ISalariesChartQueryParams request,
             CancellationToken cancellationToken)
         {
-            var currentUser = await _auth.CurrentUserOrNullAsync();
+            var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
 
             var userSalariesForLastYear = new List<UserSalary>();
 
@@ -78,10 +79,13 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
             }
 
             var salaries = await query.ToListAsync(cancellationToken);
+            var hasSurveyRecentReply = await new SalariesSurveyUserService(_context)
+                .HasFilledSurveyAsync(currentUser, cancellationToken);
 
             return new SalariesChartResponse(
                 salaries,
                 new UserSalaryAdminDto(userSalariesForLastYear.First()),
+                hasSurveyRecentReply,
                 salariesQuery.SalaryAddedEdge,
                 DateTimeOffset.Now,
                 salaries.Count);

@@ -5,6 +5,7 @@ using Domain.Entities.Questions;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 using TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
+using TechInterviewer.Features.Surveys.Services;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -84,7 +85,7 @@ public class ReplyOnSalariesSurveyHandlerTests
         var auth = new FakeAuth(currentUser);
 
         var oldDate = DateTime.UtcNow
-            .AddDays(-ReplyOnSalariesSurveyHandler.RecentRepliesDays)
+            .AddDays(-SalariesSurveyUserService.RecentRepliesDays)
             .AddDays(-1);
 
         var reply = await new FakeSalariesSurveyReply(

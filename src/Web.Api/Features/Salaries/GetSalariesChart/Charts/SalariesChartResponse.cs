@@ -13,12 +13,14 @@ public record SalariesChartResponse
     public SalariesChartResponse(
         List<UserSalaryDto> salaries,
         UserSalaryAdminDto currentUserSalary,
+        bool hasSurveyRecentReply,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
         int totalCountInStats)
         : this(
             salaries,
             currentUserSalary,
+            hasSurveyRecentReply,
             false,
             rangeStart,
             rangeEnd,
@@ -30,6 +32,7 @@ public record SalariesChartResponse
     private SalariesChartResponse(
         List<UserSalaryDto> salaries,
         UserSalaryAdminDto currentUserSalary,
+        bool hasSurveyRecentReply,
         bool shouldAddOwnSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
@@ -38,6 +41,7 @@ public record SalariesChartResponse
     {
         Salaries = salaries;
         CurrentUserSalary = currentUserSalary;
+        HasRecentSurveyReply = hasSurveyRecentReply;
         ShouldAddOwnSalary = shouldAddOwnSalary;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
@@ -119,6 +123,7 @@ public record SalariesChartResponse
         return new (
             new List<UserSalaryDto>(),
             null,
+            false,
             true,
             null,
             null,
@@ -142,6 +147,8 @@ public record SalariesChartResponse
     public UserSalaryAdminDto CurrentUserSalary { get; }
 
     public bool OnlyLocalCompanySalaries { get; private set; }
+
+    public bool HasRecentSurveyReply { get; }
 
     public bool ShouldAddOwnSalary { get; }
 
