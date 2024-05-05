@@ -7,16 +7,14 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Surveys.Dtos;
+using TechInterviewer.Features.Surveys.Services;
 
 namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 
 public class ReplyOnSalariesSurveyHandler
     : IRequestHandler<ReplyOnSalariesSurveyCommand, SalariesSurveyReplyDto>
 {
-    public const int RecentRepliesDays = 180;
-
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 
@@ -36,12 +34,8 @@ public class ReplyOnSalariesSurveyHandler
 
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
 
-        var createdAtEdge = DateTime.UtcNow.AddDays(-RecentRepliesDays);
-        var hasRecentReplies = await _context.SalariesSurveyReplies
-            .Where(x =>
-                x.CreatedByUserId == currentUser.Id &&
-                x.CreatedAt >= createdAtEdge)
-            .AnyAsync(cancellationToken);
+        var surveyUserService = new SalariesSurveyUserService(_context);
+        var hasRecentReplies = await surveyUserService.HasFilledSurveyAsync(currentUser, cancellationToken);
 
         if (hasRecentReplies)
         {
