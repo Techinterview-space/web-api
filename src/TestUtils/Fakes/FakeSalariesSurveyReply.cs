@@ -12,7 +12,7 @@ public class FakeSalariesSurveyReply : SalariesSurveyReply
         SurveyUsefulnessReplyType usefulnessReply,
         ExpectationReplyType expectationReply,
         User user,
-        DateTime? createdAt)
+        DateTime? createdAt = null)
         : base(
             usefulnessReply,
             expectationReply,

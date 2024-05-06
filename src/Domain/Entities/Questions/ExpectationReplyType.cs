@@ -6,7 +6,7 @@ public enum ExpectationReplyType
 
     Expected = 1,
 
-    ExpectedHigher = 2,
+    MoreThanExpected = 2,
 
-    ExpectedLower = 3,
+    LessThanExpected = 3,
 }

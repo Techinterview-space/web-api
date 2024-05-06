@@ -17,7 +17,7 @@ public class ReplyOnSalariesSurveyHandlerTests
 {
     [Theory]
     [InlineData(ExpectationReplyType.Expected)]
-    [InlineData(ExpectationReplyType.ExpectedHigher)]
+    [InlineData(ExpectationReplyType.MoreThanExpected)]
     public async Task Handle_NoReplies_SavesReply(
         ExpectationReplyType replyType)
     {

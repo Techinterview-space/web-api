@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TechInterviewer.Features.Surveys.Dtos;
+using TechInterviewer.Features.Surveys.GetSalariesSurveyStats;
 using TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
 using TechInterviewer.Setup.Attributes;
 
@@ -33,6 +34,17 @@ public class SurveyController
                 UsefulnessReply = requestBody.UsefulnessReply,
                 ExpectationReply = requestBody.ExpectationReply,
             },
+            cancellationToken);
+
+        return result;
+    }
+
+    [HttpGet("salaries-stats")]
+    public async Task<SalariesSurveyStatsData> GetSalariesSurveyStats(
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(
+            new GetSalariesSurveyStatsQuery(),
             cancellationToken);
 
         return result;
