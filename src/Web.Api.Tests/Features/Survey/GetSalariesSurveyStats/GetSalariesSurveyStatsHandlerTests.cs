@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Domain.Enums;
 using TechInterviewer.Features.Surveys.GetSalariesSurveyStats;
@@ -51,12 +52,29 @@ public class GetSalariesSurveyStatsHandlerTests
         var result = await handler.Handle(new GetSalariesSurveyStatsQuery(), default);
 
         Assert.Equal(5, result.CountOfRecords);
-        Assert.Equal(3, result.UsefulnessData[SurveyUsefulnessReplyType.Yes].CountOfReplies);
-        Assert.Equal(2, result.UsefulnessData[SurveyUsefulnessReplyType.No].CountOfReplies);
-        Assert.Equal(0, result.UsefulnessData[SurveyUsefulnessReplyType.NotSure].CountOfReplies);
 
-        Assert.Equal(2, result.ExpectationData[ExpectationReplyType.Expected].CountOfReplies);
-        Assert.Equal(3, result.ExpectationData[ExpectationReplyType.MoreThanExpected].CountOfReplies);
-        Assert.Equal(0, result.ExpectationData[ExpectationReplyType.LessThanExpected].CountOfReplies);
+        Assert.Equal(
+            3,
+            result.UsefulnessData.First(x => x.ReplyType == SurveyUsefulnessReplyType.Yes).Data.CountOfReplies);
+
+        Assert.Equal(
+            2,
+            result.UsefulnessData.First(x => x.ReplyType == SurveyUsefulnessReplyType.No).Data.CountOfReplies);
+
+        Assert.Equal(
+            0,
+            result.UsefulnessData.First(x => x.ReplyType == SurveyUsefulnessReplyType.NotSure).Data.CountOfReplies);
+
+        Assert.Equal(
+            2,
+            result.ExpectationData.First(x => x.ReplyType == ExpectationReplyType.Expected).Data.CountOfReplies);
+
+        Assert.Equal(
+            3,
+            result.ExpectationData.First(x => x.ReplyType == ExpectationReplyType.MoreThanExpected).Data.CountOfReplies);
+
+        Assert.Equal(
+            0,
+            result.ExpectationData.First(x => x.ReplyType == ExpectationReplyType.LessThanExpected).Data.CountOfReplies);
     }
 }

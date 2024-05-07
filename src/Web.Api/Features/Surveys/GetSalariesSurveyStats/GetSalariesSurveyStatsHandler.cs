@@ -42,47 +42,41 @@ public class GetSalariesSurveyStatsHandler
         return new SalariesSurveyStatsData
         {
             CountOfRecords = records.Count,
-            UsefulnessData = new Dictionary<SurveyUsefulnessReplyType, SalariesSurveyStatsDataItem>
+            UsefulnessData = new List<SalariesSurveyStatsData.ReplyDataItem<SurveyUsefulnessReplyType>>
             {
-                {
+                new (
                     SurveyUsefulnessReplyType.Yes,
                     new SalariesSurveyStatsDataItem(
                         records.Count(x => x.UsefulnessReply == SurveyUsefulnessReplyType.Yes),
-                        totalCount)
-                },
-                {
+                        totalCount)),
+                new (
                     SurveyUsefulnessReplyType.No,
                     new SalariesSurveyStatsDataItem(
                         records.Count(x => x.UsefulnessReply == SurveyUsefulnessReplyType.No),
-                        totalCount)
-                },
-                {
+                        totalCount)),
+                new (
                     SurveyUsefulnessReplyType.NotSure,
                     new SalariesSurveyStatsDataItem(
                         records.Count(x => x.UsefulnessReply == SurveyUsefulnessReplyType.NotSure),
-                        totalCount)
-                },
+                        totalCount)),
             },
-            ExpectationData = new Dictionary<ExpectationReplyType, SalariesSurveyStatsDataItem>
+            ExpectationData = new List<SalariesSurveyStatsData.ReplyDataItem<ExpectationReplyType>>
             {
-                {
+                new (
                     ExpectationReplyType.Expected,
                     new SalariesSurveyStatsDataItem(
                         records.Count(x => x.ExpectationReply == ExpectationReplyType.Expected),
-                        totalCount)
-                },
-                {
+                        totalCount)),
+                new (
                     ExpectationReplyType.MoreThanExpected,
                     new SalariesSurveyStatsDataItem(
                         records.Count(x => x.ExpectationReply == ExpectationReplyType.MoreThanExpected),
-                        totalCount)
-                },
-                {
+                        totalCount)),
+                new (
                     ExpectationReplyType.LessThanExpected,
                     new SalariesSurveyStatsDataItem(
                         records.Count(x => x.ExpectationReply == ExpectationReplyType.LessThanExpected),
-                        totalCount)
-                },
+                        totalCount)),
             },
         };
     }
