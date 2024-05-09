@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Questions;
 using Domain.Entities.Users;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -24,11 +26,27 @@ public class SalariesSurveyUserService
         User currentUser,
         CancellationToken cancellationToken = default)
     {
-        var createdAtEdge = DateTime.UtcNow.AddDays(-RecentRepliesDays);
         return _context.SalariesSurveyReplies
-            .Where(x =>
-                x.CreatedByUserId == currentUser.Id &&
-                x.CreatedAt >= createdAtEdge)
+            .Where(GetSurveyReplyFilter(currentUser))
             .AnyAsync(cancellationToken);
+    }
+
+    public Task<SalariesSurveyReply> GetLastSurveyOrNullAsync(
+        User currentUser,
+        CancellationToken cancellationToken = default)
+    {
+        return _context.SalariesSurveyReplies
+            .Where(GetSurveyReplyFilter(currentUser))
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    private Expression<Func<SalariesSurveyReply, bool>> GetSurveyReplyFilter(
+        User currentUser)
+    {
+        var createdAtEdge = DateTime.UtcNow.AddDays(-RecentRepliesDays);
+        return x =>
+            x.CreatedByUserId == currentUser.Id &&
+            x.CreatedAt >= createdAtEdge;
     }
 }
