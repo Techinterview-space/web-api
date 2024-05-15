@@ -1,6 +1,8 @@
 ﻿using Domain.Entities;
+using Domain.Entities.CSV;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
+using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
 using Domain.Entities.Telegram;
 using Domain.Entities.Users;
@@ -34,6 +36,10 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
     public DbSet<Profession> Professions { get; set; }
 
     public DbSet<TelegramBotUsage> TelegramBotUsages { get; set; }
+
+    public DbSet<UserCsvDownload> UserCsvDownloads { get; set; }
+
+    public DbSet<SalariesSurveyReply> SalariesSurveyReplies { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

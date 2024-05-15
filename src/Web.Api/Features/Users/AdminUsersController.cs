@@ -10,7 +10,6 @@ using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Database.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Users.Models;
@@ -35,24 +34,30 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("")]
-    public async Task<Pageable<UserDto>> All([FromQuery] PageModel pageParams = null)
+    public async Task<Pageable<UserAdminDto>> All(
+        [FromQuery] PageModel pageParams = null)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
+
         pageParams ??= PageModel.Default;
         return await _context.Users
             .Include(x => x.UserRoles)
+            .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
-            .AsPaginatedAsync(x => new UserDto(x), pageParams);
+            .Select(UserAdminDto.Transformation)
+            .AsPaginatedAsync(pageParams);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserDto> GetUser([FromRoute] long id)
+    public async Task<UserAdminDto> GetUser(
+        [FromRoute] long id)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
-        return new UserDto(await _context.Users
+        return await _context.Users
             .Include(x => x.UserRoles)
-            .AsNoTracking()
-            .ByIdOrFailAsync(id));
+            .Include(x => x.Salaries)
+            .Select(UserAdminDto.Transformation)
+            .ByIdOrFailAsync(id);
     }
 
     [HttpPost("")]
@@ -62,7 +67,7 @@ public class AdminUsersController : ControllerBase
     {
         request.ThrowIfInvalid();
 
-        await _auth.HasRoleOrFailAsync(Role.Admin);
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
         await _context.Users
             .NoItemsByConditionOrFailAsync(
                 x => x.Email == request.Email.ToUpper(),
@@ -165,12 +170,12 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("inactive")]
-    public async Task<IEnumerable<UserDto>> AllInactiveAsync()
+    public async Task<IEnumerable<UserAdminDto>> AllInactiveAsync()
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
         return await _context.Users
             .Include(x => x.UserRoles)
             .Where(x => x.DeletedAt != null)
-            .AllAsync(x => new UserDto(x));
+            .AllAsync(x => new UserAdminDto(x));
     }
 }

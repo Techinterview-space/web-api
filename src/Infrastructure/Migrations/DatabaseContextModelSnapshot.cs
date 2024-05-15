@@ -22,6 +22,28 @@ namespace Domain.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Entities.CSV.UserCsvDownload", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCsvDownloads", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Interviews.Interview", b =>
                 {
                     b.Property<Guid>("Id")
@@ -122,6 +144,34 @@ namespace Domain.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("UserLabels", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Questions.SalariesSurveyReply", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ExpectationReply")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UsefulnessReply")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.ToTable("SalariesSurveyReplies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Salaries.Profession", b =>
@@ -737,6 +787,17 @@ namespace Domain.Migrations
                     b.ToTable("InterviewUserLabel");
                 });
 
+            modelBuilder.Entity("Domain.Entities.CSV.UserCsvDownload", b =>
+                {
+                    b.HasOne("Domain.Entities.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Interviews.Interview", b =>
                 {
                     b.HasOne("Domain.Entities.Users.User", "Interviewer")
@@ -766,6 +827,15 @@ namespace Domain.Migrations
                         .HasForeignKey("CreatedById");
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Questions.SalariesSurveyReply", b =>
+                {
+                    b.HasOne("Domain.Entities.Users.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId");
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("Domain.Entities.Salaries.Profession", b =>
@@ -799,7 +869,7 @@ namespace Domain.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Domain.Entities.Users.User", "User")
-                        .WithMany()
+                        .WithMany("Salaries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -884,6 +954,8 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
                 {
+                    b.Navigation("Salaries");
+
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

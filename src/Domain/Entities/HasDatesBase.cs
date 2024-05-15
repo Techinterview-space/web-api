@@ -9,12 +9,12 @@ public abstract class HasDatesBase : IHasDates
 
     public DateTimeOffset UpdatedAt { get; protected set; }
 
-    public void OnCreate(DateTimeOffset now)
+    public virtual void OnCreate(DateTimeOffset now)
     {
         CreatedAt = UpdatedAt = now;
     }
 
-    public void OnUpdate(DateTimeOffset now)
+    public virtual void OnUpdate(DateTimeOffset now)
     {
         UpdatedAt = now;
     }

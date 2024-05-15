@@ -31,7 +31,8 @@ public class FakeUser : User, IPlease<User>
         };
     }
 
-    public async Task<User> PleaseAsync(DatabaseContext context)
+    public async Task<User> PleaseAsync(
+        DatabaseContext context)
     {
         var userEntry = await context.Users.AddAsync(Please());
         await context.TrySaveChangesAsync();

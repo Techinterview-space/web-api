@@ -7,39 +7,39 @@ public enum DeveloperGrade : long
     [Description("Unknown")]
     Unknown = 0,
 
-    [Description("Junior-")]
-    JuniorMinus = 1,
+    [Description("Trainee")]
+    Trainee = 1,
 
     [Description("Junior")]
     Junior = 2,
 
-    [Description("Junior+")]
+    [Description("Junior strong")]
     JuniorStrong = 3,
 
-    [Description("Middle-")]
+    [Description("Middle minus")]
     MiddleMinus = 4,
 
     [Description("Middle")]
     Middle = 5,
 
-    [Description("Middle+")]
+    [Description("Middle strong")]
     MiddleStrong = 6,
 
-    [Description("Senior-")]
+    [Description("Senior minus")]
     SeniorMinus = 7,
 
     [Description("Senior")]
     Senior = 8,
 
-    [Description("Senior+")]
+    [Description("Senior strong")]
     SeniorStrong = 9,
 
-    [Description("Lead-")]
+    [Description("Lead minus")]
     LeadMinus = 10,
 
     [Description("Lead")]
     Lead = 11,
 
-    [Description("Lead+")]
+    [Description("Lead strong")]
     LeadStrong = 12,
 }

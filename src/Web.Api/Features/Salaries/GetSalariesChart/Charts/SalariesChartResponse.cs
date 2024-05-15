@@ -13,12 +13,14 @@ public record SalariesChartResponse
     public SalariesChartResponse(
         List<UserSalaryDto> salaries,
         UserSalaryAdminDto currentUserSalary,
+        bool hasSurveyRecentReply,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
         int totalCountInStats)
         : this(
             salaries,
             currentUserSalary,
+            hasSurveyRecentReply,
             false,
             rangeStart,
             rangeEnd,
@@ -30,6 +32,7 @@ public record SalariesChartResponse
     private SalariesChartResponse(
         List<UserSalaryDto> salaries,
         UserSalaryAdminDto currentUserSalary,
+        bool hasSurveyRecentReply,
         bool shouldAddOwnSalary,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
@@ -38,6 +41,7 @@ public record SalariesChartResponse
     {
         Salaries = salaries;
         CurrentUserSalary = currentUserSalary;
+        HasRecentSurveyReply = hasSurveyRecentReply;
         ShouldAddOwnSalary = shouldAddOwnSalary;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
@@ -60,6 +64,14 @@ public record SalariesChartResponse
             AverageSalary = localSalaries.Select(x => x.Value).Average();
             MedianSalary = localSalaries.Select(x => x.Value).Median();
 
+            LocalSalariesByGrade = GetSalariesChartHandler.GradesToBeUsedInChart
+                .Select(x => new MedianAndAverageSalariesByGrade(
+                    x,
+                    localSalaries
+                        .Where(y => y.Grade == x)
+                        .ToList()))
+                .ToList();
+
             SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
             PeopleByGradesChartDataForLocal = new PeopleByGradesChartData(localSalaries);
         }
@@ -73,6 +85,14 @@ public record SalariesChartResponse
             AverageRemoteSalary = values.Average();
             MedianRemoteSalary = values.Median();
 
+            RemoteSalariesByGrade = GetSalariesChartHandler.GradesToBeUsedInChart
+                .Select(x => new MedianAndAverageSalariesByGrade(
+                    x,
+                    remoteSalaries
+                        .Where(y => y.Grade == x)
+                        .ToList()))
+                .ToList();
+
             SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
             PeopleByGradesChartDataForRemote = new PeopleByGradesChartData(remoteSalaries);
         }
@@ -85,22 +105,37 @@ public record SalariesChartResponse
     }
 
     public static SalariesChartResponse RequireOwnSalary(
-        List<double> salaryValues,
+        List<(CompanyType Company, double Value)> salaryValues,
         int salariesCount,
         bool onlyLocalCompanySalaries,
         bool hasAuthentication)
     {
+        var local = salaryValues
+            .Where(x => x.Company == CompanyType.Local)
+            .Select(x => x.Value)
+            .ToList();
+
+        var remote = salaryValues
+            .Where(x => x.Company == CompanyType.Foreign)
+            .Select(x => x.Value)
+            .ToList();
+
         return new (
             new List<UserSalaryDto>(),
             null,
+            false,
             true,
             null,
             null,
             salariesCount,
             hasAuthentication)
         {
-            AverageSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0,
-            MedianSalary = salaryValues.Count > 0 ? salaryValues.Median() : 0,
+            AverageSalary = local.Count > 0 ? local.Average() : 0,
+            MedianSalary = local.Count > 0 ? local.Median() : 0,
+            MedianRemoteSalary = remote.Count > 0 ? remote.Median() : 0,
+            AverageRemoteSalary = remote.Count > 0 ? remote.Average() : 0,
+            LocalSalariesByGrade = new List<MedianAndAverageSalariesByGrade>(),
+            RemoteSalariesByGrade = new List<MedianAndAverageSalariesByGrade>(),
             OnlyLocalCompanySalaries = onlyLocalCompanySalaries,
         };
     }
@@ -113,6 +148,8 @@ public record SalariesChartResponse
 
     public bool OnlyLocalCompanySalaries { get; private set; }
 
+    public bool HasRecentSurveyReply { get; }
+
     public bool ShouldAddOwnSalary { get; }
 
     public bool HasAuthentication { get; }
@@ -121,9 +158,13 @@ public record SalariesChartResponse
 
     public double MedianSalary { get; private set; }
 
-    public double? AverageRemoteSalary { get; }
+    public List<MedianAndAverageSalariesByGrade> LocalSalariesByGrade { get; private set; }
 
-    public double? MedianRemoteSalary { get; }
+    public List<MedianAndAverageSalariesByGrade> RemoteSalariesByGrade { get; private set; }
+
+    public double? AverageRemoteSalary { get; private set; }
+
+    public double? MedianRemoteSalary { get; private set; }
 
     public DateTimeOffset? RangeStart { get; }
 

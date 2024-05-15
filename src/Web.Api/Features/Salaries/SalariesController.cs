@@ -14,7 +14,9 @@ using TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
 using TechInterviewer.Features.Salaries.ApproveSalary;
 using TechInterviewer.Features.Salaries.DeleteSalary;
 using TechInterviewer.Features.Salaries.ExcludeFromStats;
+using TechInterviewer.Features.Salaries.ExportCsv;
 using TechInterviewer.Features.Salaries.GetAdminChart;
+using TechInterviewer.Features.Salaries.GetSalaries;
 using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 using TechInterviewer.Features.Salaries.GetSelectBoxItems;
@@ -48,7 +50,7 @@ public class SalariesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<Pageable<UserSalaryAdminDto>> AllAsync(
+    public async Task<Pageable<UserSalaryAdminDto>> GetAllAdmin(
         [FromQuery] GetApprovedSalariesQuery request,
         CancellationToken cancellationToken)
     {
@@ -59,7 +61,7 @@ public class SalariesController : ControllerBase
 
     [HttpGet("not-in-stats")]
     [HasAnyRole(Role.Admin)]
-    public async Task<Pageable<UserSalaryAdminDto>> AllNotShownInStatsAsync(
+    public async Task<Pageable<UserSalaryAdminDto>> GetAllNotShownInStats(
         [FromQuery] GetExcludedFromStatsSalariesQuery request,
         CancellationToken cancellationToken)
     {
@@ -70,7 +72,7 @@ public class SalariesController : ControllerBase
 
     [HttpGet("salaries-adding-trend-chart")]
     [HasAnyRole(Role.Admin)]
-    public async Task<AdminChartResponse> AdminChart(
+    public async Task<AdminChartResponse> GetAdmin(
         CancellationToken cancellationToken)
     {
         return await _mediator.Send(
@@ -79,7 +81,7 @@ public class SalariesController : ControllerBase
     }
 
     [HttpGet("chart")]
-    public Task<SalariesChartResponse> ChartAsync(
+    public Task<SalariesChartResponse> GetChart(
         [FromQuery] GetSalariesChartQuery request,
         CancellationToken cancellationToken)
     {
@@ -91,6 +93,34 @@ public class SalariesController : ControllerBase
                 Cities = request.Cities,
             },
             cancellationToken);
+    }
+
+    [HttpGet("")]
+    public Task<Pageable<UserSalaryDto>> AllForPublic(
+        [FromQuery] GetSalariesPaginatedQuery request,
+        CancellationToken cancellationToken)
+    {
+        return _mediator.Send(
+            new GetSalariesPaginatedQuery
+            {
+                Page = request.Page,
+                PageSize = request.PageSize,
+                Grade = request.Grade,
+                ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+                Cities = request.Cities,
+            },
+            cancellationToken);
+    }
+
+    [HttpGet("export")]
+    public async Task<IActionResult> Export(
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new ExportCsvQuery(),
+            cancellationToken);
+
+        return File(response.GetAsByteArray(), response.FileContentType, response.Filename);
     }
 
     [HttpPost("")]

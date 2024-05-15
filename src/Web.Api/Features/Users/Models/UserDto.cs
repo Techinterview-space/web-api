@@ -1,52 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation;
-using TechInterviewer.Features.Salaries.Models;
 
 namespace TechInterviewer.Features.Users.Models;
 
-public record UserDto
+public record UserDto : IHasId
 {
+    public UserDto()
+    {
+    }
+
     public UserDto(
-        User user,
-        List<UserSalaryAdminDto> salaries = null)
+        User user)
     {
         user.ThrowIfNull(nameof(user));
         Id = user.Id;
         Email = user.Email;
         FirstName = user.FirstName;
         LastName = user.LastName;
-        Roles = user.UserRoles?.Select(x => x.RoleId).ToArray() ?? Array.Empty<Role>();
+        Roles = user.UserRoles?.Select(x => x.RoleId).ToList() ?? new List<Role>(0);
         EmailConfirmed = user.EmailConfirmed;
         CreatedAt = user.CreatedAt;
         DeletedAt = user.DeletedAt;
-        Salaries = salaries;
     }
 
-    public long Id { get; }
+    public long Id { get; init; }
 
-    public string Email { get; }
+    public string Email { get; init; }
 
-    public bool EmailConfirmed { get; }
+    public bool EmailConfirmed { get; init; }
 
-    public string FirstName { get; }
+    public string FirstName { get; init; }
 
-    public string LastName { get; }
+    public string LastName { get; init; }
 
     public string Fullname => $"{FirstName} {LastName}";
 
-    public IReadOnlyCollection<Role> Roles { get; }
+    public List<Role> Roles { get; init; }
 
-    public List<UserSalaryAdminDto> Salaries { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
 
-    public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset? DeletedAt { get; init; }
 
-    public DateTimeOffset? DeletedAt { get; }
-
-    public static UserDto CreateFromEntityOrNull(User user)
+    public static UserDto CreateFromEntityOrNull(
+        User user)
     {
         return user is not null ? new UserDto(user) : null;
     }

@@ -6,16 +6,16 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Infrastructure.Salaries;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage;
+namespace TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 
-public record TelegramBotCommandParameters : ISalariesChartQueryParams
+public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 {
-    public TelegramBotCommandParameters()
+    public TelegramBotUserCommandParameters()
         : this(new List<Profession>())
     {
     }
 
-    public TelegramBotCommandParameters(
+    public TelegramBotUserCommandParameters(
         Profession professionToInclude)
         : this(
             new List<Profession>
@@ -25,7 +25,7 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
     {
     }
 
-    public TelegramBotCommandParameters(
+    public TelegramBotUserCommandParameters(
         List<Profession> professionsToInclude)
     {
         Grade = null;
@@ -58,7 +58,7 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
         return string.Join(", ", SelectedProfessions.Select(x => x.Title));
     }
 
-    public static TelegramBotCommandParameters CreateFromMessage(
+    public static TelegramBotUserCommandParameters CreateFromMessage(
         string message,
         List<Profession> allProfessions)
     {
@@ -88,6 +88,6 @@ public record TelegramBotCommandParameters : ISalariesChartQueryParams
             }
         }
 
-        return new TelegramBotCommandParameters(selectedProfessions);
+        return new TelegramBotUserCommandParameters(selectedProfessions);
     }
 }

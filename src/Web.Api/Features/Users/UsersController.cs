@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Enums;
+using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +27,20 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserDto> UserAsync([FromRoute] long id)
+    public async Task<UserAdminDto> UserAsync(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
     {
-        return new UserDto(await _context.Users
-            .Include(x => x.UserRoles)
-            .AsNoTracking()
-            .ByIdOrFailAsync(id));
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        if (currentUser.Has(Role.Admin) || currentUser.Id == id)
+        {
+            return await _context.Users
+                .Include(x => x.UserRoles)
+                .Include(x => x.Salaries)
+                .Select(UserAdminDto.Transformation)
+                .ByIdOrFailAsync(id, cancellationToken);
+        }
+
+        throw new NoPermissionsException("You do not have permission to view this user");
     }
 }
