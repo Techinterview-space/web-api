@@ -31,50 +31,39 @@ public class UpdateSalaryHandler : IRequestHandler<UpdateSalaryCommand, CreateOr
         CancellationToken cancellationToken)
     {
         request.IsValidOrFail();
-
-        var salary = await GetSalaryAsync(request.Id, cancellationToken);
+        var salary = await _context.Salaries
+                         .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
+                     ?? throw new NotFoundException("Salary record not found");
 
         var currentUser = await _auth.CurrentUserOrNullAsync();
 
-        CheckAuthorization(currentUser, salary);
-
-        var skill = await GetEntityByIdAsync<Skill>(request.SkillId, cancellationToken);
-        var workIndustry = await GetEntityByIdAsync<WorkIndustry>(request.WorkIndustryId, cancellationToken);
-        var profession = await GetEntityByIdAsync<Profession>(request.ProfessionId, cancellationToken);
-
-        UpdateSalaryRecord(salary, request, skill, workIndustry, profession);
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
-    }
-
-    private async Task<T> GetEntityByIdAsync<T>(int? id, CancellationToken cancellationToken) where T : class
-    {
-        if (id is null || id <= 0)
-            return null;
-
-        return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id.Value, cancellationToken);
-    }
-
-    private void CheckAuthorization(User currentUser, Salary salary)
-    {
-        if (!currentUser.Has(Role.Admin) && salary.UserId != currentUser.Id)
+        if (!currentUser.Has(Role.Admin) &&
+            salary.UserId != currentUser.Id)
+        {
             throw new ForbiddenException("You can only edit your own salary records");
-    }
+        }
 
-    private async Task<Salary> GetSalaryAsync(int salaryId, CancellationToken cancellationToken)
-    {
-        var salary = await _context.Salaries
-            .FirstOrDefaultAsync(x => x.Id == salaryId, cancellationToken);
+        Skill skill = null;
+        if (request.SkillId is > 0)
+        {
+            skill = await _context.Skills
+                .FirstOrDefaultAsync(x => x.Id == request.SkillId.Value, cancellationToken);
+        }
 
-        if (salary == null)
-            throw new NotFoundException("Salary record not found");
+        WorkIndustry workIndustry = null;
+        if (request.WorkIndustryId is > 0)
+        {
+            workIndustry = await _context.WorkIndustries
+                .FirstOrDefaultAsync(x => x.Id == request.WorkIndustryId.Value, cancellationToken);
+        }
 
-        return salary;
-    }
+        Profession profession = null;
+        if (request.ProfessionId is > 0)
+        {
+            profession = await _context.Professions
+                .FirstOrDefaultAsync(x => x.Id == request.ProfessionId, cancellationToken);
+        }
 
-    private void UpdateSalaryRecord(Salary salary, UpdateSalaryCommand request, Skill skill, WorkIndustry workIndustry, Profession profession)
-    {
         salary.Update(
             grade: request.Grade,
             city: request.City,
@@ -85,5 +74,8 @@ public class UpdateSalaryHandler : IRequestHandler<UpdateSalaryCommand, CreateOr
             age: request.Age,
             yearOfStartingWork: request.YearOfStartingWork,
             gender: request.Gender);
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return CreateOrEditSalaryRecordResponse.Success(new UserSalaryDto(salary));
     }
 }
