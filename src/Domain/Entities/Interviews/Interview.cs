@@ -47,6 +47,8 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
 
     public DeveloperGrade? CandidateGrade { get; protected set; }
 
+    public virtual ShareLink ShareLink { get; protected set; }
+
     public List<InterviewSubject> Subjects { get; protected set; } = new ();
 
     public bool CouldBeOpenBy(User user)
