@@ -59,13 +59,16 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = null,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>()
-        });
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = null,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>()
+            },
+            default);
+
         var templates = await context.Interviews.AllAsync();
         Assert.Single(templates);
         Assert.Empty(templates[0].Subjects);
@@ -87,13 +90,15 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = null,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>()
-        });
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = null,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>()
+            },
+            default);
 
         Assert.Single(await context.Interviews.AllAsync());
 
@@ -117,26 +122,29 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>
+        await target.Create(
+            new InterviewCreateRequest
             {
-                new ()
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
                 {
-                    Title = "ASP.NET Core",
-                    Grade = DeveloperGrade.Middle,
-                    Comments = "Middlewares, Caching"
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
                 }
             },
-            Labels = new List<LabelDto>
-            {
-                new LabelDto(".net", new HexColor("#ff0000")),
-                new LabelDto("java", new HexColor("#ff0000")),
-            }
-        });
+            default);
+
         var templates = await context.Interviews
             .Include(x => x.Labels)
             .AllAsync();
@@ -170,13 +178,16 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>()
-        });
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>()
+            },
+            default);
+
         var templates = await context.Interviews.AllAsync();
         Assert.Single(templates);
         Assert.Empty(templates[0].Subjects);
@@ -195,26 +206,29 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>
+        await target.Create(
+            new InterviewCreateRequest
             {
-                new ()
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
                 {
-                    Title = "ASP.NET Core",
-                    Grade = DeveloperGrade.Middle,
-                    Comments = "Middlewares, Caching"
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
                 }
             },
-            Labels = new List<LabelDto>
-            {
-                new LabelDto(".net", new HexColor("#ff0000")),
-                new LabelDto("java", new HexColor("#ff0000")),
-            }
-        });
+            default);
+
         var templates = await context.Interviews.AllAsync();
         Assert.Single(templates);
 
@@ -224,14 +238,16 @@ public class InterviewsControllerTests
             new FakeAuth(otherPerson),
             context,
             new Mock<IInterviewPdfService>().Object);
-        await Assert.ThrowsAsync<NoPermissionsException>(() => target.UpdateAsync(new InterviewUpdateRequest
-        {
-            Id = template.Id,
-            CandidateName = "Maxim Mitkin",
-            CandidateGrade = DeveloperGrade.Lead,
-            OverallOpinion = "Bad at all",
-            Subjects = new List<InterviewSubject>()
-        }));
+        await Assert.ThrowsAsync<NoPermissionsException>(() => target.UpdateAsync(
+            new InterviewUpdateRequest
+            {
+                Id = template.Id,
+                CandidateName = "Maxim Mitkin",
+                CandidateGrade = DeveloperGrade.Lead,
+                OverallOpinion = "Bad at all",
+                Subjects = new List<InterviewSubject>()
+            },
+            default));
     }
 
     [Fact]
@@ -246,26 +262,29 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>
+        await target.Create(
+            new InterviewCreateRequest
             {
-                new ()
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
                 {
-                    Title = "ASP.NET Core",
-                    Grade = DeveloperGrade.Middle,
-                    Comments = "Middlewares, Caching"
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
                 }
             },
-            Labels = new List<LabelDto>
-            {
-                new LabelDto(".net", new HexColor("#ff0000")),
-                new LabelDto("java", new HexColor("#ff0000")),
-            }
-        });
+            default);
+
         var templates = await context.Interviews
             .Include(x => x.Labels)
             .AllAsync();
@@ -275,21 +294,23 @@ public class InterviewsControllerTests
         var template = templates[0];
 
         context.ChangeTracker.Clear();
-        await target.UpdateAsync(new InterviewUpdateRequest
-        {
-            Id = template.Id,
-            CandidateName = "Maxim Mitkin",
-            CandidateGrade = DeveloperGrade.Lead,
-            OverallOpinion = "Bad at all",
-            Subjects = new List<InterviewSubject>(),
-            Labels = new List<LabelDto>
+        await target.UpdateAsync(
+            new InterviewUpdateRequest
             {
-                new LabelDto(template.Labels.First()),
-                new LabelDto("qa", new HexColor("#ff0000")),
-                new LabelDto("ba", new HexColor("#ff0000")),
-                new LabelDto("react", new HexColor("#ff0000")),
-            }
-        });
+                Id = template.Id,
+                CandidateName = "Maxim Mitkin",
+                CandidateGrade = DeveloperGrade.Lead,
+                OverallOpinion = "Bad at all",
+                Subjects = new List<InterviewSubject>(),
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(template.Labels.First()),
+                    new LabelDto("qa", new HexColor("#ff0000")),
+                    new LabelDto("ba", new HexColor("#ff0000")),
+                    new LabelDto("react", new HexColor("#ff0000")),
+                }
+            },
+            default);
 
         templates = await context.Interviews
             .Include(x => x.Labels)
@@ -316,18 +337,21 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>()
-        });
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>()
+            },
+            default);
+
         var templates = await context.Interviews.AllAsync();
         Assert.Single(templates);
         Assert.Empty(templates[0].Subjects);
 
-        await target.DeleteAsync(templates[0].Id);
+        await target.DeleteAsync(templates[0].Id, default);
         Assert.False(await context.Interviews.AnyAsync());
     }
 
@@ -343,21 +367,24 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
 
         Assert.False(await context.Interviews.AnyAsync());
-        await target.CreateAsync(new InterviewCreateRequest
-        {
-            CandidateName = "Maxim Gorbatyuk",
-            CandidateGrade = DeveloperGrade.Middle,
-            OverallOpinion = "Good at all",
-            Subjects = new List<InterviewSubject>
+        await target.Create(
+            new InterviewCreateRequest
             {
-                new ()
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
                 {
-                    Title = "ASP.NET Core",
-                    Grade = DeveloperGrade.Middle,
-                    Comments = "Middlewares, Caching"
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
                 }
-            }
-        });
+            },
+            default);
+
         var templates = await context.Interviews.AllAsync();
         Assert.Single(templates);
 
@@ -367,6 +394,6 @@ public class InterviewsControllerTests
             new FakeAuth(otherPerson),
             context,
             new Mock<IInterviewPdfService>().Object);
-        await Assert.ThrowsAsync<NoPermissionsException>(() => target.DeleteAsync(template.Id));
+        await Assert.ThrowsAsync<NoPermissionsException>(() => target.DeleteAsync(template.Id, default));
     }
 }

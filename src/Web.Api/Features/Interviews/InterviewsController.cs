@@ -82,7 +82,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/download")]
     public async Task<FileContentResult> PdfAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -97,7 +97,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/markdown")]
     public async Task<IActionResult> MarkdownAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
@@ -114,7 +114,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/download-sync")]
     public async Task<FileContentResult> DownloadSyncAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -127,32 +127,40 @@ public class InterviewsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateAsync([FromBody] InterviewCreateRequest createRequest)
+    public async Task<IActionResult> Create(
+        [FromBody] InterviewCreateRequest createRequest,
+        CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
 
-        var interview = await _context.AddEntityAsync(new Interview(
-            createRequest.CandidateName,
-            createRequest.OverallOpinion,
-            createRequest.CandidateGrade,
-            createRequest.Subjects,
-            currentUser));
+        var interview = await _context.AddEntityAsync(
+            new Interview(
+                createRequest.CandidateName,
+                createRequest.OverallOpinion,
+                createRequest.CandidateGrade,
+                createRequest.Subjects,
+                currentUser),
+            cancellationToken);
 
-        interview.Sync(await new UserLabelsCollection(_context, currentUser, createRequest.Labels).PrepareAsync());
+        interview.Sync(
+            await new UserLabelsCollection(_context, currentUser, createRequest.Labels)
+                .PrepareAsync(cancellationToken));
         interview.ThrowIfInvalid();
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok(interview.Id);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync([FromBody] InterviewUpdateRequest updateRequest)
+    public async Task<IActionResult> UpdateAsync(
+        [FromBody] InterviewUpdateRequest updateRequest,
+        CancellationToken cancellationToken)
     {
         var interview = await _context.Interviews
             .Include(x => x.Labels)
-            .ByIdOrFailAsync(updateRequest.Id);
+            .ByIdOrFailAsync(updateRequest.Id, cancellationToken);
 
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         CheckPermissions(interview, currentUser);
 
         interview
@@ -161,25 +169,29 @@ public class InterviewsController : ControllerBase
                 updateRequest.OverallOpinion,
                 updateRequest.CandidateGrade,
                 updateRequest.Subjects)
-            .Sync(await new UserLabelsCollection(_context, currentUser, updateRequest.Labels).PrepareAsync())
+            .Sync(
+                await new UserLabelsCollection(_context, currentUser, updateRequest.Labels)
+                    .PrepareAsync(cancellationToken))
             .ThrowIfInvalid();
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteAsync(Guid id)
+    public async Task<IActionResult> DeleteAsync(
+        Guid id,
+        CancellationToken cancellationToken)
     {
         var interview = await _context.Interviews
             .Include(x => x.Labels)
-            .ByIdOrFailAsync(id);
+            .ByIdOrFailAsync(id, cancellationToken);
 
-        CheckPermissions(interview, await _auth.CurrentUserOrFailAsync());
+        CheckPermissions(interview, await _auth.CurrentUserOrFailAsync(cancellationToken));
 
         _context.Interviews.Remove(interview);
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
     }
 

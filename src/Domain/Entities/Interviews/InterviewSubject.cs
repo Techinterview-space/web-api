@@ -20,11 +20,11 @@ public record InterviewSubject
     }
 
     [Required]
-    [StringLength(150)]
+    [StringLength(300)]
     public string Title { get; init; }
 
     public DeveloperGrade? Grade { get; init; }
 
-    [StringLength(1000)]
+    [StringLength(10_000)]
     public string Comments { get; init; }
 }

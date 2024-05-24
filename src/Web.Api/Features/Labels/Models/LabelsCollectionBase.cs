@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
@@ -26,7 +27,8 @@ public abstract class LabelsCollectionBase<TLabel>
         CurrentUser = currentUser;
     }
 
-    public async Task<IReadOnlyCollection<TLabel>> PrepareAsync()
+    public async Task<IReadOnlyCollection<TLabel>> PrepareAsync(
+        CancellationToken cancellationToken = default)
     {
         var labelIdsToStay = _labelsFromRequest
             .Where(x => x.Id != null)
@@ -34,7 +36,10 @@ public abstract class LabelsCollectionBase<TLabel>
             .ToList();
 
         var listToSync = new List<TLabel>();
-        listToSync.AddRange(await _context.Set<TLabel>().Where(x => labelIdsToStay.Contains(x.Id)).ToArrayAsync());
+        listToSync.AddRange(
+            await _context.Set<TLabel>()
+                .Where(x => labelIdsToStay.Contains(x.Id))
+                .ToArrayAsync(cancellationToken));
 
         var labelsToAdd = _labelsFromRequest
             .Where(x => x.Id == null)
@@ -42,7 +47,7 @@ public abstract class LabelsCollectionBase<TLabel>
 
         foreach (var userLabel in labelsToAdd)
         {
-            if (await _context.Set<TLabel>().AnyAsync(x => x.Title == userLabel.Title))
+            if (await _context.Set<TLabel>().AnyAsync(x => x.Title == userLabel.Title, cancellationToken))
             {
                 continue;
             }
