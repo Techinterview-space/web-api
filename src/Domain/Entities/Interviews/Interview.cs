@@ -10,7 +10,7 @@ namespace Domain.Entities.Interviews;
 
 public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
 {
-    public const int OverallStringLength = 20000;
+    public const int OverallStringLength = 50_000;
 
     protected Interview()
     {
@@ -35,7 +35,7 @@ public class Interview : HasLabelsEntity<Interview, UserLabel>, IHasIdBase<Guid>
     public Guid Id { get; protected set; }
 
     [Required]
-    [StringLength(150)]
+    [StringLength(200)]
     public string CandidateName { get; protected set; }
 
     public long InterviewerId { get; protected set; }
