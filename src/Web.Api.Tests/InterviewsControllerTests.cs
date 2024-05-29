@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities.Enums;
@@ -10,6 +11,7 @@ using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Services.PDF.Interviews;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using TechInterviewer.Features.Interviews;
@@ -396,4 +398,308 @@ public class InterviewsControllerTests
             new Mock<IInterviewPdfService>().Object);
         await Assert.ThrowsAsync<NoPermissionsException>(() => target.DeleteAsync(template.Id, default));
     }
+
+    [Fact]
+    public async Task ShareWithLink_InterviewWithShareToken_OkAsync()
+    {
+        await using var context = new SqliteContext();
+        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var target = new InterviewsController(
+            new FakeAuth(currentUser),
+            context,
+            new Mock<IInterviewPdfService>().Object);
+
+        Assert.False(await context.Interviews.AnyAsync());
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
+                {
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
+                }
+            },
+            default);
+
+        var templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        var template = templates[0];
+
+        await context.ShareLinks.AddAsync(new ShareLink(template));
+        await context.TrySaveChangesAsync();
+
+        var shareLinks = await context.ShareLinks
+            .AllAsync();
+        Assert.Single(shareLinks);
+
+        await target.ShareWithLink(template.Id, default);
+
+        templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+
+        Assert.NotNull(templates[0].ShareLink);
+        Assert.Equal(templates[0].Id, templates[0].ShareLink.InterviewId);
+        Assert.Equal(shareLinks[0].ShareToken, templates[0].ShareLink.ShareToken);
+    }
+
+    [Fact]
+    public async Task ShareWithLink_InterviewWithoutShareToken_OkAsync()
+    {
+        await using var context = new SqliteContext();
+        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var target = new InterviewsController(
+            new FakeAuth(currentUser),
+            context,
+            new Mock<IInterviewPdfService>().Object);
+
+        Assert.False(await context.Interviews.AnyAsync());
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
+                {
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
+                }
+            },
+            default);
+
+        var templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        var template = templates[0];
+
+        await target.ShareWithLink(template.Id, default);
+
+        templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+
+        Assert.NotNull(templates[0].ShareLink);
+        Assert.Equal(templates[0].Id, templates[0].ShareLink.InterviewId);
+        Assert.NotNull(templates[0].ShareLink.ShareToken);
+    }
+
+    [Fact]
+    public async Task GetInterviewByShareToken_ValidShareToken_OkAsync()
+    {
+        await using var context = new SqliteContext();
+        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var target = new InterviewsController(
+            new FakeAuth(currentUser),
+            context,
+            new Mock<IInterviewPdfService>().Object);
+
+        Assert.False(await context.Interviews.AnyAsync());
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
+                {
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
+                }
+            },
+            default);
+
+        var templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        var template = templates[0];
+
+        await context.ShareLinks.AddAsync(new ShareLink(template));
+        await context.TrySaveChangesAsync();
+
+        var shareLinks = await context.ShareLinks
+            .AllAsync();
+        Assert.Single(shareLinks);
+
+        var testInterview = ((await target
+                                .GetInterviewByShareToken((System.Guid)shareLinks[0].ShareToken, default))
+                            as OkObjectResult).Value as InterviewDto;
+
+        templates = await context.Interviews
+            .Include(x => x.Labels)
+            .AllAsync();
+
+        Assert.Single(templates);
+
+        template = templates[0];
+        Assert.Equal(currentUser.Id, testInterview.InterviewerId);
+        Assert.Equal("Maxim Gorbatyuk", testInterview.CandidateName);
+        Assert.Equal("Good at all", testInterview.OverallOpinion);
+        Assert.Equal(DeveloperGrade.Middle, testInterview.CandidateGrade);
+        Assert.Equal(shareLinks[0].ShareToken, testInterview.ShareToken);
+        Assert.Single(testInterview.Subjects);
+        Assert.Equal(2, testInterview.Labels.Count);
+
+        foreach (var label in testInterview.Labels)
+        {
+            Assert.True(label.Id != default);
+            Assert.Equal(currentUser.Id, label.CreatedById);
+            Assert.Equal("#ff0000", label.HexColor.ToString());
+        }
+    }
+
+    [Fact]
+    public async Task GetInterviewByShareToken_NotValidShareToken_ExceptionAsync()
+    {
+        await using var context = new SqliteContext();
+        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var target = new InterviewsController(
+            new FakeAuth(currentUser),
+            context,
+            new Mock<IInterviewPdfService>().Object);
+
+        await Assert.ThrowsAsync<NotFoundException>(() => target.GetInterviewByShareToken(Guid.NewGuid(), default));
+    }
+
+    [Fact]
+    public async Task RevokeShareLink_InterviewWithShareToken_OkAsync()
+    {
+        await using var context = new SqliteContext();
+        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var target = new InterviewsController(
+            new FakeAuth(currentUser),
+            context,
+            new Mock<IInterviewPdfService>().Object);
+
+        Assert.False(await context.Interviews.AnyAsync());
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
+                {
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
+                }
+            },
+            default);
+
+        var templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        var template = templates[0];
+
+        await context.ShareLinks.AddAsync(new ShareLink(template));
+        await context.TrySaveChangesAsync();
+
+        var shareLinks = await context.ShareLinks
+            .AllAsync();
+        Assert.Single(shareLinks);
+
+        await target.RevokeShareLink(template.Id, default);
+
+        templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        template = templates[0];
+
+        Assert.NotNull(template.ShareLink);
+        Assert.Equal(template.Id, template.ShareLink.InterviewId);
+        Assert.NotNull(template.ShareLink.ShareToken);
+        Assert.NotEqual(shareLinks[0].ShareToken, template.ShareLink.ShareToken);
+    }
+
+    [Fact]
+    public async Task RevokeShareLink_InterviewWithOutShareToken_OkAsync()
+    {
+        await using var context = new SqliteContext();
+        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var target = new InterviewsController(
+            new FakeAuth(currentUser),
+            context,
+            new Mock<IInterviewPdfService>().Object);
+
+        Assert.False(await context.Interviews.AnyAsync());
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
+                {
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
+                }
+            },
+            default);
+
+        var templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        var template = templates[0];
+
+        await target.RevokeShareLink(template.Id, default);
+
+        templates = await context.Interviews
+            .Include(x => x.ShareLink)
+            .AllAsync();
+        template = templates[0];
+
+        Assert.NotNull(template.ShareLink);
+        Assert.Equal(template.Id, template.ShareLink.InterviewId);
+        Assert.NotNull(template.ShareLink.ShareToken);
+    }
 }
+

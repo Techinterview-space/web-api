@@ -248,7 +248,7 @@ public class InterviewsController : ControllerBase
 
         if (interview == null)
         {
-            return NotFound();
+            throw new NotFoundException($"Did not find any {typeof(Interview).Name} by shareToken={shareToken}");
         }
 
         return Ok(new InterviewDto(interview));
