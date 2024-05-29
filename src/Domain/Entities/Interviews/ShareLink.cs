@@ -2,7 +2,7 @@
 
 namespace Domain.Entities.Interviews
 {
-    public class ShareLink : IHasId
+    public class ShareLink : BaseModel
     {
         protected ShareLink()
         {
@@ -14,8 +14,6 @@ namespace Domain.Entities.Interviews
             ShareToken = Guid.NewGuid();
         }
 
-        public long Id { get; protected set; }
-
         public Guid? ShareToken { get; protected set; }
 
         public Guid InterviewId { get; protected set; }
@@ -25,6 +23,8 @@ namespace Domain.Entities.Interviews
         public ShareLink RevokeToken()
         {
             ShareToken = Guid.NewGuid();
+            UpdatedAt = DateTime.UtcNow;
+
             return this;
         }
     }
