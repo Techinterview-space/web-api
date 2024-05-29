@@ -80,6 +80,8 @@ public class Startup
     {
         if (_environment.IsDevelopment())
         {
+            app
+                .UseMiddleware<DevelopmentEnvironmentMiddleware>();
             app.UseDeveloperExceptionPage();
             IdentityModelEventSource.ShowPII = true;
         }
