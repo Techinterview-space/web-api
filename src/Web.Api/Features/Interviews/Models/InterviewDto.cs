@@ -22,6 +22,7 @@ public record InterviewDto : InterviewUpdateRequest
         OverallOpinion = interview.OverallOpinion;
         Interviewer = UserDto.CreateFromEntityOrNull(interview.Interviewer);
         Subjects = interview.Subjects;
+        ShareToken = interview.ShareLink?.ShareToken;
         CreatedAt = interview.CreatedAt;
         UpdatedAt = interview.UpdatedAt;
         Labels = interview.Labels.Select(x => new LabelDto(x)).ToList();
@@ -30,6 +31,7 @@ public record InterviewDto : InterviewUpdateRequest
     public long InterviewerId { get; init; }
 
     public UserDto Interviewer { get; init; }
+    public Guid? ShareToken { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
 

@@ -25,6 +25,8 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
 
     public DbSet<Interview> Interviews { get; set; }
 
+    public DbSet<ShareLink> ShareLinks { get; set; }
+
     public DbSet<UserLabel> UserLabels { get; set; }
 
     public DbSet<UserSalary> Salaries { get; set; }

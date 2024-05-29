@@ -34,3 +34,4 @@ src/.idea
 src/Frontend/.angular
 volume
 src/.env
+/src/.vs

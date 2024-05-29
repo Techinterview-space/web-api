@@ -21,6 +21,11 @@ internal class InterviewConfig : IEntityTypeConfiguration<Interview>
             .HasJsonConversion();
 
         builder
+            .HasOne(x => x.ShareLink)
+            .WithOne(isl => isl.Interview)
+            .HasForeignKey<ShareLink>(isl => isl.InterviewId);
+
+        builder
             .HasMany(x => x.Labels)
             .WithMany(x => x.Interviews);
     }

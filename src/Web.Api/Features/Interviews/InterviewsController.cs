@@ -195,6 +195,65 @@ public class InterviewsController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("share-with-link")]
+    public async Task<IActionResult> ShareWithLink(Guid id, CancellationToken cancellationToken)
+    {
+        var interview = await _context.Interviews
+            .Include(x => x.ShareLink)
+            .ByIdOrFailAsync(id, cancellationToken);
+
+        if (interview.ShareLink == null)
+        {
+            var shareLink = await _context.AddEntityAsync(new ShareLink(interview), cancellationToken);
+            await _context.TrySaveChangesAsync(cancellationToken);
+
+            return Ok(shareLink.ShareToken);
+        }
+
+        return Ok(interview.ShareLink.ShareToken);
+    }
+
+    [HttpPost("revoke-share-link")]
+    public async Task<IActionResult> RevokeShareLink(Guid id, CancellationToken cancellationToken)
+    {
+        var interview = await _context.Interviews
+            .Include(x => x.ShareLink)
+            .ByIdOrFailAsync(id, cancellationToken);
+
+        if (interview.ShareLink == null)
+        {
+            var shareLink = await _context.AddEntityAsync(new ShareLink(interview), cancellationToken);
+            await _context.TrySaveChangesAsync(cancellationToken);
+
+            return Ok();
+        }
+
+        interview.ShareLink
+            .RevokeToken()
+            .ThrowIfInvalid();
+
+        await _context.TrySaveChangesAsync(cancellationToken);
+        return Ok();
+    }
+
+    [HttpGet("with-token/{secret_token:Guid}")]
+    public async Task<IActionResult> GetInterviewByShareToken(
+        [FromRoute(Name = "secret_token")] Guid shareToken,
+        CancellationToken cancellationToken)
+    {
+        var interview = await _context.Interviews
+            .Include(x => x.ShareLink)
+            .Where(i => i.ShareLink.ShareToken == shareToken)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        if (interview == null)
+        {
+            throw new NotFoundException($"Did not find any {typeof(Interview).Name} by shareToken={shareToken}");
+        }
+
+        return Ok(new InterviewDto(interview));
+    }
+
     private static void CheckPermissions(Interview interviewTemplate, User currentUser)
     {
         if (!interviewTemplate.CouldBeOpenBy(currentUser) && !currentUser.Has(Role.Admin))
