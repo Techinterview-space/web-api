@@ -10,6 +10,11 @@ namespace Infrastructure.Database.Config
         {
             builder.ToTable("ShareLinks");
             builder.HasKey(x => x.Id);
+
+            builder
+                .HasOne(x => x.Interview)
+                .WithOne(isl => isl.ShareLink)
+                .HasForeignKey<ShareLink>(isl => isl.InterviewId);
         }
     }
 }

@@ -445,7 +445,7 @@ public class InterviewsControllerTests
             .AllAsync();
         Assert.Single(shareLinks);
 
-        await target.ShareWithLink(template.Id, default);
+        await target.GetShareToken(template.Id, default);
 
         templates = await context.Interviews
             .Include(x => x.ShareLink)
@@ -495,7 +495,7 @@ public class InterviewsControllerTests
             .AllAsync();
         var template = templates[0];
 
-        await target.ShareWithLink(template.Id, default);
+        await target.GetShareToken(template.Id, default);
 
         templates = await context.Interviews
             .Include(x => x.ShareLink)
@@ -540,35 +540,32 @@ public class InterviewsControllerTests
             },
             default);
 
-        var templates = await context.Interviews
+        var interview = await context.Interviews
             .Include(x => x.ShareLink)
-            .AllAsync();
-        var template = templates[0];
+            .FirstOrDefaultAsync();
 
-        await context.ShareLinks.AddAsync(new ShareLink(template));
+        Assert.NotNull(interview);
+        await context.ShareLinks.AddAsync(new ShareLink(interview));
         await context.TrySaveChangesAsync();
 
-        var shareLinks = await context.ShareLinks
-            .AllAsync();
+        var shareLinks = await context.ShareLinks.AllAsync();
         Assert.Single(shareLinks);
 
-        var testInterview = ((await target
-                                .GetInterviewByShareToken((System.Guid)shareLinks[0].ShareToken, default))
-                            as OkObjectResult).Value as InterviewDto;
+        var result = await target.GetInterviewByShareToken(
+                interview.Id,
+                shareLinks[0].ShareToken.GetValueOrDefault(),
+                default) as OkObjectResult;
 
-        templates = await context.Interviews
-            .Include(x => x.Labels)
-            .AllAsync();
+        Assert.NotNull(result);
+        var testInterview = result.Value as InterviewDto;
 
-        Assert.Single(templates);
-
-        template = templates[0];
+        Assert.NotNull(testInterview);
         Assert.Equal(currentUser.Id, testInterview.InterviewerId);
         Assert.Equal("Maxim Gorbatyuk", testInterview.CandidateName);
         Assert.Equal("Good at all", testInterview.OverallOpinion);
         Assert.Equal(DeveloperGrade.Middle, testInterview.CandidateGrade);
-        Assert.Equal(shareLinks[0].ShareToken, testInterview.ShareToken);
         Assert.Single(testInterview.Subjects);
+
         Assert.Equal(2, testInterview.Labels.Count);
 
         foreach (var label in testInterview.Labels)
@@ -584,12 +581,43 @@ public class InterviewsControllerTests
     {
         await using var context = new SqliteContext();
         var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
             new Mock<IInterviewPdfService>().Object);
 
-        await Assert.ThrowsAsync<NotFoundException>(() => target.GetInterviewByShareToken(Guid.NewGuid(), default));
+        await target.Create(
+            new InterviewCreateRequest
+            {
+                CandidateName = "Maxim Gorbatyuk",
+                CandidateGrade = DeveloperGrade.Middle,
+                OverallOpinion = "Good at all",
+                Subjects = new List<InterviewSubject>
+                {
+                    new ()
+                    {
+                        Title = "ASP.NET Core",
+                        Grade = DeveloperGrade.Middle,
+                        Comments = "Middlewares, Caching"
+                    }
+                },
+                Labels = new List<LabelDto>
+                {
+                    new LabelDto(".net", new HexColor("#ff0000")),
+                    new LabelDto("java", new HexColor("#ff0000")),
+                }
+            },
+            default);
+
+        var interview = await context.Interviews.FirstOrDefaultAsync();
+        Assert.NotNull(interview);
+
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            target.GetInterviewByShareToken(
+                interview.Id,
+                Guid.NewGuid(),
+                default));
     }
 
     [Fact]

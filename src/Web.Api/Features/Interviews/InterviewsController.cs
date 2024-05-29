@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Interviews.Models;
+using TechInterviewer.Features.Interviews.RevokeShareLinkToken;
 using TechInterviewer.Features.Labels.Models;
 using TechInterviewer.Setup.Attributes;
 
@@ -195,8 +196,10 @@ public class InterviewsController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("share-with-link")]
-    public async Task<IActionResult> ShareWithLink(Guid id, CancellationToken cancellationToken)
+    [HttpPost("{id:guid}/get-share-token")]
+    public async Task<GetShareLinkTokenResult> GetShareToken(
+        Guid id,
+        CancellationToken cancellationToken)
     {
         var interview = await _context.Interviews
             .Include(x => x.ShareLink)
@@ -204,17 +207,17 @@ public class InterviewsController : ControllerBase
 
         if (interview.ShareLink == null)
         {
-            var shareLink = await _context.AddEntityAsync(new ShareLink(interview), cancellationToken);
-            await _context.TrySaveChangesAsync(cancellationToken);
-
-            return Ok(shareLink.ShareToken);
+            var shareLink = await _context.SaveAsync(new ShareLink(interview), cancellationToken);
+            return new GetShareLinkTokenResult(shareLink);
         }
 
-        return Ok(interview.ShareLink.ShareToken);
+        return new GetShareLinkTokenResult(interview.ShareLink);
     }
 
-    [HttpPost("revoke-share-link")]
-    public async Task<IActionResult> RevokeShareLink(Guid id, CancellationToken cancellationToken)
+    [HttpPost("{id:guid}/revoke-share-link")]
+    public async Task<GetShareLinkTokenResult> RevokeShareLink(
+        Guid id,
+        CancellationToken cancellationToken)
     {
         var interview = await _context.Interviews
             .Include(x => x.ShareLink)
@@ -222,33 +225,32 @@ public class InterviewsController : ControllerBase
 
         if (interview.ShareLink == null)
         {
-            var shareLink = await _context.AddEntityAsync(new ShareLink(interview), cancellationToken);
-            await _context.TrySaveChangesAsync(cancellationToken);
-
-            return Ok();
+            var shareLink = await _context.SaveAsync(new ShareLink(interview), cancellationToken);
+            return new GetShareLinkTokenResult(shareLink);
         }
 
-        interview.ShareLink
-            .RevokeToken()
-            .ThrowIfInvalid();
-
+        interview.ShareLink.RevokeToken();
         await _context.TrySaveChangesAsync(cancellationToken);
-        return Ok();
+
+        return new GetShareLinkTokenResult(interview.ShareLink);
     }
 
-    [HttpGet("with-token/{secret_token:Guid}")]
+    [HttpGet("{id:guid}/with-token/{secret_token:guid}")]
     public async Task<IActionResult> GetInterviewByShareToken(
+        [FromRoute(Name = "id")] Guid interviewId,
         [FromRoute(Name = "secret_token")] Guid shareToken,
         CancellationToken cancellationToken)
     {
         var interview = await _context.Interviews
             .Include(x => x.ShareLink)
-            .Where(i => i.ShareLink.ShareToken == shareToken)
+            .Include(x => x.Labels)
+            .Where(i => i.Id == interviewId && i.ShareLink.ShareToken == shareToken)
+            .AsNoTracking()
             .SingleOrDefaultAsync(cancellationToken);
 
         if (interview == null)
         {
-            throw new NotFoundException($"Did not find any {typeof(Interview).Name} by shareToken={shareToken}");
+            throw new NotFoundException($"Did not find any {nameof(Interview)} by shareToken {shareToken}");
         }
 
         return Ok(new InterviewDto(interview));
