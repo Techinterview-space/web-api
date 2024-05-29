@@ -8,7 +8,8 @@ namespace Domain.Entities.Interviews
         {
         }
 
-        public ShareLink(Interview interview)
+        public ShareLink(
+            Interview interview)
         {
             InterviewId = interview.Id;
             ShareToken = Guid.NewGuid();
@@ -16,9 +17,9 @@ namespace Domain.Entities.Interviews
 
         public Guid? ShareToken { get; protected set; }
 
-        public Guid InterviewId { get; protected set; }
+        public Guid? InterviewId { get; protected set; }
 
-        public Interview Interview { get; protected set; }
+        public virtual Interview Interview { get; protected set; }
 
         public ShareLink RevokeToken()
         {

@@ -126,11 +126,17 @@ namespace Domain.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<Guid>("InterviewId")
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("InterviewId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ShareToken")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -846,9 +852,7 @@ namespace Domain.Migrations
                 {
                     b.HasOne("Domain.Entities.Interviews.Interview", "Interview")
                         .WithOne("ShareLink")
-                        .HasForeignKey("Domain.Entities.Interviews.ShareLink", "InterviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Domain.Entities.Interviews.ShareLink", "InterviewId");
 
                     b.Navigation("Interview");
                 });

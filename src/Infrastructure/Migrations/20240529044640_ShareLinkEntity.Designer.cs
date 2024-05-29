@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Domain.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240528223059_ShareLink")]
-    partial class ShareLink
+    [Migration("20240529044640_ShareLinkEntity")]
+    partial class ShareLinkEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,11 +129,17 @@ namespace Domain.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<Guid>("InterviewId")
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("InterviewId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("ShareToken")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -849,9 +855,7 @@ namespace Domain.Migrations
                 {
                     b.HasOne("Domain.Entities.Interviews.Interview", "Interview")
                         .WithOne("ShareLink")
-                        .HasForeignKey("Domain.Entities.Interviews.ShareLink", "InterviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Domain.Entities.Interviews.ShareLink", "InterviewId");
 
                     b.Navigation("Interview");
                 });
