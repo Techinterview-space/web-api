@@ -3,19 +3,13 @@ using System.Collections.Generic;
 
 namespace TechInterviewer.Features.Salaries.GetAdminChart;
 
-public record AdminChartResponse
+public record GetAddingTrendChartResponse
 {
     public const string DateTimeFormat = "dd:MM";
 
     public List<string> Labels { get; init; } = new ();
 
     public List<AdminChartItem> Items { get; init; } = new ();
-
-    public double SalariesPerUser { get; init; }
-
-    public int UsersWhoLeftSalary { get; init; }
-
-    public int AllUsersCount { get; init; }
 
 #pragma warning disable SA1313
     public record AdminChartItem(

@@ -2,4 +2,4 @@
 
 namespace TechInterviewer.Features.Salaries.GetAdminChart;
 
-public record GetAdminChartQuery : IRequest<AdminChartResponse>;
+public record GetAddingTrendChartQuery : IRequest<GetAddingTrendChartResponse>;
