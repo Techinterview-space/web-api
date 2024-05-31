@@ -71,11 +71,18 @@ public class SalariesController : ControllerBase
     }
 
     [HttpGet("salaries-adding-trend-chart")]
-    public async Task<GetAddingTrendChartResponse> GetAdmin(
+    public async Task<GetAddingTrendChartResponse> GetAddingTrendChart(
+        [FromQuery] GetAddingTrendChartQuery request,
         CancellationToken cancellationToken)
     {
         return await _mediator.Send(
-            new GetAddingTrendChartQuery(),
+            new GetAddingTrendChartQuery
+            {
+                Grade = request.Grade,
+                ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude)
+                    .ToList(),
+                Cities = request.Cities,
+            },
             cancellationToken);
     }
 

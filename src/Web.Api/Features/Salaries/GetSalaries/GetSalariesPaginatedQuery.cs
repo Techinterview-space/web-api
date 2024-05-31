@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TechInterviewer.Features.Salaries.GetSalaries;
 
-public record GetSalariesPaginatedQuery : PageModel, IRequest<Pageable<UserSalaryDto>>, ISalariesChartQueryParams
+public record GetSalariesPaginatedQuery
+    : PageModel, IRequest<Pageable<UserSalaryDto>>, ISalariesChartQueryParams
 {
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }
