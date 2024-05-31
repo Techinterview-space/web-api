@@ -9,18 +9,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TechInterviewer.Features.Salaries.GetAdminChart;
 
-public class GetAdminChartHandler : IRequestHandler<GetAdminChartQuery, AdminChartResponse>
+public class GetAddingTrendChartHandler
+    : IRequestHandler<GetAddingTrendChartQuery, GetAddingTrendChartResponse>
 {
     private readonly DatabaseContext _context;
 
-    public GetAdminChartHandler(
+    public GetAddingTrendChartHandler(
         DatabaseContext context)
     {
         _context = context;
     }
 
-    public async Task<AdminChartResponse> Handle(
-        GetAdminChartQuery request,
+    public async Task<GetAddingTrendChartResponse> Handle(
+        GetAddingTrendChartQuery request,
         CancellationToken cancellationToken)
     {
         var currentDay = DateTime.UtcNow.Date;
@@ -34,21 +35,13 @@ public class GetAdminChartHandler : IRequestHandler<GetAdminChartQuery, AdminCha
             .Select(x => new
             {
                 x.Id,
-                x.UserId,
                 x.CreatedAt
             })
             .AsNoTracking()
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
-        var usersWhoLeftSalaries = salaries.GroupBy(x => x.UserId).Count();
-
-        var response = new AdminChartResponse
-        {
-            SalariesPerUser = (double)salaries.Count / usersWhoLeftSalaries,
-            UsersWhoLeftSalary = usersWhoLeftSalaries,
-            AllUsersCount = usersCount,
-        };
+        var response = new GetAddingTrendChartResponse();
 
         var salariesFifteenDaysAgoAdded = salaries
             .Where(x => x.CreatedAt >= fifteenDaysAgo)
@@ -62,8 +55,8 @@ public class GetAdminChartHandler : IRequestHandler<GetAdminChartQuery, AdminCha
                 x.CreatedAt >= start &&
                 (x.CreatedAt < end || x.CreatedAt == end));
 
-            response.Items.Add(new AdminChartResponse.AdminChartItem(count, start));
-            response.Labels.Add(start.ToString(AdminChartResponse.DateTimeFormat));
+            response.Items.Add(new GetAddingTrendChartResponse.AdminChartItem(count, start));
+            response.Labels.Add(start.ToString(GetAddingTrendChartResponse.DateTimeFormat));
         }
 
         return response;

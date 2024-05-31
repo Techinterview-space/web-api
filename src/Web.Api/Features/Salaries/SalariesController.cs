@@ -71,12 +71,11 @@ public class SalariesController : ControllerBase
     }
 
     [HttpGet("salaries-adding-trend-chart")]
-    [HasAnyRole(Role.Admin)]
-    public async Task<AdminChartResponse> GetAdmin(
+    public async Task<GetAddingTrendChartResponse> GetAdmin(
         CancellationToken cancellationToken)
     {
         return await _mediator.Send(
-            new GetAdminChartQuery(),
+            new GetAddingTrendChartQuery(),
             cancellationToken);
     }
 
