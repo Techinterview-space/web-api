@@ -27,11 +27,16 @@ public class GetAddingTrendChartHandler
         var currentDay = DateTime.UtcNow.Date;
         var fifteenDaysAgo = currentDay.AddDays(-20);
 
-        var usersCount = await _context.Users
-            .AsNoTracking()
-            .CountAsync(cancellationToken);
-
         var salaries = await _context.Salaries
+            .When(request.Grade.HasValue, x => x.Grade == request.Grade)
+            .When(
+                request.ProfessionsToInclude.Count > 0,
+                x =>
+                    x.ProfessionId.HasValue &&
+                    request.ProfessionsToInclude.Contains(x.ProfessionId.Value))
+            .When(request.Cities.Count > 0, x =>
+                x.City.HasValue &&
+                request.Cities.Contains(x.City.Value))
             .Select(x => new
             {
                 x.Id,
