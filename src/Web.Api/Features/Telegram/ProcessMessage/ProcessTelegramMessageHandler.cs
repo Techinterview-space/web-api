@@ -8,6 +8,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.Telegram;
 using Domain.Extensions;
+using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
@@ -34,17 +35,21 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
     private const int CachingMinutes = 20;
 
     private readonly ILogger<ProcessTelegramMessageHandler> _logger;
+    private readonly ICurrencyService _currencyService;
     private readonly DatabaseContext _context;
     private readonly IMemoryCache _cache;
     private readonly IGlobal _global;
+    private List<CurrencyContent> _currencyContents;
 
     public ProcessTelegramMessageHandler(
         ILogger<ProcessTelegramMessageHandler> logger,
+        ICurrencyService currencyService,
         DatabaseContext context,
         IMemoryCache cache,
         IGlobal global)
     {
         _logger = logger;
+        _currencyService = currencyService;
         _context = context;
         _cache = cache;
         _global = global;
@@ -54,6 +59,13 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
+        _currencyContents = await _cache.GetOrCreateAsync(
+            CacheKey + "_AllCurrencies",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+                return await _currencyService.GetCurrencies();
+            });
         var allProfessions = await _cache.GetOrCreateAsync(
             CacheKey + "_AllProfessions",
             async entry =>
@@ -186,26 +198,50 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
                 if (juniorMedian > 0)
                 {
+                    var resStr = $"<b>{juniorMedian:N0}</b> тг.";
+                    foreach (CurrencyContent currencyContent in _currencyContents)
+                    {
+                        resStr += $" <b>{juniorMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
+                    }
+
                     replyText += @$"
-Джуны:   <b>{juniorMedian:N0}</b> тг.";
+Джуны:   {resStr}";
                 }
 
                 if (middleMedian > 0)
                 {
+                    var resStr = $"<b>{middleMedian:N0}</b> тг.";
+                    foreach (CurrencyContent currencyContent in _currencyContents)
+                    {
+                        resStr += $" <b>{middleMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
+                    }
+
                     replyText += @$"
-Миддлы:  <b>{middleMedian:N0}</b> тг.";
+Миддлы:  {resStr}";
                 }
 
                 if (seniorMedian > 0)
                 {
+                    var resStr = $"<b>{seniorMedian:N0}</b> тг.";
+                    foreach (CurrencyContent currencyContent in _currencyContents)
+                    {
+                        resStr += $" <b>{seniorMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
+                    }
+
                     replyText += @$"
-Сеньоры: <b>{seniorMedian:N0}</b> тг.";
+Сеньоры:  {resStr}";
                 }
 
                 if (leadMedian > 0)
                 {
+                    var resStr = $"<b>{leadMedian:N0}</b> тг.";
+                    foreach (CurrencyContent currencyContent in _currencyContents)
+                    {
+                        resStr += $" <b>{leadMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
+                    }
+
                     replyText += @$"
-Лиды:    <b>{leadMedian:N0}</b> тг.";
+Лиды:     {resStr}";
                 }
 
                 replyText += @$"

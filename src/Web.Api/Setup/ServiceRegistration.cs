@@ -1,6 +1,8 @@
 ﻿using AspNetCore.Aws.S3.Simple.Settings;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Currencies;
+using Infrastructure.Currencies.Contracts;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Services.Files;
@@ -31,6 +33,7 @@ public static class ServiceRegistration
         services.AddScoped<IPdf, PdfRenderer>();
         services.AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>();
         services.AddTransient<TelegramBotService>();
+        services.AddSingleton<ICurrencyService, CurrencyService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
