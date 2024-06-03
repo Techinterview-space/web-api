@@ -28,7 +28,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 {
     public const string ApplicationName = "techinterview.space/salaries";
 
-    private const string TelegramBotName = "@techinterview_salaries_bot";
     private const string CacheKey = "TelegramBotService_ReplyData";
 
     private const int CachingMinutes = 20;
@@ -48,6 +47,19 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         _context = context;
         _cache = cache;
         _global = global;
+    }
+
+    private async Task<string> GetBotUserName(ITelegramBotClient telegramBotClient)
+    {
+        var userName = await _cache.GetOrCreateAsync(
+            CacheKey + "_BotUserName",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30);
+                return (await telegramBotClient.GetMeAsync()).Username;
+            });
+
+        return $"@{userName}";
     }
 
     public async Task<Unit> Handle(
@@ -86,7 +98,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         var mentionedInGroupChat =
             message.Entities?.Length > 0 &&
             message.Entities[0].Type == MessageEntityType.Mention &&
-            messageText.StartsWith(TelegramBotName);
+            messageText.StartsWith(await GetBotUserName(request.BotClient));
 
         var privateMessage = message.Chat.Type == ChatType.Private;
         if (mentionedInGroupChat || privateMessage)
