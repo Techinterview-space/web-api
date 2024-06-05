@@ -33,7 +33,7 @@ public static class ServiceRegistration
         services.AddScoped<IPdf, PdfRenderer>();
         services.AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>();
         services.AddTransient<TelegramBotService>();
-        services.AddSingleton<ICurrencyService, CurrencyService>();
+        services.AddTransient<ICurrencyService, CurrencyService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
