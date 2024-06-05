@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
+using Domain.Attributes;
 
 namespace Domain.Extensions;
 
@@ -16,7 +18,7 @@ public static class EnumHelper
     public static TEnum ToEnum<TEnum>(
         this string value,
         TEnum defaultValue = default)
-        where TEnum : struct
+        where TEnum : struct, Enum
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -25,7 +27,7 @@ public static class EnumHelper
 
         value = value.Trim();
 
-        return Enum.TryParse<TEnum>(value, true, out TEnum result)
+        return Enum.TryParse(value, true, out TEnum result)
             ? result :
             defaultValue;
     }
@@ -64,5 +66,18 @@ public static class EnumHelper
         return genericEnum
             .AttributeOrNull<DescriptionAttribute>()?
             .Description ?? genericEnum.ToString();
+    }
+
+    public static string GetGroupName<TEnum>(this TEnum? enumValue)
+        where TEnum : struct, Enum
+    {
+        if (enumValue == null)
+        {
+            return null;
+        }
+
+        var memberInfo = typeof(TEnum).GetMember(enumValue.ToString()).FirstOrDefault();
+        var attribute = memberInfo?.GetCustomAttribute<GroupAttribute>();
+        return attribute?.GroupName;
     }
 }

@@ -197,10 +197,10 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         if (salaries.Count > 0)
         {
-            juniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Junior).Select(x => x.Value).Median();
-            middleMedian = salaries.Where(x => x.Grade == DeveloperGrade.Middle).Select(x => x.Value).Median();
-            seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
-            leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
+            juniorMedian = salaries.Where(x => x.Grade.GetGroupName() == nameof(DeveloperGrade.Junior)).Select(x => x.Value).Median();
+            middleMedian = salaries.Where(x => x.Grade.GetGroupName() == nameof(DeveloperGrade.Middle)).Select(x => x.Value).Median();
+            seniorMedian = salaries.Where(x => x.Grade.GetGroupName() == nameof(DeveloperGrade.Senior)).Select(x => x.Value).Median();
+            leadMedian = salaries.Where(x => x.Grade.GetGroupName() == nameof(DeveloperGrade.Lead)).Select(x => x.Value).Median();
         }
 
         if (salaries.Count > 0 || Debugger.IsAttached)
