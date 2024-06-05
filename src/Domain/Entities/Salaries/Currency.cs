@@ -5,4 +5,6 @@ public enum Currency
     Undefined = 0,
 
     KZT,
+    RUB,
+    USD
 }
