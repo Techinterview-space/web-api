@@ -110,7 +110,9 @@ public class TelegramBotService
         using var scope = _serviceScopeFactory.CreateScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await mediator.Send(new ProcessTelegramMessageCommand(client, updateRequest), cancellationToken);
+        await mediator.Send(
+            new ProcessTelegramMessageCommand(client, updateRequest),
+            cancellationToken);
     }
 
     private TelegramBotClient CreateClient(

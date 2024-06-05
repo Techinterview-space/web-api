@@ -39,7 +39,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
     private readonly DatabaseContext _context;
     private readonly IMemoryCache _cache;
     private readonly IGlobal _global;
-    private List<CurrencyContent> _currencyContents;
 
     public ProcessTelegramMessageHandler(
         ILogger<ProcessTelegramMessageHandler> logger,
@@ -59,13 +58,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
-        _currencyContents = await _cache.GetOrCreateAsync(
-            CacheKey + "_AllCurrencies",
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                return await _currencyService.GetCurrencies();
-            });
         var allProfessions = await _cache.GetOrCreateAsync(
             CacheKey + "_AllProfessions",
             async entry =>
@@ -77,7 +69,8 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                     .ToListAsync(cancellationToken);
             });
 
-        if (request.UpdateRequest.Type == UpdateType.InlineQuery && request.UpdateRequest.InlineQuery != null)
+        if (request.UpdateRequest.Type == UpdateType.InlineQuery &&
+            request.UpdateRequest.InlineQuery != null)
         {
             await ProcessInlineQueryAsync(
                 request.BotClient,
@@ -183,93 +176,96 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         var frontendLink = new SalariesChartPageLink(_global, requestParams);
         var professions = requestParams.GetProfessionsTitleOrNull();
 
+        var currencies = await _currencyService.GetCurrenciesAsync();
+        string replyText;
+        double juniorMedian = 0;
+        double middleMedian = 0;
+        double seniorMedian = 0;
+        double leadMedian = 0;
+
+        if (salaries.Count > 0)
+        {
+            juniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Junior).Select(x => x.Value).Median();
+            middleMedian = salaries.Where(x => x.Grade == DeveloperGrade.Middle).Select(x => x.Value).Median();
+            seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
+            leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
+        }
+
         if (salaries.Count > 0 || Debugger.IsAttached)
         {
-            string replyText;
-            if (salaries.Count > 0)
-            {
-                var juniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Junior).Select(x => x.Value).Median();
-                var middleMedian = salaries.Where(x => x.Grade == DeveloperGrade.Middle).Select(x => x.Value).Median();
-                var seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
-                var leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
-
-                replyText = @$"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:
+            replyText = @$"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:
 ";
 
-                if (juniorMedian > 0)
+            if (juniorMedian > 0)
+            {
+                var resStr = $"<b>{juniorMedian:N0}</b> тг.";
+                foreach (var currencyContent in currencies)
                 {
-                    var resStr = $"<b>{juniorMedian:N0}</b> тг.";
-                    foreach (CurrencyContent currencyContent in _currencyContents)
-                    {
-                        resStr += $" <b>{juniorMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
-                    }
-
-                    replyText += @$"
-Джуны:   {resStr}";
-                }
-
-                if (middleMedian > 0)
-                {
-                    var resStr = $"<b>{middleMedian:N0}</b> тг.";
-                    foreach (CurrencyContent currencyContent in _currencyContents)
-                    {
-                        resStr += $" <b>{middleMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
-                    }
-
-                    replyText += @$"
-Миддлы:  {resStr}";
-                }
-
-                if (seniorMedian > 0)
-                {
-                    var resStr = $"<b>{seniorMedian:N0}</b> тг.";
-                    foreach (CurrencyContent currencyContent in _currencyContents)
-                    {
-                        resStr += $" <b>{seniorMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
-                    }
-
-                    replyText += @$"
-Сеньоры:  {resStr}";
-                }
-
-                if (leadMedian > 0)
-                {
-                    var resStr = $"<b>{leadMedian:N0}</b> тг.";
-                    foreach (CurrencyContent currencyContent in _currencyContents)
-                    {
-                        resStr += $" <b>{leadMedian / currencyContent.Value:N0}</b> {currencyContent.Currency.ToString().ToLower()}.";
-                    }
-
-                    replyText += @$"
-Лиды:     {resStr}";
+                    resStr += $" (~{juniorMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
                 }
 
                 replyText += @$"
+Джуны:   {resStr}";
+            }
+
+            if (middleMedian > 0)
+            {
+                var resStr = $"<b>{middleMedian:N0}</b> тг.";
+                foreach (var currencyContent in currencies)
+                {
+                    resStr += $" (~{middleMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
+                }
+
+                replyText += @$"
+Миддлы:  {resStr}";
+            }
+
+            if (seniorMedian > 0)
+            {
+                var resStr = $"<b>{seniorMedian:N0}</b> тг.";
+                foreach (var currencyContent in currencies)
+                {
+                    resStr += $" (~{seniorMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
+                }
+
+                replyText += @$"
+Сеньоры:  {resStr}";
+            }
+
+            if (leadMedian > 0)
+            {
+                var resStr = $"<b>{leadMedian:N0}</b> тг.";
+                foreach (var currencyContent in currencies)
+                {
+                    resStr += $" (~{leadMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
+                }
+
+                replyText += @$"
+Лиды:     {resStr}";
+            }
+
+            replyText += @$"
 
 <em>Расчитано на основе {totalCount} анкет(ы)</em>
 <em>Подробно на сайте <a href=""{frontendLink}"">{ApplicationName}</a></em>";
-            }
-            else
-            {
-                replyText = professions != null
-                    ? $"Пока никто не оставил информацию о зарплатах для {professions}."
-                    : "Пока никто не оставлял информации о зарплатах.";
+        }
+        else
+        {
+            replyText = professions != null
+                ? $"Пока никто не оставил информацию о зарплатах для {professions}."
+                : "Пока никто не оставлял информации о зарплатах.";
 
-                replyText += @$"
+            replyText += @$"
 
 <em>Посмотреть зарплаты по другим специальностям можно на сайте <a href=""{frontendLink}"">{ApplicationName}</a></em>";
-            }
-
-            return new TelegramBotReplyData(
-                replyText.Trim(),
-                new InlineKeyboardMarkup(
-                    InlineKeyboardButton.WithUrl(
-                        text: ApplicationName,
-                        url: frontendLink.ToString())));
         }
 
         return new TelegramBotReplyData(
-            "Нет информации о зарплатах =(");
+            replyText.Trim(),
+            new InlineKeyboardMarkup(
+                InlineKeyboardButton.WithUrl(
+                    text: ApplicationName,
+                    url: frontendLink.ToString())));
     }
 
     private async Task ProcessInlineQueryAsync(

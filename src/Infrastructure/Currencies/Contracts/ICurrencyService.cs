@@ -2,6 +2,6 @@
 {
     public interface ICurrencyService
     {
-        Task<List<CurrencyContent>> GetCurrencies();
+        Task<List<CurrencyContent>> GetCurrenciesAsync();
     }
 }
