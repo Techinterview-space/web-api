@@ -11,13 +11,16 @@ namespace Infrastructure.Currencies
     {
         private const string CacheKey = "CurrencyService_";
 
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _cache;
 
         public CurrencyService(
+            IHttpClientFactory httpClientFactory,
             IConfiguration configuration,
             IMemoryCache cache)
         {
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _cache = cache;
         }
@@ -41,8 +44,7 @@ namespace Infrastructure.Currencies
                 throw new InvalidOperationException("Currencies url is not set");
             }
 
-            // TODO mgprabtyuk: replace with HttpClientFactory
-            using HttpClient client = new HttpClient();
+            using HttpClient client = _httpClientFactory.CreateClient();
             var xmlContent = await client.GetStringAsync(url);
             var xdoc = XDocument.Parse(xmlContent);
 
