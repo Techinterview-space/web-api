@@ -201,7 +201,11 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
             foreach (var gradeGroup in gradeGroups)
             {
-                var median = salaries.Where(x => x.Grade.GetGroupName() == gradeGroup).Select(x => x.Value).Median();
+                var median = salaries
+                                .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
+                                .Select(x => x.Value)
+                                .Median();
+
                 if (median > 0)
                 {
                     var resStr = $"<b>{median:N0}</b> тг.";

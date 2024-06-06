@@ -69,7 +69,7 @@ public static class EnumHelper
             .Description ?? genericEnum.ToString();
     }
 
-    public static GradeGroup? GetGroupName<TEnum>(this TEnum? enumValue)
+    public static GradeGroup? GetGroupNameOrNull<TEnum>(this TEnum? enumValue)
         where TEnum : struct, Enum
     {
         if (enumValue == null)
