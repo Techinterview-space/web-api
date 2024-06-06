@@ -1,13 +1,14 @@
 ﻿using System;
+using Domain.Entities.Enums;
 
 namespace Domain.Attributes
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class GroupAttribute : Attribute
     {
-        public string GroupName { get; }
+        public GradeGroup GroupName { get; }
 
-        public GroupAttribute(string groupName)
+        public GroupAttribute(GradeGroup groupName)
         {
             GroupName = groupName;
         }

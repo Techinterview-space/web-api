@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Domain.Attributes;
+using Domain.Entities.Enums;
 
 namespace Domain.Extensions;
 
@@ -68,7 +69,7 @@ public static class EnumHelper
             .Description ?? genericEnum.ToString();
     }
 
-    public static string GetGroupName<TEnum>(this TEnum? enumValue)
+    public static GradeGroup? GetGroupName<TEnum>(this TEnum? enumValue)
         where TEnum : struct, Enum
     {
         if (enumValue == null)
@@ -79,5 +80,18 @@ public static class EnumHelper
         var memberInfo = typeof(TEnum).GetMember(enumValue.ToString()).FirstOrDefault();
         var attribute = memberInfo?.GetCustomAttribute<GroupAttribute>();
         return attribute?.GroupName;
+    }
+
+    public static string ToCustomString(this GradeGroup enumValue)
+    {
+        return enumValue switch
+        {
+            GradeGroup.Trainee => "Стажеры",
+            GradeGroup.Junior => "Джуны",
+            GradeGroup.Middle => "Миддлы",
+            GradeGroup.Senior => "Сеньоры",
+            GradeGroup.Lead => "Лиды",
+            _ => throw new ArgumentException($"No string mapping found for enum value {enumValue}")
+        };
     }
 }
