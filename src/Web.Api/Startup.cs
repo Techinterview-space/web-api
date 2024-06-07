@@ -46,6 +46,7 @@ public class Startup
             connectionString: _configuration.GetConnectionString("Elasticsearch"),
             environmentName: _environment.EnvironmentName).Setup();
 
+        services.AddHttpClient();
         services.AddControllersWithViews();
         services.AddRazorPages();
 

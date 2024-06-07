@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.Validation;
+using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Services.Files;
 using Microsoft.AspNetCore.Mvc;
@@ -17,18 +19,25 @@ namespace TechInterviewer.Features.Admin;
 [HasAnyRole(Role.Admin)]
 public class AdminToolsController : ControllerBase
 {
-    private readonly DatabaseContext _context;
     private readonly IPdf _pdf;
     private readonly IConfiguration _configuration;
+    private readonly ICurrencyService _currencyService;
 
     public AdminToolsController(
-        DatabaseContext context,
         IPdf pdf,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ICurrencyService currencyService)
     {
-        _context = context;
         _pdf = pdf;
         _configuration = configuration;
+        _currencyService = currencyService;
+    }
+
+    [HttpGet("currencies")]
+    public async Task<List<CurrencyContent>> GetCurrenciesAsync(
+        CancellationToken cancellationToken)
+    {
+        return await _currencyService.GetAllCurrenciesAsync(cancellationToken);
     }
 
     [HttpPost("generate-from-html")]

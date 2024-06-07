@@ -2,21 +2,27 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using Domain.Attributes;
+using Domain.Enums;
 
 namespace Domain.Extensions;
 
 public static class EnumHelper
 {
-    public static IEnumerable<T> Values<T>()
+    public static List<T> Values<T>(
+        bool excludeDefault = false)
         where T : struct
     {
-        return Enum.GetValues(typeof(T)).Cast<T>();
+        return Enum.GetValues(typeof(T))
+            .Cast<T>()
+            .When(excludeDefault, x => !x.Equals(default(T)))
+            .ToList();
     }
 
     public static TEnum ToEnum<TEnum>(
         this string value,
         TEnum defaultValue = default)
-        where TEnum : struct
+        where TEnum : struct, Enum
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -25,7 +31,7 @@ public static class EnumHelper
 
         value = value.Trim();
 
-        return Enum.TryParse<TEnum>(value, true, out TEnum result)
+        return Enum.TryParse(value, true, out TEnum result)
             ? result :
             defaultValue;
     }
@@ -64,5 +70,26 @@ public static class EnumHelper
         return genericEnum
             .AttributeOrNull<DescriptionAttribute>()?
             .Description ?? genericEnum.ToString();
+    }
+
+    public static GradeGroup? GetGroupNameOrNull<TEnum>(
+        this TEnum? enumValue)
+        where TEnum : struct, Enum
+    {
+        var attribute = enumValue?.AttributeOrNull<GroupAttribute>();
+        return attribute?.GroupName;
+    }
+
+    public static string ToCustomString(this GradeGroup enumValue)
+    {
+        return enumValue switch
+        {
+            GradeGroup.Trainee => "Стажеры",
+            GradeGroup.Junior => "Джуны",
+            GradeGroup.Middle => "Миддлы",
+            GradeGroup.Senior => "Сеньоры",
+            GradeGroup.Lead => "Лиды",
+            _ => throw new ArgumentException($"No string mapping found for enum value {enumValue}")
+        };
     }
 }

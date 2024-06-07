@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.Telegram;
+using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
@@ -29,7 +28,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 {
     public const string ApplicationName = "techinterview.space/salaries";
 
-    private const string TelegramBotName = "@techinterview_salaries_bot";
     private const string CacheKey = "TelegramBotService_ReplyData";
 
     private const int CachingMinutes = 20;
@@ -52,6 +50,18 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         _context = context;
         _cache = cache;
         _global = global;
+    }
+
+    private async Task<User> GetBotUserName(
+        ITelegramBotClient telegramBotClient)
+    {
+        return await _cache.GetOrCreateAsync(
+            CacheKey + "_BotUserName",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30);
+                return await telegramBotClient.GetMeAsync();
+            });
     }
 
     public async Task<Unit> Handle(
@@ -88,10 +98,13 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         var message = request.UpdateRequest.Message;
         var messageText = message.Text ?? string.Empty;
+
+        var botUser = await GetBotUserName(request.BotClient);
         var mentionedInGroupChat =
             message.Entities?.Length > 0 &&
             message.Entities[0].Type == MessageEntityType.Mention &&
-            messageText.StartsWith(TelegramBotName);
+            botUser.Username != null &&
+            messageText.StartsWith(botUser.Username);
 
         var privateMessage = message.Chat.Type == ChatType.Private;
         if (mentionedInGroupChat || privateMessage)
@@ -176,78 +189,40 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         var frontendLink = new SalariesChartPageLink(_global, requestParams);
         var professions = requestParams.GetProfessionsTitleOrNull();
 
-        var currencies = await _currencyService.GetCurrenciesAsync();
         string replyText;
-        double juniorMedian = 0;
-        double middleMedian = 0;
-        double seniorMedian = 0;
-        double leadMedian = 0;
-
         if (salaries.Count > 0)
         {
-            juniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Junior).Select(x => x.Value).Median();
-            middleMedian = salaries.Where(x => x.Grade == DeveloperGrade.Middle).Select(x => x.Value).Median();
-            seniorMedian = salaries.Where(x => x.Grade == DeveloperGrade.Senior).Select(x => x.Value).Median();
-            leadMedian = salaries.Where(x => x.Grade == DeveloperGrade.Lead).Select(x => x.Value).Median();
-        }
+            var currencies = await _currencyService.GetCurrenciesAsync(
+                [Currency.USD],
+                cancellationToken);
 
-        if (salaries.Count > 0 || Debugger.IsAttached)
-        {
-            replyText = @$"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:
-";
+            var gradeGroups = EnumHelper
+                     .Values<GradeGroup>()
+                     .Where(x => x is not(GradeGroup.Undefined or GradeGroup.Trainee));
 
-            if (juniorMedian > 0)
+            replyText = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
+
+            foreach (var gradeGroup in gradeGroups)
             {
-                var resStr = $"<b>{juniorMedian:N0}</b> тг.";
-                foreach (var currencyContent in currencies)
-                {
-                    resStr += $" (~{juniorMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
-                }
+                var median = salaries
+                                .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
+                                .Select(x => x.Value)
+                                .Median();
 
-                replyText += @$"
-Джуны:   {resStr}";
+                if (median > 0)
+                {
+                    var resStr = $"<b>{median:N0}</b> тг.";
+                    foreach (var currencyContent in currencies)
+                    {
+                        resStr += $" (~{median / currencyContent.Value:N0}{currencyContent.CurrencyString})";
+                    }
+
+                    replyText += $"\n{gradeGroup.ToCustomString()}: {resStr}";
+                }
             }
 
-            if (middleMedian > 0)
-            {
-                var resStr = $"<b>{middleMedian:N0}</b> тг.";
-                foreach (var currencyContent in currencies)
-                {
-                    resStr += $" (~{middleMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
-                }
-
-                replyText += @$"
-Миддлы:  {resStr}";
-            }
-
-            if (seniorMedian > 0)
-            {
-                var resStr = $"<b>{seniorMedian:N0}</b> тг.";
-                foreach (var currencyContent in currencies)
-                {
-                    resStr += $" (~{seniorMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
-                }
-
-                replyText += @$"
-Сеньоры:  {resStr}";
-            }
-
-            if (leadMedian > 0)
-            {
-                var resStr = $"<b>{leadMedian:N0}</b> тг.";
-                foreach (var currencyContent in currencies)
-                {
-                    resStr += $" (~{leadMedian / currencyContent.Value:N0}{currencyContent.CurrencyString})";
-                }
-
-                replyText += @$"
-Лиды:     {resStr}";
-            }
-
-            replyText += @$"
-
-<em>Расчитано на основе {totalCount} анкет(ы)</em>
-<em>Подробно на сайте <a href=""{frontendLink}"">{ApplicationName}</a></em>";
+            replyText += $"<em>\n\nРасчитано на основе {totalCount} анкет(ы)</em>" +
+                $"\n<em>Подробно на сайте <a href=\"{frontendLink}\">{ApplicationName}</a></em>";
         }
         else
         {
@@ -255,9 +230,8 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 ? $"Пока никто не оставил информацию о зарплатах для {professions}."
                 : "Пока никто не оставлял информации о зарплатах.";
 
-            replyText += @$"
-
-<em>Посмотреть зарплаты по другим специальностям можно на сайте <a href=""{frontendLink}"">{ApplicationName}</a></em>";
+            replyText += $"\n\n<em>Посмотреть зарплаты по другим специальностям можно " +
+                $"на сайте <a href=\"{frontendLink}\">{ApplicationName}</a></em>";
         }
 
         return new TelegramBotReplyData(
