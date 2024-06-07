@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using Domain.Attributes;
-using Domain.Entities.Enums;
 using Domain.Enums;
 
 namespace Domain.Extensions;
 
 public static class EnumHelper
 {
-    public static IEnumerable<T> Values<T>()
+    public static List<T> Values<T>(
+        bool excludeDefault = false)
         where T : struct
     {
-        return Enum.GetValues(typeof(T)).Cast<T>();
+        return Enum.GetValues(typeof(T))
+            .Cast<T>()
+            .When(excludeDefault, x => !x.Equals(default(T)))
+            .ToList();
     }
 
     public static TEnum ToEnum<TEnum>(

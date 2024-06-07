@@ -10,6 +10,16 @@ namespace Domain.Extensions;
 
 public static class CollectionExtensions
 {
+    public static IEnumerable<T> When<T>(
+        this IEnumerable<T> query,
+        bool condition,
+        Func<T, bool> whereExpression)
+    {
+        return condition
+            ? query.Where(whereExpression)
+            : query;
+    }
+
     public static T ByIdOrFail<T>(this IEnumerable<T> query, long id)
         where T : class, IHasId
     {

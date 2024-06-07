@@ -192,7 +192,9 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         string replyText;
         if (salaries.Count > 0)
         {
-            var currencies = await _currencyService.GetCurrenciesAsync(cancellationToken);
+            var currencies = await _currencyService.GetCurrenciesAsync(
+                [Currency.USD],
+                cancellationToken);
 
             var gradeGroups = EnumHelper
                      .Values<GradeGroup>()

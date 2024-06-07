@@ -26,6 +26,28 @@ namespace Infrastructure.Currencies
         }
 
         public async Task<List<CurrencyContent>> GetCurrenciesAsync(
+            List<Currency> currenciesToGet,
+            CancellationToken cancellationToken)
+        {
+            if (currenciesToGet == null || !currenciesToGet.Any())
+            {
+                return new List<CurrencyContent>();
+            }
+
+            var currencies = await _cache.GetOrCreateAsync(
+                CacheKey + "_AllCurrencies",
+                async entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+                    return await GetCurrenciesInternalAsync(cancellationToken);
+                });
+
+            return currencies
+                .Where(x => currenciesToGet.Contains(x.Currency))
+                .ToList();
+        }
+
+        public async Task<List<CurrencyContent>> GetAllCurrenciesAsync(
             CancellationToken cancellationToken)
         {
             return await _cache.GetOrCreateAsync(
@@ -50,9 +72,10 @@ namespace Infrastructure.Currencies
             var xmlContent = await client.GetStringAsync(url, cancellationToken);
             var xdoc = XDocument.Parse(xmlContent);
 
+            var currenciesToSave = EnumHelper.Values<Currency>(true);
             var items = xdoc.Descendants("item")
                 .Select(x => new CurrencyContent(x))
-                .Where(x => x.Currency is Currency.USD)
+                .Where(x => currenciesToSave.Contains(x.Currency))
                 .ToList();
 
             return items;
