@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.Telegram;
+using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
@@ -53,17 +52,16 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         _global = global;
     }
 
-    private async Task<string> GetBotUserName(ITelegramBotClient telegramBotClient)
+    private async Task<User> GetBotUserName(
+        ITelegramBotClient telegramBotClient)
     {
-        var userName = await _cache.GetOrCreateAsync(
+        return await _cache.GetOrCreateAsync(
             CacheKey + "_BotUserName",
             async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30);
-                return (await telegramBotClient.GetMeAsync()).Username;
+                return await telegramBotClient.GetMeAsync();
             });
-
-        return $"@{userName}";
     }
 
     public async Task<Unit> Handle(
@@ -100,10 +98,13 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         var message = request.UpdateRequest.Message;
         var messageText = message.Text ?? string.Empty;
+
+        var botUser = await GetBotUserName(request.BotClient);
         var mentionedInGroupChat =
             message.Entities?.Length > 0 &&
             message.Entities[0].Type == MessageEntityType.Mention &&
-            messageText.StartsWith(await GetBotUserName(request.BotClient));
+            botUser.Username != null &&
+            messageText.StartsWith(botUser.Username);
 
         var privateMessage = message.Chat.Type == ChatType.Private;
         if (mentionedInGroupChat || privateMessage)
@@ -191,11 +192,11 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         string replyText;
         if (salaries.Count > 0)
         {
-            var currencies = await _currencyService.GetCurrenciesAsync();
+            var currencies = await _currencyService.GetCurrenciesAsync(cancellationToken);
 
             var gradeGroups = EnumHelper
                      .Values<GradeGroup>()
-                     .Where(x => x != GradeGroup.Undefined);
+                     .Where(x => x is not(GradeGroup.Undefined or GradeGroup.Trainee));
 
             replyText = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
 
@@ -214,7 +215,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                         resStr += $" (~{median / currencyContent.Value:N0}{currencyContent.CurrencyString})";
                     }
 
-                    replyText += $"\n{gradeGroup.ToCustomString()}:   {resStr}";
+                    replyText += $"\n{gradeGroup.ToCustomString()}: {resStr}";
                 }
             }
 

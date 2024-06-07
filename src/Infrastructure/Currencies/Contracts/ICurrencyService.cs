@@ -2,6 +2,7 @@
 {
     public interface ICurrencyService
     {
-        Task<List<CurrencyContent>> GetCurrenciesAsync();
+        Task<List<CurrencyContent>> GetCurrenciesAsync(
+            CancellationToken cancellationToken);
     }
 }

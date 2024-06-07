@@ -1,5 +1,6 @@
 ﻿using System;
 using Domain.Entities.Enums;
+using Domain.Enums;
 
 namespace Domain.Attributes
 {

@@ -25,18 +25,20 @@ namespace Infrastructure.Currencies
             _cache = cache;
         }
 
-        public async Task<List<CurrencyContent>> GetCurrenciesAsync()
+        public async Task<List<CurrencyContent>> GetCurrenciesAsync(
+            CancellationToken cancellationToken)
         {
             return await _cache.GetOrCreateAsync(
                 CacheKey + "_AllCurrencies",
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                    return await GetCurrenciesInternalAsync();
+                    return await GetCurrenciesInternalAsync(cancellationToken);
                 });
         }
 
-        private async Task<List<CurrencyContent>> GetCurrenciesInternalAsync()
+        private async Task<List<CurrencyContent>> GetCurrenciesInternalAsync(
+            CancellationToken cancellationToken)
         {
             var url = _configuration["Currencies:Url"];
             if (string.IsNullOrEmpty(url))
@@ -44,8 +46,8 @@ namespace Infrastructure.Currencies
                 throw new InvalidOperationException("Currencies url is not set");
             }
 
-            using HttpClient client = _httpClientFactory.CreateClient();
-            var xmlContent = await client.GetStringAsync(url);
+            using var client = _httpClientFactory.CreateClient();
+            var xmlContent = await client.GetStringAsync(url, cancellationToken);
             var xdoc = XDocument.Parse(xmlContent);
 
             var items = xdoc.Descendants("item")

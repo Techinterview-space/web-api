@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Enums;
+﻿namespace Domain.Enums;
 
 public enum GradeGroup
 {

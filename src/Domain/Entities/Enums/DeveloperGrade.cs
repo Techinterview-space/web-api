@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Domain.Attributes;
+using Domain.Enums;
 
 namespace Domain.Entities.Enums;
 

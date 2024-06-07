@@ -7,9 +7,10 @@ using Moq.Protected;
 
 namespace InfrastructureTests.Mocks
 {
-    public static class HttpClientFactoryMock
+    public class HttpClientFactoryMock : Mock<IHttpClientFactory>
     {
-        public static Mock<IHttpClientFactory> SetupHttpClientFactoryMock(string respData)
+        public HttpClientFactoryMock(
+            string respData)
         {
             var mockHandler = new Mock<HttpMessageHandler>();
             mockHandler
@@ -26,12 +27,8 @@ namespace InfrastructureTests.Mocks
 
             var httpClient = new HttpClient(mockHandler.Object);
 
-            var mockHttpClientFactory = new Mock<IHttpClientFactory>();
-            mockHttpClientFactory
-                .Setup(factory => factory.CreateClient(It.IsAny<string>()))
+            Setup(factory => factory.CreateClient(It.IsAny<string>()))
                 .Returns(httpClient);
-
-            return mockHttpClientFactory;
         }
     }
 }

@@ -14,16 +14,17 @@ namespace InfrastructureTests.Services
     public class CurrencyServiceTests
     {
         [Fact]
-        public async Task GetCurrenciesAsync__OkAsync()
+        public async Task GetCurrenciesAsync_HasValidResposneBody_OkAsync()
         {
             // Arrange
-            Dictionary<string, string> configDic = new Dictionary<string, string>()
+            var configDic = new Dictionary<string, string>
             {
                 { "Currencies:Url", "https://currencies.com/rates_all.xml" },
             };
+
             var memoryConfig = new InMemoryConfig(configDic);
             var mockedCache = Create.MockedMemoryCache();
-            var mockHttpClientFactory = HttpClientFactoryMock.SetupHttpClientFactoryMock(FakeXml.CurrenciesXml);
+            var mockHttpClientFactory = new HttpClientFactoryMock(FakeXml.CurrenciesXml);
 
             var currencyService = new CurrencyService(
                 mockHttpClientFactory.Object,
@@ -31,7 +32,7 @@ namespace InfrastructureTests.Services
                 mockedCache);
 
             // Act
-            var currencies = await currencyService.GetCurrenciesAsync();
+            var currencies = await currencyService.GetCurrenciesAsync(default);
 
             // Assert
             Assert.Single(currencies);

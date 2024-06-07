@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Domain.Attributes;
 using Domain.Entities.Enums;
+using Domain.Enums;
 
 namespace Domain.Extensions;
 
@@ -69,16 +70,11 @@ public static class EnumHelper
             .Description ?? genericEnum.ToString();
     }
 
-    public static GradeGroup? GetGroupNameOrNull<TEnum>(this TEnum? enumValue)
+    public static GradeGroup? GetGroupNameOrNull<TEnum>(
+        this TEnum? enumValue)
         where TEnum : struct, Enum
     {
-        if (enumValue == null)
-        {
-            return null;
-        }
-
-        var memberInfo = typeof(TEnum).GetMember(enumValue.ToString()).FirstOrDefault();
-        var attribute = memberInfo?.GetCustomAttribute<GroupAttribute>();
+        var attribute = enumValue?.AttributeOrNull<GroupAttribute>();
         return attribute?.GroupName;
     }
 
