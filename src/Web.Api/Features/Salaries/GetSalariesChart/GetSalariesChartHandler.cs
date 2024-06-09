@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
@@ -28,13 +29,16 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
 
         private readonly IAuthorization _auth;
         private readonly DatabaseContext _context;
+        private readonly ICurrencyService _currencyService;
 
         public GetSalariesChartHandler(
             IAuthorization auth,
-            DatabaseContext context)
+            DatabaseContext context,
+            ICurrencyService currencyService)
         {
             _auth = auth;
             _context = context;
+            _currencyService = currencyService;
         }
 
         public async Task<SalariesChartResponse> Handle(
@@ -82,13 +86,16 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
             var hasSurveyRecentReply = await new SalariesSurveyUserService(_context)
                 .HasFilledSurveyAsync(currentUser, cancellationToken);
 
+            var currencies = await _currencyService.GetAllCurrenciesAsync(cancellationToken);
+
             return new SalariesChartResponse(
                 salaries,
                 new UserSalaryAdminDto(userSalariesForLastYear.First()),
                 hasSurveyRecentReply,
                 salariesQuery.SalaryAddedEdge,
                 DateTimeOffset.Now,
-                salaries.Count);
+                salaries.Count,
+                currencies);
         }
 
         public Task<SalariesChartResponse> Handle(

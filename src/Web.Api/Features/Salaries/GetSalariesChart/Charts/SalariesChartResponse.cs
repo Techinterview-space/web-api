@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
+using Infrastructure.Currencies.Contracts;
 using Infrastructure.Salaries;
 using TechInterviewer.Features.Salaries.Models;
 
@@ -16,7 +17,8 @@ public record SalariesChartResponse
         bool hasSurveyRecentReply,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
-        int totalCountInStats)
+        int totalCountInStats,
+        List<CurrencyContent> currencies)
         : this(
             salaries,
             currentUserSalary,
@@ -25,7 +27,8 @@ public record SalariesChartResponse
             rangeStart,
             rangeEnd,
             totalCountInStats,
-            true)
+            true,
+            currencies)
     {
     }
 
@@ -37,9 +40,12 @@ public record SalariesChartResponse
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
         int totalCountInStats,
-        bool hasAuthentication)
+        bool hasAuthentication,
+        List<CurrencyContent> currencies)
     {
         Salaries = salaries;
+        Currencies = currencies;
+
         CurrentUserSalary = currentUserSalary;
         HasRecentSurveyReply = hasSurveyRecentReply;
         ShouldAddOwnSalary = shouldAddOwnSalary;
@@ -128,7 +134,8 @@ public record SalariesChartResponse
             null,
             null,
             salariesCount,
-            hasAuthentication)
+            hasAuthentication,
+            new List<CurrencyContent>(0))
         {
             AverageSalary = local.Count > 0 ? local.Average() : 0,
             MedianSalary = local.Count > 0 ? local.Median() : 0,
@@ -141,6 +148,8 @@ public record SalariesChartResponse
     }
 
     public List<UserSalaryDto> Salaries { get; }
+
+    public List<CurrencyContent> Currencies { get; }
 
     public int TotalCountInStats { get; }
 

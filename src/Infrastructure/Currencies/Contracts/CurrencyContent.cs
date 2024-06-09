@@ -21,18 +21,27 @@ namespace Infrastructure.Currencies.Contracts
             string value,
             string currency,
             string pubDate)
+            : this(
+                !string.IsNullOrEmpty(value) ?
+                    double.Parse(value, CultureInfo.InvariantCulture) :
+                    throw new ArgumentException(value, nameof(Value)),
+                !string.IsNullOrEmpty(currency) ?
+                    currency.ToEnum<Currency>() :
+                    throw new ArgumentException(currency, nameof(currency)),
+                !string.IsNullOrEmpty(pubDate) ?
+                    DateTime.ParseExact(pubDate, "dd.MM.yyyy", CultureInfo.InvariantCulture) :
+                    throw new ArgumentException(pubDate, nameof(PubDate)))
         {
-            Value = !string.IsNullOrEmpty(value) ?
-                        double.Parse(value, CultureInfo.InvariantCulture) :
-                        throw new ArgumentException(value, nameof(Value));
+        }
 
-            Currency = !string.IsNullOrEmpty(currency) ?
-                        currency.ToEnum<Currency>() :
-                        throw new ArgumentException(currency, nameof(currency));
-
-            PubDate = !string.IsNullOrEmpty(pubDate) ?
-                        DateTime.ParseExact(pubDate, "dd.MM.yyyy", CultureInfo.InvariantCulture) :
-                        throw new ArgumentException(pubDate, nameof(PubDate));
+        public CurrencyContent(
+            double value,
+            Currency currency,
+            DateTime pubDate)
+        {
+            Value = value;
+            Currency = currency;
+            PubDate = pubDate;
         }
 
         public double Value { get; }

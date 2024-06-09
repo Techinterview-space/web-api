@@ -8,6 +8,7 @@ using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Tests.Mocks;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Salaries.GetSalariesChart;
@@ -76,7 +77,8 @@ public class GetSalariesChartHandlerTests
 
         var salariesResponse = await new GetSalariesChartHandler(
                 new FakeAuth(null),
-                context)
+                context,
+                new CurrenciesServiceFake())
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
@@ -86,6 +88,7 @@ public class GetSalariesChartHandlerTests
         Assert.Equal(675_000, salariesResponse.MedianSalary);
 
         Assert.Null(salariesResponse.SalariesByMoneyBarChart);
+        Assert.Empty(salariesResponse.Currencies);
     }
 
     [Fact]
@@ -150,7 +153,8 @@ public class GetSalariesChartHandlerTests
 
         var salariesResponse = await new GetSalariesChartHandler(
                 new FakeAuth(user1),
-                context)
+                context,
+                new CurrenciesServiceFake())
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
@@ -173,6 +177,8 @@ public class GetSalariesChartHandlerTests
         Assert.Equal(
             (long)UserProfessionEnum.Developer,
             salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[2].ProfessionId);
+
+        Assert.Equal(3, salariesResponse.Currencies.Count);
     }
 
     [Fact]
@@ -222,12 +228,14 @@ public class GetSalariesChartHandlerTests
 
         var salariesResponse = await new GetSalariesChartHandler(
                 new FakeAuth(user1),
-                context)
+                context,
+                new CurrenciesServiceFake())
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
         Assert.Equal(4, salariesResponse.Salaries.Count);
         Assert.Equal(salary4.Value, salariesResponse.CurrentUserSalary.Value);
+        Assert.Equal(3, salariesResponse.Currencies.Count);
     }
 
     [Fact]
@@ -256,10 +264,12 @@ public class GetSalariesChartHandlerTests
 
         var salariesResponse = await new GetSalariesChartHandler(
                 new FakeAuth(user2),
-                context)
+                context,
+                new CurrenciesServiceFake())
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
         Assert.Empty(salariesResponse.Salaries);
+        Assert.Empty(salariesResponse.Currencies);
     }
 }
