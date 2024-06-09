@@ -69,7 +69,6 @@ namespace InfrastructureTests.Services
             // Assert
             var existingCurrencies = EnumHelper
                 .Values<Currency>(true)
-                .Where(x => x is not Currency.KZT)
                 .ToList();
 
             Assert.NotEmpty(existingCurrencies);

@@ -78,6 +78,16 @@ namespace Infrastructure.Currencies
                 .Where(x => currenciesToSave.Contains(x.Currency))
                 .ToList();
 
+            if (items.All(x => x.Currency is not Currency.KZT))
+            {
+                items.Insert(
+                    0,
+                    new CurrencyContent(
+                        1,
+                        Currency.KZT,
+                        DateTime.Today));
+            }
+
             return items;
         }
     }
