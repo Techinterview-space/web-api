@@ -89,12 +89,12 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 request.UpdateRequest,
                 cancellationToken);
 
-            return string.Empty;
+            return null;
         }
 
         if (request.UpdateRequest.Message == null)
         {
-            return string.Empty;
+            return null;
         }
 
         var message = request.UpdateRequest.Message;
@@ -167,7 +167,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             }
         }
 
-        return replyData.ReplyText;
+        return replyData?.ReplyText;
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
