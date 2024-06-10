@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TechInterviewer.Features.Telegram.ProcessMessage;
 
-public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, Unit>
+public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, string>
 {
     public const string ApplicationName = "techinterview.space/salaries";
 
@@ -64,7 +65,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             });
     }
 
-    public async Task<Unit> Handle(
+    public async Task<string> Handle(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
@@ -88,12 +89,12 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 request.UpdateRequest,
                 cancellationToken);
 
-            return Unit.Value;
+            return string.Empty;
         }
 
         if (request.UpdateRequest.Message == null)
         {
-            return Unit.Value;
+            return string.Empty;
         }
 
         var message = request.UpdateRequest.Message;
@@ -107,6 +108,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             messageText.StartsWith(botUser.Username);
 
         var privateMessage = message.Chat.Type == ChatType.Private;
+        TelegramBotReplyData replyData = null;
         if (mentionedInGroupChat || privateMessage)
         {
             if (privateMessage && messageText.Equals("/start", StringComparison.InvariantCultureIgnoreCase))
@@ -119,14 +121,14 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                     replyMarkup: startReplyData.InlineKeyboardMarkup,
                     cancellationToken: cancellationToken);
 
-                return Unit.Value;
+                return startReplyData.ReplyText;
             }
 
             var parameters = TelegramBotUserCommandParameters.CreateFromMessage(
                 messageText,
                 allProfessions);
 
-            var replyData = await _cache.GetOrCreateAsync(
+            replyData = await _cache.GetOrCreateAsync(
                 CacheKey + "_" + parameters.GetKeyPostfix(),
                 async entry =>
                 {
@@ -165,7 +167,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             }
         }
 
-        return Unit.Value;
+        return replyData.ReplyText;
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
@@ -211,10 +213,10 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
                 if (median > 0)
                 {
-                    var resStr = $"<b>{median:N0}</b> тг.";
+                    var resStr = $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг.";
                     foreach (var currencyContent in currencies)
                     {
-                        resStr += $" (~{median / currencyContent.Value:N0}{currencyContent.CurrencyString})";
+                        resStr += $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
                     }
 
                     replyText += $"\n{gradeGroup.ToCustomString()}: {resStr}";
