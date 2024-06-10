@@ -223,7 +223,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 }
             }
 
-            replyText += $"<em>\n\nРасчитано на основе {totalCount} анкет(ы)</em>" +
+            replyText += $"<em>\n\nРассчитано на основе {totalCount} анкет(ы)</em>" +
                 $"\n<em>Подробно на сайте <a href=\"{frontendLink}\">{ApplicationName}</a></em>";
         }
         else
