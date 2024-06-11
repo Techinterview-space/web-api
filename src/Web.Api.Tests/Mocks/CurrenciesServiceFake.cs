@@ -52,4 +52,10 @@ public class CurrenciesServiceFake : ICurrencyService
     {
         return Task.FromResult(_currencies);
     }
+
+    public Task ResetCacheAsync(
+        CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 }

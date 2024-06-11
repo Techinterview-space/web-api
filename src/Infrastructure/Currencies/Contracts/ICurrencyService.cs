@@ -10,5 +10,8 @@ namespace Infrastructure.Currencies.Contracts
 
         Task<List<CurrencyContent>> GetAllCurrenciesAsync(
             CancellationToken cancellationToken);
+
+        Task ResetCacheAsync(
+            CancellationToken cancellationToken);
     }
 }

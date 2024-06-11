@@ -9,7 +9,7 @@ namespace Infrastructure.Currencies
 {
     public class CurrencyService : ICurrencyService
     {
-        private const string CacheKey = "CurrencyService_";
+        private const string CacheKey = "CurrencyService__AllCurrencies";
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
@@ -35,7 +35,7 @@ namespace Infrastructure.Currencies
             }
 
             var currencies = await _cache.GetOrCreateAsync(
-                CacheKey + "_AllCurrencies",
+                CacheKey,
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
@@ -51,12 +51,19 @@ namespace Infrastructure.Currencies
             CancellationToken cancellationToken)
         {
             return await _cache.GetOrCreateAsync(
-                CacheKey + "_AllCurrencies",
+                CacheKey,
                 async entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
                     return await GetCurrenciesInternalAsync(cancellationToken);
                 });
+        }
+
+        public async Task ResetCacheAsync(
+            CancellationToken cancellationToken)
+        {
+            _cache.Remove(CacheKey);
+            await GetAllCurrenciesAsync(cancellationToken);
         }
 
         private async Task<List<CurrencyContent>> GetCurrenciesInternalAsync(

@@ -1,6 +1,7 @@
 ﻿using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using TechInterviewer.Features.BackgroundJobs;
 
 namespace TechInterviewer.Setup;
 
@@ -16,7 +17,8 @@ public static class ScheduleConfig
         this IServiceCollection services)
     {
         services
-            .AddScheduler();
+            .AddScheduler()
+            .AddTransient<CurrenciesResetJob>();
 
         return services;
     }
@@ -25,6 +27,9 @@ public static class ScheduleConfig
     {
         app.ApplicationServices.UseScheduler((scheduler) =>
         {
+            scheduler
+                .Schedule<CurrenciesResetJob>()
+                .DailyAt(6, 0);
         });
     }
 }
