@@ -80,12 +80,13 @@ namespace Infrastructure.Currencies
 
             if (items.All(x => x.Currency is not Currency.KZT))
             {
+                var pubDate = items.FirstOrDefault()?.PubDate ?? DateTime.UtcNow;
                 items.Insert(
                     0,
                     new CurrencyContent(
                         1,
                         Currency.KZT,
-                        DateTime.Today));
+                        pubDate));
             }
 
             return items;
