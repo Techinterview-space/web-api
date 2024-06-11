@@ -29,7 +29,8 @@ public static class ScheduleConfig
         {
             scheduler
                 .Schedule<CurrenciesResetJob>()
-                .DailyAt(6, 0);
+                .DailyAt(6, 0)
+                .RunOnceAtStart();
         });
     }
 }

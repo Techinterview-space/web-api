@@ -62,7 +62,11 @@ namespace Infrastructure.Currencies
         public async Task ResetCacheAsync(
             CancellationToken cancellationToken)
         {
-            _cache.Remove(CacheKey);
+            if (_cache.TryGetValue(CacheKey, out _))
+            {
+                _cache.Remove(CacheKey);
+            }
+
             await GetAllCurrenciesAsync(cancellationToken);
         }
 
