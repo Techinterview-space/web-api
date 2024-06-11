@@ -19,6 +19,12 @@ public class SalaryLabelsProviderFake : ISalaryLabelsProvider
         _context = context;
     }
 
+    public Task ResetCacheAsync(
+        CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
     public async Task<SelectBoxItemsResponse> GetAsync(
         CancellationToken cancellationToken)
     {

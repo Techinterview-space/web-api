@@ -53,7 +53,7 @@ public class UserLabelsController : ControllerBase
 
         var titleUpper = createRequest.Title.ToUpperInvariant();
         if (await _context.UserLabels.AnyAsync(x =>
-                x.CreatedById == currentUser.Id && x.Title.ToUpperInvariant() == titleUpper))
+                x.CreatedById == currentUser.Id && x.Title.ToUpper() == titleUpper))
         {
             throw new BadRequestException("Label with this title already exists");
         }

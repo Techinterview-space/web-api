@@ -6,6 +6,9 @@ namespace TechInterviewer.Features.Salaries.Providers;
 
 public interface ISalaryLabelsProvider
 {
+    Task ResetCacheAsync(
+        CancellationToken cancellationToken);
+
     Task<SelectBoxItemsResponse> GetAsync(
         CancellationToken cancellationToken);
 }

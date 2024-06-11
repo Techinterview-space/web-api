@@ -11,6 +11,7 @@ using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TechInterviewer.Features.Labels.Models;
+using TechInterviewer.Features.Salaries.Providers;
 using TechInterviewer.Setup.Attributes;
 
 namespace TechInterviewer.Features.Professions;
@@ -21,15 +22,20 @@ public class ProfessionsController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
+    private readonly ISalaryLabelsProvider _salaryLabelsProvider;
 
-    public ProfessionsController(IAuthorization auth, DatabaseContext context)
+    public ProfessionsController(
+        IAuthorization auth,
+        DatabaseContext context,
+        ISalaryLabelsProvider salaryLabelsProvider)
     {
         _auth = auth;
         _context = context;
+        _salaryLabelsProvider = salaryLabelsProvider;
     }
 
     [HttpGet("for-select-boxes")]
-    public async Task<IEnumerable<LabelEntityDto>> ForSelectBoxes(
+    public async Task<List<LabelEntityDto>> ForSelectBoxes(
         CancellationToken cancellationToken)
     {
         return await _context.Professions
@@ -45,7 +51,7 @@ public class ProfessionsController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<IEnumerable<LabelEntityAdminDto>> All(
+    public async Task<List<LabelEntityAdminDto>> All(
         CancellationToken cancellationToken)
     {
         return await _context.Professions
@@ -67,7 +73,7 @@ public class ProfessionsController : ControllerBase
         [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.Professions.AnyAsync(
@@ -85,6 +91,7 @@ public class ProfessionsController : ControllerBase
             cancellationToken: cancellationToken);
 
         await _context.TrySaveChangesAsync(cancellationToken);
+        await _salaryLabelsProvider.ResetCacheAsync(cancellationToken);
         return Ok(item.Id);
     }
 
@@ -94,7 +101,7 @@ public class ProfessionsController : ControllerBase
         [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         var item = await _context.Professions.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
         item.CouldBeUpdatedByOrFail(currentUser);
 
@@ -103,6 +110,7 @@ public class ProfessionsController : ControllerBase
             new HexColor(updateRequest.HexColor));
 
         await _context.TrySaveChangesAsync(cancellationToken);
+        await _salaryLabelsProvider.ResetCacheAsync(cancellationToken);
         return Ok();
     }
 
@@ -112,13 +120,16 @@ public class ProfessionsController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         var item = await _context.Professions.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
         item.CouldBeUpdatedByOrFail(currentUser);
 
         _context.Professions.Remove(item);
+
         await _context.SaveChangesAsync(cancellationToken);
+
+        await _salaryLabelsProvider.ResetCacheAsync(cancellationToken);
 
         return Ok();
     }

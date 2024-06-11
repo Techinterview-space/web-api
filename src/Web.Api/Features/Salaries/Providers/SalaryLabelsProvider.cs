@@ -26,6 +26,13 @@ public class SalaryLabelsProvider : ISalaryLabelsProvider
         _cache = cache;
     }
 
+    public async Task ResetCacheAsync(
+        CancellationToken cancellationToken)
+    {
+        _cache.Remove(CacheKey);
+        await GetAsync(cancellationToken);
+    }
+
     public async Task<SelectBoxItemsResponse> GetAsync(
         CancellationToken cancellationToken)
     {
