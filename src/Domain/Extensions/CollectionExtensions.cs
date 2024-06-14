@@ -69,10 +69,36 @@ public static class CollectionExtensions
         return items != null && items.Any();
     }
 
+    public static double AverageOrDefault<T>(
+        this IEnumerable<T> sourceNumbers,
+        Func<T, double> selector)
+    {
+        var list = sourceNumbers
+            .Select(selector)
+            .ToList();
+
+        if (list.Count == 0)
+        {
+            return 0;
+        }
+
+        return list.Average();
+    }
+
     public static double Median(
         this IEnumerable<double> sourceNumbers)
     {
         return sourceNumbers.ToList().Median();
+    }
+
+    public static double Median<T>(
+        this IEnumerable<T> sourceNumbers,
+        Func<T, double> selector)
+    {
+        return sourceNumbers
+            .Select(selector)
+            .ToList()
+            .Median();
     }
 
     public static double Median(

@@ -19,6 +19,7 @@ using TechInterviewer.Features.Salaries.GetAdminChart;
 using TechInterviewer.Features.Salaries.GetSalaries;
 using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+using TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
 using TechInterviewer.Features.Salaries.GetSelectBoxItems;
 using TechInterviewer.Features.Salaries.Models;
 using TechInterviewer.Features.Salaries.UpdateSalary;

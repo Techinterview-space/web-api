@@ -8,18 +8,18 @@ public record DateTimeRangeSplitter : IEnumerable<(DateTime Start, DateTime End)
 {
     private readonly DateTime _min;
     private readonly DateTime _max;
-    private readonly int _stepInMinutes;
+    private readonly TimeSpan _interval;
 
     private List<(DateTime Start, DateTime End)> _ranges;
 
     public DateTimeRangeSplitter(
         DateTime min,
         DateTime max,
-        int stepInMinutes)
+        TimeSpan interval)
     {
         _min = min;
         _max = max;
-        _stepInMinutes = stepInMinutes;
+        _interval = interval;
     }
 
     public IEnumerator<(DateTime Start, DateTime End)> GetEnumerator()
@@ -51,12 +51,11 @@ public record DateTimeRangeSplitter : IEnumerable<(DateTime Start, DateTime End)
 
     private List<(DateTime Start, DateTime End)> PrepareData()
     {
-        var interval = TimeSpan.FromMinutes(_stepInMinutes);
         var ranges = new List<(DateTime Start, DateTime End)>();
 
-        for (var time = _min; time < _max; time += interval)
+        for (var time = _min; time < _max; time += _interval)
         {
-            ranges.Add((time, time + interval));
+            ranges.Add((time, time + _interval));
         }
 
         return ranges;

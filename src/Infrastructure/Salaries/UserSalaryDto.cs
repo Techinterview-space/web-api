@@ -4,7 +4,7 @@ using Domain.Enums;
 
 namespace Infrastructure.Salaries;
 
-public record UserSalaryDto
+public record UserSalaryDto : UserSalarySimpleDto
 {
     public UserSalaryDto()
     {
@@ -30,17 +30,7 @@ public record UserSalaryDto
         UpdatedAt = salary.UpdatedAt;
     }
 
-    public double Value { get; init; }
-
-    public int Quarter { get; init; }
-
-    public int Year { get; init; }
-
     public Currency Currency { get; init; }
-
-    public CompanyType Company { get; init; }
-
-    public DeveloperGrade? Grade { get; init; }
 
     public KazakhstanCity? City { get; init; }
 
@@ -67,8 +57,4 @@ public record UserSalaryDto
         YearOfStartingWork.HasValue ||
         Gender.HasValue ||
         Grade.HasValue;
-
-    public DateTimeOffset? CreatedAt { get; init; }
-
-    public DateTimeOffset? UpdatedAt { get; init; }
 }
