@@ -19,14 +19,6 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
 {
     public class GetSalariesChartHandler : IRequestHandler<GetSalariesChartQuery, SalariesChartResponse>
     {
-        public static readonly List<DeveloperGrade> GradesToBeUsedInChart = new ()
-        {
-            DeveloperGrade.Junior,
-            DeveloperGrade.Middle,
-            DeveloperGrade.Senior,
-            DeveloperGrade.Lead,
-        };
-
         private readonly IAuthorization _auth;
         private readonly DatabaseContext _context;
         private readonly ICurrencyService _currencyService;
@@ -51,7 +43,9 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
 
             var salariesQuery = new SalariesForChartQuery(
                 _context,
-                request);
+                request,
+                DateTimeOffset.Now.AddMonths(-12),
+                DateTimeOffset.Now);
 
             if (currentUser != null)
             {
@@ -92,9 +86,8 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart
                 salaries,
                 new UserSalaryAdminDto(userSalariesForLastYear.First()),
                 hasSurveyRecentReply,
-                salariesQuery.SalaryAddedEdge,
-                DateTimeOffset.Now,
-                salaries.Count,
+                salariesQuery.From,
+                salariesQuery.To,
                 currencies);
         }
 

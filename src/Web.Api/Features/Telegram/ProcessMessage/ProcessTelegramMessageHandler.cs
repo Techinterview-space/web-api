@@ -176,7 +176,9 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
     {
         var salariesQuery = new SalariesForChartQuery(
             _context,
-            requestParams);
+            requestParams,
+            DateTimeOffset.Now.AddMonths(-12),
+            DateTimeOffset.Now);
 
         var totalCount = await salariesQuery.ToQueryable().CountAsync(cancellationToken);
         var salaries = await salariesQuery

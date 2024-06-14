@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
@@ -11,13 +12,20 @@ namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
 
 public record SalariesChartResponse
 {
+    private static readonly List<DeveloperGrade> _gradesToBeUsedInChart = new ()
+    {
+        DeveloperGrade.Junior,
+        DeveloperGrade.Middle,
+        DeveloperGrade.Senior,
+        DeveloperGrade.Lead,
+    };
+
     public SalariesChartResponse(
         List<UserSalaryDto> salaries,
         UserSalaryAdminDto currentUserSalary,
         bool hasSurveyRecentReply,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
-        int totalCountInStats,
         List<CurrencyContent> currencies)
         : this(
             salaries,
@@ -26,7 +34,7 @@ public record SalariesChartResponse
             false,
             rangeStart,
             rangeEnd,
-            totalCountInStats,
+            salaries.Count,
             true,
             currencies)
     {
@@ -70,7 +78,7 @@ public record SalariesChartResponse
             AverageSalary = localSalaries.Select(x => x.Value).Average();
             MedianSalary = localSalaries.Select(x => x.Value).Median();
 
-            LocalSalariesByGrade = GetSalariesChartHandler.GradesToBeUsedInChart
+            LocalSalariesByGrade = _gradesToBeUsedInChart
                 .Select(x => new MedianAndAverageSalariesByGrade(
                     x,
                     localSalaries
@@ -91,7 +99,7 @@ public record SalariesChartResponse
             AverageRemoteSalary = values.Average();
             MedianRemoteSalary = values.Median();
 
-            RemoteSalariesByGrade = GetSalariesChartHandler.GradesToBeUsedInChart
+            RemoteSalariesByGrade = _gradesToBeUsedInChart
                 .Select(x => new MedianAndAverageSalariesByGrade(
                     x,
                     remoteSalaries

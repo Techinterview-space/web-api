@@ -19,7 +19,9 @@ public record SalariesForChartQuery
 
     public List<KazakhstanCity> Cities { get; }
 
-    public DateTimeOffset SalaryAddedEdge { get; }
+    public DateTimeOffset From { get; }
+
+    public DateTimeOffset To { get; }
 
     private readonly DatabaseContext _context;
 
@@ -27,7 +29,9 @@ public record SalariesForChartQuery
         DatabaseContext context,
         DeveloperGrade? grade,
         List<long> professionsToInclude,
-        List<KazakhstanCity> cities)
+        List<KazakhstanCity> cities,
+        DateTimeOffset from,
+        DateTimeOffset to)
     {
         _context = context;
         Grade = grade;
@@ -35,28 +39,71 @@ public record SalariesForChartQuery
         Cities = cities ?? new List<KazakhstanCity>();
 
         CurrentQuarter = DateQuarter.Current;
-        SalaryAddedEdge = DateTimeOffset.Now.AddMonths(-6);
+        From = from;
+        To = to;
     }
 
     public SalariesForChartQuery(
         DatabaseContext context,
-        ISalariesChartQueryParams request)
+        ISalariesChartQueryParams request,
+        DateTimeOffset from,
+        DateTimeOffset to)
         : this(
             context,
             request.Grade,
             request.ProfessionsToInclude,
-            request.Cities)
+            request.Cities,
+            from,
+            to)
     {
     }
 
     public IQueryable<UserSalaryDto> ToQueryable(
         CompanyType? companyType = null)
     {
+        var query = BuildQuery(companyType);
+
+        return query
+            .OrderBy(x => x.Value)
+            .Select(x => new UserSalaryDto
+            {
+                Value = x.Value,
+                Quarter = x.Quarter,
+                Year = x.Year,
+                Currency = x.Currency,
+                Company = x.Company,
+                Grade = x.Grade,
+                City = x.City,
+                Age = x.Age,
+                YearOfStartingWork = x.YearOfStartingWork,
+                Gender = x.Gender,
+                SkillId = x.SkillId,
+                WorkIndustryId = x.WorkIndustryId,
+                ProfessionId = x.ProfessionId,
+                CreatedAt = x.CreatedAt,
+            })
+            .AsNoTracking();
+    }
+
+    public IQueryable<TResult> ToQueryable<TResult>(
+        Expression<Func<UserSalary, TResult>> selector,
+        CompanyType? companyType = null)
+    {
+        var query = BuildQuery(companyType);
+
+        return query
+            .OrderBy(x => x.Value)
+            .Select(selector);
+    }
+
+    private IQueryable<UserSalary> BuildQuery(
+        CompanyType? companyType = null)
+    {
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
             .Where(x => x.Year == CurrentQuarter.Year || x.Year == CurrentQuarter.Year - 1)
-            .Where(x => x.CreatedAt >= SalaryAddedEdge)
+            .Where(x => x.CreatedAt >= From && x.CreatedAt <= To)
             .When(companyType.HasValue, x => x.Company == companyType.Value)
             .When(Grade.HasValue, x => x.Grade == Grade.Value);
 
@@ -76,30 +123,9 @@ public record SalariesForChartQuery
             query = query.Where(clause);
         }
 
-        query = query
+        return query
             .When(
                 ProfessionsToInclude.Count > 0,
                 x => x.ProfessionId != null && ProfessionsToInclude.Contains(x.ProfessionId.Value));
-
-        return query
-            .Select(x => new UserSalaryDto
-            {
-                Value = x.Value,
-                Quarter = x.Quarter,
-                Year = x.Year,
-                Currency = x.Currency,
-                Company = x.Company,
-                Grade = x.Grade,
-                City = x.City,
-                Age = x.Age,
-                YearOfStartingWork = x.YearOfStartingWork,
-                Gender = x.Gender,
-                SkillId = x.SkillId,
-                WorkIndustryId = x.WorkIndustryId,
-                ProfessionId = x.ProfessionId,
-                CreatedAt = x.CreatedAt,
-            })
-            .OrderBy(x => x.Value)
-            .AsNoTracking();
     }
 }

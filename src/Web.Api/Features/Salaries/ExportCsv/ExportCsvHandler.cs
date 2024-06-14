@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.CSV;
@@ -34,7 +35,7 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
         ExportCsvQuery request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
         if (currentUser is null)
         {
             throw new NoPermissionsException("No user found");
@@ -55,7 +56,9 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
             _context,
             null,
             null,
-            null)
+            null,
+            DateTimeOffset.Now.AddMonths(-12),
+            DateTimeOffset.Now)
             .ToQueryable()
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
