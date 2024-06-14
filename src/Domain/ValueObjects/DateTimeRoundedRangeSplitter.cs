@@ -11,7 +11,7 @@ public record DateTimeRoundedRangeSplitter : DateTimeRangeSplitter
         : base(
             RoundDown(start),
             RoundUp(end),
-            intervalInMinutes)
+            TimeSpan.FromMinutes(intervalInMinutes))
     {
     }
 

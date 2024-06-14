@@ -20,14 +20,14 @@ public class DateTimeRangeSplitterTests
     [InlineData(1140, 2)]
     [InlineData(1440, 1)]
     public void Ctor_Cases_Match(
-        int interval,
+        int intervalInMinutes,
         int expectedCount)
     {
         var start = new DateTime(2024, 1, 12, 0, 0, 0);
         var target = new DateTimeRangeSplitter(
                 start,
                 start.AddHours(23).AddMinutes(59),
-                interval)
+                TimeSpan.FromMinutes(intervalInMinutes))
             .ToList();
 
         Assert.Equal(expectedCount, target.Count);

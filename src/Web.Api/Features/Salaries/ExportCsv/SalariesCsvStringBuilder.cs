@@ -44,7 +44,7 @@ public record SalariesCsvStringBuilder
             $"{salary.City?.ToString() ?? NoValue}," +
             $"{skill?.Title ?? NoValue}," +
             $"{workIndustry?.Title ?? NoValue}," +
-            $"{salary.CreatedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? NoValue}");
+            $"{salary.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") ?? NoValue}");
 
         return this;
     }

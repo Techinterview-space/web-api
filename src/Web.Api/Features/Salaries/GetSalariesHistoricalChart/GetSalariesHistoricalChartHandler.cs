@@ -8,7 +8,7 @@ using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesHostoricalChart;
+namespace TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
 
 public class GetSalariesHistoricalChartHandler
     : IRequestHandler<GetSalariesHistoricalChartQuery, GetSalariesHistoricalChartResponse>

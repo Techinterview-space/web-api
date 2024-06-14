@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Salaries\GetSalariesHostoricalChart\Charts\" />
-  </ItemGroup>
-
 </Project>
