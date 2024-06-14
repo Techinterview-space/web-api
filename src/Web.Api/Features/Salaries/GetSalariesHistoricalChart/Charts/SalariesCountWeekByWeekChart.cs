@@ -9,6 +9,8 @@ namespace TechInterviewer.Features.Salaries.GetSalariesHistoricalChart.Charts;
 
 public record SalariesCountWeekByWeekChart
 {
+    public List<DateTime> WeekEnds { get; init; }
+
     public List<SalariesCountWeekByWeekChartItem> TotalCountItems { get; init; }
 
     public List<SalariesCountWeekByWeekChartGradeItem> GradeItems { get; init; }
@@ -18,11 +20,14 @@ public record SalariesCountWeekByWeekChart
         List<UserSalarySimpleDto> remoteSalaries,
         WeekSplitter weekSplitter)
     {
+        WeekEnds = new List<DateTime>();
         TotalCountItems = new List<SalariesCountWeekByWeekChartItem>();
         GradeItems = new List<SalariesCountWeekByWeekChartGradeItem>();
 
         foreach (var (start, end) in weekSplitter.ToList())
         {
+            WeekEnds.Add(end);
+
             var localSalariesForPeriod = localSalaries
                 .Where(x => x.CreatedAt <= end)
                 .ToList();
@@ -32,7 +37,6 @@ public record SalariesCountWeekByWeekChart
                 .ToList();
 
             TotalCountItems.Add(new SalariesCountWeekByWeekChartItem(
-                end,
                 localSalariesForPeriod.Count + remoteSalariesForPeriod.Count,
                 localSalariesForPeriod.Median(x => x.Value),
                 localSalariesForPeriod.AverageOrDefault(x => x.Value),
@@ -47,7 +51,6 @@ public record SalariesCountWeekByWeekChart
                 GradeItems.Add(
                     new SalariesCountWeekByWeekChartGradeItem(
                         grade,
-                        end,
                         localByGrade.Count + remoteByGrade.Count,
                         localByGrade.Median(x => x.Value),
                         localByGrade.AverageOrDefault(x => x.Value),
@@ -60,7 +63,6 @@ public record SalariesCountWeekByWeekChart
 #pragma warning disable SA1009
 #pragma warning disable SA1313
     public record SalariesCountWeekByWeekChartItem(
-        DateTime WeekEnd,
         int TotalCount,
         double LocalMedian,
         double LocalAverage,
@@ -69,13 +71,11 @@ public record SalariesCountWeekByWeekChart
 
     public record SalariesCountWeekByWeekChartGradeItem(
         DeveloperGrade Grade,
-        DateTime WeekEnd,
         int TotalCount,
         double LocalMedian,
         double LocalAverage,
         double RemoteMedian,
         double RemoteAverage) : SalariesCountWeekByWeekChartItem(
-            WeekEnd,
             TotalCount,
             LocalMedian,
             LocalAverage,
