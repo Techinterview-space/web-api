@@ -4,7 +4,7 @@ using System.Net;
 using Domain.Validation;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Middlewares.Error;
+namespace Web.Api.Middlewares.Error;
 
 public class ValidationProblemDetails : ProblemDetails
 {

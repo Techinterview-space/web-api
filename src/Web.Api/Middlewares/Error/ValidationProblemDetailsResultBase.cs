@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace TechInterviewer.Middlewares.Error;
+namespace Web.Api.Middlewares.Error;
 
 public abstract class ValidationProblemDetailsResultBase : IActionResult
 {

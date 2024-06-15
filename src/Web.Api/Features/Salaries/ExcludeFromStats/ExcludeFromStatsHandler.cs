@@ -5,7 +5,7 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Salaries.ExcludeFromStats;
+namespace Web.Api.Features.Salaries.ExcludeFromStats;
 
 public class ExcludeFromStatsHandler : IRequestHandler<ExcludeFromStatsCommand, Unit>
 {

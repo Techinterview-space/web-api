@@ -8,10 +8,10 @@ using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 using NotFoundException = Domain.Validation.Exceptions.NotFoundException;
 
-namespace TechInterviewer.Features.Salaries.UpdateSalary;
+namespace Web.Api.Features.Salaries.UpdateSalary;
 
 public class UpdateSalaryHandler : IRequestHandler<UpdateSalaryCommand, CreateOrEditSalaryRecordResponse>
 {

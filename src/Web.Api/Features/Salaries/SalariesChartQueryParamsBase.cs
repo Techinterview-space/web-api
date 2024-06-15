@@ -4,7 +4,7 @@ using Domain.Enums;
 using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Salaries;
+namespace Web.Api.Features.Salaries;
 
 public record SalariesChartQueryParamsBase : ISalariesChartQueryParams
 {

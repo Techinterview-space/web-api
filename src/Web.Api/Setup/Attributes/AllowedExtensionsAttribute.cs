@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Setup.Attributes;
+namespace Web.Api.Setup.Attributes;
 
 // copied from https://stackoverflow.com/questions/56588900/how-to-validate-uploaded-file-in-asp-net-core
 public class AllowedExtensionsAttribute : ValidationAttribute

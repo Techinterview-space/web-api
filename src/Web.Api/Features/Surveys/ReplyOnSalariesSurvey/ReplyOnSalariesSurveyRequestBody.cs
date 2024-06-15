@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Questions;
 
-namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
+namespace Web.Api.Features.Surveys.ReplyOnSalariesSurvey;
 
 public record ReplyOnSalariesSurveyRequestBody
 {

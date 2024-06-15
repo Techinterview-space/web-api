@@ -9,7 +9,7 @@ using Domain.ValueObjects;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Salaries.Models;
+namespace Web.Api.Features.Salaries.Models;
 
 public record UserSalaryShowInStatsDecisionMaker
 {

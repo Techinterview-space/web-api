@@ -5,7 +5,6 @@
     <LangVersion>latest</LangVersion>
     <UserSecretsId>f6827f9d-bdc5-4028-a203-d3796bc6e836</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <RootNamespace>TechInterviewer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

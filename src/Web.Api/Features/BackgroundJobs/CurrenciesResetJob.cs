@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Infrastructure.Currencies.Contracts;
 using Microsoft.Extensions.Logging;
 
-namespace TechInterviewer.Features.BackgroundJobs;
+namespace Web.Api.Features.BackgroundJobs;
 
 public class CurrenciesResetJob : InvocableJobBase<CurrenciesResetJob>
 {

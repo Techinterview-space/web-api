@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TechInterviewer.Features.Salaries.GetAdminChart;
+namespace Web.Api.Features.Salaries.GetAdminChart;
 
 public record GetAddingTrendChartResponse
 {

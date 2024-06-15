@@ -3,9 +3,9 @@ using Domain.Entities.Salaries;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.Admin;
+namespace Web.Api.Features.Salaries.Admin;
 
 public record SalariesQuery
 {

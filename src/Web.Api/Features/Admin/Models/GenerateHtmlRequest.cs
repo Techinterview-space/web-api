@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TechInterviewer.Features.Admin.Models;
+namespace Web.Api.Features.Admin.Models;
 
 public record GenerateHtmlRequest
 {

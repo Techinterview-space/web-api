@@ -5,7 +5,7 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Salaries.ApproveSalary;
+namespace Web.Api.Features.Salaries.ApproveSalary;
 
 public class ApproveSalaryHandler : IRequestHandler<ApproveSalaryCommand, Unit>
 {

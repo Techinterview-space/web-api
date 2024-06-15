@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Domain.Entities.Salaries;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
+namespace Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
 public record ProductManagersTelegramBotUserCommandParameters
     : TelegramBotUserCommandParameters

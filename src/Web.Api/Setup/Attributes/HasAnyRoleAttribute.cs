@@ -7,7 +7,7 @@ using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace TechInterviewer.Setup.Attributes;
+namespace Web.Api.Setup.Attributes;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
 public class HasAnyRoleAttribute : Attribute, IAuthorizationFilter

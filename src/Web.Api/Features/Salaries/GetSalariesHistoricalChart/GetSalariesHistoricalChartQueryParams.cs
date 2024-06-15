@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
+namespace Web.Api.Features.Salaries.GetSalariesHistoricalChart;
 
 public record GetSalariesHistoricalChartQueryParams : SalariesChartQueryParamsBase
 {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using TechInterviewer.Features.Labels.Models;
+using Web.Api.Features.Labels.Models;
 
-namespace TechInterviewer.Features.Salaries.Models;
+namespace Web.Api.Features.Salaries.Models;
 
 public record SelectBoxItemsResponse
 {

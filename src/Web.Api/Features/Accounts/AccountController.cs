@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Features.Users.Models;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Users.Models;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Accounts;
+namespace Web.Api.Features.Accounts;
 
 [ApiController]
 [Route("api/account")]

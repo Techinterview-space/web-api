@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Salaries;
 
-namespace TechInterviewer.Features.Salaries.Models;
+namespace Web.Api.Features.Salaries.Models;
 
 public record CreateOrEditSalaryRecordResponse
 {

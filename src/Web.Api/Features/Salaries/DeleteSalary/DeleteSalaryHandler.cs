@@ -5,7 +5,7 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Salaries.DeleteSalary;
+namespace Web.Api.Features.Salaries.DeleteSalary;
 
 public class DeleteSalaryHandler : IRequestHandler<DeleteSalaryCommand, Unit>
 {

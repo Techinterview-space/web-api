@@ -10,10 +10,10 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Skills;
+namespace Web.Api.Features.Skills;
 
 [ApiController]
 [Route("api/skills")]

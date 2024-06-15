@@ -1,16 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using MediatR;
-using TechInterviewer.Features.Surveys.Dtos;
-using TechInterviewer.Features.Surveys.Services;
+using Web.Api.Features.Surveys.Dtos;
+using Web.Api.Features.Surveys.Services;
 
-namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
+namespace Web.Api.Features.Surveys.ReplyOnSalariesSurvey;
 
 public class ReplyOnSalariesSurveyHandler
     : IRequestHandler<ReplyOnSalariesSurveyCommand, SalariesSurveyReplyDto>

@@ -1,4 +1,4 @@
-﻿using TechInterviewer.Features.SalariesChartShare.GetChartSharePage;
+﻿using Web.Api.Features.SalariesChartShare.GetChartSharePage;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Charts;

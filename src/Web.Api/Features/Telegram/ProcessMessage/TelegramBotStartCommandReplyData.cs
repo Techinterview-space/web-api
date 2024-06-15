@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Salaries;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram.ProcessMessage;
 
 public record TelegramBotStartCommandReplyData : TelegramBotReplyData
 {

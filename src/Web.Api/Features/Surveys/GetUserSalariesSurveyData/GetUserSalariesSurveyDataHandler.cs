@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using MediatR;
-using TechInterviewer.Features.Surveys.Services;
+using Web.Api.Features.Surveys.Services;
 
-namespace TechInterviewer.Features.Surveys.GetUserSalariesSurveyData;
+namespace Web.Api.Features.Surveys.GetUserSalariesSurveyData;
 
 public class GetUserSalariesSurveyDataHandler : IRequestHandler<GetUserSalariesSurveyDataQuery, GetUserSalariesSurveyDataResponse>
 {

@@ -16,14 +16,14 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram.ProcessMessage;
 
 public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, string>
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TechInterviewer.Setup.Attributes;
+namespace Web.Api.Setup.Attributes;
 
 public class OnlyPositiveNumberAttribute : RangeAttribute
 {

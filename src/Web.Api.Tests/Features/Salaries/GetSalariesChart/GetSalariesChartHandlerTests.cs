@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.GetSalariesChart;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Salaries.GetSalariesChart;
 using Web.Api.Tests.Mocks;
 using Xunit;
 

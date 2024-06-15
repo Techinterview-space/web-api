@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Middlewares
+namespace Web.Api.Middlewares
 {
     public class DevelopmentEnvironmentMiddleware
     {

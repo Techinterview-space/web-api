@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using TechInterviewer.Features.Salaries.Models;
-using TechInterviewer.Features.Salaries.Providers;
+using Web.Api.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Providers;
 
-namespace TechInterviewer.Features.Salaries.GetSelectBoxItems;
+namespace Web.Api.Features.Salaries.GetSelectBoxItems;
 
 public class GetSelectBoxItemsHandler : IRequestHandler<GetSelectBoxItemsQuery, SelectBoxItemsResponse>
 {

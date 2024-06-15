@@ -1,7 +1,7 @@
 ﻿using System;
 using Domain.Entities.Interviews;
 
-namespace TechInterviewer.Features.Interviews.RevokeShareLinkToken;
+namespace Web.Api.Features.Interviews.RevokeShareLinkToken;
 
 public record GetShareLinkTokenResult
 {

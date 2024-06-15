@@ -6,7 +6,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Infrastructure.Salaries;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
+namespace Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
 public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 {

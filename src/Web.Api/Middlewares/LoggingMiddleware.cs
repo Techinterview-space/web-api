@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace TechInterviewer.Middlewares;
+namespace Web.Api.Middlewares;
 
 public class LoggingMiddleware
 {

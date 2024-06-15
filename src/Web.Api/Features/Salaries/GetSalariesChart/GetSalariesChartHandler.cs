@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
@@ -11,11 +10,11 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
-using TechInterviewer.Features.Salaries.Models;
-using TechInterviewer.Features.Surveys.Services;
+using Web.Api.Features.Salaries.GetSalariesChart.Charts;
+using Web.Api.Features.Salaries.Models;
+using Web.Api.Features.Surveys.Services;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesChart
+namespace Web.Api.Features.Salaries.GetSalariesChart
 {
     public class GetSalariesChartHandler : IRequestHandler<GetSalariesChartQuery, SalariesChartResponse>
     {

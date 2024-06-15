@@ -4,7 +4,7 @@ using Infrastructure.Emails.Contracts;
 using Infrastructure.Emails.Contracts.Requests;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Admin;
+namespace Web.Api.Features.Admin;
 
 [ApiController]
 [Route("api/debug")]

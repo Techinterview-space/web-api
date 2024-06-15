@@ -6,7 +6,7 @@ using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Salaries.GetSalaries;
+namespace Web.Api.Features.Salaries.GetSalaries;
 
 public record GetSalariesPaginatedQuery
     : PageModel, IRequest<Pageable<UserSalaryDto>>, ISalariesChartQueryParams

@@ -7,9 +7,9 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.AddSalary;
+namespace Web.Api.Features.Salaries.AddSalary;
 
 public class AddSalaryHandler : IRequestHandler<AddSalaryCommand, CreateOrEditSalaryRecordResponse>
 {

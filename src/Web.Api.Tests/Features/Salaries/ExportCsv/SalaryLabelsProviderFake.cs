@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Features.Salaries.Models;
-using TechInterviewer.Features.Salaries.Providers;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Providers;
 
 namespace Web.Api.Tests.Features.Salaries.ExportCsv;
 

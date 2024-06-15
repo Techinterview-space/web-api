@@ -3,7 +3,7 @@ using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Setup.Attributes;
 using Xunit;
 
 namespace Web.Api.Tests.Setup.Attributes;

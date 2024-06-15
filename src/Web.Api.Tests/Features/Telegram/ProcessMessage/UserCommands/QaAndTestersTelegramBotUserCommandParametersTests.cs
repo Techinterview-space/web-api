@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Salaries;
-using TechInterviewer.Features.Telegram.ProcessMessage.UserCommands;
 using TestUtils.Fakes;
+using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Telegram.ProcessMessage.UserCommands;

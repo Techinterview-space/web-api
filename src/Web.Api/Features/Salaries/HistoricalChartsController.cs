@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
+using Web.Api.Features.Salaries.GetSalariesHistoricalChart;
 
-namespace TechInterviewer.Features.Salaries;
+namespace Web.Api.Features.Salaries;
 
 [ApiController]
 [Route("api/historical-charts")]

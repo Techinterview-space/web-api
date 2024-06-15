@@ -6,7 +6,7 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Telegram.GetTelegramBotUsages;
+namespace Web.Api.Features.Telegram.GetTelegramBotUsages;
 
 public class GetTelegramBotUsagesHandler : IRequestHandler<GetTelegramBotUsagesQuery, Pageable<TelegramBotUsageDto>>
 {

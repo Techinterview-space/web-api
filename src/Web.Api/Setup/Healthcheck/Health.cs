@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TechInterviewer.Setup.Healthcheck;
+namespace Web.Api.Setup.Healthcheck;
 
 public static class Health
 {

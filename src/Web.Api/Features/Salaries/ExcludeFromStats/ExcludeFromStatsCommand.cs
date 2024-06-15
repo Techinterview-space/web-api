@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace TechInterviewer.Features.Salaries.ExcludeFromStats;
+namespace Web.Api.Features.Salaries.ExcludeFromStats;
 
 public record ExcludeFromStatsCommand : IRequest<Unit>
 {

@@ -7,9 +7,9 @@ using Domain.Entities.Questions;
 using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Surveys.Services;
+using Web.Api.Features.Surveys.Services;
 
-namespace TechInterviewer.Features.Surveys.GetSalariesSurveyStats;
+namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 
 public class GetSalariesSurveyStatsHandler
     : IRequestHandler<GetSalariesSurveyStatsQuery, SalariesSurveyStatsData>

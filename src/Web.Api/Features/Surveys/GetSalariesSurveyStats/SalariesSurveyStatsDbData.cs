@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Questions;
 
-namespace TechInterviewer.Features.Surveys.GetSalariesSurveyStats;
+namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 
 internal record SalariesSurveyStatsDbData
 {

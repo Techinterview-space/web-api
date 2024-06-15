@@ -9,9 +9,9 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.Providers;
+using Web.Api.Features.Salaries.Providers;
 
-namespace TechInterviewer.Features.Salaries.ExportCsv;
+namespace Web.Api.Features.Salaries.ExportCsv;
 
 public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvResponse>
 {

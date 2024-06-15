@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.Providers;
+namespace Web.Api.Features.Salaries.Providers;
 
 public class SalaryLabelsProvider : ISalaryLabelsProvider
 {

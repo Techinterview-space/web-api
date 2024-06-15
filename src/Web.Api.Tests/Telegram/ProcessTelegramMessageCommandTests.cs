@@ -9,12 +9,12 @@ using MemoryCache.Testing.Moq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
-using TechInterviewer.Features.Telegram.ProcessMessage;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Telegram.ProcessMessage;
 using Web.Api.Tests.Mocks;
 using Xunit;
 

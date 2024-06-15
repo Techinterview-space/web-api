@@ -14,10 +14,10 @@ using Infrastructure.Services.PDF.Interviews;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TechInterviewer.Features.Salaries.Providers;
-using TechInterviewer.Features.Telegram;
+using Web.Api.Features.Salaries.Providers;
+using Web.Api.Features.Telegram;
 
-namespace TechInterviewer.Setup;
+namespace Web.Api.Setup;
 
 public static class ServiceRegistration
 {

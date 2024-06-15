@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram.ProcessMessage;
 
 public record ProcessTelegramMessageCommand : MediatR.IRequest<string>
 {

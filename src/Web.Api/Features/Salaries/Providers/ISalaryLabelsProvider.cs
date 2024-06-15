@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.Providers;
+namespace Web.Api.Features.Salaries.Providers;
 
 public interface ISalaryLabelsProvider
 {

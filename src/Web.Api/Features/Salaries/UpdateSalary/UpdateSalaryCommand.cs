@@ -1,8 +1,8 @@
 ﻿using System;
 using MediatR;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.UpdateSalary;
+namespace Web.Api.Features.Salaries.UpdateSalary;
 
 public record UpdateSalaryCommand : EditSalaryRequest, IRequest<CreateOrEditSalaryRecordResponse>
 {

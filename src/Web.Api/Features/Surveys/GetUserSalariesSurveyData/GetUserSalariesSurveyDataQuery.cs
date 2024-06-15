@@ -1,5 +1,5 @@
 ﻿using MediatR;
 
-namespace TechInterviewer.Features.Surveys.GetUserSalariesSurveyData;
+namespace Web.Api.Features.Surveys.GetUserSalariesSurveyData;
 
 public record GetUserSalariesSurveyDataQuery : IRequest<GetUserSalariesSurveyDataResponse>;

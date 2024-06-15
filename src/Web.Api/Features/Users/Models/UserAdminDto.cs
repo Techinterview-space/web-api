@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Domain.Entities;
 using Domain.Entities.Users;
 
-namespace TechInterviewer.Features.Users.Models;
+namespace Web.Api.Features.Users.Models;
 
 public record UserAdminDto : UserDto
 {

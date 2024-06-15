@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TechInterviewer.Setup;
+namespace Web.Api.Setup;
 
 public static class Auth
 {

@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
-using TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
-using TechInterviewer.Features.Surveys.Services;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Surveys.ReplyOnSalariesSurvey;
+using Web.Api.Features.Surveys.Services;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Survey.ReplyOnSalariesSurvey;

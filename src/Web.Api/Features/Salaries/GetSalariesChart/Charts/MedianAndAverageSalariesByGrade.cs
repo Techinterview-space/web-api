@@ -4,7 +4,7 @@ using Domain.Entities.Enums;
 using Domain.Extensions;
 using Infrastructure.Salaries;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 public record MedianAndAverageSalariesByGrade
 {

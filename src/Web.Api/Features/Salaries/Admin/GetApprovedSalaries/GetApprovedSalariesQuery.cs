@@ -1,7 +1,7 @@
 ﻿using Domain.ValueObjects.Pagination;
 using MediatR;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
+namespace Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 
 public record GetApprovedSalariesQuery : GetAllSalariesQueryParams, IRequest<Pageable<UserSalaryAdminDto>>;

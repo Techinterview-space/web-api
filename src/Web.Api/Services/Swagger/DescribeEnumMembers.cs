@@ -5,7 +5,7 @@ using System.Xml.XPath;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace TechInterviewer.Services.Swagger;
+namespace Web.Api.Services.Swagger;
 
 // https://stackoverflow.com/a/69089035
 public class DescribeEnumMembers : ISchemaFilter

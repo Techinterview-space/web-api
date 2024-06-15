@@ -4,7 +4,7 @@ using Domain.Attributes;
 using Domain.Entities.Users;
 using Domain.Enums;
 
-namespace TechInterviewer.Features.Users.Models;
+namespace Web.Api.Features.Users.Models;
 
 public record CreateUserRequest
 {

@@ -5,10 +5,10 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.Models;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Salaries.Models;
 using Xunit;
 
 namespace Web.Api.Tests.Controllers.Salaries;

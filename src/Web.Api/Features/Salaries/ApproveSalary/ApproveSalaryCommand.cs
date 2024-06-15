@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace TechInterviewer.Features.Salaries.ApproveSalary;
+namespace Web.Api.Features.Salaries.ApproveSalary;
 
 public record ApproveSalaryCommand : IRequest<Unit>
 {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Middlewares;
+namespace Web.Api.Middlewares;
 
 public class DefaultNotFoundPageMiddleware
 {

@@ -8,24 +8,23 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Features.Salaries.AddSalary;
-using TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
-using TechInterviewer.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
-using TechInterviewer.Features.Salaries.ApproveSalary;
-using TechInterviewer.Features.Salaries.DeleteSalary;
-using TechInterviewer.Features.Salaries.ExcludeFromStats;
-using TechInterviewer.Features.Salaries.ExportCsv;
-using TechInterviewer.Features.Salaries.GetAdminChart;
-using TechInterviewer.Features.Salaries.GetSalaries;
-using TechInterviewer.Features.Salaries.GetSalariesChart;
-using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
-using TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
-using TechInterviewer.Features.Salaries.GetSelectBoxItems;
-using TechInterviewer.Features.Salaries.Models;
-using TechInterviewer.Features.Salaries.UpdateSalary;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Salaries.AddSalary;
+using Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
+using Web.Api.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
+using Web.Api.Features.Salaries.ApproveSalary;
+using Web.Api.Features.Salaries.DeleteSalary;
+using Web.Api.Features.Salaries.ExcludeFromStats;
+using Web.Api.Features.Salaries.ExportCsv;
+using Web.Api.Features.Salaries.GetAdminChart;
+using Web.Api.Features.Salaries.GetSalaries;
+using Web.Api.Features.Salaries.GetSalariesChart;
+using Web.Api.Features.Salaries.GetSalariesChart.Charts;
+using Web.Api.Features.Salaries.GetSelectBoxItems;
+using Web.Api.Features.Salaries.Models;
+using Web.Api.Features.Salaries.UpdateSalary;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Salaries;
+namespace Web.Api.Features.Salaries;
 
 [ApiController]
 [Route("api/salaries")]

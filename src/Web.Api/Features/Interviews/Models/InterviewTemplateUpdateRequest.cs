@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TechInterviewer.Features.Interviews.Models;
+namespace Web.Api.Features.Interviews.Models;
 
 public record InterviewTemplateUpdateRequest : InterviewTemplateCreateRequest
 {

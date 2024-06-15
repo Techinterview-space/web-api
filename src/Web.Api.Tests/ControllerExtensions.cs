@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Tests;
 

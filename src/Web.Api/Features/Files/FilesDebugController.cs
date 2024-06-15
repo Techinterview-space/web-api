@@ -3,9 +3,9 @@ using AspNetCore.Aws.S3.Simple.Models;
 using Domain.Enums;
 using Infrastructure.Services.Files;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Files;
+namespace Web.Api.Features.Files;
 
 [ApiController]
 [Route("api/debug/file/")]

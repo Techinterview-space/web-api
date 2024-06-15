@@ -7,13 +7,13 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TechInterviewer.Features.Telegram.ProcessMessage;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Web.Api.Features.Telegram.ProcessMessage;
 
-namespace TechInterviewer.Features.Telegram;
+namespace Web.Api.Features.Telegram;
 
 public class TelegramBotService
 {

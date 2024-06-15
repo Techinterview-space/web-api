@@ -7,7 +7,7 @@ using Domain.Entities.Users;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Labels.Models;
+namespace Web.Api.Features.Labels.Models;
 
 public abstract class LabelsCollectionBase<TLabel>
     where TLabel : EntityLabelBase

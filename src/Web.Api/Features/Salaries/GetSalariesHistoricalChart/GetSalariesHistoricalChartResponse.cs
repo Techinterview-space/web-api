@@ -4,9 +4,9 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.ValueObjects.Dates;
 using Infrastructure.Salaries;
-using TechInterviewer.Features.Salaries.GetSalariesHistoricalChart.Charts;
+using Web.Api.Features.Salaries.GetSalariesHistoricalChart.Charts;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
+namespace Web.Api.Features.Salaries.GetSalariesHistoricalChart;
 
 public record GetSalariesHistoricalChartResponse
 {

@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using Infrastructure.Salaries;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.ExportCsv;
+namespace Web.Api.Features.Salaries.ExportCsv;
 
 public record SalariesCsvStringBuilder
 {

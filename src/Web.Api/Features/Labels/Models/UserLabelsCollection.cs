@@ -4,7 +4,7 @@ using Domain.Entities.Users;
 using Domain.ValueObjects;
 using Infrastructure.Database;
 
-namespace TechInterviewer.Features.Labels.Models;
+namespace Web.Api.Features.Labels.Models;
 
 public class UserLabelsCollection : LabelsCollectionBase<UserLabel>
 {

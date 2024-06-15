@@ -2,7 +2,7 @@
 using Domain.Entities.Labels;
 using Domain.ValueObjects;
 
-namespace TechInterviewer.Features.Labels.Models;
+namespace Web.Api.Features.Labels.Models;
 
 public record LabelDto
 {

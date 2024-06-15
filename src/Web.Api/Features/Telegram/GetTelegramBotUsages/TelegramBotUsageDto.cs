@@ -1,7 +1,7 @@
 ﻿using System;
 using Domain.Entities.Telegram;
 
-namespace TechInterviewer.Features.Telegram.GetTelegramBotUsages;
+namespace Web.Api.Features.Telegram.GetTelegramBotUsages;
 
 public record TelegramBotUsageDto
 {

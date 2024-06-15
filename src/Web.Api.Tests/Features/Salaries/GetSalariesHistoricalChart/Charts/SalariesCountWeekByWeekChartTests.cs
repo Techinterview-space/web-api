@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Infrastructure.Salaries;
-using TechInterviewer.Features.Salaries.GetSalariesHistoricalChart;
-using TechInterviewer.Features.Salaries.GetSalariesHistoricalChart.Charts;
+using Web.Api.Features.Salaries.GetSalariesHistoricalChart;
+using Web.Api.Features.Salaries.GetSalariesHistoricalChart.Charts;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Salaries.GetSalariesHistoricalChart.Charts;

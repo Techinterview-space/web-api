@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Setup.Attributes;
+namespace Web.Api.Setup.Attributes;
 
 public class CollectionStandardAllowedFileExtensionsAttribute : StandardAllowedFileExtensionsAttribute
 {

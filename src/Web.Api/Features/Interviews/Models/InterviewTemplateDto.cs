@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Domain.Entities.Interviews;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Features.Users.Models;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Features.Users.Models;
 
-namespace TechInterviewer.Features.Interviews.Models;
+namespace Web.Api.Features.Interviews.Models;
 
 public record InterviewTemplateDto : InterviewTemplateUpdateRequest
 {

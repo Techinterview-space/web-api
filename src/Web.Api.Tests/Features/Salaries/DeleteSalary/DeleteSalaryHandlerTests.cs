@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
-using TechInterviewer.Features.Salaries.DeleteSalary;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Salaries.DeleteSalary;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Salaries.DeleteSalary;

@@ -1,6 +1,6 @@
 ﻿using Domain.Validation;
 
-namespace TechInterviewer.Middlewares.Error;
+namespace Web.Api.Middlewares.Error;
 
 public class ValidationError
 {

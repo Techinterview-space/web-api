@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace TechInterviewer.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram.ProcessMessage;
 
 public record TelegramBotReplyData
 {

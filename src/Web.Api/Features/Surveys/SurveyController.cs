@@ -1,15 +1,14 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Features.Surveys.Dtos;
-using TechInterviewer.Features.Surveys.GetSalariesSurveyStats;
-using TechInterviewer.Features.Surveys.GetUserSalariesSurveyData;
-using TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Surveys.Dtos;
+using Web.Api.Features.Surveys.GetSalariesSurveyStats;
+using Web.Api.Features.Surveys.GetUserSalariesSurveyData;
+using Web.Api.Features.Surveys.ReplyOnSalariesSurvey;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Surveys;
+namespace Web.Api.Features.Surveys;
 
 [HasAnyRole]
 [ApiController]

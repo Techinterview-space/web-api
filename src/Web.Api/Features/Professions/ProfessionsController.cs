@@ -10,11 +10,11 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Features.Salaries.Providers;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Features.Salaries.Providers;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Professions;
+namespace Web.Api.Features.Professions;
 
 [ApiController]
 [Route("api/professions")]

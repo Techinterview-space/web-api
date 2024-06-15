@@ -3,7 +3,7 @@ using Domain.Validation;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace TechInterviewer.Setup.Healthcheck;
+namespace Web.Api.Setup.Healthcheck;
 
 public class DatabaseHealthCheck : DatabaseHealthCheckBase
 {

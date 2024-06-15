@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Domain.Enums;
-using TechInterviewer.Features.Surveys.GetSalariesSurveyStats;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Surveys.GetSalariesSurveyStats;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Survey.GetSalariesSurveyStats;

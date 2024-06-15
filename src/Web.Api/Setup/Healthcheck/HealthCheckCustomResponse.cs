@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace TechInterviewer.Setup.Healthcheck;
+namespace Web.Api.Setup.Healthcheck;
 
 public class HealthCheckCustomResponse : HealthCheckOptions
 {

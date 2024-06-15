@@ -4,9 +4,9 @@ using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using MediatR;
-using TechInterviewer.Features.Salaries.Admin;
+using Web.Api.Features.Salaries.Admin;
 
-namespace TechInterviewer.Features.Salaries.GetSalaries;
+namespace Web.Api.Features.Salaries.GetSalaries;
 
 public class GetSalariesPaginatedQueryHandler : IRequestHandler<GetSalariesPaginatedQuery, Pageable<UserSalaryDto>>
 {

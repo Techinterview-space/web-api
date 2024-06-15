@@ -7,9 +7,9 @@ using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.GetSalariesChart;
+using Web.Api.Features.Salaries.GetSalariesChart;
 
-namespace TechInterviewer.Features.SalariesChartShare.GetChartSharePage
+namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
 {
     public class GetChartSharePageHandler : IRequestHandler<GetChartSharePageQuery, string>
     {

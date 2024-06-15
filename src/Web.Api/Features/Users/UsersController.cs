@@ -7,10 +7,10 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Users.Models;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Users.Models;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Users;
+namespace Web.Api.Features.Users;
 
 [HasAnyRole]
 [ApiController]

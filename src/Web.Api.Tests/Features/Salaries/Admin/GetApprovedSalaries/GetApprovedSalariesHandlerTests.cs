@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Salaries.Admin.GetApprovedSalaries;

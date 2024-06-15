@@ -4,7 +4,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 
-namespace TechInterviewer.Features.Salaries.Models;
+namespace Web.Api.Features.Salaries.Models;
 
 public record EditSalaryRequest
 {

@@ -4,10 +4,10 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Salaries.UpdateSalary;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Salaries.UpdateSalary;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Salaries.UpdateSalary;

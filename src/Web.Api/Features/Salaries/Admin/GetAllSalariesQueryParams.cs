@@ -3,7 +3,7 @@ using Domain.Entities.Salaries;
 using Domain.ValueObjects.Pagination;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Salaries.Admin;
+namespace Web.Api.Features.Salaries.Admin;
 
 public record GetAllSalariesQueryParams : PageModel
 {

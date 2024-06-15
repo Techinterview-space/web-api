@@ -1,7 +1,7 @@
 ﻿using System;
 using Domain.Entities.Questions;
 
-namespace TechInterviewer.Features.Surveys.Dtos;
+namespace Web.Api.Features.Surveys.Dtos;
 
 public record SalariesSurveyReplyDto
 {

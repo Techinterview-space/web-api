@@ -1,9 +1,9 @@
 ﻿using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using TechInterviewer.Features.BackgroundJobs;
+using Web.Api.Features.BackgroundJobs;
 
-namespace TechInterviewer.Setup;
+namespace Web.Api.Setup;
 
 public static class ScheduleConfig
 {

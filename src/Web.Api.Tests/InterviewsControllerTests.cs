@@ -14,12 +14,12 @@ using Infrastructure.Services.PDF.Interviews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using TechInterviewer.Features.Interviews;
-using TechInterviewer.Features.Interviews.Models;
-using TechInterviewer.Features.Labels.Models;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Interviews;
+using Web.Api.Features.Interviews.Models;
+using Web.Api.Features.Labels.Models;
 using Xunit;
 
 namespace Web.Api.Tests;

@@ -12,11 +12,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Interviews.Models;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Interviews.Models;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Interviews;
+namespace Web.Api.Features.Interviews;
 
 [ApiController]
 [Route("api/interview-templates")]

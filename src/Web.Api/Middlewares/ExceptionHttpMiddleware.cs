@@ -4,9 +4,9 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Microsoft.AspNetCore.Http;
-using TechInterviewer.Middlewares.Error;
+using Web.Api.Middlewares.Error;
 
-namespace TechInterviewer.Middlewares;
+namespace Web.Api.Middlewares;
 
 public class ExceptionHttpMiddleware
 {

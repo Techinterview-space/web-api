@@ -10,18 +10,19 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
-using TechInterviewer.Middlewares;
-using TechInterviewer.Services.Logging;
-using TechInterviewer.Services.Swagger;
-using TechInterviewer.Setup;
-using TechInterviewer.Setup.Healthcheck;
+using Web.Api.Middlewares;
+using Web.Api.Services.Logging;
+using Web.Api.Services.Swagger;
+using Web.Api.Setup;
+using Web.Api.Setup.Healthcheck;
+using Web.Api.Setup.HostedServices;
 
-namespace TechInterviewer;
+namespace Web.Api;
 
 public class Startup
 {
     private const string CorsPolicyName = "CorsPolicy";
-    private const string AppName = "Tech.Interview.API";
+    private const string AppName = "TechInterview.API";
 
     private readonly IGlobal _global;
     private readonly IConfiguration _configuration;

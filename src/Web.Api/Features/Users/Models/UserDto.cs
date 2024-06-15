@@ -6,7 +6,7 @@ using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation;
 
-namespace TechInterviewer.Features.Users.Models;
+namespace Web.Api.Features.Users.Models;
 
 public record UserDto : IHasId
 {

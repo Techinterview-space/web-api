@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace TechInterviewer.Setup.Attributes;
+namespace Web.Api.Setup.Attributes;
 
 public class CollectionMaxFileSizeAttribute : MaxFileSizeAttribute
 {

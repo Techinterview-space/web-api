@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TechInterviewer.Middlewares.Error;
+namespace Web.Api.Middlewares.Error;
 
 public record ErrorDetails
 {

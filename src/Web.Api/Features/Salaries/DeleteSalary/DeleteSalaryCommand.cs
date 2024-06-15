@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace TechInterviewer.Features.Salaries.DeleteSalary;
+namespace Web.Api.Features.Salaries.DeleteSalary;
 
 public record DeleteSalaryCommand : IRequest<Unit>
 {

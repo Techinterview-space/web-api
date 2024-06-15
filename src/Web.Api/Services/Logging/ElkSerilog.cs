@@ -6,7 +6,7 @@ using Serilog.Core;
 using Serilog.Formatting.Elasticsearch;
 using Serilog.Sinks.Elasticsearch;
 
-namespace TechInterviewer.Services.Logging;
+namespace Web.Api.Services.Logging;
 
 public class ElkSerilog
 {

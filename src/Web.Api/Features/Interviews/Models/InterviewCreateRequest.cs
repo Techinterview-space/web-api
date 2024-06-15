@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
-using TechInterviewer.Features.Labels.Models;
+using Web.Api.Features.Labels.Models;
 
-namespace TechInterviewer.Features.Interviews.Models;
+namespace Web.Api.Features.Interviews.Models;
 
 public record InterviewCreateRequest
 {

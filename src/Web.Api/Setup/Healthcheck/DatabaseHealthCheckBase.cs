@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace TechInterviewer.Setup.Healthcheck;
+namespace Web.Api.Setup.Healthcheck;
 
 public abstract class DatabaseHealthCheckBase : IHealthCheck
 {

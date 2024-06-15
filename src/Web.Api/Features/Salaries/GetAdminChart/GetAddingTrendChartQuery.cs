@@ -4,7 +4,7 @@ using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Salaries.GetAdminChart;
+namespace Web.Api.Features.Salaries.GetAdminChart;
 
 public record GetAddingTrendChartQuery : IRequest<GetAddingTrendChartResponse>
 {

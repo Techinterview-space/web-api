@@ -4,7 +4,7 @@ using Domain.Enums;
 using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 // TODO to be removed
 public record SalariesChartQueryParams : ISalariesChartQueryParams

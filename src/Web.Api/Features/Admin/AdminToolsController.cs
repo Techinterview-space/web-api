@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.Validation;
 using Infrastructure.Currencies.Contracts;
-using Infrastructure.Database;
 using Infrastructure.Services.Files;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using TechInterviewer.Features.Admin.Models;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Admin.Models;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Admin;
+namespace Web.Api.Features.Admin;
 
 [ApiController]
 [Route("api/admin-tools")]

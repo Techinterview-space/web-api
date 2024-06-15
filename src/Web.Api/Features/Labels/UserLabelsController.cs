@@ -9,10 +9,10 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TechInterviewer.Features.Labels.Models;
-using TechInterviewer.Setup.Attributes;
+using Web.Api.Features.Labels.Models;
+using Web.Api.Setup.Attributes;
 
-namespace TechInterviewer.Features.Labels;
+namespace Web.Api.Features.Labels;
 
 [ApiController]
 [Route("api/user-labels")]

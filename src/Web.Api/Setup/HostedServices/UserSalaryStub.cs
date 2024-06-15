@@ -4,7 +4,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.ValueObjects.Dates;
 
-namespace TechInterviewer.Setup.HostedServices;
+namespace Web.Api.Setup.HostedServices;
 
 internal class UserSalaryStub : UserSalary
 {

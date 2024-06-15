@@ -1,9 +1,9 @@
 ﻿using System;
 using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.AddSalary;
+namespace Web.Api.Features.Salaries.AddSalary;
 
 public record AddSalaryCommand : EditSalaryRequest, MediatR.IRequest<CreateOrEditSalaryRecordResponse>
 {

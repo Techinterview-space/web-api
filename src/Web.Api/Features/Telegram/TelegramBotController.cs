@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TechInterviewer.Features.Telegram.GetTelegramBotUsages;
+using Web.Api.Features.Telegram.GetTelegramBotUsages;
 
-namespace TechInterviewer.Features.Telegram;
+namespace Web.Api.Features.Telegram;
 
 [ApiController]
 [Route("api/telegram-bot")]

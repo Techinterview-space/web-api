@@ -1,10 +1,9 @@
-﻿using System;
-using Domain.Entities.Questions;
+﻿using Domain.Entities.Questions;
 using Domain.Validation.Exceptions;
 using MediatR;
-using TechInterviewer.Features.Surveys.Dtos;
+using Web.Api.Features.Surveys.Dtos;
 
-namespace TechInterviewer.Features.Surveys.ReplyOnSalariesSurvey;
+namespace Web.Api.Features.Surveys.ReplyOnSalariesSurvey;
 
 public record ReplyOnSalariesSurveyCommand
     : ReplyOnSalariesSurveyRequestBody, IRequest<SalariesSurveyReplyDto>

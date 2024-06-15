@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Infrastructure.Services.Global;
-using TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
-namespace TechInterviewer.Views;
+namespace Web.Api.Views;
 
 public record ChartSharePageViewModel
 {

@@ -6,9 +6,9 @@ using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Salaries;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 public record SalariesChartResponse
 {

@@ -11,7 +11,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
-namespace TechInterviewer.Services.Swagger;
+namespace Web.Api.Services.Swagger;
 
 public static class SwaggerConfig
 {

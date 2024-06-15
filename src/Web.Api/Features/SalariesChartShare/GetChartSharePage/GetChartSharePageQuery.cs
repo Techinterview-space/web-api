@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using TechInterviewer.Features.Salaries;
+using Web.Api.Features.Salaries;
 
-namespace TechInterviewer.Features.SalariesChartShare.GetChartSharePage;
+namespace Web.Api.Features.SalariesChartShare.GetChartSharePage;
 
 public record GetChartSharePageQuery
     : SalariesChartQueryParamsBase, IRequest<string>;

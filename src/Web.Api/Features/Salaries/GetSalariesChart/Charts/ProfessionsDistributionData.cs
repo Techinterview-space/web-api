@@ -2,7 +2,7 @@
 using System.Linq;
 using Infrastructure.Salaries;
 
-namespace TechInterviewer.Features.Salaries.GetSalariesChart.Charts;
+namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 public record ProfessionsDistributionData
 {

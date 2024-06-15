@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using MediatR;
-using TechInterviewer.Features.Salaries.Models;
+using Web.Api.Features.Salaries.Models;
 
-namespace TechInterviewer.Features.Salaries.Admin.GetApprovedSalaries;
+namespace Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 
 public class GetApprovedSalariesHandler
     : IRequestHandler<GetApprovedSalariesQuery, Pageable<UserSalaryAdminDto>>

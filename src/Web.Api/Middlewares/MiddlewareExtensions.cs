@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
-namespace TechInterviewer.Middlewares;
+namespace Web.Api.Middlewares;
 
 public static class MiddlewareExtensions
 {

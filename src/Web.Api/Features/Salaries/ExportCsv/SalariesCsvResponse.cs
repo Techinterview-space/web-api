@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace TechInterviewer.Features.Salaries.ExportCsv;
+namespace Web.Api.Features.Salaries.ExportCsv;
 
 public record SalariesCsvResponse
 {

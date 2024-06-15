@@ -3,7 +3,7 @@ using System.Linq;
 using Domain.Attributes;
 using Domain.Enums;
 
-namespace TechInterviewer.Features.Users.Models;
+namespace Web.Api.Features.Users.Models;
 
 public record UserUpdateRolesRequest
 {

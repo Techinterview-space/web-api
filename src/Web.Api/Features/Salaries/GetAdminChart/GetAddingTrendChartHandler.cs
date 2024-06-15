@@ -7,7 +7,7 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Salaries.GetAdminChart;
+namespace Web.Api.Features.Salaries.GetAdminChart;
 
 public class GetAddingTrendChartHandler
     : IRequestHandler<GetAddingTrendChartQuery, GetAddingTrendChartResponse>

@@ -8,7 +8,7 @@ using Domain.Entities.Users;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace TechInterviewer.Features.Surveys.Services;
+namespace Web.Api.Features.Surveys.Services;
 
 public class SalariesSurveyUserService
 {

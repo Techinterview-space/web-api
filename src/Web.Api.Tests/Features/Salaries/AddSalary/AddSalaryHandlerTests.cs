@@ -5,10 +5,10 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
-using TechInterviewer.Features.Salaries.AddSalary;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using Web.Api.Features.Salaries.AddSalary;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Salaries.AddSalary;

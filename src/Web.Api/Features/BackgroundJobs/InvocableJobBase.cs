@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Coravel.Invocable;
 using Microsoft.Extensions.Logging;
 
-namespace TechInterviewer.Features.BackgroundJobs;
+namespace Web.Api.Features.BackgroundJobs;
 
 public abstract class InvocableJobBase<TJob> : IInvocable
 {
