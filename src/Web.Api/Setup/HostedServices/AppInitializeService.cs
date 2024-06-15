@@ -51,13 +51,6 @@ public class AppInitializeService : IHostedService
 
         var telegramService = scope.ServiceProvider.GetRequiredService<TelegramBotService>();
         telegramService.StartReceiving(cancellationToken);
-
-        if (Environment.GetEnvironmentVariable("GenerateStubData") != "true")
-        {
-            return;
-        }
-
-        await GenerateSubSalariesIfEmptyAsync(database, cancellationToken);
     }
 
     private static async Task MigrateAsync(
@@ -72,45 +65,5 @@ public class AppInitializeService : IHostedService
         {
             throw new InvalidOperationException("Cannot migrate database", exception);
         }
-    }
-
-    private static async Task GenerateSubSalariesIfEmptyAsync(
-        DatabaseContext context,
-        CancellationToken cancellationToken)
-    {
-        if (await context.Salaries.AnyAsync(cancellationToken))
-        {
-            return;
-        }
-
-        var grades = new List<DeveloperGrade>
-        {
-            DeveloperGrade.Junior,
-            DeveloperGrade.Middle,
-            DeveloperGrade.Senior,
-            DeveloperGrade.Lead,
-        };
-
-        var companyTypes = EnumHelper.Values<CompanyType>(true);
-        var cities = EnumHelper.Values<KazakhstanCity>(true);
-
-        var professions = await context.Professions
-            .ToListAsync(cancellationToken);
-
-        var list = new List<UserSalary>();
-
-        for (var i = 0; i < 500; i++)
-        {
-            var random = new Random(i);
-            list.Add(new UserSalaryStub(
-                random.Next(300_000, 1_500_000),
-                grades.GetRandomItemOrDefault(i),
-                companyTypes.GetRandomItemOrDefault(i),
-                professions.GetRandomItemOrDefault(i),
-                cities.GetRandomItemOrDefault(i)).AsDomain());
-        }
-
-        context.Salaries.AddRange(list);
-        await context.SaveChangesAsync(cancellationToken);
     }
 }
