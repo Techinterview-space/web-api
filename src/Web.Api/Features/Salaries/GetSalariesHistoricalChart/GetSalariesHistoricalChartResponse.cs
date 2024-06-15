@@ -27,7 +27,6 @@ public record GetSalariesHistoricalChartResponse
         DateTimeOffset from,
         DateTimeOffset to)
     {
-        Salaries = salaries;
         From = from;
         To = to;
         HasAuthentication = true;
@@ -60,8 +59,6 @@ public record GetSalariesHistoricalChartResponse
             remoteSalaries,
             weekSplitter);
     }
-
-    public List<UserSalarySimpleDto> Salaries { get; private set; }
 
     public SalariesCountWeekByWeekChart SalariesCountWeekByWeekChart { get; private set; }
 
