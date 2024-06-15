@@ -71,18 +71,16 @@ public class GetSalariesHistoricalChartHandler
             .ToQueryable(x => new UserSalarySimpleDto
             {
                 Value = x.Value,
-                Quarter = x.Quarter,
-                Year = x.Year,
                 Company = x.Company,
                 Grade = x.Grade,
                 CreatedAt = x.CreatedAt,
-                UpdatedAt = x.UpdatedAt,
             })
             .ToListAsync(cancellationToken);
 
         return new GetSalariesHistoricalChartResponse(
             salaries,
             from,
-            to);
+            to,
+            !request.Grade.HasValue);
     }
 }

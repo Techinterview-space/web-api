@@ -43,7 +43,9 @@ public static class CollectionExtensions
         return items?.ToArray() ?? Array.Empty<T>();
     }
 
-    public static IReadOnlyCollection<IReadOnlyCollection<T>> Chunks<T>(this IReadOnlyCollection<T> list, int parts)
+    public static IReadOnlyCollection<IReadOnlyCollection<T>> Chunks<T>(
+        this IReadOnlyCollection<T> list,
+        int parts)
     {
         return list
             .Select((item, index) => new { index, item })
@@ -52,6 +54,19 @@ public static class CollectionExtensions
                 .Select(y => y.item)
                 .ToArray())
             .ToArray();
+    }
+
+    public static T GetRandomItemOrDefault<T>(
+        this List<T> items,
+        int? seed = null)
+    {
+        if (items is null || items.Count == 0)
+        {
+            return default;
+        }
+
+        var random = new Random(seed ?? DateTime.UtcNow.Millisecond);
+        return items.ElementAt(random.Next(0, items.Count - 1));
     }
 
     public static async Task<T> FirstItemOrNullAsync<T>(this Task<IReadOnlyCollection<T>> arrayTask)

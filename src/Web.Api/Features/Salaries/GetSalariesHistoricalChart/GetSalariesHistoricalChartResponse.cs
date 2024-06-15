@@ -25,7 +25,8 @@ public record GetSalariesHistoricalChartResponse
     public GetSalariesHistoricalChartResponse(
         List<UserSalarySimpleDto> salaries,
         DateTimeOffset from,
-        DateTimeOffset to)
+        DateTimeOffset to,
+        bool addGradeChartData)
     {
         From = from;
         To = to;
@@ -57,7 +58,8 @@ public record GetSalariesHistoricalChartResponse
         SalariesCountWeekByWeekChart = new SalariesCountWeekByWeekChart(
             localSalaries,
             remoteSalaries,
-            weekSplitter);
+            weekSplitter,
+            addGradeChartData);
     }
 
     public SalariesCountWeekByWeekChart SalariesCountWeekByWeekChart { get; private set; }

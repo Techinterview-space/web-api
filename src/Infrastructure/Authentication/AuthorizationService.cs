@@ -10,7 +10,6 @@ public record AuthorizationService : IAuthorization
 {
     private readonly IHttpContext _http;
     private readonly DatabaseContext _context;
-    private readonly bool _withinBackgroundJob;
 
     private User _userFromDatabase;
 
@@ -18,9 +17,13 @@ public record AuthorizationService : IAuthorization
         IHttpContext http,
         DatabaseContext context)
     {
+        if (!http.Exists)
+        {
+            throw new InvalidOperationException("Not allowed out of web");
+        }
+
         _http = http;
         _context = context;
-        _withinBackgroundJob = !_http.Exists;
     }
 
     public async Task<User> CurrentUserOrFailAsync(
@@ -33,11 +36,6 @@ public record AuthorizationService : IAuthorization
     public async Task<User> CurrentUserOrNullAsync(
         CancellationToken cancellationToken = default)
     {
-        if (_withinBackgroundJob)
-        {
-            throw new InvalidOperationException("The current user is not available within background class");
-        }
-
         if (!_http.HasUserClaims)
         {
             return null;
@@ -49,17 +47,7 @@ public record AuthorizationService : IAuthorization
     }
 
     public CurrentUser CurrentUser
-    {
-        get
-        {
-            if (_withinBackgroundJob)
-            {
-                throw new InvalidOperationException("The current user is not available within background class");
-            }
-
-            return _http.CurrentUser;
-        }
-    }
+        => _http.CurrentUser;
 
     public async Task HasRoleOrFailAsync(
         Role role,

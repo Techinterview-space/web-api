@@ -30,6 +30,10 @@ public record UserSalaryDto : UserSalarySimpleDto
         UpdatedAt = salary.UpdatedAt;
     }
 
+    public int Quarter { get; init; }
+
+    public int Year { get; init; }
+
     public Currency Currency { get; init; }
 
     public KazakhstanCity? City { get; init; }
@@ -49,6 +53,8 @@ public record UserSalaryDto : UserSalarySimpleDto
     public long? WorkIndustryId { get; init; }
 
     public long? ProfessionId { get; init; }
+
+    public DateTimeOffset UpdatedAt { get; init; }
 
     private bool RequireAdditionalData =>
         SkillId.HasValue ||

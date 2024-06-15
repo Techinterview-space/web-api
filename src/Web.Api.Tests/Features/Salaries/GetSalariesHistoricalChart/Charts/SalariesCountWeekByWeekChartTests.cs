@@ -15,66 +15,48 @@ public class SalariesCountWeekByWeekChartTests
     {
         new UserSalarySimpleDto(
             500_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Junior,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             300_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Junior,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             600_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Junior,
             DateTimeOffset.Now.AddDays(-5)),
 
         new UserSalarySimpleDto(
             700_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Middle,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             800_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Middle,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             900_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Middle,
             DateTimeOffset.Now.AddDays(-5)),
 
         new UserSalarySimpleDto(
             900_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Senior,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             1_000_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Senior,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             1_100_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Senior,
             DateTimeOffset.Now.AddDays(-5)),
@@ -84,66 +66,48 @@ public class SalariesCountWeekByWeekChartTests
     {
         new UserSalarySimpleDto(
             1_500_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Junior,
             DateTimeOffset.Now.AddDays(-45)),
         new UserSalarySimpleDto(
             1_300_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Junior,
             DateTimeOffset.Now.AddDays(-35)),
         new UserSalarySimpleDto(
             1_600_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Junior,
             DateTimeOffset.Now.AddDays(-15)),
 
         new UserSalarySimpleDto(
             1_700_000,
-            1,
-            2024,
             CompanyType.Local,
             DeveloperGrade.Middle,
             DateTimeOffset.Now.AddDays(-5)),
         new UserSalarySimpleDto(
             1_800_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Middle,
             DateTimeOffset.Now.AddDays(-25)),
         new UserSalarySimpleDto(
             1_900_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Middle,
             DateTimeOffset.Now.AddDays(-45)),
 
         new UserSalarySimpleDto(
             1_900_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Senior,
             DateTimeOffset.Now.AddDays(-45)),
         new UserSalarySimpleDto(
             2_000_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Senior,
             DateTimeOffset.Now.AddDays(-55)),
         new UserSalarySimpleDto(
             2_100_000,
-            1,
-            2024,
             CompanyType.Foreign,
             DeveloperGrade.Senior,
             DateTimeOffset.Now.AddDays(-15)),
@@ -163,7 +127,8 @@ public class SalariesCountWeekByWeekChartTests
         var chart = new SalariesCountWeekByWeekChart(
             localSalaries,
             remoteSalaries,
-            weekSplitter);
+            weekSplitter,
+            true);
 
         Assert.Equal(20, chart.TotalCountItems.Count);
         foreach (var item in chart.TotalCountItems)
@@ -197,7 +162,8 @@ public class SalariesCountWeekByWeekChartTests
         var chart = new SalariesCountWeekByWeekChart(
             _localSalaries,
             _remoteSalaries,
-            weekSplitter);
+            weekSplitter,
+            true);
 
         Assert.Equal(20, chart.TotalCountItems.Count);
 
@@ -248,5 +214,28 @@ public class SalariesCountWeekByWeekChartTests
         Assert.Equal(755_555.5555555555, chart.TotalCountItems[19].LocalAverage);
         Assert.Equal(1_800_000, chart.TotalCountItems[19].RemoteMedian);
         Assert.Equal(1755555.5555555555, chart.TotalCountItems[19].RemoteAverage);
+
+        Assert.NotEmpty(chart.GradeItems);
+        Assert.True(chart.HasGradeItems);
+    }
+
+    [Fact]
+    public void Ctor_HasSalaries_NoGradeItems_Ok()
+    {
+        var now = DateTime.UtcNow;
+        var weekSplitter = new WeekSplitter(
+            now.AddDays(-140),
+            now);
+
+        var chart = new SalariesCountWeekByWeekChart(
+            _localSalaries,
+            _remoteSalaries,
+            weekSplitter,
+            false);
+
+        Assert.Equal(20, chart.TotalCountItems.Count);
+
+        Assert.Empty(chart.GradeItems);
+        Assert.False(chart.HasGradeItems);
     }
 }

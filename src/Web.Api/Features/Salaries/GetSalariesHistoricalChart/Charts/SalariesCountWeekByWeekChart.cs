@@ -3,22 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Enums;
 using Domain.Extensions;
+using Domain.ValueObjects;
 using Infrastructure.Salaries;
 
 namespace TechInterviewer.Features.Salaries.GetSalariesHistoricalChart.Charts;
 
 public record SalariesCountWeekByWeekChart
 {
-    public List<DateTime> WeekEnds { get; init; }
+    public List<DateTime> WeekEnds { get; }
 
-    public List<SalariesCountWeekByWeekChartItem> TotalCountItems { get; init; }
+    public List<SalariesCountWeekByWeekChartItem> TotalCountItems { get; }
 
-    public List<SalariesCountWeekByWeekChartGradeItem> GradeItems { get; init; }
+    public List<SalariesCountWeekByWeekChartGradeItem> GradeItems { get; }
+
+    public bool HasGradeItems => GradeItems.Count > 0;
 
     public SalariesCountWeekByWeekChart(
         List<UserSalarySimpleDto> localSalaries,
         List<UserSalarySimpleDto> remoteSalaries,
-        WeekSplitter weekSplitter)
+        DateTimeRangeSplitter weekSplitter,
+        bool addGradeChartData)
     {
         WeekEnds = new List<DateTime>();
         TotalCountItems = new List<SalariesCountWeekByWeekChartItem>();
@@ -42,6 +46,11 @@ public record SalariesCountWeekByWeekChart
                 localSalariesForPeriod.AverageOrDefault(x => x.Value),
                 remoteSalariesForPeriod.Median(x => x.Value),
                 remoteSalariesForPeriod.AverageOrDefault(x => x.Value)));
+
+            if (!addGradeChartData)
+            {
+                continue;
+            }
 
             foreach (var grade in GetSalariesHistoricalChartResponse.GradesToBeUsedInChart)
             {

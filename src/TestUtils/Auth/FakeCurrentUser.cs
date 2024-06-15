@@ -9,7 +9,8 @@ namespace TestUtils.Auth;
 
 public record FakeCurrentUser : CurrentUser
 {
-    public FakeCurrentUser(User user)
+    public FakeCurrentUser(
+        User user)
     {
         Id = user.Id.ToString();
         FirstName = user.FirstName;

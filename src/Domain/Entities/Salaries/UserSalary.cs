@@ -142,7 +142,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         UpdatedAt = DateTime.UtcNow;
     }
 
-    private static double NonNegativeValue(double value)
+    protected static double NonNegativeValue(double value)
     {
         if (value <= 0)
         {
@@ -152,7 +152,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         return value;
     }
 
-    private static int NonNegativeValue(int value)
+    protected static int NonNegativeValue(int value)
     {
         if (value <= 0)
         {
