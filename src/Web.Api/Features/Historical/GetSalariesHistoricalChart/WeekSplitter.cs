@@ -1,7 +1,7 @@
 ﻿using System;
 using Domain.ValueObjects;
 
-namespace Web.Api.Features.Salaries.GetSalariesHistoricalChart;
+namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
 public record WeekSplitter : DateTimeRangeSplitter
 {

@@ -4,11 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
+using Infrastructure.Extensions;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Web.Api.Features.Salaries.GetSalariesHistoricalChart;
+namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
 public class GetSalariesHistoricalChartHandler
     : IRequestHandler<GetSalariesHistoricalChartQuery, GetSalariesHistoricalChartResponse>
@@ -44,16 +45,10 @@ public class GetSalariesHistoricalChartHandler
 
         if (currentUser != null)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
-
             var userSalariesForLastYear = await _context.Salaries
-                .Where(x => x.UserId == user.Id)
-                .Where(x => x.Year == salariesQuery.CurrentQuarter.Year || x.Year == salariesQuery.CurrentQuarter.Year - 1)
-                .AsNoTracking()
-                .OrderByDescending(x => x.Year)
-                .ThenByDescending(x => x.Quarter)
-                .ToListAsync(cancellationToken);
+                .GetUserRelevantSalariesAsync(
+                    currentUser.Id,
+                    cancellationToken);
 
             shouldAddOwnSalary = !userSalariesForLastYear.Any();
         }
