@@ -13,7 +13,7 @@ public record SurveyResultsByWeeksChart
 {
     public List<DateTime> WeekEnds { get; }
 
-    public List<SurveyResultsByWeeksChartItem> TotalCountItems { get; }
+    public List<SurveyResultsByWeeksChartItem> Items { get; }
 
     public List<SurveyResultsByWeeksChartGradeItem> GradeItems { get; }
 
@@ -26,7 +26,7 @@ public record SurveyResultsByWeeksChart
         bool addGradeChartData)
     {
         WeekEnds = new List<DateTime>();
-        TotalCountItems = new List<SurveyResultsByWeeksChartItem>();
+        Items = new List<SurveyResultsByWeeksChartItem>();
         GradeItems = new List<SurveyResultsByWeeksChartGradeItem>();
 
         foreach (var (start, end) in weekSplitter.ToList())
@@ -41,7 +41,7 @@ public record SurveyResultsByWeeksChart
                 remoteRecords,
                 end);
 
-            TotalCountItems.Add(
+            Items.Add(
                 new SurveyResultsByWeeksChartItem(
                     localData.TotalCount + remoteData.TotalCount,
                     localData.GetUsefulnessReport(),
