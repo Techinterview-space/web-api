@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 using Infrastructure.Salaries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Web.Api.Features.Salaries.GetSalariesHistoricalChart;
+using Web.Api.Features.Historical.GetSalariesHistoricalChart;
+using Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
-namespace Web.Api.Features.Salaries;
+namespace Web.Api.Features.Historical;
 
 [ApiController]
 [Route("api/historical-charts")]
@@ -21,7 +22,7 @@ public class HistoricalChartsController : ControllerBase
     }
 
     [HttpGet("salaries")]
-    public Task<GetSalariesHistoricalChartResponse> GetHistoricalChart(
+    public Task<GetSalariesHistoricalChartResponse> GetSalariesHistoricalChart(
         [FromQuery] GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
@@ -34,6 +35,15 @@ public class HistoricalChartsController : ControllerBase
                 ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
                 Cities = request.Cities,
             },
+            cancellationToken);
+    }
+
+    [HttpGet("survey")]
+    public Task<GetSurveyHistoricalChartResponse> GetSurveyHistoricalChart(
+        CancellationToken cancellationToken)
+    {
+        return _mediator.Send(
+            new GetSurveyHistoricalChartQuery(),
             cancellationToken);
     }
 }

@@ -6,7 +6,7 @@ using Domain.Extensions;
 using Domain.ValueObjects;
 using Infrastructure.Salaries;
 
-namespace Web.Api.Features.Salaries.GetSalariesHistoricalChart.Charts;
+namespace Web.Api.Features.Historical.GetSalariesHistoricalChart.Charts;
 
 public record SalariesCountWeekByWeekChart
 {
