@@ -1,10 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domain.Entities.Enums;
+using Domain.Entities.Salaries;
+using Domain.ValueObjects.Dates;
 
 namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
 public record GetSurveyHistoricalChartResponse
 {
+    public static readonly List<DeveloperGrade> GradesToBeUsedInChart = new ()
+    {
+        DeveloperGrade.Junior,
+        DeveloperGrade.Middle,
+        DeveloperGrade.Senior,
+        DeveloperGrade.Lead,
+    };
+
     private GetSurveyHistoricalChartResponse()
     {
     }
@@ -18,7 +29,37 @@ public record GetSurveyHistoricalChartResponse
         To = to;
         ChartFrom = from;
         ChartTo = to;
+
+        var twentyWeeksBeforeTo = to.DateTime.AddDays(-140);
+        var weekSplitterFrom = from.Earlier(twentyWeeksBeforeTo)
+            ? twentyWeeksBeforeTo
+            : from.DateTime;
+
+        var weekSplitter = new WeekSplitter(weekSplitterFrom, to.DateTime);
+
+        var localSalaries = new List<SurveyDatabaseData>();
+        var remoteSalaries = new List<SurveyDatabaseData>();
+
+        foreach (var salary in records)
+        {
+            if (salary.LastSalary.CompanyType is CompanyType.Local)
+            {
+                localSalaries.Add(salary);
+            }
+            else if (salary.LastSalary.CompanyType is CompanyType.Foreign)
+            {
+                remoteSalaries.Add(salary);
+            }
+        }
+
+        SurveyResultsByWeeksChart = new SurveyResultsByWeeksChart(
+            localSalaries,
+            remoteSalaries,
+            weekSplitter,
+            true);
     }
+
+    public SurveyResultsByWeeksChart SurveyResultsByWeeksChart { get; private set; }
 
     public bool ShouldAddOwnSalary { get; private set; }
 

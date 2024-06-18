@@ -75,6 +75,9 @@ public class GetSurveyHistoricalChartHandler
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        throw new System.NotImplementedException();
+        return new GetSurveyHistoricalChartResponse(
+            surveyReplies,
+            from,
+            to);
     }
 }
