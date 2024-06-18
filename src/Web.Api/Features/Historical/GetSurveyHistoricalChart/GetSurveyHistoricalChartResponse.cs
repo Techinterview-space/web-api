@@ -42,11 +42,11 @@ public record GetSurveyHistoricalChartResponse
 
         foreach (var salary in records)
         {
-            if (salary.LastSalary.CompanyType is CompanyType.Local)
+            if (salary.LastSalaryOrNull?.CompanyType is CompanyType.Local)
             {
                 localSalaries.Add(salary);
             }
-            else if (salary.LastSalary.CompanyType is CompanyType.Foreign)
+            else if (salary.LastSalaryOrNull?.CompanyType is CompanyType.Foreign)
             {
                 remoteSalaries.Add(salary);
             }

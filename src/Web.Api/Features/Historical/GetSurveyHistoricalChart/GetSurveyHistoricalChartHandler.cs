@@ -60,23 +60,28 @@ public class GetSurveyHistoricalChartHandler
             .Include(x => x.CreatedByUser)
             .ThenInclude(x => x.Salaries)
             .Where(x => x.CreatedAt >= from && x.CreatedAt <= to)
+            .Select(x => new
+            {
+                x.ExpectationReply,
+                x.UsefulnessReply,
+                x.CreatedAt,
+                LastSalaryOrNull = x.CreatedByUser.Salaries
+                    .OrderBy(s => s.CreatedAt)
+                    .LastOrDefault()
+            })
             .Select(x => new SurveyDatabaseData
             {
                 ExpectationReply = x.ExpectationReply,
                 UsefulnessReply = x.UsefulnessReply,
                 CreatedAt = x.CreatedAt,
-                LastSalary = new SurveyDatabaseData.UserLastSalaryData
-                {
-                    CompanyType = x.CreatedByUser.Salaries
-                        .OrderBy(s => s.CreatedAt)
-                        .Last().Company,
-                    Grade = x.CreatedByUser.Salaries
-                        .OrderBy(s => s.CreatedAt)
-                        .Last().Grade,
-                    CreatedAt = x.CreatedByUser.Salaries
-                        .OrderBy(s => s.CreatedAt)
-                        .Last().CreatedAt,
-                },
+                LastSalaryOrNull = x.LastSalaryOrNull != null
+                    ? new SurveyDatabaseData.UserLastSalaryData
+                    {
+                        CompanyType = x.LastSalaryOrNull.Company,
+                        Grade = x.LastSalaryOrNull.Grade,
+                        CreatedAt = x.LastSalaryOrNull.CreatedAt,
+                    }
+                    : null,
             })
             .AsNoTracking()
             .ToListAsync(cancellationToken);

@@ -59,14 +59,14 @@ public record SurveyResultsByWeeksChart
                 var localGradeData = new RecordsForPeriodCalculator(
                     localData
                         .RecordsForPeriod
-                        .Where(x => x.LastSalary.Grade == grade)
+                        .Where(x => x.LastSalaryOrNull.Grade == grade)
                         .ToList(),
                     end);
 
                 var remoteGradeData = new RecordsForPeriodCalculator(
                     remoteData
                         .RecordsForPeriod
-                        .Where(x => x.LastSalary.Grade == grade)
+                        .Where(x => x.LastSalaryOrNull.Grade == grade)
                         .ToList(),
                     end);
 

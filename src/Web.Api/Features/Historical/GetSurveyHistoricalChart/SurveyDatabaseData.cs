@@ -11,7 +11,7 @@ public record SurveyDatabaseData
 
     public ExpectationReplyType ExpectationReply { get; init; }
 
-    public UserLastSalaryData LastSalary { get; init; }
+    public UserLastSalaryData LastSalaryOrNull { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
 
