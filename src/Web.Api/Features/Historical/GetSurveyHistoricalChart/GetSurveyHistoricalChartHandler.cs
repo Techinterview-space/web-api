@@ -67,9 +67,15 @@ public class GetSurveyHistoricalChartHandler
                 CreatedAt = x.CreatedAt,
                 LastSalary = new SurveyDatabaseData.UserLastSalaryData
                 {
-                    CompanyType = x.CreatedByUser.Salaries.Last().Company,
-                    Grade = x.CreatedByUser.Salaries.Last().Grade,
-                    CreatedAt = x.CreatedByUser.Salaries.Last().CreatedAt,
+                    CompanyType = x.CreatedByUser.Salaries
+                        .OrderBy(s => s.CreatedAt)
+                        .Last().Company,
+                    Grade = x.CreatedByUser.Salaries
+                        .OrderBy(s => s.CreatedAt)
+                        .Last().Grade,
+                    CreatedAt = x.CreatedByUser.Salaries
+                        .OrderBy(s => s.CreatedAt)
+                        .Last().CreatedAt,
                 },
             })
             .AsNoTracking()
