@@ -73,6 +73,8 @@ public record SurveyResultsByWeeksChart
                 GradeItems.Add(
                     new SurveyResultsByWeeksChartGradeItem(
                         grade,
+                        localGradeData.TotalCount,
+                        remoteGradeData.TotalCount,
                         localGradeData.TotalCount + remoteGradeData.TotalCount,
                         localGradeData.GetUsefulnessReport(),
                         remoteGradeData.GetUsefulnessReport(),
@@ -93,6 +95,8 @@ public record SurveyResultsByWeeksChart
 
     public record SurveyResultsByWeeksChartGradeItem(
         DeveloperGrade Grade,
+        int LocalCount,
+        int RemoteCount,
         int TotalCount,
         List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> LocalUsefulnessPercentage,
         List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> RemoteUsefulnessPercentage,
