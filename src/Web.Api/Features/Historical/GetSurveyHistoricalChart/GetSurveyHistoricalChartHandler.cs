@@ -84,6 +84,7 @@ public class GetSurveyHistoricalChartHandler
                     : null,
             })
             .AsNoTracking()
+            .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
         return new GetSurveyHistoricalChartResponse(

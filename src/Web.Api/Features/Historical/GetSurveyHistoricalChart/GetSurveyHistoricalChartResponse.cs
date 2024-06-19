@@ -30,8 +30,13 @@ public record GetSurveyHistoricalChartResponse
         ChartFrom = from;
         ChartTo = to;
 
-        var someWeeksAgo = to.DateTime.AddDays(-140);
-        var weekSplitterFrom = from.Earlier(someWeeksAgo)
+        var someWeeksAgo = to.DateTime.AddDays(-70);
+        var firstSalaryDate = records[0].CreatedAt;
+        var fromDateToCalculateWeeks = firstSalaryDate.Earlier(someWeeksAgo)
+            ? someWeeksAgo
+            : firstSalaryDate.DateTime;
+
+        var weekSplitterFrom = from.Earlier(fromDateToCalculateWeeks)
             ? someWeeksAgo
             : from.DateTime;
 
