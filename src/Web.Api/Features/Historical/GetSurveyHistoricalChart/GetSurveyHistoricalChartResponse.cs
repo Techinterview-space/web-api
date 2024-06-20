@@ -23,12 +23,14 @@ public record GetSurveyHistoricalChartResponse
     public GetSurveyHistoricalChartResponse(
         List<SurveyDatabaseData> records,
         DateTimeOffset from,
-        DateTimeOffset to)
+        DateTimeOffset to,
+        DateTimeOffset? lastSurveyReplyDate)
     {
         From = from;
         To = to;
         ChartFrom = from;
         ChartTo = to;
+        LastSurveyReplyDate = lastSurveyReplyDate;
 
         var someWeeksAgo = to.DateTime.AddDays(-70);
         var firstSalaryDate = records[0].CreatedAt;
@@ -63,6 +65,10 @@ public record GetSurveyHistoricalChartResponse
             weekSplitter,
             true);
     }
+
+    public bool HasRecentSurveyReply => LastSurveyReplyDate.HasValue;
+
+    public DateTimeOffset? LastSurveyReplyDate { get; }
 
     public SurveyResultsByWeeksChart SurveyResultsByWeeksChart { get; private set; }
 

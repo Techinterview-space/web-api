@@ -8,6 +8,7 @@ using Infrastructure.Database;
 using Infrastructure.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Web.Api.Features.Surveys.Services;
 
 namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
@@ -87,9 +88,13 @@ public class GetSurveyHistoricalChartHandler
             .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
+        var lastSurvey = await new SalariesSurveyUserService(_context)
+            .GetLastSurveyOrNullAsync(currentUser, cancellationToken);
+
         return new GetSurveyHistoricalChartResponse(
             surveyReplies,
             from,
-            to);
+            to,
+            lastSurvey?.CreatedAt);
     }
 }
