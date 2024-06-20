@@ -8,6 +8,7 @@ using Infrastructure.Database;
 using Infrastructure.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Web.Api.Features.Surveys.Services;
 
 namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
@@ -15,15 +16,20 @@ namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 public class GetSurveyHistoricalChartHandler
     : IRequestHandler<GetSurveyHistoricalChartQuery, GetSurveyHistoricalChartResponse>
 {
+    private const string CacheKey = $"{nameof(GetSurveyHistoricalChartHandler)}_SurveyData";
+
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
+    private readonly IMemoryCache _memoryCache;
 
     public GetSurveyHistoricalChartHandler(
         IAuthorization auth,
-        DatabaseContext context)
+        DatabaseContext context,
+        IMemoryCache memoryCache)
     {
         _auth = auth;
         _context = context;
+        _memoryCache = memoryCache;
     }
 
     public async Task<GetSurveyHistoricalChartResponse> Handle(
@@ -57,39 +63,47 @@ public class GetSurveyHistoricalChartHandler
                 to);
         }
 
-        var surveyReplies = await _context.SalariesSurveyReplies
-            .Include(x => x.CreatedByUser)
-            .ThenInclude(x => x.Salaries)
-            .Where(x => x.CreatedAt >= from && x.CreatedAt <= to)
-            .Select(x => new
-            {
-                x.ExpectationReply,
-                x.UsefulnessReply,
-                x.CreatedAt,
-                LastSalaryOrNull = x.CreatedByUser.Salaries
-                    .OrderBy(s => s.CreatedAt)
-                    .LastOrDefault()
-            })
-            .Select(x => new SurveyDatabaseData
-            {
-                ExpectationReply = x.ExpectationReply,
-                UsefulnessReply = x.UsefulnessReply,
-                CreatedAt = x.CreatedAt,
-                LastSalaryOrNull = x.LastSalaryOrNull != null
-                    ? new SurveyDatabaseData.UserLastSalaryData
-                    {
-                        CompanyType = x.LastSalaryOrNull.Company,
-                        Grade = x.LastSalaryOrNull.Grade,
-                        CreatedAt = x.LastSalaryOrNull.CreatedAt,
-                    }
-                    : null,
-            })
-            .AsNoTracking()
-            .OrderBy(x => x.CreatedAt)
-            .ToListAsync(cancellationToken);
-
         var lastSurvey = await new SalariesSurveyUserService(_context)
             .GetLastSurveyOrNullAsync(currentUser, cancellationToken);
+
+        var surveyReplies = await _memoryCache
+            .GetOrCreateAsync(
+                CacheKey,
+                async (entry) =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
+
+                    return await _context.SalariesSurveyReplies
+                        .Include(x => x.CreatedByUser)
+                        .ThenInclude(x => x.Salaries)
+                        .Where(x => x.CreatedAt >= from && x.CreatedAt <= to)
+                        .Select(x => new
+                        {
+                            x.ExpectationReply,
+                            x.UsefulnessReply,
+                            x.CreatedAt,
+                            LastSalaryOrNull = x.CreatedByUser.Salaries
+                                .OrderBy(s => s.CreatedAt)
+                                .LastOrDefault()
+                        })
+                        .Select(x => new SurveyDatabaseData
+                        {
+                            ExpectationReply = x.ExpectationReply,
+                            UsefulnessReply = x.UsefulnessReply,
+                            CreatedAt = x.CreatedAt,
+                            LastSalaryOrNull = x.LastSalaryOrNull != null
+                                ? new SurveyDatabaseData.UserLastSalaryData
+                                {
+                                    CompanyType = x.LastSalaryOrNull.Company,
+                                    Grade = x.LastSalaryOrNull.Grade,
+                                    CreatedAt = x.LastSalaryOrNull.CreatedAt,
+                                }
+                                : null,
+                        })
+                        .AsNoTracking()
+                        .OrderBy(x => x.CreatedAt)
+                        .ToListAsync(cancellationToken);
+                });
 
         return new GetSurveyHistoricalChartResponse(
             surveyReplies,
