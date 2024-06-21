@@ -8,11 +8,13 @@ using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
+using Domain.ValueObjects.Dates.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Infrastructure.Database;
 
-public class DatabaseContext : AppDbContextBase<DatabaseContext>
+public class DatabaseContext : DbContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options)
         : base(options)
@@ -38,6 +40,8 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
     public DbSet<Profession> Professions { get; set; }
 
     public DbSet<TelegramBotUsage> TelegramBotUsages { get; set; }
+
+    public DbSet<TelegramUserSettings> TelegramUserSettings { get; set; }
 
     public DbSet<UserCsvDownload> UserCsvDownloads { get; set; }
 
@@ -122,5 +126,59 @@ public class DatabaseContext : AppDbContextBase<DatabaseContext>
             const string defaultError = "Cannot execute transaction due to database error";
             throw new InvalidOperationException(errorMessage ?? defaultError, exception);
         }
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        OnBeforeSaving();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+    {
+        OnBeforeSaving();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
+    }
+
+    protected virtual void OnBeforeSaving()
+    {
+        var entries = ChangeTracker.Entries<IHasDates>();
+        var currentDateTime = DateTimeOffset.Now;
+
+        foreach (EntityEntry<IHasDates> entry in entries)
+        {
+            switch (entry.State)
+            {
+                case EntityState.Modified:
+                    entry.Entity.OnUpdate(currentDateTime);
+                    break;
+
+                case EntityState.Added:
+                    if (!IsInMemory())
+                    {
+                        entry.Entity.OnCreate(currentDateTime);
+                        break;
+                    }
+
+                    if (entry.Entity.CreatedAt == default)
+                    {
+                        entry.Entity.OnCreate(currentDateTime);
+                    }
+
+                    break;
+            }
+        }
+    }
+
+    protected virtual bool IsInMemory()
+    {
+        return false;
     }
 }
