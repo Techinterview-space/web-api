@@ -31,5 +31,7 @@ public class TelegramUserSettings : HasDatesBase, IHasIdBase<Guid>
 
     public virtual User User { get; protected set; }
 
+    public bool SendBotRegularStatsUpdates { get; protected set; }
+
     public Guid Id { get; protected set; }
 }
