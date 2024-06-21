@@ -32,6 +32,7 @@ public static class ServiceRegistration
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
         services.AddScoped<IPdf, PdfRenderer>();
         services.AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>();
+        services.AddTransient<TelegramBotClientProvider>();
         services.AddTransient<TelegramBotService>();
         services.AddTransient<ICurrencyService, CurrencyService>();
 

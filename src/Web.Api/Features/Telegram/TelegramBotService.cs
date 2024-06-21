@@ -24,17 +24,17 @@ public class TelegramBotService
         UpdateType.ChosenInlineResult,
     }.ToArray();
 
-    private readonly IConfiguration _configuration;
+    private readonly TelegramBotClientProvider _botClientProvider;
     private readonly ILogger<TelegramBotService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DateTime _startedToListenTo;
 
     public TelegramBotService(
-        IConfiguration configuration,
+        TelegramBotClientProvider botClientProvider,
         ILogger<TelegramBotService> logger,
         IServiceScopeFactory serviceScopeFactory)
     {
-        _configuration = configuration;
+        _botClientProvider = botClientProvider;
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
         _startedToListenTo = DateTime.UtcNow;
@@ -43,28 +43,11 @@ public class TelegramBotService
     public void StartReceiving(
         CancellationToken cancellationToken)
     {
-        var enabled = _configuration["Telegram:Enable"]?.ToLowerInvariant();
-        var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
-
-        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
-        if (string.IsNullOrEmpty(token))
+        var client = _botClientProvider.CreateClient();
+        if (client is null)
         {
-            token = _configuration["Telegram:BotToken"];
-        }
-
-        if (!parsedEnabled ||
-            !isEnabled ||
-            string.IsNullOrEmpty(token))
-        {
-            _logger.LogWarning(
-                "Telegram bot is disabled. Value {Value}. Parsed: {Parsed}",
-                enabled,
-                parsedEnabled);
-
             return;
         }
-
-        var client = CreateClient(token);
 
         client.StartReceiving(
             updateHandler: HandleUpdateAsync,
@@ -81,7 +64,11 @@ public class TelegramBotService
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "An error occurred while polling: {Message}", exception.Message);
+        _logger.LogError(
+            exception,
+            "An error occurred while polling: {Message}",
+            exception.Message);
+
         return Task.CompletedTask;
     }
 

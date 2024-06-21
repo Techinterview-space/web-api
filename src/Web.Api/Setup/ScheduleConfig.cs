@@ -18,7 +18,8 @@ public static class ScheduleConfig
     {
         services
             .AddScheduler()
-            .AddTransient<CurrenciesResetJob>();
+            .AddTransient<CurrenciesResetJob>()
+            .AddTransient<TelegramSalariesRegularStatsUpdateJob>();
 
         return services;
     }
@@ -30,6 +31,11 @@ public static class ScheduleConfig
             scheduler
                 .Schedule<CurrenciesResetJob>()
                 .DailyAt(6, 0)
+                .RunOnceAtStart();
+
+            scheduler
+                .Schedule<TelegramSalariesRegularStatsUpdateJob>()
+                .DailyAt(7, 0)
                 .RunOnceAtStart();
         });
     }
