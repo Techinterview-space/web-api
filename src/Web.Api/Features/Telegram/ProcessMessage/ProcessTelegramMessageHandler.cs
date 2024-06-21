@@ -107,21 +107,17 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             botUser.Username != null &&
             messageText.StartsWith(botUser.Username);
 
-        var privateMessage = message.Chat.Type == ChatType.Private;
         TelegramBotReplyData replyData = null;
-        if (mentionedInGroupChat || privateMessage)
+        if (mentionedInGroupChat ||
+            message.Chat.Type is ChatType.Private)
         {
-            if (privateMessage && messageText.Equals("/start", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var startReplyData = new TelegramBotStartCommandReplyData(new SalariesChartPageLink(_global, null));
-                await request.BotClient.SendTextMessageAsync(
-                    message.Chat.Id,
-                    startReplyData.ReplyText,
-                    parseMode: startReplyData.ParseMode,
-                    replyMarkup: startReplyData.InlineKeyboardMarkup,
-                    cancellationToken: cancellationToken);
+            var directMessageResult = await TryProcessDirectMessageAsync(
+                request,
+                cancellationToken);
 
-                return startReplyData.ReplyText;
+            if (directMessageResult.Processed)
+            {
+                return directMessageResult.ReplyText;
             }
 
             var parameters = TelegramBotUserCommandParameters.CreateFromMessage(
@@ -168,6 +164,68 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         }
 
         return replyData?.ReplyText;
+    }
+
+    private async Task<(bool Processed, string ReplyText)> TryProcessDirectMessageAsync(
+        ProcessTelegramMessageCommand request,
+        CancellationToken cancellationToken)
+    {
+        var message = request.UpdateRequest.Message!;
+        var messageText = message.Text ?? string.Empty;
+
+        if (message.Chat.Type is not ChatType.Private)
+        {
+            return (false, null);
+        }
+
+        if (messageText.Equals("/start", StringComparison.InvariantCultureIgnoreCase))
+        {
+            var startReplyData = new TelegramBotStartCommandReplyData(
+                new SalariesChartPageLink(
+                    _global,
+                    null));
+
+            await request.BotClient.SendTextMessageAsync(
+                message.Chat.Id,
+                startReplyData.ReplyText,
+                parseMode: startReplyData.ParseMode,
+                replyMarkup: startReplyData.InlineKeyboardMarkup,
+                cancellationToken: cancellationToken);
+
+            return (true, startReplyData.ReplyText);
+        }
+
+        if (messageText.Equals("/info", StringComparison.InvariantCultureIgnoreCase))
+        {
+            var replyMessage = $@"
+Chat ID: {message.Chat.Id}
+Chat type: {message.Chat.Type}
+User ID: {message.From?.Id}
+Username: {message.From?.Username}
+First name: {message.From?.FirstName}
+Last name: {message.From?.LastName}";
+
+            await request.BotClient.SendTextMessageAsync(
+                message.Chat.Id,
+                replyMessage,
+                cancellationToken: cancellationToken);
+
+            return (true, replyMessage);
+        }
+
+        if (messageText.Equals("/help", StringComparison.InvariantCultureIgnoreCase))
+        {
+            var replyMessage = $@"Команда еще в разработке. Stay tuned";
+
+            await request.BotClient.SendTextMessageAsync(
+                message.Chat.Id,
+                replyMessage,
+                cancellationToken: cancellationToken);
+
+            return (true, replyMessage);
+        }
+
+        return (false, null);
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
