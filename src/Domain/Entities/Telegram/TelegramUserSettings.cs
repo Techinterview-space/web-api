@@ -13,7 +13,8 @@ public class TelegramUserSettings : HasDatesBase, IHasIdBase<Guid>
     public TelegramUserSettings(
         string username,
         long chatId,
-        User user)
+        User user,
+        bool sendBotRegularStatsUpdates = false)
     {
         Username = username;
         ChatId = chatId;
