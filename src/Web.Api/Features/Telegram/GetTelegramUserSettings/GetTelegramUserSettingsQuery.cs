@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Domain.ValueObjects.Pagination;
 using MediatR;
 
 namespace Web.Api.Features.Telegram.GetTelegramUserSettings;
 
-public record GetTelegramUserSettingsQuery : IRequest<List<TelegramUserSettingsDto>>;
+public record GetTelegramUserSettingsQuery : PageModel, IRequest<Pageable<TelegramUserSettingsDto>>;

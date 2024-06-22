@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Telegram.GetTelegramUserSettings;
 
 public class GetTelegramUserSettingsHandler
-    : IRequestHandler<GetTelegramUserSettingsQuery, List<TelegramUserSettingsDto>>
+    : IRequestHandler<GetTelegramUserSettingsQuery, Pageable<TelegramUserSettingsDto>>
 {
     private readonly DatabaseContext _context;
 
@@ -19,12 +18,13 @@ public class GetTelegramUserSettingsHandler
         _context = context;
     }
 
-    public async Task<List<TelegramUserSettingsDto>> Handle(
+    public async Task<Pageable<TelegramUserSettingsDto>> Handle(
         GetTelegramUserSettingsQuery request,
         CancellationToken cancellationToken)
     {
         return await _context.TelegramUserSettings
+            .OrderBy(x => x.CreatedAt)
             .Select(TelegramUserSettingsDto.Transform)
-            .ToListAsync(cancellationToken);
+            .AsPaginatedAsync(request, cancellationToken);
     }
 }
