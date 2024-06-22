@@ -20,6 +20,7 @@ public class TelegramUserSettings : HasDatesBase, IHasIdBase<Guid>
         ChatId = chatId;
         UserId = user.Id;
         User = user;
+        SendBotRegularStatsUpdates = sendBotRegularStatsUpdates;
     }
 
     [Required]
@@ -35,4 +36,11 @@ public class TelegramUserSettings : HasDatesBase, IHasIdBase<Guid>
     public bool SendBotRegularStatsUpdates { get; protected set; }
 
     public Guid Id { get; protected set; }
+
+    public void Update(
+        bool sendBotRegularStatsUpdates)
+    {
+        SendBotRegularStatsUpdates = sendBotRegularStatsUpdates;
+        UpdatedAt = DateTime.UtcNow;
+    }
 }

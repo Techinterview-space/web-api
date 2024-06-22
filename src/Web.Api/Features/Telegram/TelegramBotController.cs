@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
@@ -6,8 +7,10 @@ using Domain.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
+using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
+using Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Telegram;
@@ -36,11 +39,12 @@ public class TelegramBotController : ControllerBase
     }
 
     [HttpGet("bot-user-settings")]
-    public async Task<List<TelegramUserSettingsDto>> GetTelegramUserSettings(
+    public async Task<Pageable<TelegramUserSettingsDto>> GetTelegramUserSettings(
+        [FromQuery] GetTelegramUserSettingsQuery request,
         CancellationToken cancellationToken)
     {
         return await _mediator.Send(
-            new GetTelegramUserSettingsQuery(),
+            request,
             cancellationToken);
     }
 
@@ -52,5 +56,30 @@ public class TelegramBotController : ControllerBase
         return await _mediator.Send(
             new AddTelegramUserSettingsCommand(request),
             cancellationToken);
+    }
+
+    [HttpPut("bot-user-settings/{id:guid}")]
+    public async Task<TelegramUserSettingsDto> UpdateTelegramUserSettings(
+        [FromRoute] Guid id,
+        UpdateTelegramUserSettingsBody request,
+        CancellationToken cancellationToken)
+    {
+        return await _mediator.Send(
+            new UpdateTelegramUserSettingsCommand(
+                id,
+                request),
+            cancellationToken);
+    }
+
+    [HttpDelete("bot-user-settings/{id:guid}")]
+    public async Task<IActionResult> DeleteTelegramUserSettings(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteTelegramUserSettingsCommand(id),
+            cancellationToken);
+
+        return NoContent();
     }
 }
