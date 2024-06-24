@@ -52,11 +52,17 @@ public class TelegramSalariesRegularStatsUpdateJob
         var allSalariesCount = await _context.Salaries
             .CountAsync(cancellationToken);
 
-        var addedSalariesCount = await _context.Salaries
+        var addedRelevantSalariesCount = await _context.Salaries
+            .Where(x => x.UseInStats)
             .Where(x => x.CreatedAt >= dayAgo)
             .CountAsync(cancellationToken);
 
-        var surveyPassedCount = await _context.Salaries
+        var addedIrrelevantSalariesCount = await _context.Salaries
+            .Where(x => !x.UseInStats)
+            .Where(x => x.CreatedAt >= dayAgo)
+            .CountAsync(cancellationToken);
+
+        var surveyPassedCount = await _context.SalariesSurveyReplies
             .Where(x => x.CreatedAt >= dayAgo)
             .CountAsync(cancellationToken);
 
@@ -64,7 +70,8 @@ public class TelegramSalariesRegularStatsUpdateJob
 Всего анкет: {allSalariesCount}
 
 За последние сутки:
-- Добавлено анкет : +{addedSalariesCount}
+- Добавлено релевантных анкет: +{addedRelevantSalariesCount}
+- Добавлено нерелевантных анкет: +{addedIrrelevantSalariesCount}
 - Прошли опрос: +{surveyPassedCount}";
 
         var failedToSend = new List<(TelegramUserSettings Settings, Exception Ex)>();
