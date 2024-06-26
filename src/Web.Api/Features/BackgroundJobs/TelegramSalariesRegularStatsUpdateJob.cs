@@ -8,7 +8,9 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 using Web.Api.Features.Telegram;
+using Web.Api.Features.Telegram.ProcessMessage.ReplyMessages;
 
 namespace Web.Api.Features.BackgroundJobs;
 
@@ -48,31 +50,8 @@ public class TelegramSalariesRegularStatsUpdateJob
             return;
         }
 
-        var dayAgo = DateTime.UtcNow.AddDays(-1);
-        var allSalariesCount = await _context.Salaries
-            .CountAsync(cancellationToken);
-
-        var addedRelevantSalariesCount = await _context.Salaries
-            .Where(x => x.UseInStats)
-            .Where(x => x.CreatedAt >= dayAgo)
-            .CountAsync(cancellationToken);
-
-        var addedIrrelevantSalariesCount = await _context.Salaries
-            .Where(x => !x.UseInStats)
-            .Where(x => x.CreatedAt >= dayAgo)
-            .CountAsync(cancellationToken);
-
-        var surveyPassedCount = await _context.SalariesSurveyReplies
-            .Where(x => x.CreatedAt >= dayAgo)
-            .CountAsync(cancellationToken);
-
-        var messageToSend = $@"
-Всего анкет: {allSalariesCount}
-
-За последние сутки:
-- Добавлено релевантных анкет: +{addedRelevantSalariesCount}
-- Добавлено нерелевантных анкет: +{addedIrrelevantSalariesCount}
-- Прошли опрос: +{surveyPassedCount}";
+        var messageToSend = await new StatsReplyMessageBuilder(_context)
+            .BuildAsync(cancellationToken);
 
         var failedToSend = new List<(TelegramUserSettings Settings, Exception Ex)>();
 
@@ -82,7 +61,8 @@ public class TelegramSalariesRegularStatsUpdateJob
             {
                 await client.SendTextMessageAsync(
                     settingsEntity.ChatId,
-                    messageToSend,
+                    messageToSend.ReplyText,
+                    parseMode: messageToSend.ParseMode,
                     cancellationToken: cancellationToken);
             }
             catch (Exception e)

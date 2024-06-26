@@ -21,6 +21,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using Web.Api.Features.Telegram.ProcessMessage.ReplyMessages;
 using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
 namespace Web.Api.Features.Telegram.ProcessMessage;
@@ -213,16 +214,45 @@ Last name: {message.From?.LastName}";
             return (true, replyMessage);
         }
 
-        if (messageText.Equals("/help", StringComparison.InvariantCultureIgnoreCase))
+        if (messageText.Equals("/stats", StringComparison.InvariantCultureIgnoreCase))
         {
-            var replyMessage = $@"Команда еще в разработке. Stay tuned";
+            var tgUserSettings = await _context.TelegramUserSettings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    x => x.ChatId == message.Chat.Id,
+                    cancellationToken);
+
+            TelegramBotReplyData replyMessage;
+            if (tgUserSettings is null)
+            {
+                replyMessage = new CommandNotReadyReply();
+            }
+            else
+            {
+                replyMessage = await new StatsReplyMessageBuilder(_context)
+                    .BuildAsync(cancellationToken);
+            }
 
             await request.BotClient.SendTextMessageAsync(
                 message.Chat.Id,
-                replyMessage,
+                replyMessage.ReplyText,
+                parseMode: replyMessage.ParseMode,
                 cancellationToken: cancellationToken);
 
-            return (true, replyMessage);
+            return (true, replyMessage.ReplyText);
+        }
+
+        if (messageText.Equals("/help", StringComparison.InvariantCultureIgnoreCase))
+        {
+            var replyMessage = new CommandNotReadyReply();
+
+            await request.BotClient.SendTextMessageAsync(
+                message.Chat.Id,
+                replyMessage.ReplyText,
+                parseMode: replyMessage.ParseMode,
+                cancellationToken: cancellationToken);
+
+            return (true, replyMessage.ReplyText);
         }
 
         return (false, null);
