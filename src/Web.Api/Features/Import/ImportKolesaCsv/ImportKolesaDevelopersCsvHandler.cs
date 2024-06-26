@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Validation.Exceptions;
 using MediatR;
 
 namespace Web.Api.Features.Import.ImportKolesaCsv;
@@ -15,6 +16,14 @@ public class ImportKolesaDevelopersCsvHandler
         ImportKolesaDevelopersCsvCommand request,
         CancellationToken cancellationToken)
     {
+        var filename = request.File.FileName;
+        var extension = Path.GetExtension(filename);
+
+        if (extension != ".csv")
+        {
+            throw new BadRequestException("Invalid file extension");
+        }
+
         var lines = ReadLines(request)
             .Select(x => new KolesaDeveloperCsvLine(x))
             .ToList();
