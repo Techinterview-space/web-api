@@ -26,10 +26,13 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         WorkIndustry workIndustryOrNull,
         Profession professionOrNull,
         KazakhstanCity? city,
-        bool useInStats)
+        bool useInStats,
+        SalarySourceType? sourceType = null,
+        int? age = null,
+        int? yearOfStartingWork = null)
     {
         Id = Guid.NewGuid();
-        UserId = user.Id;
+        UserId = user?.Id;
         User = user;
 
         Value = NonNegativeValue(value);
@@ -39,13 +42,19 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         Currency = currency;
         Grade = grade;
         Company = company;
-        ProfessionEnum = professionOrNull?.IdAsEnum ?? UserProfessionEnum.Undefined; // TODO remove
+        ProfessionEnum = professionOrNull?.IdAsEnum
+                         ?? UserProfessionEnum.Undefined; // TODO remove
+
         SkillId = skillOrNull?.Id;
         WorkIndustryId = workIndustryOrNull?.Id;
         ProfessionId = professionOrNull?.Id;
 
         City = city;
         UseInStats = useInStats;
+        SourceType = sourceType;
+
+        Age = age;
+        YearOfStartingWork = yearOfStartingWork;
     }
 
     public Guid Id { get; protected set; }
@@ -93,6 +102,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
     public long? ProfessionId { get; protected set; }
 
     public virtual Profession Profession { get; protected set; }
+
+    public SalarySourceType? SourceType { get; protected set; }
 
     public void Update(
         DeveloperGrade grade,

@@ -28,6 +28,7 @@ public record UserSalaryDto : UserSalarySimpleDto
         ProfessionId = salary.ProfessionId;
         CreatedAt = salary.CreatedAt;
         UpdatedAt = salary.UpdatedAt;
+        SourceType = salary.SourceType;
     }
 
     public int Quarter { get; init; }
@@ -55,6 +56,8 @@ public record UserSalaryDto : UserSalarySimpleDto
     public long? ProfessionId { get; init; }
 
     public DateTimeOffset UpdatedAt { get; init; }
+
+    public SalarySourceType? SourceType { get; init; }
 
     private bool RequireAdditionalData =>
         SkillId.HasValue ||

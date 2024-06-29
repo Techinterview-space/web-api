@@ -89,7 +89,8 @@ public class AddSalaryHandler : IRequestHandler<AddSalaryCommand, CreateOrEditSa
                 workIndustry,
                 profession,
                 request.City,
-                shouldShowInStats),
+                shouldShowInStats,
+                null),
             cancellationToken);
 
         return CreateOrEditSalaryRecordResponse.Success(

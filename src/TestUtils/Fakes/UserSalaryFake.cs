@@ -23,7 +23,8 @@ public class UserSalaryFake : UserSalary
         WorkIndustry workIndustryOrNull = null,
         Profession professionOrNull = null,
         KazakhstanCity? kazakhstanCity = null,
-        bool useInStats = true)
+        bool useInStats = true,
+        SalarySourceType? sourceType = null)
         : base(
             user,
             value,
@@ -36,7 +37,8 @@ public class UserSalaryFake : UserSalary
             workIndustryOrNull,
             professionOrNull,
             kazakhstanCity,
-            useInStats)
+            useInStats,
+            sourceType)
     {
         if (createdAt.HasValue)
         {

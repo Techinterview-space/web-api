@@ -1,18 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Domain.Validation.Exceptions;
+using Infrastructure.Database;
+using Infrastructure.Salaries;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Import.ImportKolesaCsv;
 
 public class ImportKolesaDevelopersCsvHandler
-    : IRequestHandler<ImportKolesaDevelopersCsvCommand, List<KolesaDeveloperCsvLine>>
+    : IRequestHandler<ImportKolesaDevelopersCsvCommand, List<UserSalaryDto>>
 {
-    public Task<List<KolesaDeveloperCsvLine>> Handle(
+    private readonly DatabaseContext _context;
+
+    public ImportKolesaDevelopersCsvHandler(
+        DatabaseContext context)
+    {
+        _context = context;
+    }
+
+    public Task<List<UserSalaryDto>> Handle(
         ImportKolesaDevelopersCsvCommand request,
         CancellationToken cancellationToken)
     {
@@ -24,23 +39,40 @@ public class ImportKolesaDevelopersCsvHandler
             throw new BadRequestException("Invalid file extension");
         }
 
-        var lines = ReadLines(request)
-            .Select(x => new KolesaDeveloperCsvLine(x))
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            NewLine = Environment.NewLine,
+            Encoding = Encoding.UTF8,
+            Delimiter = ";",
+        };
+
+        var skills = _context.Skills
+            .AsNoTracking()
             .ToList();
 
-        return Task.FromResult(lines);
-    }
+        var workIndustries = _context.WorkIndustries
+            .AsNoTracking()
+            .ToList();
 
-    private IEnumerable<string> ReadLines(
-        ImportKolesaDevelopersCsvRequestBody request)
-    {
+        var professions = _context.Professions
+            .AsNoTracking()
+            .ToList();
+
         using var stream = request.File.OpenReadStream();
         using var streamReader = new StreamReader(stream, Encoding.UTF8);
+        using var csv = new CsvReader(streamReader, config);
 
-        string line;
-        while ((line = streamReader.ReadLine()) != null)
-        {
-            yield return line;
-        }
+        var salariesToSave = csv
+            .GetRecords<KolesaDeveloperCsvLine>()
+            .Where(x => x.UseInStat)
+            .Select(x => x.CreateUserSalary(
+                skills,
+                workIndustries,
+                professions))
+            .ToList();
+
+        return Task.FromResult(salariesToSave
+            .Select(x => new UserSalaryDto(x))
+            .ToList());
     }
 }
