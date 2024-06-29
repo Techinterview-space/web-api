@@ -198,7 +198,32 @@ public record KolesaDeveloperCsvLine
                 x.Title.Contains(workIndustry, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        if (CurrentProfession != null)
+        var teamleadProfession = professions.FirstOrDefault(
+            x => x.Title.Contains("Teamleader", StringComparison.InvariantCultureIgnoreCase));
+        var techleadProfession = professions.FirstOrDefault(
+            x => x.Title.Contains("Techleader", StringComparison.InvariantCultureIgnoreCase));
+        var ctoProfession = professions.FirstOrDefault(
+            x => x.Title.Equals("Chief Technical Officer (CTO)", StringComparison.InvariantCultureIgnoreCase));
+        var solutionArchitectProfession = professions.FirstOrDefault(
+            x => x.Title.Equals("Архитектор (Architect)", StringComparison.InvariantCultureIgnoreCase));
+
+        if (Grade == "Teamlead/Techlead" && techleadProfession != null)
+        {
+            professionOrNull = techleadProfession;
+        }
+        else if (Grade == "Teamlead" && teamleadProfession != null)
+        {
+            professionOrNull = teamleadProfession;
+        }
+        else if (Grade == "CTO" && ctoProfession != null)
+        {
+            professionOrNull = ctoProfession;
+        }
+        else if (Grade == "SolutionArchitect" && solutionArchitectProfession != null)
+        {
+            professionOrNull = solutionArchitectProfession;
+        }
+        else if (CurrentProfession != null)
         {
             var profession = CurrentProfession.ToLowerInvariant();
             professionOrNull = professions.FirstOrDefault(x =>
@@ -220,7 +245,8 @@ public record KolesaDeveloperCsvLine
             true,
             SalarySourceType.KolesaDevelopersCsv2022,
             Age,
-            2021 - Experience);
+            2021 - Experience,
+            GenderAsEnum);
 
         return salary;
     }

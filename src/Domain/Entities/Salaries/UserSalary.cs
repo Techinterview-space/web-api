@@ -29,7 +29,8 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
         bool useInStats,
         SalarySourceType? sourceType = null,
         int? age = null,
-        int? yearOfStartingWork = null)
+        int? yearOfStartingWork = null,
+        Gender? gender = null)
     {
         Id = Guid.NewGuid();
         UserId = user?.Id;
@@ -55,6 +56,7 @@ public class UserSalary : HasDatesBase, IHasIdBase<Guid>
 
         Age = age;
         YearOfStartingWork = yearOfStartingWork;
+        Gender = gender;
     }
 
     public Guid Id { get; protected set; }
