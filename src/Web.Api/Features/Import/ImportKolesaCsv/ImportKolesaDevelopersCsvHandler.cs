@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Web.Api.Features.Import.ImportKolesaCsv;
 
 public class ImportKolesaDevelopersCsvHandler
-    : IRequestHandler<ImportKolesaDevelopersCsvCommand, List<UserSalaryDto>>
+    : IRequestHandler<ImportKolesaDevelopersCsvCommand, List<ImportCsvResponseItem>>
 {
     private readonly DatabaseContext _context;
 
@@ -27,7 +27,7 @@ public class ImportKolesaDevelopersCsvHandler
         _context = context;
     }
 
-    public Task<List<UserSalaryDto>> Handle(
+    public async Task<List<ImportCsvResponseItem>> Handle(
         ImportKolesaDevelopersCsvCommand request,
         CancellationToken cancellationToken)
     {
@@ -46,33 +46,37 @@ public class ImportKolesaDevelopersCsvHandler
             Delimiter = ";",
         };
 
-        var skills = _context.Skills
+        var skills = await _context.Skills
             .AsNoTracking()
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        var workIndustries = _context.WorkIndustries
+        var workIndustries = await _context.WorkIndustries
             .AsNoTracking()
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        var professions = _context.Professions
+        var professions = await _context.Professions
             .AsNoTracking()
-            .ToList();
+            .ToListAsync(cancellationToken);
 
-        using var stream = request.File.OpenReadStream();
+        await using var stream = request.File.OpenReadStream();
         using var streamReader = new StreamReader(stream, Encoding.UTF8);
         using var csv = new CsvReader(streamReader, config);
 
         var salariesToSave = csv
             .GetRecords<KolesaDeveloperCsvLine>()
             .Where(x => x.UseInStat)
-            .Select(x => x.CreateUserSalary(
-                skills,
-                workIndustries,
-                professions))
+            .Select(x => new ImportCsvResponseItem
+            {
+                CsvLine = x,
+                UserSalary =
+                    new UserSalaryDto(
+                        x.CreateUserSalary(
+                            skills,
+                            workIndustries,
+                            professions)),
+            })
             .ToList();
 
-        return Task.FromResult(salariesToSave
-            .Select(x => new UserSalaryDto(x))
-            .ToList());
+        return salariesToSave;
     }
 }
