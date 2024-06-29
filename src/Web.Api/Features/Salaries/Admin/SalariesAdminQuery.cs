@@ -104,6 +104,7 @@ public record SalariesAdminQuery
                 Gender = x.Gender,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
+                SourceType = x.SourceType,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
             });
@@ -127,6 +128,7 @@ public record SalariesAdminQuery
                 Gender = x.Gender,
                 SkillId = x.SkillId,
                 WorkIndustryId = x.WorkIndustryId,
+                SourceType = x.SourceType,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
             });
