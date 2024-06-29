@@ -20,7 +20,7 @@ public record SalariesCsvStringBuilder
 
     public SalariesCsvStringBuilder AppendHeader()
     {
-        _stringBuilder.AppendLine("Value,Quarter,Year,Age,Gender,Started,Profession,Grade,Company,City,Skill,Industry,Created");
+        _stringBuilder.AppendLine("Value,Quarter,Year,Age,Gender,Started,Profession,Grade,Company,City,Skill,Industry,SourceType,Created");
         return this;
     }
 
@@ -44,6 +44,7 @@ public record SalariesCsvStringBuilder
             $"{salary.City?.ToString() ?? NoValue}," +
             $"{skill?.Title ?? NoValue}," +
             $"{workIndustry?.Title ?? NoValue}," +
+            $"{salary.SourceType?.ToString() ?? NoValue}," +
             $"{salary.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") ?? NoValue}");
 
         return this;

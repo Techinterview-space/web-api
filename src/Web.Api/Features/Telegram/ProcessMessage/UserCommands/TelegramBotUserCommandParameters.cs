@@ -41,6 +41,12 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 
     public List<Profession> SelectedProfessions { get; }
 
+    public SalarySourceType? SalarySourceType { get; init; }
+
+    public int? QuarterTo { get; init; }
+
+    public int? YearTo { get; init; }
+
     public string GetKeyPostfix()
     {
         var grade = Grade?.ToString() ?? "all";

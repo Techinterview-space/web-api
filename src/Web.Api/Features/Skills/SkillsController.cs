@@ -33,6 +33,7 @@ public class SkillsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await _context.Skills
+            .OrderBy(x => x.Id)
             .Select(x => new LabelEntityDto
             {
                 Id = x.Id,
@@ -45,10 +46,11 @@ public class SkillsController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<IEnumerable<LabelEntityAdminDto>> All(
+    public async Task<List<LabelEntityAdminDto>> All(
         CancellationToken cancellationToken)
     {
         return await _context.Skills
+            .OrderBy(x => x.Id)
             .Select(x => new LabelEntityAdminDto
             {
                 Id = x.Id,
@@ -67,7 +69,8 @@ public class SkillsController : ControllerBase
         [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(
+            cancellationToken);
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.Skills.AnyAsync(
@@ -94,7 +97,9 @@ public class SkillsController : ControllerBase
         [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(
+            cancellationToken);
+
         var skill = await _context.Skills.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
         skill.CouldBeUpdatedByOrFail(currentUser);
 
@@ -112,7 +117,9 @@ public class SkillsController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(
+            cancellationToken);
+
         var skill = await _context.Skills.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
         skill.CouldBeUpdatedByOrFail(currentUser);

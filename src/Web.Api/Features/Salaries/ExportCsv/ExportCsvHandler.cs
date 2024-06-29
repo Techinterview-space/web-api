@@ -58,7 +58,10 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
             null,
             null,
             DateTimeOffset.Now.AddMonths(-12),
-            DateTimeOffset.Now)
+            DateTimeOffset.Now,
+            null,
+            null,
+            null)
             .ToQueryable()
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);

@@ -23,6 +23,12 @@ public record SalariesForChartQuery
 
     public DateTimeOffset To { get; }
 
+    public SalarySourceType? SalarySourceType { get; }
+
+    public int? QuarterTo { get; }
+
+    public int? YearTo { get; }
+
     private readonly DatabaseContext _context;
 
     public SalariesForChartQuery(
@@ -31,7 +37,10 @@ public record SalariesForChartQuery
         List<long> professionsToInclude,
         List<KazakhstanCity> cities,
         DateTimeOffset from,
-        DateTimeOffset to)
+        DateTimeOffset to,
+        SalarySourceType? salarySourceType,
+        int? quarterTo,
+        int? yearTo)
     {
         _context = context;
         Grade = grade;
@@ -41,6 +50,10 @@ public record SalariesForChartQuery
         CurrentQuarter = DateQuarter.Current;
         From = from;
         To = to;
+
+        SalarySourceType = salarySourceType;
+        QuarterTo = quarterTo;
+        YearTo = yearTo;
     }
 
     public SalariesForChartQuery(
@@ -54,7 +67,10 @@ public record SalariesForChartQuery
             request.ProfessionsToInclude,
             request.Cities,
             from,
-            to)
+            to,
+            request.SalarySourceType,
+            request.QuarterTo,
+            request.YearTo)
     {
     }
 
@@ -102,10 +118,34 @@ public record SalariesForChartQuery
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
-            .Where(x => x.Year == CurrentQuarter.Year || x.Year == CurrentQuarter.Year - 1)
-            .Where(x => x.CreatedAt >= From && x.CreatedAt <= To)
             .When(companyType.HasValue, x => x.Company == companyType.Value)
             .When(Grade.HasValue, x => x.Grade == Grade.Value);
+
+        if (SalarySourceType.HasValue)
+        {
+            query = query
+                .Where(x => x.SourceType == SalarySourceType.Value);
+        }
+        else
+        {
+            query = query
+                .Where(x => x.SourceType == null);
+        }
+
+        if (QuarterTo.HasValue && YearTo.HasValue)
+        {
+            query = query
+                .Where(x =>
+                    (x.Year == YearTo.Value && x.Quarter <= QuarterTo.Value) ||
+                    x.Year < YearTo.Value);
+        }
+        else
+        {
+            query = query
+                .Where(x =>
+                    (x.Year == CurrentQuarter.Year || x.Year == CurrentQuarter.Year - 1) &&
+                    x.CreatedAt >= From && x.CreatedAt <= To);
+        }
 
         if (Cities.Count != 0)
         {

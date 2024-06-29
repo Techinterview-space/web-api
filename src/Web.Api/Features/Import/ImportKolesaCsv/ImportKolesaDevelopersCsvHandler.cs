@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
@@ -62,21 +63,34 @@ public class ImportKolesaDevelopersCsvHandler
         using var streamReader = new StreamReader(stream, Encoding.UTF8);
         using var csv = new CsvReader(streamReader, config);
 
-        var salariesToSave = csv
-            .GetRecords<KolesaDeveloperCsvLine>()
-            .Where(x => x.UseInStat)
+        var result = new List<(KolesaDeveloperCsvLine record, UserSalary salary)>();
+        var records = csv.GetRecords<KolesaDeveloperCsvLine>();
+        foreach (var record in records)
+        {
+            if (!record.UseInStat ||
+                record.SalaryNett == null ||
+                record.CompanyTypeAsEnum == null)
+            {
+                continue;
+            }
+
+            var salary = _context.Salaries.Add(
+                record.CreateUserSalary(
+                    skills,
+                    workIndustries,
+                    professions));
+
+            result.Add((record, salary.Entity));
+        }
+
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return result
             .Select(x => new ImportCsvResponseItem
             {
-                CsvLine = x,
-                UserSalary =
-                    new UserSalaryDto(
-                        x.CreateUserSalary(
-                            skills,
-                            workIndustries,
-                            professions)),
+                CsvLine = x.record,
+                UserSalary = new UserSalaryDto(x.salary),
             })
             .ToList();
-
-        return salariesToSave;
     }
 }

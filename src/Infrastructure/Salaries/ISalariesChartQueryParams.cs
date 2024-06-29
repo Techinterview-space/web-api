@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Enums;
+using Domain.Entities.Salaries;
 using Domain.Enums;
 
 namespace Infrastructure.Salaries;
@@ -10,6 +11,12 @@ public interface ISalariesChartQueryParams
     public List<long> ProfessionsToInclude { get; }
 
     public List<KazakhstanCity> Cities { get; }
+
+    public SalarySourceType? SalarySourceType { get; }
+
+    public int? QuarterTo { get; }
+
+    public int? YearTo { get; }
 
     public bool HasAnyFilter =>
         Grade.HasValue || ProfessionsToInclude.Count > 0 || Cities.Count > 0;

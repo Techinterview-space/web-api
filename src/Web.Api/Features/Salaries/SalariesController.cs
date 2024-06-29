@@ -97,6 +97,9 @@ public class SalariesController : ControllerBase
                 Grade = request.Grade,
                 ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
                 Cities = request.Cities,
+                SalarySourceType = request.SalarySourceType,
+                QuarterTo = request.QuarterTo,
+                YearTo = request.YearTo,
             },
             cancellationToken);
     }
@@ -114,6 +117,9 @@ public class SalariesController : ControllerBase
                 Grade = request.Grade,
                 ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
                 Cities = request.Cities,
+                SalarySourceType = request.SalarySourceType,
+                QuarterTo = request.QuarterTo,
+                YearTo = request.YearTo,
             },
             cancellationToken);
     }

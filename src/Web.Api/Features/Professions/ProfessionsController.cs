@@ -39,6 +39,7 @@ public class ProfessionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await _context.Professions
+            .OrderBy(x => x.Id)
             .Select(x => new LabelEntityDto
             {
                 Id = x.Id,
@@ -55,6 +56,7 @@ public class ProfessionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return await _context.Professions
+            .OrderBy(x => x.Id)
             .Select(x => new LabelEntityAdminDto
             {
                 Id = x.Id,

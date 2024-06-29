@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Infrastructure.Salaries;
 using MediatR;
 
 namespace Web.Api.Features.Import.ImportKolesaCsv;

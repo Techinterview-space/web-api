@@ -34,6 +34,7 @@ public class UserLabelsController : ControllerBase
         var currentUser = await _auth.CurrentUserOrFailAsync();
         return await _context.UserLabels
             .Where(x => x.CreatedById == currentUser.Id)
+            .OrderBy(x => x.Id)
             .AllAsync(x => new LabelDto(x));
     }
 
@@ -43,6 +44,7 @@ public class UserLabelsController : ControllerBase
     {
         return await _context.UserLabels
             .Where(x => x.CreatedById == null)
+            .OrderBy(x => x.Id)
             .AllAsync(x => new LabelDto(x));
     }
 

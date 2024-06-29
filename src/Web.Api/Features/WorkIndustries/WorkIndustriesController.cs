@@ -31,10 +31,11 @@ public class WorkIndustriesController : ControllerBase
     }
 
     [HttpGet("for-select-boxes")]
-    public async Task<IEnumerable<LabelEntityDto>> ForSelectBoxes(
+    public async Task<List<LabelEntityDto>> ForSelectBoxes(
         CancellationToken cancellationToken)
     {
         return await _context.WorkIndustries
+            .OrderBy(x => x.Id)
             .Select(x => new LabelEntityDto
             {
                 Id = x.Id,
@@ -47,10 +48,11 @@ public class WorkIndustriesController : ControllerBase
 
     [HttpGet("all")]
     [HasAnyRole(Role.Admin)]
-    public async Task<IEnumerable<LabelEntityAdminDto>> All(
+    public async Task<List<LabelEntityAdminDto>> All(
         CancellationToken cancellationToken)
     {
         return await _context.WorkIndustries
+            .OrderBy(x => x.Id)
             .Select(x => new LabelEntityAdminDto
             {
                 Id = x.Id,
@@ -69,7 +71,8 @@ public class WorkIndustriesController : ControllerBase
         [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(
+            cancellationToken);
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.WorkIndustries.AnyAsync(
@@ -96,7 +99,9 @@ public class WorkIndustriesController : ControllerBase
         [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(
+            cancellationToken);
+
         var item = await _context.WorkIndustries.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
         item.CouldBeUpdatedByOrFail(currentUser);
 
@@ -114,7 +119,9 @@ public class WorkIndustriesController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.CurrentUserOrFailAsync(
+            cancellationToken);
+
         var item = await _context.WorkIndustries.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
         item.CouldBeUpdatedByOrFail(currentUser);
