@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Salaries.AddSalary;
 using Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 using Web.Api.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
+using Web.Api.Features.Salaries.Admin.GetSourcedSalaries;
 using Web.Api.Features.Salaries.ApproveSalary;
 using Web.Api.Features.Salaries.DeleteSalary;
 using Web.Api.Features.Salaries.ExcludeFromStats;
@@ -63,6 +64,17 @@ public class SalariesController : ControllerBase
     [HasAnyRole(Role.Admin)]
     public async Task<Pageable<UserSalaryAdminDto>> GetAllNotShownInStats(
         [FromQuery] GetExcludedFromStatsSalariesQuery request,
+        CancellationToken cancellationToken)
+    {
+        return await _mediator.Send(
+            request,
+            cancellationToken);
+    }
+
+    [HttpGet("sourced-salaries")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<Pageable<UserSalaryAdminDto>> GetAllNotShownInStats(
+        [FromQuery] GetSourcedSalariesQuery request,
         CancellationToken cancellationToken)
     {
         return await _mediator.Send(

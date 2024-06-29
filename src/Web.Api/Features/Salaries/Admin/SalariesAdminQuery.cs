@@ -7,20 +7,29 @@ using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.Admin;
 
-public record SalariesQuery
+public record SalariesAdminQuery
 {
     private readonly DatabaseContext _context;
 
     private IQueryable<UserSalary> _query;
 
-    public SalariesQuery(
+    public SalariesAdminQuery(
         DatabaseContext context)
     {
         _context = context;
         _query = _context.Salaries.AsNoTracking();
     }
 
-    public SalariesQuery ApplyFilters(
+    public SalariesAdminQuery WithSource(
+        SalarySourceType? sourceType)
+    {
+        _query = _query
+            .Where(x => x.SourceType == sourceType);
+
+        return this;
+    }
+
+    public SalariesAdminQuery ApplyFilters(
         GetAllSalariesQueryParams queryParams)
     {
         _query = _query
@@ -31,7 +40,7 @@ public record SalariesQuery
         return this;
     }
 
-    public SalariesQuery ApplyFilters(
+    public SalariesAdminQuery ApplyFilters(
         ISalariesChartQueryParams queryParams)
     {
         _query = _query
@@ -42,7 +51,7 @@ public record SalariesQuery
         return this;
     }
 
-    public SalariesQuery ApplyOrder(
+    public SalariesAdminQuery ApplyOrder(
         GetAllSalariesOrderType orderType)
     {
         switch (orderType)
@@ -67,7 +76,7 @@ public record SalariesQuery
         return this;
     }
 
-    public SalariesQuery ApplyShowInStats(
+    public SalariesAdminQuery ApplyShowInStats(
         bool? showInStats)
     {
         _query = _query

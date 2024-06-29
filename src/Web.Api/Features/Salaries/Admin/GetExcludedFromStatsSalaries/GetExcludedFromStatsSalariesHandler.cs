@@ -22,8 +22,9 @@ public class GetExcludedFromStatsSalariesHandler
         GetExcludedFromStatsSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        var query = new SalariesQuery(_context)
+        var query = new SalariesAdminQuery(_context)
             .ApplyFilters(request)
+            .WithSource(null)
             .ApplyShowInStats(false)
             .ApplyOrder(request.OrderType)
             .ToAdminDtoQueryable();

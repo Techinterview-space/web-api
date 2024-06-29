@@ -27,7 +27,8 @@ public class GetAddingTrendChartHandler
         var currentDay = DateTime.UtcNow.Date;
         var fifteenDaysAgo = currentDay.AddDays(-20);
 
-        var salaries = await _context.Salaries
+        var query = _context.Salaries
+            .Where(x => x.UseInStats)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade)
             .When(
                 request.ProfessionsToInclude.Count > 0,
@@ -36,7 +37,18 @@ public class GetAddingTrendChartHandler
                     request.ProfessionsToInclude.Contains(x.ProfessionId.Value))
             .When(request.Cities.Count > 0, x =>
                 x.City.HasValue &&
-                request.Cities.Contains(x.City.Value))
+                request.Cities.Contains(x.City.Value));
+
+        if (request.SalarySourceType.HasValue)
+        {
+            query = query.Where(x => x.SourceType == request.SalarySourceType);
+        }
+        else
+        {
+            query = query.Where(x => x.SourceType == null);
+        }
+
+        var salaries = await query
             .Select(x => new
             {
                 x.Id,
