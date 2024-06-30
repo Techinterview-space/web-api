@@ -80,7 +80,9 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             var hasSurveyRecentReply = await new SalariesSurveyUserService(_context)
                 .HasFilledSurveyAsync(currentUser, cancellationToken);
 
-            var currencies = await _currencyService.GetAllCurrenciesAsync(cancellationToken);
+            var currencies = await GetCurrenciesAsync(
+                request,
+                cancellationToken);
 
             return new SalariesChartResponse(
                 salaries,
@@ -96,6 +98,37 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             CancellationToken cancellationToken)
         {
             return Handle((ISalariesChartQueryParams)request, cancellationToken);
+        }
+
+        private async Task<List<CurrencyContent>> GetCurrenciesAsync(
+            ISalariesChartQueryParams request,
+            CancellationToken cancellationToken)
+        {
+            if (request.SalarySourceType is SalarySourceType.KolesaDevelopersCsv2022)
+            {
+                var date = new DateTime(2021, 12, 31);
+                return
+                [
+                    new CurrencyContent(
+                        1,
+                        Currency.KZT,
+                        date),
+
+                    new CurrencyContent(
+                        434,
+                        Currency.USD,
+                        date),
+
+                    new CurrencyContent(
+                        491,
+                        Currency.EUR,
+                        date)
+
+                ];
+            }
+
+            return await _currencyService
+                .GetAllCurrenciesAsync(cancellationToken);
         }
     }
 }
