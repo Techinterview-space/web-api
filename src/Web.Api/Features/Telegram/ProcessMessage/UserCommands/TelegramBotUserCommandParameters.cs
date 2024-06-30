@@ -35,7 +35,9 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 
     public DeveloperGrade? Grade { get; }
 
-    public List<long> ProfessionsToInclude { get; }
+    public List<long> ProfessionsToInclude { get; } = new ();
+
+    public List<long> Skills { get; } = new ();
 
     public List<KazakhstanCity> Cities => new List<KazakhstanCity>(0);
 

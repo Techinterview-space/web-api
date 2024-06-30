@@ -10,6 +10,8 @@ public interface ISalariesChartQueryParams
 
     public List<long> ProfessionsToInclude { get; }
 
+    public List<long> Skills { get; }
+
     public List<KazakhstanCity> Cities { get; }
 
     public SalarySourceType? SalarySourceType { get; }

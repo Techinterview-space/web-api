@@ -16,6 +16,9 @@ public record SalariesChartQueryParams : ISalariesChartQueryParams
     [FromQuery(Name = "profsInclude")]
     public List<long> ProfessionsToInclude { get; init; } = new ();
 
+    [FromQuery(Name = "skills")]
+    public List<long> Skills { get; init; } = new ();
+
     [FromQuery(Name = "cities")]
     public List<KazakhstanCity> Cities { get; init; } = new ();
 

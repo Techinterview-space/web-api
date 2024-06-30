@@ -57,6 +57,7 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
             null,
             null,
             null,
+            null,
             DateTimeOffset.Now.AddMonths(-12),
             DateTimeOffset.Now,
             null,

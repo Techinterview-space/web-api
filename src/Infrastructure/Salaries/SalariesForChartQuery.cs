@@ -17,6 +17,8 @@ public record SalariesForChartQuery
 
     public List<long> ProfessionsToInclude { get; }
 
+    public List<long> Skills { get; }
+
     public List<KazakhstanCity> Cities { get; }
 
     public DateTimeOffset From { get; }
@@ -35,6 +37,7 @@ public record SalariesForChartQuery
         DatabaseContext context,
         DeveloperGrade? grade,
         List<long> professionsToInclude,
+        List<long> skills,
         List<KazakhstanCity> cities,
         DateTimeOffset from,
         DateTimeOffset to,
@@ -45,6 +48,8 @@ public record SalariesForChartQuery
         _context = context;
         Grade = grade;
         ProfessionsToInclude = professionsToInclude ?? new List<long>();
+        Skills = skills ?? new List<long>();
+
         Cities = cities ?? new List<KazakhstanCity>();
 
         CurrentQuarter = DateQuarter.Current;
@@ -65,6 +70,7 @@ public record SalariesForChartQuery
             context,
             request.Grade,
             request.ProfessionsToInclude,
+            request.Skills,
             request.Cities,
             from,
             to,
@@ -163,9 +169,14 @@ public record SalariesForChartQuery
             query = query.Where(clause);
         }
 
-        return query
+        query = query
+            .When(
+                Skills.Count > 0,
+                x => x.SkillId != null && Skills.Contains(x.SkillId.Value))
             .When(
                 ProfessionsToInclude.Count > 0,
                 x => x.ProfessionId != null && ProfessionsToInclude.Contains(x.ProfessionId.Value));
+
+        return query;
     }
 }
