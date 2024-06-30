@@ -31,6 +31,9 @@ public class GetAddingTrendChartHandler
             .Where(x => x.UseInStats)
             .When(request.Grade.HasValue, x => x.Grade == request.Grade)
             .When(
+                request.Skills.Count > 0,
+                x => x.SkillId != null && request.Skills.Contains(x.SkillId.Value))
+            .When(
                 request.ProfessionsToInclude.Count > 0,
                 x =>
                     x.ProfessionId.HasValue &&
@@ -46,6 +49,25 @@ public class GetAddingTrendChartHandler
         else
         {
             query = query.Where(x => x.SourceType == null);
+        }
+
+        // TODO mgorbatyuk: avoid duplication.
+        if (request.QuarterTo.HasValue && request.YearTo.HasValue)
+        {
+            query = query
+                .Where(x =>
+                    (x.Year == request.YearTo.Value && x.Quarter <= request.QuarterTo.Value) ||
+                    x.Year < request.YearTo.Value);
+        }
+        else if (request.SalarySourceType == null)
+        {
+            var now = DateTimeOffset.Now;
+            var from = now.AddMonths(-12);
+
+            query = query
+                .Where(x =>
+                    (x.Year == currentDay.Year || x.Year == currentDay.Year - 1) &&
+                    x.CreatedAt >= from && x.CreatedAt <= now);
         }
 
         var salaries = await query

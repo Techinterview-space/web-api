@@ -40,11 +40,12 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
 
             var userSalariesForLastYear = new List<UserSalary>();
 
+            var now = DateTimeOffset.Now;
             var salariesQuery = new SalariesForChartQuery(
                 _context,
                 request,
-                DateTimeOffset.Now.AddMonths(-12),
-                DateTimeOffset.Now);
+                now.AddMonths(-12),
+                now);
 
             if (currentUser != null)
             {

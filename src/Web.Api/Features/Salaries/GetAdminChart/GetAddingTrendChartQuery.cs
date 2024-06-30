@@ -20,4 +20,13 @@ public record GetAddingTrendChartQuery : IRequest<GetAddingTrendChartResponse>
 
     [FromQuery(Name = "salarySourceType")]
     public SalarySourceType? SalarySourceType { get; init; }
+
+    [FromQuery(Name = "skills")]
+    public List<long> Skills { get; init; } = new ();
+
+    [FromQuery(Name = "quarterTo")]
+    public int? QuarterTo { get; init; }
+
+    [FromQuery(Name = "yearTo")]
+    public int? YearTo { get; init; }
 }
