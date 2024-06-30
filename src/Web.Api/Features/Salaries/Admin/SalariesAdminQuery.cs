@@ -23,8 +23,16 @@ public record SalariesAdminQuery
     public SalariesAdminQuery WithSource(
         SalarySourceType? sourceType)
     {
-        _query = _query
-            .Where(x => x.SourceType == sourceType);
+        if (sourceType.HasValue)
+        {
+            _query = _query
+                .Where(x => x.SourceType == sourceType);
+        }
+        else
+        {
+            _query = _query
+                .Where(x => x.SourceType == null);
+        }
 
         return this;
     }
@@ -46,7 +54,16 @@ public record SalariesAdminQuery
         _query = _query
             .When(queryParams.Grade.HasValue, x => x.Grade == queryParams.Grade.Value)
             .When(queryParams.ProfessionsToInclude.Count > 0, x => x.ProfessionId.HasValue && queryParams.ProfessionsToInclude.Contains(x.ProfessionId.Value))
-            .When(queryParams.Cities.Count > 0, x => x.City.HasValue && queryParams.Cities.Contains(x.City.Value));
+            .When(queryParams.Cities.Count > 0, x => x.City.HasValue && queryParams.Cities.Contains(x.City.Value))
+            .When(queryParams.Skills.Count > 0, x => x.SkillId != null && queryParams.Skills.Contains(x.SkillId.Value));
+
+        if (queryParams.QuarterTo != null && queryParams.YearTo != null)
+        {
+            _query = _query
+                .Where(x =>
+                    (x.Year == queryParams.YearTo.Value && x.Quarter <= queryParams.QuarterTo.Value) ||
+                    x.Year < queryParams.YearTo.Value);
+        }
 
         return this;
     }

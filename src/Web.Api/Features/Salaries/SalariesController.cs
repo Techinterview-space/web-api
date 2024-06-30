@@ -133,6 +133,7 @@ public class SalariesController : ControllerBase
                 Grade = request.Grade,
                 ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
                 Cities = request.Cities,
+                Skills = request.Skills,
                 SalarySourceType = request.SalarySourceType,
                 QuarterTo = request.QuarterTo,
                 YearTo = request.YearTo,

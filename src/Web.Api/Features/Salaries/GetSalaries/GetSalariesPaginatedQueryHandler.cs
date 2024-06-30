@@ -23,6 +23,7 @@ public class GetSalariesPaginatedQueryHandler : IRequestHandler<GetSalariesPagin
         CancellationToken cancellationToken)
     {
         var query = new SalariesAdminQuery(_context)
+            .WithSource(request.SalarySourceType)
             .ApplyFilters(request)
             .ApplyShowInStats(true)
             .ApplyOrder(GetAllSalariesOrderType.CreatedAtDesc)
