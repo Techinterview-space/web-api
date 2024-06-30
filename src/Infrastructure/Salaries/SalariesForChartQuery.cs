@@ -145,7 +145,7 @@ public record SalariesForChartQuery
                     (x.Year == YearTo.Value && x.Quarter <= QuarterTo.Value) ||
                     x.Year < YearTo.Value);
         }
-        else
+        else if (SalarySourceType == null)
         {
             query = query
                 .Where(x =>
