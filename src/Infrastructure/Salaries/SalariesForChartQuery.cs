@@ -179,4 +179,10 @@ public record SalariesForChartQuery
 
         return query;
     }
+
+    public Task<int> CountAsync(
+        CancellationToken cancellationToken)
+    {
+        return ToQueryable().CountAsync(cancellationToken);
+    }
 }

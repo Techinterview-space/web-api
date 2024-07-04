@@ -7,7 +7,7 @@ public record TelegramBotReplyData
 {
     public TelegramBotReplyData(
         string replyText,
-        InlineKeyboardMarkup inlineKeyboardMarkup = null,
+        IReplyMarkup inlineKeyboardMarkup = null,
         ParseMode parseMode = ParseMode.Html)
     {
         ReplyText = replyText;
@@ -19,5 +19,5 @@ public record TelegramBotReplyData
 
     public ParseMode ParseMode { get; }
 
-    public InlineKeyboardMarkup InlineKeyboardMarkup { get; }
+    public IReplyMarkup InlineKeyboardMarkup { get; }
 }

@@ -54,32 +54,11 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         _global = global;
     }
 
-    private async Task<User> GetBotUserName(
-        ITelegramBotClient telegramBotClient)
-    {
-        return await _cache.GetOrCreateAsync(
-            CacheKey + "_BotUserName",
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30);
-                return await telegramBotClient.GetMeAsync();
-            });
-    }
-
     public async Task<string> Handle(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
-        var allProfessions = await _cache.GetOrCreateAsync(
-            CacheKey + "_AllProfessions",
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(120);
-                return await _context
-                    .Professions
-                    .AsNoTracking()
-                    .ToListAsync(cancellationToken);
-            });
+        var allProfessions = await GetProfessionsAsync(cancellationToken);
 
         if (request.UpdateRequest.Type == UpdateType.InlineQuery &&
             request.UpdateRequest.InlineQuery != null)
@@ -108,63 +87,64 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             botUser.Username != null &&
             messageText.StartsWith(botUser.Username);
 
-        TelegramBotReplyData replyData = null;
-        if (mentionedInGroupChat ||
-            message.Chat.Type is ChatType.Private)
+        if (!mentionedInGroupChat &&
+            message.Chat.Type is not ChatType.Private)
         {
-            var directMessageResult = await TryProcessDirectMessageAsync(
-                request,
-                cancellationToken);
-
-            if (directMessageResult.Processed)
-            {
-                return directMessageResult.ReplyText;
-            }
-
-            var parameters = TelegramBotUserCommandParameters.CreateFromMessage(
-                messageText,
-                allProfessions);
-
-            replyData = await _cache.GetOrCreateAsync(
-                CacheKey + "_" + parameters.GetKeyPostfix(),
-                async entry =>
-                {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-                    return await ReplyWithSalariesAsync(
-                        parameters,
-                        cancellationToken);
-                });
-
-            var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
-            await request.BotClient.SendTextMessageAsync(
-                request.UpdateRequest.Message!.Chat.Id,
-                replyData.ReplyText,
-                parseMode: replyData.ParseMode,
-                replyMarkup: replyData.InlineKeyboardMarkup,
-                replyToMessageId: replyToMessageId,
-                cancellationToken: cancellationToken);
-
-            if (message.From! is not null)
-            {
-                var usageType = message.Chat.Type switch
-                {
-                    ChatType.Private => TelegramBotUsageType.DirectMessage,
-                    ChatType.Sender => TelegramBotUsageType.DirectMessage,
-                    ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
-                    ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
-                    _ => TelegramBotUsageType.Undefined,
-                };
-
-                await GetOrCreateTelegramBotUsageAsync(
-                    message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
-                    message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
-                    messageText,
-                    usageType,
-                    cancellationToken);
-            }
+            return null;
         }
 
-        return replyData?.ReplyText;
+        var directMessageResult = await TryProcessDirectMessageAsync(
+            request,
+            cancellationToken);
+
+        if (directMessageResult.Processed)
+        {
+            return directMessageResult.ReplyText;
+        }
+
+        var parameters = TelegramBotUserCommandParameters.CreateFromMessage(
+            messageText,
+            allProfessions);
+
+        var replyData = await _cache.GetOrCreateAsync(
+            CacheKey + "_" + parameters.GetKeyPostfix(),
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
+                return await ReplyWithSalariesAsync(
+                    parameters,
+                    cancellationToken);
+            });
+
+        var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
+        await request.BotClient.SendTextMessageAsync(
+            request.UpdateRequest.Message!.Chat.Id,
+            replyData.ReplyText,
+            parseMode: replyData.ParseMode,
+            replyMarkup: replyData.InlineKeyboardMarkup,
+            replyToMessageId: replyToMessageId,
+            cancellationToken: cancellationToken);
+
+        if (message.From! is not null)
+        {
+            var usageType = message.Chat.Type switch
+            {
+                ChatType.Private => TelegramBotUsageType.DirectMessage,
+                ChatType.Sender => TelegramBotUsageType.DirectMessage,
+                ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
+                ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
+                _ => TelegramBotUsageType.Undefined,
+            };
+
+            await GetOrCreateTelegramBotUsageAsync(
+                message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
+                message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
+                messageText,
+                usageType,
+                cancellationToken);
+        }
+
+        return replyData.ReplyText;
     }
 
     private async Task<(bool Processed, string ReplyText)> TryProcessDirectMessageAsync(
@@ -244,7 +224,8 @@ Last name: {message.From?.LastName}";
 
         if (messageText.Equals("/help", StringComparison.InvariantCultureIgnoreCase))
         {
-            var replyMessage = new CommandNotReadyReply();
+            var replyMessage = new HelpCommandMessageBuilder(_global)
+                .Build();
 
             await request.BotClient.SendTextMessageAsync(
                 message.Chat.Id,
@@ -262,13 +243,14 @@ Last name: {message.From?.LastName}";
         TelegramBotUserCommandParameters requestParams,
         CancellationToken cancellationToken)
     {
+        var now = DateTimeOffset.Now;
         var salariesQuery = new SalariesForChartQuery(
             _context,
             requestParams,
-            DateTimeOffset.Now.AddMonths(-12),
-            DateTimeOffset.Now);
+            now.AddMonths(-12),
+            now);
 
-        var totalCount = await salariesQuery.ToQueryable().CountAsync(cancellationToken);
+        var totalCount = await salariesQuery.CountAsync(cancellationToken);
         var salaries = await salariesQuery
             .ToQueryable(CompanyType.Local)
             .Select(x => new
@@ -496,5 +478,32 @@ Last name: {message.From?.LastName}";
 
         usage.IncrementUsageCount(receivedMessageTextOrNull);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<List<Profession>> GetProfessionsAsync(
+        CancellationToken cancellationToken)
+    {
+        return await _cache.GetOrCreateAsync(
+            CacheKey + "_AllProfessions",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(120);
+                return await _context
+                    .Professions
+                    .AsNoTracking()
+                    .ToListAsync(cancellationToken);
+            });
+    }
+
+    private async Task<User> GetBotUserName(
+        ITelegramBotClient telegramBotClient)
+    {
+        return await _cache.GetOrCreateAsync(
+            CacheKey + "_BotUserName",
+            async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30);
+                return await telegramBotClient.GetMeAsync();
+            });
     }
 }

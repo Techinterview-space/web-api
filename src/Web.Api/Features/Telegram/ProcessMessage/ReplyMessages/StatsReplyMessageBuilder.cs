@@ -53,7 +53,7 @@ public class StatsReplyMessageBuilder
 - Добавлено нерелевантных анкет: <b>+{addedIrrelevantSalariesCount}</b>
 - Прошли опрос: <b>+{surveyPassedCount}</b>
 
-<em>Даты выборки: [{dayAgo:O} - {now:O}]</em>";
+<em>Даты выборки: [{dayAgo:yyyy-MM-dd HH:mm:ss} - {now:yyyy-MM-dd HH:mm:ss}]</em>";
 
         return new TelegramBotReplyData(
             messageToSend,
