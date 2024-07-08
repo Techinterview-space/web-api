@@ -1,3 +1,6 @@
-﻿namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
+﻿using Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
-public record GetSurveyHistoricalChartQuery : MediatR.IRequest<GetSurveyHistoricalChartResponse>;
+namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
+
+public record GetSurveyHistoricalChartQuery
+    : GetSalariesHistoricalChartQueryParams, MediatR.IRequest<GetSurveyHistoricalChartResponse>;

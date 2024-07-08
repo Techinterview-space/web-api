@@ -22,4 +22,6 @@ public interface ISalariesChartQueryParams
 
     public bool HasAnyFilter =>
         Grade.HasValue || ProfessionsToInclude.Count > 0 || Cities.Count > 0;
+
+    string GetKeyPostfix();
 }

@@ -35,4 +35,11 @@ public record GetSalariesPaginatedQuery
 
     public bool HasAnyFilter =>
         Grade.HasValue || ProfessionsToInclude.Count > 0 || Cities.Count > 0;
+
+    public string GetKeyPostfix()
+    {
+        var grade = Grade?.ToString() ?? "all";
+        var professions = ProfessionsToInclude.Count == 0 ? "all" : string.Join("_", ProfessionsToInclude);
+        return $"{grade}_{professions}";
+    }
 }

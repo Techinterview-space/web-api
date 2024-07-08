@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Salaries;
+using Domain.Enums;
+using Domain.Extensions;
 using Domain.ValueObjects.Dates;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
@@ -41,8 +45,8 @@ public class GetSurveyHistoricalChartHandler
         var hasAuthentication = currentUser != null;
         var shouldAddOwnSalary = false;
 
-        var to = DateTimeOffset.Now;
-        var from = to.AddMonths(-12);
+        var to = request.To ?? DateTimeOffset.Now;
+        var from = request.From ?? to.AddMonths(-12);
 
         if (currentUser != null)
         {
@@ -51,7 +55,7 @@ public class GetSurveyHistoricalChartHandler
                     currentUser.Id,
                     cancellationToken);
 
-            shouldAddOwnSalary = !userSalariesForLastYear.Any();
+            shouldAddOwnSalary = userSalariesForLastYear.Count == 0;
         }
 
         if (currentUser is null || shouldAddOwnSalary)
@@ -68,12 +72,12 @@ public class GetSurveyHistoricalChartHandler
 
         var surveyReplies = await _memoryCache
             .GetOrCreateAsync(
-                CacheKey,
+                CacheKey + request.GetKeyPostfix(),
                 async (entry) =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
-                    return await _context.SalariesSurveyReplies
+                    var query = _context.SalariesSurveyReplies
                         .Include(x => x.CreatedByUser)
                         .ThenInclude(x => x.Salaries)
                         .Where(x => x.CreatedAt >= from && x.CreatedAt <= to)
@@ -86,6 +90,18 @@ public class GetSurveyHistoricalChartHandler
                                 .OrderBy(s => s.CreatedAt)
                                 .LastOrDefault()
                         })
+                        .When(
+                            request.Skills.Count > 0,
+                            x =>
+                                x.LastSalaryOrNull != null &&
+                                x.LastSalaryOrNull.SkillId != null &&
+                                request.Skills.Contains(x.LastSalaryOrNull.SkillId.Value))
+                        .When(
+                            request.ProfessionsToInclude.Count > 0,
+                            x =>
+                                x.LastSalaryOrNull != null &&
+                                x.LastSalaryOrNull.ProfessionId != null &&
+                                request.ProfessionsToInclude.Contains(x.LastSalaryOrNull.ProfessionId.Value))
                         .Select(x => new SurveyDatabaseData
                         {
                             ExpectationReply = x.ExpectationReply,
@@ -94,13 +110,40 @@ public class GetSurveyHistoricalChartHandler
                             LastSalaryOrNull = x.LastSalaryOrNull != null
                                 ? new SurveyDatabaseData.UserLastSalaryData
                                 {
+                                    City = x.LastSalaryOrNull.City,
                                     CompanyType = x.LastSalaryOrNull.Company,
                                     Grade = x.LastSalaryOrNull.Grade,
                                     CreatedAt = x.LastSalaryOrNull.CreatedAt,
                                 }
                                 : null,
                         })
-                        .AsNoTracking()
+                        .AsNoTracking();
+
+                    if (request.Cities.Count != 0)
+                    {
+                        if (request.Cities.Count == 1 && request.Cities[0] == KazakhstanCity.Undefined)
+                        {
+                            query = query
+                                .Where(s =>
+                                    s.LastSalaryOrNull != null &&
+                                    s.LastSalaryOrNull.City == null);
+                        }
+
+                        Expression<Func<SurveyDatabaseData, bool>> clause = s =>
+                            s.LastSalaryOrNull.City != null &&
+                            request.Cities.Contains(s.LastSalaryOrNull.City.Value);
+
+                        if (request.Cities.Any(x => x == KazakhstanCity.Undefined))
+                        {
+                            clause = clause.Or(x =>
+                                x.LastSalaryOrNull != null &&
+                                x.LastSalaryOrNull.City == null);
+                        }
+
+                        query = query.Where(clause);
+                    }
+
+                    return await query
                         .OrderBy(x => x.CreatedAt)
                         .ToListAsync(cancellationToken);
                 });

@@ -40,10 +40,18 @@ public class HistoricalChartsController : ControllerBase
 
     [HttpGet("survey")]
     public Task<GetSurveyHistoricalChartResponse> GetSurveyHistoricalChart(
+        [FromQuery] GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
         return _mediator.Send(
-            new GetSurveyHistoricalChartQuery(),
+            new GetSurveyHistoricalChartQuery
+            {
+                From = request.From,
+                To = request.To,
+                Grade = request.Grade,
+                ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+                Cities = request.Cities,
+            },
             cancellationToken);
     }
 }

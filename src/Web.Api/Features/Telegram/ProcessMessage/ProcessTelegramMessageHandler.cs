@@ -28,7 +28,7 @@ namespace Web.Api.Features.Telegram.ProcessMessage;
 
 public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, string>
 {
-    public const string ApplicationName = "techinterview.space/salaries";
+    public const string SalariesPageUrl = "techinterview.space/salaries";
 
     private const string CacheKey = "TelegramBotService_ReplyData";
 
@@ -162,7 +162,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         if (messageText.Equals("/start", StringComparison.InvariantCultureIgnoreCase))
         {
             var startReplyData = new TelegramBotStartCommandReplyData(
-                new SalariesChartPageLink(
+                new ChartPageLink(
                     _global,
                     null));
 
@@ -260,7 +260,11 @@ Last name: {message.From?.LastName}";
             })
             .ToListAsync(cancellationToken);
 
-        var frontendLink = new SalariesChartPageLink(_global, requestParams);
+        var salariesChartPageLink = new ChartPageLink(_global, requestParams);
+        var historicalChartPageLink = new ChartPageLink(
+            _global.FrontendBaseUrl + "/salaries/historical-data",
+            requestParams);
+
         var professions = requestParams.GetProfessionsTitleOrNull();
 
         string replyText;
@@ -296,7 +300,7 @@ Last name: {message.From?.LastName}";
             }
 
             replyText += $"<em>\n\nРассчитано на основе {totalCount} анкет(ы)</em>" +
-                $"\n<em>Подробно на сайте <a href=\"{frontendLink}\">{ApplicationName}</a></em>";
+                $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
         }
         else
         {
@@ -305,15 +309,15 @@ Last name: {message.From?.LastName}";
                 : "Пока никто не оставлял информации о зарплатах.";
 
             replyText += $"\n\n<em>Посмотреть зарплаты по другим специальностям можно " +
-                $"на сайте <a href=\"{frontendLink}\">{ApplicationName}</a></em>";
+                $"на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
         }
 
         return new TelegramBotReplyData(
             replyText.Trim(),
             new InlineKeyboardMarkup(
                 InlineKeyboardButton.WithUrl(
-                    text: ApplicationName,
-                    url: frontendLink.ToString())));
+                    text: SalariesPageUrl,
+                    url: salariesChartPageLink.ToString())));
     }
 
     private async Task ProcessInlineQueryAsync(

@@ -2,19 +2,28 @@
 
 namespace Infrastructure.Salaries;
 
-public record SalariesChartPageLink
+public record ChartPageLink
 {
     private readonly ISalariesChartQueryParams _requestOrNull;
     private readonly string _frontendBaseUrl;
 
     private string _result;
 
-    public SalariesChartPageLink(
-        IGlobal global,
+    public ChartPageLink(
+        string baseUrl,
         ISalariesChartQueryParams requestOrNull)
     {
         _requestOrNull = requestOrNull;
-        _frontendBaseUrl = global.FrontendBaseUrl + "/salaries";
+        _frontendBaseUrl = baseUrl;
+    }
+
+    public ChartPageLink(
+        IGlobal global,
+        ISalariesChartQueryParams requestOrNull)
+        : this(
+            global.FrontendBaseUrl + "/salaries",
+            requestOrNull)
+    {
     }
 
     public override string ToString()
