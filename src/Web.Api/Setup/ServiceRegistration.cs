@@ -30,15 +30,16 @@ public static class ServiceRegistration
         services.AddScoped<IAuthorization, AuthorizationService>();
         services.AddScoped<IGlobal, Global>();
         services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
-        services.AddScoped<IPdf, PdfRenderer>();
+
+        services.AddScoped<IPdf, QuestPdfBasedRender>();
         services.AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>();
         services.AddTransient<TelegramBotClientProvider>();
         services.AddTransient<TelegramBotService>();
         services.AddTransient<ICurrencyService, CurrencyService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
-        services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
-        services.AddScoped<IInterviewPdfService, InterviewPdfService>();
+        // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
+        services.AddScoped<IInterviewPdfService, QuestPdfBasedService>();
 
         services
             .AddS3Settings()

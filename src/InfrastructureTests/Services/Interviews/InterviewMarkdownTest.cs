@@ -19,7 +19,7 @@ public class InterviewMarkdownTest
 
         Assert.NotEqual(default(Guid), interview.Id);
 
-        var markdown = new InterviewMarkdown(interview).ToString();
+        var markdown = new InterviewMarkdownBody(interview).ToString();
 
         var expected = @$"# Interview with Jorn Smith
 
@@ -27,7 +27,7 @@ public class InterviewMarkdownTest
 
 - Interviewer: Maxim Gorbatyuk, m.gorbatyuk@gmail.com
 
-- When: {interview.CreatedAt.ToString(InterviewMarkdown.DateFormat)}
+- When: {interview.CreatedAt.ToString(InterviewMarkdownBody.DateFormat)}
 
 ## Overall Opinion
 

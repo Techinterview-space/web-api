@@ -30,6 +30,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using QuestPDF.Infrastructure;
 
 namespace Web.Api;
 
@@ -41,6 +42,8 @@ public class Program
     {
         try
         {
+            QuestPDF.Settings.License = LicenseType.Community;
+
             await CreateHostBuilder(args)
                 .Build()
                 .RunAsync();

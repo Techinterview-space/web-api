@@ -2,18 +2,20 @@
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
 using Domain.Extensions;
+using Infrastructure.Services.Global;
 
 namespace Infrastructure.Services.PDF.Interviews;
 
-public class InterviewMarkdown
+public class InterviewMarkdownBody
 {
     public const string DateFormat = "yyyy-MM-dd";
 
     private readonly Interview _interview;
 
     private string _rendered = null;
+    private string _footer = null;
 
-    public InterviewMarkdown(
+    public InterviewMarkdownBody(
         Interview interview)
     {
         _interview = interview;
@@ -28,10 +30,39 @@ public class InterviewMarkdown
             builder.Append(GetOverallOpinion());
             builder.Append(GetSubjects());
 
+            if (_footer != null)
+            {
+                builder.Append(_footer);
+            }
+
             _rendered = builder.ToString();
         }
 
         return _rendered;
+    }
+
+    public InterviewMarkdownBody WithFooter(
+        IGlobal globalSettings)
+    {
+        if (_footer == null)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine();
+            builder.AppendLine(MarkdownItems.Line());
+            builder.AppendLine();
+            builder.AppendLine(MarkdownItems.Italic($"View this interview {MarkdownItems.Link(globalSettings.InterviewWebLink(_interview.Id), "on website")}"));
+            builder.AppendLine();
+            builder.AppendLine(MarkdownItems.Italic(MarkdownItems.Link(globalSettings.FrontendBaseUrl, globalSettings.AppName)));
+            builder.AppendLine();
+            builder.AppendLine(MarkdownItems.Italic(globalSettings.AppVersion));
+            builder.AppendLine();
+            builder.AppendLine(MarkdownItems.Italic(DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zz")));
+            builder.AppendLine();
+
+            _footer = builder.ToString();
+        }
+
+        return this;
     }
 
     private string GetHeader()

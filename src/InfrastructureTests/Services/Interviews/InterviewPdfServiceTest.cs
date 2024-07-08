@@ -29,7 +29,7 @@ public class InterviewPdfServiceTest
 </li>
 <li><p>Interviewer: Maxim Gorbatyuk, m.gorbatyuk@gmail.com</p>
 </li>
-<li><p>When: {interview.CreatedAt.ToString(InterviewMarkdown.DateFormat)}</p>
+<li><p>When: {interview.CreatedAt.ToString(InterviewMarkdownBody.DateFormat)}</p>
 </li>
 </ul>
 <h2 id=""overall-opinion"">Overall Opinion</h2>

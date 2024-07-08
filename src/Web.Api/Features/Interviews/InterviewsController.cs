@@ -107,7 +107,7 @@ public class InterviewsController : ControllerBase
 
         return Ok(new
         {
-            Markdown = new InterviewMarkdown(interview).ToString()
+            Markdown = new InterviewMarkdownBody(interview).ToString()
         });
     }
 
