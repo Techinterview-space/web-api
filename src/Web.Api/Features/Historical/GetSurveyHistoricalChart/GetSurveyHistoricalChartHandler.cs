@@ -91,6 +91,11 @@ public class GetSurveyHistoricalChartHandler
                                 .LastOrDefault()
                         })
                         .When(
+                            request.Grade.HasValue,
+                            x =>
+                                x.LastSalaryOrNull != null &&
+                                x.LastSalaryOrNull.Grade == request.Grade.Value)
+                        .When(
                             request.Skills.Count > 0,
                             x =>
                                 x.LastSalaryOrNull != null &&
