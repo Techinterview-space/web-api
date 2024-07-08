@@ -4,14 +4,6 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# https://github.com/rdvojmoc/DinkToPdf/issues/53#issuecomment-535026014
-# https://github.com/rdvojmoc/DinkToPdf/issues/138#issuecomment-914972777
-RUN apt-get update
-RUN apt-get install wget libgdiplus -y
-RUN wget -P /app https://github.com/rdvojmoc/DinkToPdf/raw/master/v0.12.4/64%20bit/libwkhtmltox.dll
-RUN wget -P /app https://github.com/rdvojmoc/DinkToPdf/raw/master/v0.12.4/64%20bit/libwkhtmltox.dylib
-RUN wget -P /app https://github.com/rdvojmoc/DinkToPdf/raw/master/v0.12.4/64%20bit/libwkhtmltox.so
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src

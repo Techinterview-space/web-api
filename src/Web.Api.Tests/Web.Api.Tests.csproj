@@ -24,4 +24,8 @@
       <ProjectReference Include="..\Web.Api\Web.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\PDF\" />
+    </ItemGroup>
+
 </Project>

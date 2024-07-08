@@ -17,13 +17,6 @@ public class QuestPdfBasedService : IInterviewPdfService
         _global = global;
     }
 
-    public Task<FileData> RenderAsync(
-        Interview interview,
-        CancellationToken cancellationToken = default)
-    {
-        return Task.Run(() => Render(interview), cancellationToken);
-    }
-
     public FileData Render(
         Interview interview)
     {

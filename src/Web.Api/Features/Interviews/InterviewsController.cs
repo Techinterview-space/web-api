@@ -81,7 +81,9 @@ public class InterviewsController : ControllerBase
     }
 
     [HttpGet("{id:guid}/download")]
-    public async Task<FileContentResult> PdfAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<FileContentResult> PdfAsync(
+        Guid id,
+        CancellationToken cancellationToken)
     {
         var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
@@ -91,7 +93,7 @@ public class InterviewsController : ControllerBase
 
         CheckPermissions(interview, currentUser);
 
-        var file = await _pdf.RenderAsync(interview, cancellationToken);
+        var file = _pdf.Render(interview);
         return File(file.Data, file.ContentType, file.Filename);
     }
 

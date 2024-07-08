@@ -40,13 +40,18 @@ public class AdminToolsController : ControllerBase
     }
 
     [HttpPost("generate-from-html")]
-    public async Task<IActionResult> GenerateFromHtmlAsync([FromBody] GenerateHtmlRequest request)
+    public IActionResult GenerateFromHtml(
+        [FromBody] GenerateHtmlRequest request)
     {
         request
             .ThrowIfNull(nameof(request))
             .ThrowIfInvalid();
 
-        var pdf = await _pdf.RenderAsync(request.Content, "demo.pdf", "application/pdf");
+        var pdf = _pdf.Render(
+            request.Content,
+            "demo.pdf",
+            "application/pdf");
+
         return File(pdf.Data, contentType: pdf.ContentType, fileDownloadName: pdf.Filename);
     }
 

@@ -1,13 +1,7 @@
 ﻿namespace Infrastructure.Services.Files;
 
-public interface IPdf : IDisposable
+public interface IPdf
 {
-    Task<FileData> RenderAsync(
-        string htmlContent,
-        string filename,
-        string contentType,
-        CancellationToken cancellationToken = default);
-
     FileData Render(
         string htmlContent,
         string filename,
