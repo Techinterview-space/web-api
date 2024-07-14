@@ -19,7 +19,7 @@ public record ProductManagersTelegramBotUserCommandParameters
         string requestedProfession) =>
         requestedProfession.Equals(ProductProfessionTitle, StringComparison.InvariantCultureIgnoreCase);
 
-    private static List<Profession> GetProductProfessionIds(
+    public static List<Profession> GetProductProfessionIds(
         List<Profession> professions)
     {
         var productProfessions = new List<Profession>();

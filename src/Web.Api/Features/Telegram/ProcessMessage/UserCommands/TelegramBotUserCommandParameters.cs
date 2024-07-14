@@ -76,22 +76,36 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 
         if (string.IsNullOrEmpty(message) || message.Length < 2)
         {
-            selectedProfessions = new List<Profession>(0);
+            return new TelegramBotUserCommandParameters(new List<Profession>(0));
         }
-        else
-        {
-            foreach (var profession in allProfessions)
-            {
-                var titleParts = profession.Title
-                    .ToLowerInvariant()
-                    .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var titlePart in titleParts)
+        if (ProductManagersTelegramBotUserCommandParameters.ShouldIncludeGroup(message))
+        {
+            var productProfessions = ProductManagersTelegramBotUserCommandParameters.GetProductProfessionIds(
+                allProfessions);
+
+            return new ProductManagersTelegramBotUserCommandParameters(productProfessions);
+        }
+
+        if (QaAndTestersTelegramBotUserCommandParameters.ShouldIncludeGroup(message))
+        {
+            var testerProfessions = QaAndTestersTelegramBotUserCommandParameters.GetProfessionIds(
+                allProfessions);
+
+            return new QaAndTestersTelegramBotUserCommandParameters(testerProfessions);
+        }
+
+        foreach (var profession in allProfessions)
+        {
+            var titleParts = profession.Title
+                .ToLowerInvariant()
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var titlePart in titleParts)
+            {
+                if (titlePart.StartsWith(message))
                 {
-                    if (titlePart.StartsWith(message))
-                    {
-                        selectedProfessions.Add(profession);
-                    }
+                    selectedProfessions.Add(profession);
                 }
             }
         }

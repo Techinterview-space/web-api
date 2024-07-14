@@ -93,7 +93,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             return null;
         }
 
-        var directMessageResult = await TryProcessDirectMessageAsync(
+        var directMessageResult = await TryProcessDirectMessageBotCommandAsync(
             request,
             cancellationToken);
 
@@ -111,6 +111,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
+
                 return await ReplyWithSalariesAsync(
                     parameters,
                     cancellationToken);
@@ -147,7 +148,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         return replyData.ReplyText;
     }
 
-    private async Task<(bool Processed, string ReplyText)> TryProcessDirectMessageAsync(
+    private async Task<(bool Processed, string ReplyText)> TryProcessDirectMessageBotCommandAsync(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {

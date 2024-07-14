@@ -31,7 +31,7 @@ public record QaAndTestersTelegramBotUserCommandParameters
         return _professionTitles.Any(x => x == requestedProfession);
     }
 
-    private static List<Profession> GetProfessionIds(
+    public static List<Profession> GetProfessionIds(
         List<Profession> professions)
     {
         var productProfessions = new List<Profession>();
