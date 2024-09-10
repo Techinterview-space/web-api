@@ -19,8 +19,8 @@ public class StatDataCacheItemEntityConfig : IEntityTypeConfiguration<StatDataCa
 
         builder
             .HasOne(x => x.PreviousStatDataCacheItem)
-            .WithOne(x => x.NextStatDataCacheItem)
-            .HasForeignKey<StatDataCacheItem>(x => x.PreviousStatDataCacheItemId)
+            .WithMany(x => x.NextStatDataCacheItems)
+            .HasForeignKey(x => x.PreviousStatDataCacheItemId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder

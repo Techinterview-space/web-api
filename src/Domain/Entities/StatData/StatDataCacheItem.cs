@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities.StatData;
 
@@ -14,7 +15,7 @@ public class StatDataCacheItem : HasDatesBase, IHasIdBase<Guid>
 
     public virtual StatDataCacheItem PreviousStatDataCacheItem { get; protected set; }
 
-    public virtual StatDataCacheItem NextStatDataCacheItem { get; protected set; }
+    public virtual List<StatDataCacheItem> NextStatDataCacheItems { get; protected set; }
 
     public StatDataCacheItemSalaryData Data { get; protected set; }
 

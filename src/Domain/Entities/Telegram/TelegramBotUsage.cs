@@ -13,6 +13,8 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
 
     public string ChannelName { get; protected set; }
 
+    public long? ChannelId { get; protected set; }
+
     public string ReceivedMessageText { get; protected set; }
 
     public TelegramBotUsageType UsageType { get; protected set; }
@@ -20,6 +22,7 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
     public TelegramBotUsage(
         string username,
         string channelName,
+        long? channelId,
         TelegramBotUsageType usageType)
     {
         username = username?.Trim().ToLowerInvariant();
@@ -33,15 +36,28 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
         UsageCount = 0;
         Username = username;
         ChannelName = channelName;
+        ChannelId = channelId;
 
         UsageType = usageType;
     }
 
     public void IncrementUsageCount(
-        string receivedMessageText)
+        string receivedMessageText,
+        string channelName,
+        long? channelId)
     {
         UsageCount++;
         ReceivedMessageText = receivedMessageText;
+
+        if (!string.IsNullOrEmpty(channelName))
+        {
+            ChannelName = channelName;
+        }
+
+        if (channelId.HasValue && channelId.Value != ChannelId)
+        {
+            ChannelId = channelId;
+        }
 
         UpdatedAt = DateTime.UtcNow;
     }
