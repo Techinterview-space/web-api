@@ -3,6 +3,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
+using Domain.ValueObjects;
 using Domain.ValueObjects.Dates;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -59,6 +60,18 @@ public record SalariesForChartQuery
         SalarySourceType = salarySourceType;
         QuarterTo = quarterTo;
         YearTo = yearTo;
+    }
+
+    public SalariesForChartQuery(
+        DatabaseContext context,
+        ISalariesChartQueryParams request,
+        DateTimeOffset now)
+        : this(
+            context,
+            request,
+            now.AddMonths(-12),
+            now)
+    {
     }
 
     public SalariesForChartQuery(

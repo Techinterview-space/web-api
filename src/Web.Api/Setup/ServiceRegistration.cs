@@ -11,6 +11,7 @@ using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
+using Infrastructure.Services.Professions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,6 +37,7 @@ public static class ServiceRegistration
         services.AddTransient<TelegramBotClientProvider>();
         services.AddTransient<TelegramBotService>();
         services.AddTransient<ICurrencyService, CurrencyService>();
+        services.AddTransient<IProfessionsCacheService, ProfessionsCacheService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

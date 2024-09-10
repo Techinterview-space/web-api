@@ -14,6 +14,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using TestUtils.Mocks;
 using Web.Api.Features.Telegram.ProcessMessage;
 using Web.Api.Tests.Mocks;
 using Xunit;
@@ -63,7 +64,8 @@ namespace Web.Api.Tests.Telegram
                 currencyService,
                 context,
                 mockedCache,
-                new GlobalFake());
+                new GlobalFake(),
+                new ProfessionsCacheServiceFake(context));
 
             var mockUpdate = new Mock<Update>();
 
@@ -99,7 +101,8 @@ namespace Web.Api.Tests.Telegram
                 currencyService,
                 context,
                 mockedCache,
-                new GlobalFake());
+                new GlobalFake(),
+                new ProfessionsCacheServiceFake(context));
 
             var mockUpdate = new Mock<Update>();
             mockUpdate.Object.Message = new Message()

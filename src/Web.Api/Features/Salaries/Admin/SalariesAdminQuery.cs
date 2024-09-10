@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Domain.Entities.Salaries;
+using Domain.ValueObjects;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Microsoft.EntityFrameworkCore;

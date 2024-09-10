@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Infrastructure.Currencies.Contracts;
 
-namespace Web.Api.Tests.Mocks;
+namespace TestUtils.Mocks;
 
 public class CurrenciesServiceFake : ICurrencyService
 {
