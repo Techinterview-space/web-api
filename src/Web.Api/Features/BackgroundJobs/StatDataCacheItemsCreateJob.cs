@@ -54,7 +54,6 @@ public class StatDataCacheItemsCreateJob
         CancellationToken cancellationToken = default)
     {
         var cacheRecords = await _context.StatDataCacheRecords
-            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
         if (cacheRecords.Count == 0)
