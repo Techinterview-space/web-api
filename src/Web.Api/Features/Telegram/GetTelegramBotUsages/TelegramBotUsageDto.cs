@@ -13,6 +13,8 @@ public record TelegramBotUsageDto
 
     public string ChannelName { get; init; }
 
+    public long? ChannelId { get; init; }
+
     public string ReceivedMessageText { get; init; }
 
     public TelegramBotUsageType UsageType { get; init; }
