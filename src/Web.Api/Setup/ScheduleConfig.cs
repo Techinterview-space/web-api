@@ -42,7 +42,7 @@ public static class ScheduleConfig
 
             scheduler
                 .Schedule<StatDataCacheItemsCreateJob>()
-                .EveryFifteenSeconds()
+                .EveryThirtySeconds()
                 .When(() => Task.FromResult(Debugger.IsAttached));
         });
     }

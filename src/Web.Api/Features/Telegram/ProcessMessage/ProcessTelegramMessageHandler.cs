@@ -141,9 +141,12 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 _ => TelegramBotUsageType.Undefined,
             };
 
+            var chat = message.SenderChat ?? message.Chat;
+
             await GetOrCreateTelegramBotUsageAsync(
                 message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
-                message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
+                chat.Title ?? chat.Username ?? chat.Id.ToString(),
+                chat.Id,
                 messageText,
                 usageType,
                 cancellationToken);
@@ -421,8 +424,10 @@ Last name: {message.From?.LastName}";
 
             var userName = updateRequest.InlineQuery.From.Username
                            ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
+
             await GetOrCreateTelegramBotUsageAsync(
                 userName,
+                null,
                 null,
                 updateRequest.InlineQuery?.Query,
                 TelegramBotUsageType.InlineQuery,
@@ -465,6 +470,7 @@ Last name: {message.From?.LastName}";
     private async Task GetOrCreateTelegramBotUsageAsync(
         string username,
         string channelName,
+        long? channelId,
         string receivedMessageTextOrNull,
         TelegramBotUsageType usageType,
         CancellationToken cancellationToken)
@@ -477,11 +483,20 @@ Last name: {message.From?.LastName}";
 
         if (usage == null)
         {
-            usage = new TelegramBotUsage(username, channelName, usageType);
+            usage = new TelegramBotUsage(
+                username,
+                channelName,
+                channelId,
+                usageType);
+
             _context.TelegramBotUsages.Add(usage);
         }
 
-        usage.IncrementUsageCount(receivedMessageTextOrNull);
+        usage.IncrementUsageCount(
+            receivedMessageTextOrNull,
+            channelName,
+            channelId);
+
         await _context.SaveChangesAsync(cancellationToken);
     }
 
