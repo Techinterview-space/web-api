@@ -4,6 +4,7 @@ using System.Linq;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Infrastructure.Salaries;
 
 namespace Web.Api.Features.Telegram.ProcessMessage.UserCommands;
@@ -30,7 +31,9 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
     {
         Grade = null;
         SelectedProfessions = professionsToInclude;
-        ProfessionsToInclude = professionsToInclude.Select(x => x.Id).ToList();
+        ProfessionsToInclude = professionsToInclude
+            .Select(x => x.Id)
+            .ToList();
     }
 
     public DeveloperGrade? Grade { get; }

@@ -1,8 +1,9 @@
-﻿using Domain.Entities.Enums;
+﻿using System.Collections.Generic;
+using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 
-namespace Infrastructure.Salaries;
+namespace Domain.ValueObjects;
 
 public interface ISalariesChartQueryParams
 {

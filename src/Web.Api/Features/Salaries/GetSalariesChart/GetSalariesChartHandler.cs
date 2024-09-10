@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
+using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
@@ -44,7 +45,6 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             var salariesQuery = new SalariesForChartQuery(
                 _context,
                 request,
-                now.AddMonths(-12),
                 now);
 
             if (currentUser != null)

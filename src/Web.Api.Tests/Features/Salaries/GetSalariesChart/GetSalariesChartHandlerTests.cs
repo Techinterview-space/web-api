@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using TestUtils.Mocks;
 using Web.Api.Features.Salaries.GetSalariesChart;
 using Web.Api.Tests.Mocks;
 using Xunit;

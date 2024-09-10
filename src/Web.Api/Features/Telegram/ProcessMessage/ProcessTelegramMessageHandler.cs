@@ -12,6 +12,7 @@ using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
+using Infrastructure.Services.Professions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -36,6 +37,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
     private readonly ILogger<ProcessTelegramMessageHandler> _logger;
     private readonly ICurrencyService _currencyService;
+    private readonly IProfessionsCacheService _professionsCacheService;
     private readonly DatabaseContext _context;
     private readonly IMemoryCache _cache;
     private readonly IGlobal _global;
@@ -45,20 +47,22 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         ICurrencyService currencyService,
         DatabaseContext context,
         IMemoryCache cache,
-        IGlobal global)
+        IGlobal global,
+        IProfessionsCacheService professionsCacheService)
     {
         _logger = logger;
         _currencyService = currencyService;
         _context = context;
         _cache = cache;
         _global = global;
+        _professionsCacheService = professionsCacheService;
     }
 
     public async Task<string> Handle(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
-        var allProfessions = await GetProfessionsAsync(cancellationToken);
+        var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
 
         if (request.UpdateRequest.Type == UpdateType.InlineQuery &&
             request.UpdateRequest.InlineQuery != null)
@@ -248,7 +252,6 @@ Last name: {message.From?.LastName}";
         var salariesQuery = new SalariesForChartQuery(
             _context,
             requestParams,
-            now.AddMonths(-12),
             now);
 
         var totalCount = await salariesQuery.CountAsync(cancellationToken);
@@ -262,9 +265,6 @@ Last name: {message.From?.LastName}";
             .ToListAsync(cancellationToken);
 
         var salariesChartPageLink = new ChartPageLink(_global, requestParams);
-        var historicalChartPageLink = new ChartPageLink(
-            _global.FrontendBaseUrl + "/salaries/historical-data",
-            requestParams);
 
         var professions = requestParams.GetProfessionsTitleOrNull();
 
@@ -483,21 +483,6 @@ Last name: {message.From?.LastName}";
 
         usage.IncrementUsageCount(receivedMessageTextOrNull);
         await _context.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task<List<Profession>> GetProfessionsAsync(
-        CancellationToken cancellationToken)
-    {
-        return await _cache.GetOrCreateAsync(
-            CacheKey + "_AllProfessions",
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(120);
-                return await _context
-                    .Professions
-                    .AsNoTracking()
-                    .ToListAsync(cancellationToken);
-            });
     }
 
     private async Task<User> GetBotUserName(

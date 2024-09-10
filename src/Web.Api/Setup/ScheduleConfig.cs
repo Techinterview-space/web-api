@@ -1,4 +1,6 @@
-﻿using Coravel;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
+using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.BackgroundJobs;
@@ -7,19 +9,14 @@ namespace Web.Api.Setup;
 
 public static class ScheduleConfig
 {
-    private const int Night = 0;
-    private const int EarlyMorning = 3;
-    private const int Midday = 9;
-    private const int Afternoon = 15;
-    private const int Evening = 21;
-
     public static IServiceCollection SetupScheduler(
         this IServiceCollection services)
     {
         services
             .AddScheduler()
             .AddTransient<CurrenciesResetJob>()
-            .AddTransient<TelegramSalariesRegularStatsUpdateJob>();
+            .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
+            .AddTransient<StatDataCacheItemsCreateJob>();
 
         return services;
     }
@@ -37,6 +34,16 @@ public static class ScheduleConfig
                 .Schedule<TelegramSalariesRegularStatsUpdateJob>()
                 .DailyAt(7, 0)
                 .RunOnceAtStart();
+
+            scheduler
+                .Schedule<StatDataCacheItemsCreateJob>()
+                .DailyAt(6, 0)
+                .Wednesday();
+
+            scheduler
+                .Schedule<StatDataCacheItemsCreateJob>()
+                .EveryFifteenSeconds()
+                .When(() => Task.FromResult(Debugger.IsAttached));
         });
     }
 }

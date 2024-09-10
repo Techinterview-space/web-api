@@ -4,6 +4,7 @@ using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
+using Domain.Entities.StatData;
 using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation;
@@ -46,6 +47,10 @@ public class DatabaseContext : DbContext
     public DbSet<UserCsvDownload> UserCsvDownloads { get; set; }
 
     public DbSet<SalariesSurveyReply> SalariesSurveyReplies { get; set; }
+
+    public DbSet<StatDataCache> StatDataCacheRecords { get; set; }
+
+    public DbSet<StatDataCacheItem> StatDataCacheItems { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

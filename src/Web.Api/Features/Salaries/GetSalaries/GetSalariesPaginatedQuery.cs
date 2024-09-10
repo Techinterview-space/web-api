@@ -2,6 +2,7 @@
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Salaries;
 using MediatR;

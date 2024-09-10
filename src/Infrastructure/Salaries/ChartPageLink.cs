@@ -1,4 +1,5 @@
-﻿using Infrastructure.Services.Global;
+﻿using Domain.ValueObjects;
+using Infrastructure.Services.Global;
 
 namespace Infrastructure.Salaries;
 
