@@ -85,6 +85,38 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         var messageText = message.Text ?? string.Empty;
 
         var botUser = await GetBotUserName(request.BotClient);
+
+        var messageSentByBot =
+            message.ViaBot is not null &&
+            message.ViaBot.Username == botUser.Username;
+
+        if (messageSentByBot)
+        {
+            var chat = message.SenderChat ?? message.Chat;
+            var userOrChatName = message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim();
+            if (string.IsNullOrEmpty(userOrChatName))
+            {
+                userOrChatName = chat.Title ?? chat.Username ?? chat.Id.ToString();
+            }
+
+            await GetOrCreateTelegramBotUsageAsync(
+                userOrChatName,
+                chat.Title ?? chat.Username ?? chat.Id.ToString(),
+                chat.Id,
+                messageText,
+                message.Chat.Type switch
+                {
+                    ChatType.Private => TelegramBotUsageType.DirectMessage,
+                    ChatType.Sender => TelegramBotUsageType.DirectMessage,
+                    ChatType.Group => TelegramBotUsageType.GroupMention,
+                    ChatType.Supergroup => TelegramBotUsageType.SupergroupMention,
+                    _ => TelegramBotUsageType.Undefined,
+                },
+                cancellationToken);
+
+            return null;
+        }
+
         var mentionedInGroupChat =
             message.Entities?.Length > 0 &&
             message.Entities[0].Type == MessageEntityType.Mention &&
@@ -123,7 +155,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
         await request.BotClient.SendTextMessageAsync(
-            request.UpdateRequest.Message!.Chat.Id,
+            message.Chat.Id,
             replyData.ReplyText,
             parseMode: replyData.ParseMode,
             replyMarkup: replyData.InlineKeyboardMarkup,
@@ -132,23 +164,20 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         if (message.From! is not null)
         {
-            var usageType = message.Chat.Type switch
-            {
-                ChatType.Private => TelegramBotUsageType.DirectMessage,
-                ChatType.Sender => TelegramBotUsageType.DirectMessage,
-                ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
-                ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
-                _ => TelegramBotUsageType.Undefined,
-            };
-
             var chat = message.SenderChat ?? message.Chat;
-
             await GetOrCreateTelegramBotUsageAsync(
                 message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
                 chat.Title ?? chat.Username ?? chat.Id.ToString(),
                 chat.Id,
                 messageText,
-                usageType,
+                message.Chat.Type switch
+                {
+                    ChatType.Private => TelegramBotUsageType.DirectMessage,
+                    ChatType.Sender => TelegramBotUsageType.DirectMessage,
+                    ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
+                    ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
+                    _ => TelegramBotUsageType.Undefined,
+                },
                 cancellationToken);
         }
 
