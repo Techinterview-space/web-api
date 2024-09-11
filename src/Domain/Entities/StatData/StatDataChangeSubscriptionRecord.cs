@@ -7,15 +7,15 @@ public class StatDataChangeSubscriptionRecord : HasDatesBase, IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
 
-    public Guid StatDataChangeSubscriptionId { get; protected set; }
+    public Guid SubscriptionId { get; protected set; }
 
-    public virtual StatDataChangeSubscription StatDataChangeSubscription { get; protected set; }
+    public virtual StatDataChangeSubscription Subscription { get; protected set; }
 
-    public Guid? PreviousStatDataChangeSubscriptionRecordId { get; protected set; }
+    public Guid? PreviousRecordId { get; protected set; }
 
-    public virtual StatDataChangeSubscriptionRecord PreviousStatDataChangeSubscriptionRecord { get; protected set; }
+    public virtual StatDataChangeSubscriptionRecord PreviousRecord { get; protected set; }
 
-    public virtual List<StatDataChangeSubscriptionRecord> NextStatDataChangeSubscriptionRecords { get; protected set; }
+    public virtual List<StatDataChangeSubscriptionRecord> NextRecords { get; protected set; }
 
     public StatDataCacheItemSalaryData Data { get; protected set; }
 
@@ -29,19 +29,19 @@ public class StatDataChangeSubscriptionRecord : HasDatesBase, IHasIdBase<Guid>
         StatDataCacheItemSalaryData data)
     {
         Id = Guid.NewGuid();
-        StatDataChangeSubscriptionId = subscription.Id;
-        StatDataChangeSubscription = subscription;
-        PreviousStatDataChangeSubscriptionRecordId = previousStatDataChangeSubscriptionRecord?.Id;
+        SubscriptionId = subscription.Id;
+        Subscription = subscription;
+        PreviousRecordId = previousStatDataChangeSubscriptionRecord?.Id;
         Data = data;
     }
 
     public long GetChatId()
     {
-        if (StatDataChangeSubscription is null)
+        if (Subscription is null)
         {
             throw new InvalidOperationException("You must load StatDataCache before calling this method.");
         }
 
-        return StatDataChangeSubscription.TelegramChatId;
+        return Subscription.TelegramChatId;
     }
 }

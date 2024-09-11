@@ -12,16 +12,18 @@ public class StatDataChangeSubscriptionRecordEntityConfig : IEntityTypeConfigura
         builder.HasKey(x => x.Id);
 
         builder
-            .HasOne(x => x.StatDataChangeSubscription)
-            .WithMany(x => x.StatDataChangeSubscriptionRecords)
-            .HasForeignKey(x => x.StatDataChangeSubscriptionId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(x => x.Subscription)
+            .WithMany(x => x.Records)
+            .HasForeignKey(x => x.SubscriptionId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("FK_StatDataChangeSubscriptionRecord_Subscription");
 
         builder
-            .HasOne(x => x.PreviousStatDataChangeSubscriptionRecord)
-            .WithMany(x => x.NextStatDataChangeSubscriptionRecords)
-            .HasForeignKey(x => x.PreviousStatDataChangeSubscriptionRecordId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .HasOne(x => x.PreviousRecord)
+            .WithMany(x => x.NextRecords)
+            .HasForeignKey(x => x.PreviousRecordId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("FK_StatDataChangeSubscriptionRecord_PreviousRecord");
 
         builder
             .Property(x => x.Data)

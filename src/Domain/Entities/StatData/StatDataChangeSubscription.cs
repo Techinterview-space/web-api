@@ -15,7 +15,7 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
 
     public DateTimeOffset? DeletedAt { get; protected set; }
 
-    public virtual List<StatDataChangeSubscriptionRecord> StatDataChangeSubscriptionRecords { get; protected set; }
+    public virtual List<StatDataChangeSubscriptionRecord> Records { get; protected set; }
 
     protected StatDataChangeSubscription()
     {
