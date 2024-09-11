@@ -86,7 +86,7 @@ public class TelegramBotController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("cache-data-change-subscriptions")]
+    [HttpGet("stat-data-change-subscriptions")]
     public async Task<Pageable<StatDataChangeSubscriptionDto>> GetStatDataChangeSubscriptions(
         [FromQuery] GetStatDataChangeSubscriptionsQuery request,
         CancellationToken cancellationToken)
@@ -96,7 +96,7 @@ public class TelegramBotController : ControllerBase
             cancellationToken);
     }
 
-    [HttpPut("cache-data-change-subscriptions/{id:guid}/activate")]
+    [HttpPut("stat-data-change-subscriptions/{id:guid}/activate")]
     public async Task<IActionResult> ActivateCacheChangeSubscription(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -108,7 +108,7 @@ public class TelegramBotController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("cache-data-change-subscriptions/{id:guid}/deactivate")]
+    [HttpPut("stat-data-change-subscriptions/{id:guid}/deactivate")]
     public async Task<IActionResult> DeactivateCacheChangeSubscription(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
