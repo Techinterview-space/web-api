@@ -6,8 +6,11 @@ using Domain.Enums;
 using Domain.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Web.Api.Features.Telegram.ActivateCacheData;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
+using Web.Api.Features.Telegram.DeactivateCacheData;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
+using Web.Api.Features.Telegram.GetStatDataCacheRecords;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 using Web.Api.Features.Telegram.UpdateTelegramUserSettings;
@@ -78,6 +81,40 @@ public class TelegramBotController : ControllerBase
     {
         await _mediator.Send(
             new DeleteTelegramUserSettingsCommand(id),
+            cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpGet("cache-data-records")]
+    public async Task<Pageable<StatDataCacheDto>> GetCacheDataRecords(
+        [FromQuery] GetStatDataCacheQuery request,
+        CancellationToken cancellationToken)
+    {
+        return await _mediator.Send(
+            request,
+            cancellationToken);
+    }
+
+    [HttpPut("cache-data-records/{id:guid}/activate")]
+    public async Task<IActionResult> ActivateCacheData(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new ActivateCacheDataCommand(id),
+            cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpPut("cache-data-records/{id:guid}/deactivate")]
+    public async Task<IActionResult> DeactivateCacheData(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeactivateCacheDataCommand(id),
             cancellationToken);
 
         return NoContent();

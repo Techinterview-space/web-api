@@ -33,4 +33,15 @@ public class StatDataCache : HasDatesBase, IHasIdBase<Guid>
         ProfessionIds = professionIds;
         DeletedAt = null;
     }
+
+    public void Activate()
+    {
+        DeletedAt = null;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void Deactivate()
+    {
+        DeletedAt = UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
