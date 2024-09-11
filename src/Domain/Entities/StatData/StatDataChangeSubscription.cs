@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domain.ValueObjects;
 
 namespace Domain.Entities.StatData;
 
-public class StatDataCache : HasDatesBase, IHasIdBase<Guid>
+public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
 
@@ -16,13 +15,13 @@ public class StatDataCache : HasDatesBase, IHasIdBase<Guid>
 
     public DateTimeOffset? DeletedAt { get; protected set; }
 
-    public virtual List<StatDataCacheItem> StatDataCacheItems { get; protected set; }
+    public virtual List<StatDataChangeSubscriptionRecord> StatDataChangeSubscriptionRecords { get; protected set; }
 
-    protected StatDataCache()
+    protected StatDataChangeSubscription()
     {
     }
 
-    public StatDataCache(
+    public StatDataChangeSubscription(
         string name,
         long telegramChatId,
         List<long> professionIds)

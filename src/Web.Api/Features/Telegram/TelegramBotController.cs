@@ -6,11 +6,11 @@ using Domain.Enums;
 using Domain.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Web.Api.Features.Telegram.ActivateCacheData;
+using Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
-using Web.Api.Features.Telegram.DeactivateCacheData;
+using Web.Api.Features.Telegram.DeactivateStatDataChangeSubscription;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
-using Web.Api.Features.Telegram.GetStatDataCacheRecords;
+using Web.Api.Features.Telegram.GetStatDataChangeSubscriptions;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 using Web.Api.Features.Telegram.UpdateTelegramUserSettings;
@@ -86,9 +86,9 @@ public class TelegramBotController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("cache-data-records")]
-    public async Task<Pageable<StatDataCacheDto>> GetCacheDataRecords(
-        [FromQuery] GetStatDataCacheQuery request,
+    [HttpGet("cache-data-change-subscriptions")]
+    public async Task<Pageable<StatDataChangeSubscriptionDto>> GetStatDataChangeSubscriptions(
+        [FromQuery] GetStatDataChangeSubscriptionsQuery request,
         CancellationToken cancellationToken)
     {
         return await _mediator.Send(
@@ -96,25 +96,25 @@ public class TelegramBotController : ControllerBase
             cancellationToken);
     }
 
-    [HttpPut("cache-data-records/{id:guid}/activate")]
-    public async Task<IActionResult> ActivateCacheData(
+    [HttpPut("cache-data-change-subscriptions/{id:guid}/activate")]
+    public async Task<IActionResult> ActivateCacheChangeSubscription(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         await _mediator.Send(
-            new ActivateCacheDataCommand(id),
+            new ActivateStatDataChangeSubscriptionCommand(id),
             cancellationToken);
 
         return NoContent();
     }
 
-    [HttpPut("cache-data-records/{id:guid}/deactivate")]
-    public async Task<IActionResult> DeactivateCacheData(
+    [HttpPut("cache-data-change-subscriptions/{id:guid}/deactivate")]
+    public async Task<IActionResult> DeactivateCacheChangeSubscription(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
         await _mediator.Send(
-            new DeactivateCacheDataCommand(id),
+            new DeactivateStatDataChangeSubscriptionCommand(id),
             cancellationToken);
 
         return NoContent();

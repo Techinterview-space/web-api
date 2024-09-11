@@ -7,16 +7,15 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Telegram.ActivateCacheData;
 
-namespace Web.Api.Features.Telegram.DeactivateCacheData;
+namespace Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
 
-public class DeactivateCacheDataHandler : IRequestHandler<ActivateCacheDataCommand, Unit>
+public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 
-    public DeactivateCacheDataHandler(
+    public ActivateStatDataChangeSubscriptionHandler(
         DatabaseContext context,
         IAuthorization authorization)
     {
@@ -25,7 +24,7 @@ public class DeactivateCacheDataHandler : IRequestHandler<ActivateCacheDataComma
     }
 
     public async Task<Unit> Handle(
-        ActivateCacheDataCommand request,
+        ActivateStatDataChangeSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
@@ -34,11 +33,11 @@ public class DeactivateCacheDataHandler : IRequestHandler<ActivateCacheDataComma
             throw new NoPermissionsException("You don't have permissions to perform this.");
         }
 
-        var cacheRecord = await _context.StatDataCacheRecords
+        var cacheRecord = await _context.StatDataChangeSubscriptions
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
-            ?? throw NotFoundException.CreateFromEntity<StatDataCache>(request.Id);
+            ?? throw NotFoundException.CreateFromEntity<StatDataChangeSubscription>(request.Id);
 
-        cacheRecord.Deactivate();
+        cacheRecord.Activate();
 
         await _context.SaveChangesAsync(cancellationToken);
         return Unit.Value;

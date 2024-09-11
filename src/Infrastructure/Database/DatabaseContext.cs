@@ -48,9 +48,9 @@ public class DatabaseContext : DbContext
 
     public DbSet<SalariesSurveyReply> SalariesSurveyReplies { get; set; }
 
-    public DbSet<StatDataCache> StatDataCacheRecords { get; set; }
+    public DbSet<StatDataChangeSubscription> StatDataChangeSubscriptions { get; set; }
 
-    public DbSet<StatDataCacheItem> StatDataCacheItems { get; set; }
+    public DbSet<StatDataChangeSubscriptionRecord> StatDataChangeSubscriptionRecords { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

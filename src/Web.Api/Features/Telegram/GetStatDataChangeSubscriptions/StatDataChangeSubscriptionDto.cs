@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Domain.Entities.StatData;
 
-namespace Web.Api.Features.Telegram.GetStatDataCacheRecords;
+namespace Web.Api.Features.Telegram.GetStatDataChangeSubscriptions;
 
-public record StatDataCacheDto
+public record StatDataChangeSubscriptionDto
 {
-    public StatDataCacheDto()
+    public StatDataChangeSubscriptionDto()
     {
     }
 
-    public StatDataCacheDto(
-        StatDataCache entity)
+    public StatDataChangeSubscriptionDto(
+        StatDataChangeSubscription entity)
     {
         Id = entity.Id;
         Name = entity.Name;
@@ -37,7 +37,7 @@ public record StatDataCacheDto
 
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static readonly Expression<Func<StatDataCache, StatDataCacheDto>> Transform = x => new StatDataCacheDto
+    public static readonly Expression<Func<StatDataChangeSubscription, StatDataChangeSubscriptionDto>> Transform = x => new StatDataChangeSubscriptionDto
     {
         Id = x.Id,
         Name = x.Name,

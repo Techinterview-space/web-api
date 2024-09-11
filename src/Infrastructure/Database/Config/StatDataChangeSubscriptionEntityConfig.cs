@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Database.Config;
 
-public class StatDataCacheEntityConfig : IEntityTypeConfiguration<StatDataCache>
+public class StatDataChangeSubscriptionEntityConfig : IEntityTypeConfiguration<StatDataChangeSubscription>
 {
     public void Configure(
-        EntityTypeBuilder<StatDataCache> builder)
+        EntityTypeBuilder<StatDataChangeSubscription> builder)
     {
-        builder.ToTable(nameof(StatDataCache));
+        builder.ToTable($"{nameof(StatDataChangeSubscription)}s");
         builder.HasKey(x => x.Id);
 
         builder

@@ -53,11 +53,11 @@ public class StatDataCacheItemsCreateJob
     public override async Task ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
-        var cacheRecords = await _context.StatDataCacheRecords
+        var subscriptions = await _context.StatDataChangeSubscriptions
             .Where(x => x.DeletedAt == null)
             .ToListAsync(cancellationToken);
 
-        if (cacheRecords.Count == 0)
+        if (subscriptions.Count == 0)
         {
             Logger.LogInformation(
                 "No StatDataCache records found. Exiting job.");
@@ -68,19 +68,19 @@ public class StatDataCacheItemsCreateJob
             [Currency.USD],
             cancellationToken);
 
-        var listOfDataToBeSent = new List<(StatDataCacheItem Item, TelegramBotReplyData Data)>();
+        var listOfDataToBeSent = new List<(StatDataChangeSubscriptionRecord Item, TelegramBotReplyData Data)>();
         var now = DateTimeOffset.Now;
 
-        foreach (var statDataCache in cacheRecords)
+        foreach (var subscription in subscriptions)
         {
-            var lastCacheItemOrNull = await _context.StatDataCacheItems
+            var lastCacheItemOrNull = await _context.StatDataChangeSubscriptionRecords
                 .AsNoTracking()
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 
             var filterData = new TelegramBotUserCommandParameters(
                 allProfessions
-                    .Where(x => statDataCache.ProfessionIds.Contains(x.Id))
+                    .Where(x => subscription.ProfessionIds.Contains(x.Id))
                     .ToList());
 
             var salariesQuery = new SalariesForChartQuery(
@@ -150,8 +150,8 @@ public class StatDataCacheItemsCreateJob
                         text: SalariesPageUrl,
                         url: salariesChartPageLink.ToString())));
 
-            var cacheItem = new StatDataCacheItem(
-                statDataCache,
+            var subscriptionRecord = new StatDataChangeSubscriptionRecord(
+                subscription,
                 lastCacheItemOrNull,
                 new StatDataCacheItemSalaryData(
                     salaries
@@ -159,8 +159,8 @@ public class StatDataCacheItemsCreateJob
                         .ToList(),
                     totalCount));
 
-            _context.Add(cacheItem);
-            listOfDataToBeSent.Add((cacheItem, dataTobeSent));
+            _context.Add(subscriptionRecord);
+            listOfDataToBeSent.Add((subscriptionRecord, dataTobeSent));
         }
 
         await _context.TrySaveChangesAsync(cancellationToken);
@@ -172,7 +172,7 @@ public class StatDataCacheItemsCreateJob
             return;
         }
 
-        var failedToSend = new List<(StatDataCacheItem CacheItem, Exception Ex)>();
+        var failedToSend = new List<(StatDataChangeSubscriptionRecord SubscriptionRecord, Exception Ex)>();
 
         foreach (var data in listOfDataToBeSent)
         {
