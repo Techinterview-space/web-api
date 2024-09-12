@@ -99,7 +99,9 @@ public class StatDataChangeSubscriptionCalculateJob
                 })
                 .ToListAsync(cancellationToken);
 
-            var salariesChartPageLink = new ChartPageLink(_global, filterData);
+            var salariesChartPageLink = new ChartPageLink(_global, filterData)
+                .AddQueryParam("utm_source", subscription.TelegramChatId.ToString())
+                .AddQueryParam("utm_campaign", "telegram-regular-stats-update");
 
             var gradeGroups = EnumHelper
                 .Values<GradeGroup>()
@@ -111,7 +113,7 @@ public class StatDataChangeSubscriptionCalculateJob
             }
 
             var professions = filterData.GetProfessionsTitleOrNull();
-            var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
+            var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n";
             foreach (var gradeGroup in gradeGroups)
             {
                 var median = salaries
