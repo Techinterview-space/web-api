@@ -105,44 +105,36 @@ public class StatDataChangeSubscriptionCalculateJob
                 .Values<GradeGroup>()
                 .Where(x => x is not(GradeGroup.Undefined or GradeGroup.Trainee));
 
+            if (salaries.Count <= 0)
+            {
+                continue;
+            }
+
             var professions = filterData.GetProfessionsTitleOrNull();
-
-            string textMessageToBeSent;
-            if (salaries.Count > 0)
+            var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
+            foreach (var gradeGroup in gradeGroups)
             {
-                textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
+                var median = salaries
+                    .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
+                    .Select(x => x.Value)
+                    .Median();
 
-                foreach (var gradeGroup in gradeGroups)
+                if (median > 0)
                 {
-                    var median = salaries
-                        .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
-                        .Select(x => x.Value)
-                        .Median();
-
-                    if (median > 0)
+                    var resStr = $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг.";
+                    foreach (var currencyContent in currencies)
                     {
-                        var resStr = $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг.";
-                        foreach (var currencyContent in currencies)
-                        {
-                            resStr += $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
-                        }
-
-                        textMessageToBeSent += $"\n{gradeGroup.ToCustomString()}: {resStr}";
+                        resStr +=
+                            $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
                     }
+
+                    textMessageToBeSent += $"\n{gradeGroup.ToCustomString()}: {resStr}";
                 }
-
-                textMessageToBeSent += $"<em>\n\nРассчитано на основе {totalCount} анкет(ы)</em>" +
-                             $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
             }
-            else
-            {
-                textMessageToBeSent = professions != null
-                    ? $"Пока никто не оставил информацию о зарплатах для {professions}."
-                    : "Пока никто не оставлял информации о зарплатах.";
 
-                textMessageToBeSent += $"\n\n<em>Посмотреть зарплаты по другим специальностям можно " +
-                             $"на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
-            }
+            textMessageToBeSent +=
+                $"<em>\n\nРассчитано на основе {totalCount} анкет(ы)</em>" +
+                $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
 
             var dataTobeSent = new TelegramBotReplyData(
                 textMessageToBeSent.Trim(),
@@ -164,6 +156,11 @@ public class StatDataChangeSubscriptionCalculateJob
             listOfDataToBeSent.Add((subscriptionRecord, dataTobeSent));
         }
 
+        if (listOfDataToBeSent.Count == 0)
+        {
+            return;
+        }
+
         await _context.TrySaveChangesAsync(cancellationToken);
 
         var client = _botClientProvider.CreateClient();
@@ -174,7 +171,6 @@ public class StatDataChangeSubscriptionCalculateJob
         }
 
         var failedToSend = new List<(StatDataChangeSubscriptionRecord SubscriptionRecord, Exception Ex)>();
-        var subscriptionsToBeUpdated = new List<(StatDataChangeSubscription Subscription, long? ChatId)>();
 
         var hasAnySubscriptionToUpdate = false;
         foreach (var data in listOfDataToBeSent)
