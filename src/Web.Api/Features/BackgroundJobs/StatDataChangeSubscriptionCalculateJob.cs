@@ -109,6 +109,7 @@ public class StatDataChangeSubscriptionCalculateJob
 
             if (salaries.Count <= 0)
             {
+                // TODO log
                 continue;
             }
 
