@@ -11,7 +11,7 @@ using Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
 
 namespace Web.Api.Features.Telegram.DeactivateStatDataChangeSubscription;
 
-public class DeactivateStatDataChangeSubscriptionHandler : IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
+public class DeactivateStatDataChangeSubscriptionHandler : IRequestHandler<DeactivateStatDataChangeSubscriptionCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -25,7 +25,7 @@ public class DeactivateStatDataChangeSubscriptionHandler : IRequestHandler<Activ
     }
 
     public async Task<Unit> Handle(
-        ActivateStatDataChangeSubscriptionCommand request,
+        DeactivateStatDataChangeSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);

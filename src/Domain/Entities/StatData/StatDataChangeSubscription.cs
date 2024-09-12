@@ -43,4 +43,10 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     {
         DeletedAt = UpdatedAt = DateTimeOffset.UtcNow;
     }
+
+    public void ChangeChatId(long telegramChatId)
+    {
+        TelegramChatId = telegramChatId;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }

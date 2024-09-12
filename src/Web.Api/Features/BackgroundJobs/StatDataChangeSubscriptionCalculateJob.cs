@@ -16,6 +16,7 @@ using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
 using Web.Api.Features.Telegram;
 using Web.Api.Features.Telegram.ProcessMessage;
@@ -23,8 +24,8 @@ using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
 namespace Web.Api.Features.BackgroundJobs;
 
-public class StatDataCacheItemsCreateJob
-    : InvocableJobBase<StatDataCacheItemsCreateJob>
+public class StatDataChangeSubscriptionCalculateJob
+    : InvocableJobBase<StatDataChangeSubscriptionCalculateJob>
 {
     public const string SalariesPageUrl = "techinterview.space/salaries";
 
@@ -34,8 +35,8 @@ public class StatDataCacheItemsCreateJob
     private readonly IGlobal _global;
     private readonly TelegramBotClientProvider _botClientProvider;
 
-    public StatDataCacheItemsCreateJob(
-        ILogger<StatDataCacheItemsCreateJob> logger,
+    public StatDataChangeSubscriptionCalculateJob(
+        ILogger<StatDataChangeSubscriptionCalculateJob> logger,
         DatabaseContext context,
         ICurrencyService currencyService,
         IGlobal global,
@@ -173,21 +174,27 @@ public class StatDataCacheItemsCreateJob
         }
 
         var failedToSend = new List<(StatDataChangeSubscriptionRecord SubscriptionRecord, Exception Ex)>();
+        var subscriptionsToBeUpdated = new List<(StatDataChangeSubscription Subscription, long? ChatId)>();
 
+        var hasAnySubscriptionToUpdate = false;
         foreach (var data in listOfDataToBeSent)
         {
-            try
+            var result = await TrySendTelegramMessageAsync(
+                data.Item,
+                data.Data,
+                client,
+                cancellationToken);
+
+            if (result.HasError)
             {
-                await client.SendTextMessageAsync(
-                    data.Item.GetChatId(),
-                    data.Data.ReplyText,
-                    parseMode: data.Data.ParseMode,
-                    replyMarkup: data.Data.InlineKeyboardMarkup,
-                    cancellationToken: cancellationToken);
+                failedToSend.Add((data.Item, result.RaisedException));
             }
-            catch (Exception e)
+
+            if (result.HasSubscription)
             {
-                failedToSend.Add((data.Item, e));
+                var subscription = result.SubscriptionToBeUpdated.Subscription;
+                subscription.ChangeChatId(result.SubscriptionToBeUpdated.ChatId);
+                hasAnySubscriptionToUpdate = true;
             }
         }
 
@@ -197,6 +204,62 @@ public class StatDataCacheItemsCreateJob
                 "Failed to send regular stats updates chats to {Count} users. Errors: {Errors}",
                 failedToSend.Count,
                 failedToSend.Select(x => x.Ex.Message + ", " + x.Ex.GetType().FullName));
+        }
+
+        if (hasAnySubscriptionToUpdate)
+        {
+            await _context.TrySaveChangesAsync(cancellationToken);
+        }
+    }
+
+    private async Task<StatDataChangeSubscriptionCalculateJobSendTgData> TrySendTelegramMessageAsync(
+        StatDataChangeSubscriptionRecord subscriptionRecord,
+        TelegramBotReplyData tgData,
+        ITelegramBotClient client,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await client.SendTextMessageAsync(
+                subscriptionRecord.GetChatId(),
+                tgData.ReplyText,
+                parseMode: tgData.ParseMode,
+                replyMarkup: tgData.InlineKeyboardMarkup,
+                cancellationToken: cancellationToken);
+
+            return new StatDataChangeSubscriptionCalculateJobSendTgData();
+        }
+        catch (ApiRequestException apiEx)
+        {
+            const string chatIdChangedMessage = "Bad Request: group chat was upgraded to a supergroup chat";
+            if (apiEx.Message == chatIdChangedMessage &&
+                apiEx.Parameters?.MigrateToChatId != null)
+            {
+                await client.SendTextMessageAsync(
+                    apiEx.Parameters.MigrateToChatId.Value,
+                    tgData.ReplyText,
+                    parseMode: tgData.ParseMode,
+                    replyMarkup: tgData.InlineKeyboardMarkup,
+                    cancellationToken: cancellationToken);
+
+                return new StatDataChangeSubscriptionCalculateJobSendTgData
+                {
+                    RaisedException = apiEx,
+                    SubscriptionToBeUpdated = (subscriptionRecord.Subscription, apiEx.Parameters.MigrateToChatId.Value)
+                };
+            }
+
+            return new StatDataChangeSubscriptionCalculateJobSendTgData
+            {
+                RaisedException = apiEx,
+            };
+        }
+        catch (Exception e)
+        {
+            return new StatDataChangeSubscriptionCalculateJobSendTgData
+            {
+                RaisedException = e,
+            };
         }
     }
 }

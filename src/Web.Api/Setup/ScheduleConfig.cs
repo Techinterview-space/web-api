@@ -16,7 +16,7 @@ public static class ScheduleConfig
             .AddScheduler()
             .AddTransient<CurrenciesResetJob>()
             .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
-            .AddTransient<StatDataCacheItemsCreateJob>();
+            .AddTransient<StatDataChangeSubscriptionCalculateJob>();
 
         return services;
     }
@@ -36,14 +36,16 @@ public static class ScheduleConfig
                 .RunOnceAtStart();
 
             scheduler
-                .Schedule<StatDataCacheItemsCreateJob>()
+                .Schedule<StatDataChangeSubscriptionCalculateJob>()
                 .DailyAt(6, 0)
-                .Wednesday();
+                .Wednesday()
+                .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob));
 
             scheduler
-                .Schedule<StatDataCacheItemsCreateJob>()
+                .Schedule<StatDataChangeSubscriptionCalculateJob>()
                 .EveryThirtySeconds()
-                .When(() => Task.FromResult(Debugger.IsAttached));
+                .When(() => Task.FromResult(Debugger.IsAttached))
+                .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob));
         });
     }
 }
