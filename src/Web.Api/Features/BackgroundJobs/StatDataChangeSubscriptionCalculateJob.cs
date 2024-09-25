@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
-using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
@@ -92,10 +91,11 @@ public class StatDataChangeSubscriptionCalculateJob
             var totalCount = await salariesQuery.CountAsync(cancellationToken);
             var salaries = await salariesQuery
                 .ToQueryable(CompanyType.Local)
-                .Select(x => new
+                .Where(x => x.Grade.HasValue)
+                .Select(x => new SalaryGraveValue
                 {
-                    x.Grade,
-                    x.Value,
+                    Grade = x.Grade.Value,
+                    Value = x.Value,
                 })
                 .ToListAsync(cancellationToken);
 
@@ -103,41 +103,60 @@ public class StatDataChangeSubscriptionCalculateJob
                 .AddQueryParam("utm_source", subscription.TelegramChatId.ToString())
                 .AddQueryParam("utm_campaign", "telegram-regular-stats-update");
 
-            var gradeGroups = EnumHelper
-                .Values<GradeGroup>()
-                .Where(x => x is not(GradeGroup.Undefined or GradeGroup.Trainee));
-
-            if (salaries.Count <= 0)
+            if (salaries.Count == 0)
             {
                 // TODO log
                 continue;
             }
 
             var professions = filterData.GetProfessionsTitleOrNull();
-            var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n";
-            foreach (var gradeGroup in gradeGroups)
+            var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n\n";
+
+            foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
                 var median = salaries
                     .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
                     .Select(x => x.Value)
                     .Median();
 
-                if (median > 0)
+                var line = $"{gradeGroup.ToCustomString()}: ";
+                if (median <= 0)
                 {
-                    var resStr = $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг.";
-                    foreach (var currencyContent in currencies)
-                    {
-                        resStr +=
-                            $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
-                    }
-
-                    textMessageToBeSent += $"\n{gradeGroup.ToCustomString()}: {resStr}";
+                    continue;
                 }
+
+                line += $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг. ";
+
+                if (lastCacheItemOrNull is not null)
+                {
+                    var oldGradeValue = lastCacheItemOrNull.Data.GetMedianLocalSalaryByGrade(gradeGroup);
+                    if (oldGradeValue.HasValue && oldGradeValue.Value > 0)
+                    {
+                        var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
+
+                        if (diffInPercent is > 0 or < 0)
+                        {
+                            var sign = diffInPercent > 0 ? "+" : "-";
+                            line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
+                        }
+                    }
+                }
+
+                foreach (var currencyContent in currencies)
+                {
+                    line +=
+                        $"(~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString}) ";
+                }
+
+                line = line.Trim();
+
+                textMessageToBeSent += line + "\n";
             }
 
             textMessageToBeSent +=
-                $"<em>\n\nРассчитано на основе {totalCount} анкет(ы)</em>" +
-                $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
+                $"\n\n<em>Рассчитано на основе {totalCount} анкет(ы)</em>" +
+                $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
+                $"\n#зарплата";
 
             var dataTobeSent = new TelegramBotReplyData(
                 textMessageToBeSent.Trim(),
@@ -150,9 +169,7 @@ public class StatDataChangeSubscriptionCalculateJob
                 subscription,
                 lastCacheItemOrNull,
                 new StatDataCacheItemSalaryData(
-                    salaries
-                        .Select(x => x.Value)
-                        .ToList(),
+                    salaries,
                     totalCount));
 
             _context.Add(subscriptionRecord);

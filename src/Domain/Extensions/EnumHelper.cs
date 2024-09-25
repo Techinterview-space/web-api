@@ -76,7 +76,14 @@ public static class EnumHelper
         this TEnum? enumValue)
         where TEnum : struct, Enum
     {
-        var attribute = enumValue?.AttributeOrNull<GroupAttribute>();
+        return enumValue?.GetGroupNameOrNull();
+    }
+
+    public static GradeGroup? GetGroupNameOrNull<TEnum>(
+        this TEnum enumValue)
+        where TEnum : struct, Enum
+    {
+        var attribute = enumValue.AttributeOrNull<GroupAttribute>();
         return attribute?.GroupName;
     }
 

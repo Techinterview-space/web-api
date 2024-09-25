@@ -39,8 +39,7 @@ public static class ScheduleConfig
                 .Schedule<StatDataChangeSubscriptionCalculateJob>()
                 .DailyAt(6, 0)
                 .Wednesday()
-                .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob))
-                .RunOnceAtStart();
+                .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob));
 
             scheduler
                 .Schedule<StatDataChangeSubscriptionCalculateJob>()
