@@ -156,7 +156,7 @@ public class StatDataChangeSubscriptionCalculateJob
             textMessageToBeSent +=
                 $"\n<em>Рассчитано на основе {totalCount} анкет(ы)</em>" +
                 $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
-                $"\n\n#зарплата";
+                $"\n\n#статистика_зарплат";
 
             var dataTobeSent = new TelegramBotReplyData(
                 textMessageToBeSent.Trim(),
