@@ -153,8 +153,15 @@ public class StatDataChangeSubscriptionCalculateJob
                 textMessageToBeSent += line + "\n";
             }
 
+            var calculatedBasedOnLine = $"Рассчитано на основе {totalCount} анкет(ы)";
+            if (lastCacheItemOrNull is not null &&
+                lastCacheItemOrNull.Data.TotalSalaryCount < totalCount)
+            {
+                calculatedBasedOnLine += $" (+{totalCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
+            }
+
             textMessageToBeSent +=
-                $"\n<em>Рассчитано на основе {totalCount} анкет(ы)</em>" +
+                $"\n<em>{calculatedBasedOnLine}</em>" +
                 $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
                 $"\n\n#статистика_зарплат";
 
