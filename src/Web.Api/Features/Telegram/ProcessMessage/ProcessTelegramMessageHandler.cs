@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
+using Domain.Entities.StatData;
 using Domain.Entities.Telegram;
 using Domain.Enums;
 using Domain.Extensions;
@@ -142,16 +143,10 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             messageText,
             allProfessions);
 
-        var replyData = await _cache.GetOrCreateAsync(
-            CacheKey + "_" + parameters.GetKeyPostfix(),
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-
-                return await ReplyWithSalariesAsync(
-                    parameters,
-                    cancellationToken);
-            });
+        var replyData = await ReplyWithSalariesAsync(
+            message.Chat.Id.ToString(),
+            parameters,
+            cancellationToken);
 
         var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
         await request.BotClient.SendTextMessageAsync(
@@ -201,7 +196,9 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             var startReplyData = new TelegramBotStartCommandReplyData(
                 new ChartPageLink(
                     _global,
-                    null));
+                    null)
+                    .AddQueryParam("utm_source", message.Chat.Id.ToString())
+                    .AddQueryParam("utm_campaign", "telegram-reply"));
 
             await request.BotClient.SendTextMessageAsync(
                 message.Chat.Id,
@@ -277,34 +274,48 @@ Last name: {message.From?.LastName}";
     }
 
     private async Task<TelegramBotReplyData> ReplyWithSalariesAsync(
+        string utmSource,
         TelegramBotUserCommandParameters requestParams,
         CancellationToken cancellationToken)
     {
         var now = DateTimeOffset.Now;
-        var salariesQuery = new SalariesForChartQuery(
-            _context,
-            requestParams,
-            now);
 
-        var totalCount = await salariesQuery.CountAsync(cancellationToken);
-        var salaries = await salariesQuery
-            .ToQueryable(CompanyType.Local)
-            .Select(x => new
+        var (totalCount, salaries) = await _cache.GetOrCreateAsync(
+            CacheKey + "_" + requestParams.GetKeyPostfix(),
+            async entry =>
             {
-                x.Grade,
-                x.Value,
-            })
-            .ToListAsync(cancellationToken);
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
 
-        var salariesChartPageLink = new ChartPageLink(_global, requestParams);
+                var salariesQuery = new SalariesForChartQuery(
+                    _context,
+                    requestParams,
+                    now);
+
+                var totalCount = await salariesQuery.CountAsync(cancellationToken);
+                var salaries = await salariesQuery
+                    .ToQueryable(CompanyType.Local)
+                    .Where(x => x.Grade != null)
+                    .Select(x => new SalaryGraveValue
+                    {
+                        Grade = x.Grade.Value,
+                        Value = x.Value,
+                    })
+                    .ToListAsync(cancellationToken);
+
+                return (totalCount, salaries);
+            });
+
+        var salariesChartPageLink = new ChartPageLink(_global, requestParams)
+            .AddQueryParam("utm_source", utmSource)
+            .AddQueryParam("utm_campaign", "telegram-reply");
 
         var professions = requestParams.GetProfessionsTitleOrNull();
 
         string replyText;
         if (salaries.Count > 0)
         {
-            var currencies = await _currencyService.GetCurrenciesAsync(
-                [Currency.USD],
+            var currencyContent = await _currencyService.GetCurrencyAsync(
+                Currency.USD,
                 cancellationToken);
 
             var gradeGroups = EnumHelper
@@ -322,11 +333,9 @@ Last name: {message.From?.LastName}";
 
                 if (median > 0)
                 {
-                    var resStr = $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг.";
-                    foreach (var currencyContent in currencies)
-                    {
-                        resStr += $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
-                    }
+                    var resStr =
+                        $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг." +
+                        $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
 
                     replyText += $"\n{gradeGroup.ToCustomString()}: {resStr}";
                 }
@@ -364,15 +373,10 @@ Last name: {message.From?.LastName}";
         var counter = 0;
 
         var parametersForAllSalaries = new TelegramBotUserCommandParameters();
-        var replyDataForAllSalaries = await _cache.GetOrCreateAsync(
-            CacheKey + "_" + parametersForAllSalaries.GetKeyPostfix(),
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-                return await ReplyWithSalariesAsync(
-                    parametersForAllSalaries,
-                    cancellationToken);
-            });
+        var replyDataForAllSalaries = await ReplyWithSalariesAsync(
+            "inline",
+            parametersForAllSalaries,
+            cancellationToken);
 
         results.Add(
             new InlineQueryResultArticle(
@@ -422,15 +426,10 @@ Last name: {message.From?.LastName}";
 
                 var parameters = new TelegramBotUserCommandParameters(profession);
 
-                var replyData = await _cache.GetOrCreateAsync(
-                    CacheKey + "_" + parameters.GetKeyPostfix(),
-                    async entry =>
-                    {
-                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-                        return await ReplyWithSalariesAsync(
-                            parameters,
-                            cancellationToken);
-                    });
+                var replyData = await ReplyWithSalariesAsync(
+                    "inline",
+                    parameters,
+                    cancellationToken);
 
                 results.Add(new InlineQueryResultArticle(
                     counter.ToString(),
@@ -477,15 +476,10 @@ Last name: {message.From?.LastName}";
         string title,
         CancellationToken cancellationToken)
     {
-        var professionsGroupReplyData = await _cache.GetOrCreateAsync(
-            CacheKey + "_" + professionGroupParams.GetKeyPostfix(),
-            async entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CachingMinutes);
-                return await ReplyWithSalariesAsync(
-                    professionGroupParams,
-                    cancellationToken);
-            });
+        var professionsGroupReplyData = await ReplyWithSalariesAsync(
+            "inline",
+            professionGroupParams,
+            cancellationToken);
 
         return new InlineQueryResultArticle(
             counter.ToString(),

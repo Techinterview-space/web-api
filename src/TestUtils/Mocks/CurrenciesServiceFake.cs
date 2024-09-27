@@ -38,6 +38,14 @@ public class CurrenciesServiceFake : ICurrencyService
         _currencies = currencies;
     }
 
+    public Task<CurrencyContent> GetCurrencyAsync(
+        Currency currency,
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_currencies
+            .FirstOrDefault(x => x.Currency == currency));
+    }
+
     public Task<List<CurrencyContent>> GetCurrenciesAsync(
         List<Currency> currenciesToGet,
         CancellationToken cancellationToken)

@@ -25,6 +25,16 @@ namespace Infrastructure.Currencies
             _cache = cache;
         }
 
+        public async Task<CurrencyContent> GetCurrencyAsync(
+            Currency currency,
+            CancellationToken cancellationToken)
+        {
+            return (await GetCurrenciesAsync(
+                    [currency],
+                    cancellationToken))
+                .FirstOrDefault();
+        }
+
         public async Task<List<CurrencyContent>> GetCurrenciesAsync(
             List<Currency> currenciesToGet,
             CancellationToken cancellationToken)
