@@ -46,14 +46,31 @@ public record KolesaDeveloperCsvLine
 
     public DeveloperGrade? DeveloperGradeAsEnum()
     {
-        return Grade.ToEnum<DeveloperGrade>();
+        return Grade switch
+        {
+            "специалист среднего звена: средние задачи делаю сам и сложные — под присмотром" => DeveloperGrade.Middle,
+            "старший специалист: сам делаю проект любой сложности, состоящий из одной и более задач. Консультирую стажеров и спецов среднего уровня"
+                => DeveloperGrade.Senior,
+            "джун: простые задачи делаю сам, средние – под присмотром" => DeveloperGrade.Junior,
+            _ => Grade.ToEnum<DeveloperGrade>()
+        };
     }
 
     public string Gender { get; set; }
 
     public Gender? GetGenderAsEnum()
     {
-        return Gender.ToEnum<Gender>();
+        if (string.IsNullOrEmpty(Gender))
+        {
+            return null;
+        }
+
+        return Gender switch
+        {
+            "мужской" => Domain.Enums.Gender.Male,
+            "женский" => Domain.Enums.Gender.Female,
+            _ => Gender.ToEnum<Gender>()
+        };
     }
 
     public string Profession { get; set; }
@@ -80,7 +97,14 @@ public record KolesaDeveloperCsvLine
 
         if (WorkIndustry != null)
         {
-            var workIndustry = WorkIndustry.ToLowerInvariant();
+            var workIndustry = WorkIndustry switch
+            {
+                "телеком-компания" => "телеком",
+                "финансы, банковское дело" => "банк",
+                "outsource IT-компания" => "it аутсорс/аутстафф",
+                _ => WorkIndustry.ToLowerInvariant()
+            };
+
             workIndustryOrNull = workIndustries.FirstOrDefault(x =>
                 x.Title.Contains(workIndustry, StringComparison.InvariantCultureIgnoreCase));
         }
@@ -112,7 +136,15 @@ public record KolesaDeveloperCsvLine
         }
         else if (Profession != null)
         {
-            var profession = Profession.ToLowerInvariant();
+            var profession = Profession switch
+            {
+                "Администратор базы данных" => "Администратор Баз Данных (Database Administrator)".ToLowerInvariant(),
+                "Software engineer" => "developer",
+                "Solution architect" => "Архитектор (Architect)",
+                "Дата аналитик" => "data analyst",
+                "ML developer" => "Machine Learning Developer (ML)".ToLowerInvariant(),
+                _ => Profession.ToLowerInvariant(),
+            };
             professionOrNull = professions.FirstOrDefault(x =>
                 x.Title.Contains(profession, StringComparison.InvariantCultureIgnoreCase));
         }

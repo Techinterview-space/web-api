@@ -82,7 +82,7 @@ public class ImportKolesaDevelopersCsvHandler
             result.Add((record, salary.Entity));
         }
 
-        // await _context.TrySaveChangesAsync(cancellationToken);
+        await _context.TrySaveChangesAsync(cancellationToken);
         return result
             .Select(x => new ImportCsvResponseItem
             {

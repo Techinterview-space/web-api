@@ -138,18 +138,8 @@ public record SalariesForChartQuery
             .Where(x => x.UseInStats)
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
             .When(companyType.HasValue, x => x.Company == companyType.Value)
-            .When(Grade.HasValue, x => x.Grade == Grade.Value);
-
-        if (SalarySourceType.HasValue)
-        {
-            query = query
-                .Where(x => x.SourceType == SalarySourceType.Value);
-        }
-        else
-        {
-            query = query
-                .Where(x => x.SourceType == null);
-        }
+            .When(Grade.HasValue, x => x.Grade == Grade.Value)
+            .When(SalarySourceType.HasValue, x => x.SourceType == SalarySourceType.Value);
 
         if (QuarterTo.HasValue && YearTo.HasValue)
         {
