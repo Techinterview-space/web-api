@@ -67,9 +67,8 @@ public class ImportKolesaDevelopersCsvHandler
         var records = csv.GetRecords<KolesaDeveloperCsvLine>();
         foreach (var record in records)
         {
-            if (!record.UseInStat ||
-                record.SalaryNett == null ||
-                record.CompanyTypeAsEnum == null)
+            if (record.Salary == null ||
+                record.GetCompanyTypeAsEnum() == null)
             {
                 continue;
             }
@@ -83,8 +82,7 @@ public class ImportKolesaDevelopersCsvHandler
             result.Add((record, salary.Entity));
         }
 
-        await _context.TrySaveChangesAsync(cancellationToken);
-
+        // await _context.TrySaveChangesAsync(cancellationToken);
         return result
             .Select(x => new ImportCsvResponseItem
             {
