@@ -25,8 +25,8 @@ public record GetSalariesPaginatedQuery
     [FromQuery(Name = "skills")]
     public List<long> Skills { get; init; } = new ();
 
-    [FromQuery(Name = "salarySourceType")]
-    public SalarySourceType? SalarySourceType { get; init; }
+    [FromQuery(Name = "salarySourceTypes")]
+    public List<SalarySourceType> SalarySourceTypes { get; init; } = new ();
 
     [FromQuery(Name = "quarterTo")]
     public int? QuarterTo { get; init; }

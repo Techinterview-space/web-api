@@ -15,7 +15,7 @@ public interface ISalariesChartQueryParams
 
     public List<KazakhstanCity> Cities { get; }
 
-    public SalarySourceType? SalarySourceType { get; }
+    public List<SalarySourceType> SalarySourceTypes { get; init; }
 
     public int? QuarterTo { get; }
 

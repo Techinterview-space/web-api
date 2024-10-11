@@ -24,7 +24,6 @@ public class GetExcludedFromStatsSalariesHandler
     {
         var query = new SalariesAdminQuery(_context)
             .ApplyFilters(request)
-            .WithSource(null)
             .ApplyShowInStats(false)
             .ApplyOrder(request.OrderType)
             .ToAdminDtoQueryable();

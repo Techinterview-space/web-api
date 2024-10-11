@@ -104,27 +104,47 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             ISalariesChartQueryParams request,
             CancellationToken cancellationToken)
         {
-            if (request.SalarySourceType is SalarySourceType.KolesaDevelopersCsv2022)
+            if (request.SalarySourceTypes.Count > 0)
             {
-                var date = new DateTime(2021, 12, 31);
-                return
-                [
-                    new CurrencyContent(
-                        1,
-                        Currency.KZT,
-                        date),
+                if (request.SalarySourceTypes.First() is SalarySourceType.KolesaDevelopersCsv2022)
+                {
+                    var date = new DateTime(2021, 12, 31);
+                    return
+                    [
+                        new CurrencyContent(
+                            1,
+                            Currency.KZT,
+                            date),
 
-                    new CurrencyContent(
-                        434,
-                        Currency.USD,
-                        date),
+                        new CurrencyContent(
+                            434,
+                            Currency.USD,
+                            date),
 
-                    new CurrencyContent(
-                        491,
-                        Currency.EUR,
-                        date)
+                        new CurrencyContent(
+                            491,
+                            Currency.EUR,
+                            date)
 
-                ];
+                    ];
+                }
+
+                if (request.SalarySourceTypes.First() is SalarySourceType.KolesaDataAnalystCsv2024)
+                {
+                    var date = new DateTime(2024, 10, 05);
+                    return
+                    [
+                        new CurrencyContent(
+                            1,
+                            Currency.KZT,
+                            date),
+
+                        new CurrencyContent(
+                            485,
+                            Currency.USD,
+                            date),
+                    ];
+                }
             }
 
             return await _currencyService

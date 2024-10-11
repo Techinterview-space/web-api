@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.ValueObjects;
 using Infrastructure.Database;
@@ -22,17 +23,20 @@ public record SalariesAdminQuery
     }
 
     public SalariesAdminQuery WithSource(
-        SalarySourceType? sourceType)
+        params SalarySourceType[] sourceTypes)
     {
-        if (sourceType.HasValue)
+        return WithSource(sourceTypes.ToList());
+    }
+
+    public SalariesAdminQuery WithSource(
+        List<SalarySourceType> sourceTypes)
+    {
+        if (sourceTypes.Count > 0)
         {
             _query = _query
-                .Where(x => x.SourceType == sourceType);
-        }
-        else
-        {
-            _query = _query
-                .Where(x => x.SourceType == null);
+                .Where(x =>
+                    x.SourceType != null &&
+                    sourceTypes.Contains(x.SourceType.Value));
         }
 
         return this;

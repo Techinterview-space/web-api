@@ -24,7 +24,6 @@ public class GetApprovedSalariesHandler
     {
         var query = new SalariesAdminQuery(_context)
             .ApplyFilters(request)
-            .WithSource(null)
             .ApplyShowInStats(true)
             .ApplyOrder(request.OrderType)
             .ToAdminDtoQueryable();

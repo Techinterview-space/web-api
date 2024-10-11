@@ -46,7 +46,7 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 
     public List<Profession> SelectedProfessions { get; }
 
-    public SalarySourceType? SalarySourceType { get; init; }
+    public List<SalarySourceType> SalarySourceTypes { get; init; } = new ();
 
     public int? QuarterTo { get; init; }
 

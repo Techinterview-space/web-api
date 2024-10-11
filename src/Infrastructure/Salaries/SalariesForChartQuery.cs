@@ -26,7 +26,7 @@ public record SalariesForChartQuery
 
     public DateTimeOffset To { get; }
 
-    public SalarySourceType? SalarySourceType { get; }
+    public List<SalarySourceType> SalarySourceTypes { get; }
 
     public int? QuarterTo { get; }
 
@@ -42,7 +42,7 @@ public record SalariesForChartQuery
         List<KazakhstanCity> cities,
         DateTimeOffset from,
         DateTimeOffset to,
-        SalarySourceType? salarySourceType,
+        List<SalarySourceType> salarySourceTypes,
         int? quarterTo,
         int? yearTo)
     {
@@ -57,7 +57,7 @@ public record SalariesForChartQuery
         From = from;
         To = to;
 
-        SalarySourceType = salarySourceType;
+        SalarySourceTypes = salarySourceTypes ?? new List<SalarySourceType>();
         QuarterTo = quarterTo;
         YearTo = yearTo;
     }
@@ -87,7 +87,7 @@ public record SalariesForChartQuery
             request.Cities,
             from,
             to,
-            request.SalarySourceType,
+            request.SalarySourceTypes,
             request.QuarterTo,
             request.YearTo)
     {
@@ -139,7 +139,9 @@ public record SalariesForChartQuery
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
             .When(companyType.HasValue, x => x.Company == companyType.Value)
             .When(Grade.HasValue, x => x.Grade == Grade.Value)
-            .When(SalarySourceType.HasValue, x => x.SourceType == SalarySourceType.Value);
+            .When(SalarySourceTypes is { Count: > 0 }, x =>
+                x.SourceType != null &&
+                SalarySourceTypes.Contains(x.SourceType.Value));
 
         if (QuarterTo.HasValue && YearTo.HasValue)
         {
@@ -148,7 +150,7 @@ public record SalariesForChartQuery
                     (x.Year == YearTo.Value && x.Quarter <= QuarterTo.Value) ||
                     x.Year < YearTo.Value);
         }
-        else if (SalarySourceType == null)
+        else if (SalarySourceTypes.Count == 0)
         {
             query = query
                 .Where(x =>

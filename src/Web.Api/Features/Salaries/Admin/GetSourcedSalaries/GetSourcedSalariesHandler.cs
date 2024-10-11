@@ -25,7 +25,9 @@ public class GetSourcedSalariesHandler
     {
         var query = new SalariesAdminQuery(_context)
             .ApplyFilters(request)
-            .WithSource(SalarySourceType.KolesaDevelopersCsv2022)
+            .WithSource(
+                SalarySourceType.KolesaDevelopersCsv2022,
+                SalarySourceType.KolesaDataAnalystCsv2024)
             .ApplyShowInStats(true)
             .ApplyOrder(request.OrderType)
             .ToAdminDtoQueryable();
