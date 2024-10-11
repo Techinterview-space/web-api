@@ -73,13 +73,17 @@ public class ImportKolesaDevelopersCsvHandler
                 continue;
             }
 
-            var salary = _context.Salaries.Add(
-                record.CreateUserSalary(
-                    skills,
-                    workIndustries,
-                    professions));
+            var salary = record.CreateUserSalary(
+                skills,
+                workIndustries,
+                professions);
 
-            result.Add((record, salary.Entity));
+            if (salary != null)
+            {
+                _context.Salaries.Add(salary);
+            }
+
+            result.Add((record, salary));
         }
 
         await _context.TrySaveChangesAsync(cancellationToken);
@@ -87,7 +91,7 @@ public class ImportKolesaDevelopersCsvHandler
             .Select(x => new ImportCsvResponseItem
             {
                 CsvLine = x.record,
-                UserSalary = new UserSalaryDto(x.salary),
+                UserSalary = x.salary != null ? new UserSalaryDto(x.salary) : null,
             })
             .ToList();
     }

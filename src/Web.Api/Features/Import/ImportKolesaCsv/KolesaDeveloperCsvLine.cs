@@ -15,46 +15,15 @@ public record KolesaDeveloperCsvLine
 
     public string WorkIndustry { get; set; }
 
-    public string City { get; set; }
-
-    public KazakhstanCity? GetCityAsEnum()
-    {
-        if (string.IsNullOrEmpty(City))
-        {
-            return null;
-        }
-
-        var value = City.ToEnum<KazakhstanCity>();
-        if (value is KazakhstanCity.Undefined)
-        {
-            return null;
-        }
-
-        return value;
-    }
-
     public string CompanyType { get; set; }
-
-    public CompanyType? GetCompanyTypeAsEnum()
-    {
-        return CompanyType.ToEnum<CompanyType>();
-    }
-
-    public string WorkMode { get; set; }
 
     public string Grade { get; set; }
 
-    public DeveloperGrade? DeveloperGradeAsEnum()
-    {
-        return Grade switch
-        {
-            "специалист среднего звена: средние задачи делаю сам и сложные — под присмотром" => DeveloperGrade.Middle,
-            "старший специалист: сам делаю проект любой сложности, состоящий из одной и более задач. Консультирую стажеров и спецов среднего уровня"
-                => DeveloperGrade.Senior,
-            "джун: простые задачи делаю сам, средние – под присмотром" => DeveloperGrade.Junior,
-            _ => Grade.ToEnum<DeveloperGrade>()
-        };
-    }
+    public string Profession { get; set; }
+
+    public string Salary { get; set; }
+
+    public string City { get; set; }
 
     public string Gender { get; set; }
 
@@ -73,13 +42,38 @@ public record KolesaDeveloperCsvLine
         };
     }
 
-    public string Profession { get; set; }
+    public DeveloperGrade? DeveloperGradeAsEnum()
+    {
+        return Grade switch
+        {
+            "специалист среднего звена: средние задачи делаю сам и сложные — под присмотром" => DeveloperGrade.Middle,
+            "старший специалист: сам делаю проект любой сложности, состоящий из одной и более задач. Консультирую стажеров и спецов среднего уровня"
+                => DeveloperGrade.Senior,
+            "джун: простые задачи делаю сам, средние – под присмотром" => DeveloperGrade.Junior,
+            _ => Grade.ToEnum<DeveloperGrade>()
+        };
+    }
 
-    public int? Salary { get; set; }
+    public CompanyType? GetCompanyTypeAsEnum()
+    {
+        return CompanyType.ToEnum<CompanyType>();
+    }
 
-    [Format("dd.MM.yyyy HH:mm:ss")]
-    [Optional]
-    public DateTime? AnswerDate { get; set; }
+    public KazakhstanCity? GetCityAsEnum()
+    {
+        if (string.IsNullOrEmpty(City))
+        {
+            return null;
+        }
+
+        var value = City.ToEnum<KazakhstanCity>();
+        if (value is KazakhstanCity.Undefined)
+        {
+            return null;
+        }
+
+        return value;
+    }
 
     public UserSalary CreateUserSalary(
         List<Skill> skills,
@@ -111,30 +105,11 @@ public record KolesaDeveloperCsvLine
 
         var teamleadProfession = professions.FirstOrDefault(
             x => x.Title.Contains("Teamleader", StringComparison.InvariantCultureIgnoreCase));
-        var techleadProfession = professions.FirstOrDefault(
-            x => x.Title.Contains("Techleader", StringComparison.InvariantCultureIgnoreCase));
-        var ctoProfession = professions.FirstOrDefault(
-            x => x.Title.Equals("Chief Technical Officer (CTO)", StringComparison.InvariantCultureIgnoreCase));
-        var solutionArchitectProfession = professions.FirstOrDefault(
-            x => x.Title.Equals("Архитектор (Architect)", StringComparison.InvariantCultureIgnoreCase));
 
-        if (Grade == "Teamlead/Techlead" && techleadProfession != null)
-        {
-            professionOrNull = techleadProfession;
-        }
-        else if (Grade == "Teamlead" && teamleadProfession != null)
-        {
-            professionOrNull = teamleadProfession;
-        }
-        else if (Grade == "CTO" && ctoProfession != null)
-        {
-            professionOrNull = ctoProfession;
-        }
-        else if (Grade == "SolutionArchitect" && solutionArchitectProfession != null)
-        {
-            professionOrNull = solutionArchitectProfession;
-        }
-        else if (Profession != null)
+        var headOfDepartmentProfession = professions.FirstOrDefault(
+            x => x.Title.Contains("Head of department", StringComparison.InvariantCultureIgnoreCase));
+
+        if (Profession != null)
         {
             var profession = Profession switch
             {
@@ -145,19 +120,69 @@ public record KolesaDeveloperCsvLine
                 "ML developer" => "Machine Learning Developer (ML)".ToLowerInvariant(),
                 _ => Profession.ToLowerInvariant(),
             };
+
             professionOrNull = professions.FirstOrDefault(x =>
                 x.Title.Contains(profession, StringComparison.InvariantCultureIgnoreCase));
         }
 
+        DeveloperGrade? grade = null;
+        Skill skillOrNull = null;
+
+        if (Grade != null)
+        {
+            if (string.Equals(Grade, "teamlead", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (Profession != null)
+                {
+                    skillOrNull = skills.FirstOrDefault(x =>
+                        x.Title.Contains(Profession, StringComparison.InvariantCultureIgnoreCase));
+                }
+
+                grade = DeveloperGrade.Lead;
+                professionOrNull = teamleadProfession;
+            }
+
+            if (string.Equals(Grade, "head of department", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (Profession != null)
+                {
+                    skillOrNull = skills.FirstOrDefault(x =>
+                        x.Title.Contains(Profession, StringComparison.InvariantCultureIgnoreCase));
+                }
+
+                grade = DeveloperGrade.Lead;
+                professionOrNull = headOfDepartmentProfession;
+            }
+
+            grade ??= DeveloperGradeAsEnum();
+        }
+
+        int? salaryValue = null;
+        if (Salary != null)
+        {
+            var cleanedSalary = Salary.Replace(" ", string.Empty);
+            if (!int.TryParse(cleanedSalary, out var value))
+            {
+                return null;
+            }
+
+            salaryValue = value;
+        }
+
+        if (salaryValue == null)
+        {
+            return null;
+        }
+
         var salary = new UserSalary(
             null,
-            Salary.Value,
+            salaryValue.Value,
             4,
             2024,
             Currency.KZT,
-            DeveloperGradeAsEnum(),
+            grade,
             GetCompanyTypeAsEnum().GetValueOrDefault(Domain.Entities.Salaries.CompanyType.Local),
-            null,
+            skillOrNull,
             workIndustryOrNull,
             professionOrNull,
             GetCityAsEnum(),
