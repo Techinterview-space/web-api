@@ -134,8 +134,14 @@ public record KolesaDeveloperCsvLine
             {
                 if (Profession != null)
                 {
+                    var skillTitle = Profession switch
+                    {
+                        "Data analyst" => "data analysis",
+                        _ => Profession
+                    };
+
                     skillOrNull = skills.FirstOrDefault(x =>
-                        x.Title.Contains(Profession, StringComparison.InvariantCultureIgnoreCase));
+                        x.Title.Contains(skillTitle, StringComparison.InvariantCultureIgnoreCase));
                 }
 
                 grade = DeveloperGrade.Lead;
@@ -146,8 +152,14 @@ public record KolesaDeveloperCsvLine
             {
                 if (Profession != null)
                 {
+                    var skillTitle = Profession switch
+                    {
+                        "Data analyst" => "data analysis",
+                        _ => Profession
+                    };
+
                     skillOrNull = skills.FirstOrDefault(x =>
-                        x.Title.Contains(Profession, StringComparison.InvariantCultureIgnoreCase));
+                        x.Title.Contains(skillTitle, StringComparison.InvariantCultureIgnoreCase));
                 }
 
                 grade = DeveloperGrade.Lead;
@@ -160,7 +172,10 @@ public record KolesaDeveloperCsvLine
         int? salaryValue = null;
         if (Salary != null)
         {
-            var cleanedSalary = Salary.Replace(" ", string.Empty);
+            var cleanedSalary = Salary
+                .Replace(" ", string.Empty)
+                .Replace("тг", string.Empty);
+
             if (!int.TryParse(cleanedSalary, out var value))
             {
                 return null;
