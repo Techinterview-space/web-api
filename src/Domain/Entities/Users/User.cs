@@ -45,7 +45,7 @@ public class User : BaseModel, IHasDeletedAt
         : this(
             currentUser.Email,
             currentUser.FirstName ?? currentUser.Email,
-            currentUser.LastName ?? "-",
+            !string.IsNullOrEmpty(currentUser.LastName) ? currentUser.LastName : "-",
             currentUser.Roles.ToArray())
     {
         IdentityId = currentUser.Id;
