@@ -149,12 +149,15 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             cancellationToken);
 
         var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
-        await request.BotClient.SendTextMessageAsync(
+        await request.BotClient.SendMessage(
             message.Chat.Id,
             replyData.ReplyText,
             parseMode: replyData.ParseMode,
+            replyParameters: new ReplyParameters
+            {
+                MessageId = replyToMessageId,
+            },
             replyMarkup: replyData.InlineKeyboardMarkup,
-            replyToMessageId: replyToMessageId,
             cancellationToken: cancellationToken);
 
         if (message.From! is not null)
@@ -200,7 +203,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                     .AddQueryParam("utm_source", message.Chat.Id.ToString())
                     .AddQueryParam("utm_campaign", "telegram-reply"));
 
-            await request.BotClient.SendTextMessageAsync(
+            await request.BotClient.SendMessage(
                 message.Chat.Id,
                 startReplyData.ReplyText,
                 parseMode: startReplyData.ParseMode,
@@ -220,7 +223,7 @@ Username: {message.From?.Username}
 First name: {message.From?.FirstName}
 Last name: {message.From?.LastName}";
 
-            await request.BotClient.SendTextMessageAsync(
+            await request.BotClient.SendMessage(
                 message.Chat.Id,
                 replyMessage,
                 cancellationToken: cancellationToken);
@@ -247,7 +250,7 @@ Last name: {message.From?.LastName}";
                     .BuildAsync(cancellationToken);
             }
 
-            await request.BotClient.SendTextMessageAsync(
+            await request.BotClient.SendMessage(
                 message.Chat.Id,
                 replyMessage.ReplyText,
                 parseMode: replyMessage.ParseMode,
@@ -261,7 +264,7 @@ Last name: {message.From?.LastName}";
             var replyMessage = new HelpCommandMessageBuilder(_global)
                 .Build();
 
-            await request.BotClient.SendTextMessageAsync(
+            await request.BotClient.SendMessage(
                 message.Chat.Id,
                 replyMessage.ReplyText,
                 parseMode: replyMessage.ParseMode,
@@ -446,7 +449,7 @@ Last name: {message.From?.LastName}";
 
         try
         {
-            await client.AnswerInlineQueryAsync(
+            await client.AnswerInlineQuery(
                 updateRequest.InlineQuery!.Id,
                 results,
                 cancellationToken: cancellationToken);
@@ -532,7 +535,7 @@ Last name: {message.From?.LastName}";
             async entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(30);
-                return await telegramBotClient.GetMeAsync();
+                return await telegramBotClient.GetMe();
             });
     }
 }

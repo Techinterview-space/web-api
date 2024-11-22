@@ -59,7 +59,7 @@ public class TelegramSalariesRegularStatsUpdateJob
         {
             try
             {
-                await client.SendTextMessageAsync(
+                await client.SendMessage(
                     settingsEntity.ChatId,
                     messageToSend.ReplyText,
                     parseMode: messageToSend.ParseMode,
