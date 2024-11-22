@@ -75,6 +75,7 @@ public class StatDataChangeSubscriptionCalculateJob
         {
             var lastCacheItemOrNull = await _context.StatDataChangeSubscriptionRecords
                 .AsNoTracking()
+                .Where(x => x.SubscriptionId == subscription.Id)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -155,7 +156,7 @@ public class StatDataChangeSubscriptionCalculateJob
 
             var calculatedBasedOnLine = $"Рассчитано на основе {totalCount} анкет(ы)";
             if (lastCacheItemOrNull is not null &&
-                lastCacheItemOrNull.Data.TotalSalaryCount < totalCount)
+                totalCount > lastCacheItemOrNull.Data.TotalSalaryCount)
             {
                 calculatedBasedOnLine += $" (+{totalCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
             }
