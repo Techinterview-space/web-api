@@ -37,7 +37,7 @@ public class TelegramSalariesRegularStatsUpdateJob
             .Where(x => x.SendBotRegularStatsUpdates)
             .ToListAsync(cancellationToken);
 
-        if (!settings.Any())
+        if (settings.Count == 0)
         {
             Logger.LogInformation("No users to send regular stats updates to.");
             return;
