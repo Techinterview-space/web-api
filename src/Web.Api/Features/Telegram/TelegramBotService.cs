@@ -51,7 +51,7 @@ public class TelegramBotService
 
         client.StartReceiving(
             updateHandler: HandleUpdateAsync,
-            pollingErrorHandler: HandlePollingErrorAsync,
+            errorHandler: HandlePollingErrorAsync,
             receiverOptions: new ReceiverOptions
             {
                 AllowedUpdates = _updateTypes

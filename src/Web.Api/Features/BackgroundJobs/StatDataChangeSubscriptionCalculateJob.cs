@@ -243,7 +243,7 @@ public class StatDataChangeSubscriptionCalculateJob
     {
         try
         {
-            await client.SendTextMessageAsync(
+            await client.SendMessage(
                 subscriptionRecord.GetChatId(),
                 tgData.ReplyText,
                 parseMode: tgData.ParseMode,
@@ -258,7 +258,7 @@ public class StatDataChangeSubscriptionCalculateJob
             if (apiEx.Message == chatIdChangedMessage &&
                 apiEx.Parameters?.MigrateToChatId != null)
             {
-                await client.SendTextMessageAsync(
+                await client.SendMessage(
                     apiEx.Parameters.MigrateToChatId.Value,
                     tgData.ReplyText,
                     parseMode: tgData.ParseMode,
