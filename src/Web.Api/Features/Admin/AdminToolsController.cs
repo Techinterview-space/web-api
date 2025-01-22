@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.Validation;
 using Infrastructure.Currencies.Contracts;
+using Infrastructure.Images;
 using Infrastructure.Services.Files;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Web.Api.Features.Admin.Models;
+using Web.Api.Features.Admin.QR;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Admin;
@@ -60,6 +62,16 @@ public class AdminToolsController : ControllerBase
     {
         var configs = GetSectionValues(_configuration.GetChildren());
         return Ok(configs);
+    }
+
+    [HttpPost("generate-qr")]
+    public IActionResult GenerateQrCode(
+        [FromBody] GenerateQRCodeRequestBody requestBody)
+    {
+        var qr = new QRCodeImage(requestBody.Value);
+        var qrImage = qr.AsBase64(requestBody.PixelSize);
+
+        return Ok(qrImage);
     }
 
     private IDictionary<string, object> GetSectionValues(IEnumerable<IConfigurationSection> sections)

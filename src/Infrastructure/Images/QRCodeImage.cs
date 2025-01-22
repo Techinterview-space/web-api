@@ -14,21 +14,23 @@ public class QRCodeImage
         _value = value;
     }
 
-    public byte[] AsBytes()
+    public byte[] AsBytes(
+        int? pixelPerModule = null)
     {
         using var qrGenerator = new QRCodeGenerator();
         using var qrCodeData = qrGenerator.CreateQrCode(_value, QRCodeGenerator.ECCLevel.Q);
         using var qrCode = new PngByteQRCode(qrCodeData);
 
-        return qrCode.GetGraphic(DefaultPixelSize);
+        return qrCode.GetGraphic(pixelPerModule ?? DefaultPixelSize);
     }
 
-    public string AsBase64()
+    public string AsBase64(
+        int? pixelPerModule = null)
     {
         using var qrGenerator = new QRCodeGenerator();
         using var qrCodeData = qrGenerator.CreateQrCode(_value, QRCodeGenerator.ECCLevel.Q);
         using var qrCode = new Base64QRCode(qrCodeData);
 
-        return qrCode.GetGraphic(DefaultPixelSize);
+        return qrCode.GetGraphic(pixelPerModule ?? DefaultPixelSize);
     }
 }
