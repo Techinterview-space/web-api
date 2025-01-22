@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
-        <IsPackable>false</IsPackable>
         <LangVersion>latest</LangVersion>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,8 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
-      <ProjectReference Include="..\Web.Api\Web.Api.csproj" />
+      <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
 </Project>

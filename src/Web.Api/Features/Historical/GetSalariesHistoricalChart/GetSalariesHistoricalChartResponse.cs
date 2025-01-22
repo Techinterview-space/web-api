@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.ValueObjects;
 using Domain.ValueObjects.Dates;
 using Infrastructure.Salaries;
 using Web.Api.Features.Historical.GetSalariesHistoricalChart.Charts;
@@ -33,12 +34,15 @@ public record GetSalariesHistoricalChartResponse
         HasAuthentication = true;
         ShouldAddOwnSalary = false;
 
-        var twentyWeeksBeforeTo = to.DateTime.AddDays(-140);
+        var twentyWeeksBeforeTo = to.DateTime.AddYears(-1);
         var weekSplitterFrom = from.Earlier(twentyWeeksBeforeTo)
             ? twentyWeeksBeforeTo
             : from.DateTime;
 
-        var weekSplitter = new WeekSplitter(weekSplitterFrom, to.DateTime);
+        var rangeSplitter = new DateTimeRangeSplitter(
+            weekSplitterFrom,
+            to.DateTime,
+            TimeSpan.FromDays(30));
 
         var localSalaries = new List<UserSalarySimpleDto>();
         var remoteSalaries = new List<UserSalarySimpleDto>();
@@ -58,10 +62,11 @@ public record GetSalariesHistoricalChartResponse
         SalariesCountWeekByWeekChart = new SalariesCountWeekByWeekChart(
             localSalaries,
             remoteSalaries,
-            weekSplitter,
+            rangeSplitter,
             addGradeChartData);
     }
 
+    // TODO mgorbatyuk: rename to avoid using "weeks"
     public SalariesCountWeekByWeekChart SalariesCountWeekByWeekChart { get; private set; }
 
     public bool ShouldAddOwnSalary { get; private set; }

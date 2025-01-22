@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.ValueObjects;
 using Domain.ValueObjects.Dates;
 
 namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
@@ -42,7 +43,10 @@ public record GetSurveyHistoricalChartResponse
             ? someWeeksAgo
             : from.DateTime;
 
-        var weekSplitter = new WeekSplitter(weekSplitterFrom, to.DateTime);
+        var rangeSplitter = new DateTimeRangeSplitter(
+            weekSplitterFrom,
+            to.DateTime,
+            TimeSpan.FromDays(30));
 
         var localSalaries = new List<SurveyDatabaseData>();
         var remoteSalaries = new List<SurveyDatabaseData>();
@@ -62,7 +66,7 @@ public record GetSurveyHistoricalChartResponse
         SurveyResultsByWeeksChart = new SurveyResultsByWeeksChart(
             localSalaries,
             remoteSalaries,
-            weekSplitter,
+            rangeSplitter,
             true);
     }
 
