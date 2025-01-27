@@ -8,8 +8,17 @@ internal class UserDbConfig : IEntityTypeConfiguration<User>, IEntityTypeConfigu
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasIndex(x => x.Email).IsUnique();
-        builder.HasIndex(x => x.IdentityId).IsUnique();
+        builder
+            .HasIndex(x => x.Email)
+            .IsUnique();
+
+        builder
+            .HasIndex(x => x.IdentityId)
+            .IsUnique();
+
+        builder
+            .Property(x => x.TotpSecret)
+            .HasMaxLength(100);
     }
 
     public void Configure(EntityTypeBuilder<UserRole> builder)
