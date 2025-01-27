@@ -72,7 +72,7 @@ public class InterviewMarkdownBody
         builder.AppendLine();
         builder.Append(MarkdownItems.List(
                 $"Grade: {MarkdownItems.Bold(GradeAsString(_interview.CandidateGrade))}",
-                $"Interviewer: {_interview.Interviewer.Fullname}, {_interview.Interviewer.Email}",
+                $"Interviewer: {_interview.Interviewer.GetFullname()}, {_interview.Interviewer.Email}",
                 $"When: {_interview.CreatedAt.ToString(DateFormat)}"));
 
         return builder.ToString();

@@ -7,9 +7,11 @@ using System.Text.Json.Serialization;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
+using Domain.Totp;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
+using OtpNet;
 
 namespace Domain.Entities.Users;
 
@@ -38,6 +40,8 @@ public class User : BaseModel, IHasDeletedAt
         {
             UserRoles.Add(new UserRole(role, this));
         }
+
+        LastLoginAt = DateTimeOffset.Now;
     }
 
     public User(
@@ -68,6 +72,10 @@ public class User : BaseModel, IHasDeletedAt
 
     public bool EmailConfirmed { get; protected set; }
 
+    public string TotpSecret { get; protected set; }
+
+    public DateTimeOffset? TotpVerifiedAt { get; protected set; }
+
     public DateTimeOffset? DeletedAt { get; protected set; }
 
     public DateTimeOffset? LastLoginAt { get; protected set; }
@@ -78,15 +86,20 @@ public class User : BaseModel, IHasDeletedAt
     [JsonIgnore]
     public virtual List<UserSalary> Salaries { get; protected set; } = new ();
 
-    [NotMapped]
-    public IReadOnlyCollection<Role> Roles
-        => UserRoles
+    public string GetFullname()
+    {
+        return $"{FirstName} {LastName}";
+    }
+
+    public bool IsMfaEnabled() => TotpSecret != null;
+
+    public List<Role> GetRoles()
+    {
+        return UserRoles
             .CollectionOrEmpty()
             .Select(x => x.RoleId)
-            .ToArray();
-
-    [NotMapped]
-    public string Fullname => $"{FirstName} {LastName}";
+            .ToList();
+    }
 
     public void ConfirmEmail()
     {
@@ -98,7 +111,8 @@ public class User : BaseModel, IHasDeletedAt
         EmailConfirmed = true;
     }
 
-    public void SetIdentityId(CurrentUser currentUser)
+    public void SetIdentityId(
+        CurrentUser currentUser)
     {
         currentUser.ThrowIfNull(nameof(currentUser));
         if (IdentityId != null)
@@ -112,7 +126,7 @@ public class User : BaseModel, IHasDeletedAt
     public void SetRoles(
         IReadOnlyCollection<Role> roles)
     {
-        if (UserRoles.Any())
+        if (UserRoles.Count != 0)
         {
             throw new InvalidOperationException($"The user Id:{Id} has roles");
         }
@@ -123,7 +137,8 @@ public class User : BaseModel, IHasDeletedAt
         }
     }
 
-    public void AddRole(Role role)
+    public void AddRole(
+        Role role)
     {
         UserRoles.ThrowIfNull(nameof(UserRoles));
 
@@ -135,7 +150,8 @@ public class User : BaseModel, IHasDeletedAt
         UserRoles.Add(new UserRole(role, this));
     }
 
-    public void SyncRoles(IReadOnlyCollection<Role> roles)
+    public void SyncRoles(
+        IReadOnlyCollection<Role> roles)
     {
         roles.ThrowIfNull(nameof(roles));
         UserRoles.ThrowIfNull(nameof(UserRoles));
@@ -171,6 +187,26 @@ public class User : BaseModel, IHasDeletedAt
         }
 
         DeletedAt = null;
+    }
+
+    public void GenerateTotpSecretKey()
+    {
+        if (TotpSecret != null)
+        {
+            throw new InvalidOperationException($"The user Id:{Id} has TotpSecretKey");
+        }
+
+        TotpSecret = TotpSecretKey.Random().KeyAsBase32;
+    }
+
+    public TotpSecretKey GetTotpSecretKey()
+    {
+        if (TotpSecret == null)
+        {
+            throw new InvalidOperationException($"The user Id:{Id} has no TotpSecretKey");
+        }
+
+        return new TotpSecretKey(TotpSecret);
     }
 
     public void Update(
@@ -233,5 +269,28 @@ public class User : BaseModel, IHasDeletedAt
         }
 
         throw new InvalidOperationException($"The user Id:{Id} is active");
+    }
+
+    public bool TotpVerificationExpired()
+    {
+        return TotpVerifiedAt == null ||
+               TotpVerifiedAt.Value.AddHours(6) < DateTimeOffset.Now;
+    }
+
+    public bool VerifyTotp(
+        string totpCode)
+    {
+        var totp = new OtpNet.Totp(GetTotpSecretKey().KeyAsBytes);
+        var result = totp.VerifyTotp(
+            totpCode,
+            out _,
+            new VerificationWindow(previous: 1, future: 1));
+
+        if (result)
+        {
+            TotpVerifiedAt = DateTimeOffset.Now;
+        }
+
+        return result;
     }
 }

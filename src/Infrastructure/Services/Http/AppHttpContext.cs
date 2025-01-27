@@ -23,6 +23,6 @@ public class AppHttpContext : IHttpContext
 
     public bool HasUserClaims
         => Exists &&
-           _http.HttpContext.User != null &&
+           _http.HttpContext?.User != null &&
            _http.HttpContext.User.Claims.Any();
 }

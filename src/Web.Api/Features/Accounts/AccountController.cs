@@ -1,7 +1,11 @@
-﻿using System.Threading;
+﻿using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
+using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
+using Web.Api.Features.Accounts.Dtos;
 using Web.Api.Features.Users.Models;
 using Web.Api.Setup.Attributes;
 
@@ -13,18 +17,68 @@ namespace Web.Api.Features.Accounts;
 public class AccountController : ControllerBase
 {
     private readonly IAuthorization _auth;
+    private readonly DatabaseContext _context;
 
     public AccountController(
-        IAuthorization auth)
+        IAuthorization auth,
+        DatabaseContext context)
     {
         _auth = auth;
+        _context = context;
     }
 
     [HttpGet("me")]
     public async Task<UserAdminDto> MeAsync(
         CancellationToken cancellationToken)
     {
-        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var user = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        if (user == null)
+        {
+            throw new AuthenticationException("The current user is not authenticated");
+        }
+
+        if (user.IsMfaEnabled() &&
+            user.TotpVerificationExpired())
+        {
+            throw new AuthenticationException("TOTP verification is expired");
+        }
+
         return new (user);
+    }
+
+    [HttpPost("totp/setup")]
+    public async Task<SetupTotpResponse> SetupTotp(
+        CancellationToken cancellationToken)
+    {
+        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        if (user.IsMfaEnabled())
+        {
+            throw new BadRequestException("TOTP MFA is already enabled for this user.");
+        }
+
+        user.GenerateTotpSecretKey();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return new SetupTotpResponse(user);
+    }
+
+    [HttpPost("totp/verify")]
+    public async Task<CheckTotpResponse> VerifyTotp(
+        [FromBody] CheckTotpRequest request,
+        CancellationToken cancellationToken)
+    {
+        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        if (!user.IsMfaEnabled())
+        {
+            throw new BadRequestException("TOTP MFA is not enabled for this user.");
+        }
+
+        var verifyResult = user.VerifyTotp(request.TotpCode);
+        if (verifyResult)
+        {
+            await _context.TrySaveChangesAsync(cancellationToken);
+        }
+
+        return new CheckTotpResponse(verifyResult);
     }
 }
