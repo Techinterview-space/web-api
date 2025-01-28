@@ -3,6 +3,8 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
+using Infrastructure.Database.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Authentication;
 
@@ -41,9 +43,7 @@ public record AuthorizationService : IAuthorization
             return null;
         }
 
-        return _userFromDatabase
-            ??= await new CurrentUserProvider(_context, _http.CurrentUser)
-                .GetOrCreateAsync(cancellationToken);
+        return _userFromDatabase ??= await GetOrCreateAsync(cancellationToken);
     }
 
     public CurrentUser CurrentUser
@@ -59,5 +59,42 @@ public record AuthorizationService : IAuthorization
     public async Task HasAnyRoleOrFailAsync(params Role[] roles)
     {
         (await CurrentUserOrNullAsync()).HasAnyOrFail(roles);
+    }
+
+    public async Task<User> GetOrCreateAsync(
+        CancellationToken cancellationToken)
+    {
+        var user = await _context.Users
+            .Include(x => x.UserRoles)
+            .Include(x => x.Salaries)
+            .ByEmailOrNullAsync(_http.CurrentUser.Email);
+
+        if (user == null)
+        {
+            var claimsUser = new User(_http.CurrentUser);
+            user = await _context.AddEntityAsync(claimsUser, cancellationToken);
+            await _context.TrySaveChangesAsync(cancellationToken);
+            return user;
+        }
+
+        if (!user.EmailConfirmed)
+        {
+            user.ConfirmEmail();
+        }
+
+        if (user.IdentityId == null)
+        {
+            user.SetIdentityId(_http.CurrentUser);
+        }
+
+        if (user.GetRoles().Count == 0 && _http.CurrentUser.Roles.Count > 0)
+        {
+            user.SetRoles(_http.CurrentUser.Roles);
+        }
+
+        user.RenewLastLoginTime();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return user;
     }
 }
