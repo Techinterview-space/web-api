@@ -199,6 +199,16 @@ public class User : BaseModel, IHasDeletedAt
         TotpSecret = TotpSecretKey.Random().KeyAsBase32;
     }
 
+    public void DisableTotp()
+    {
+        if (TotpSecret == null)
+        {
+            throw new InvalidOperationException($"The user Id:{Id} has no TotpSecretKey");
+        }
+
+        TotpSecret = null;
+    }
+
     public TotpSecretKey GetTotpSecretKey()
     {
         if (TotpSecret == null)

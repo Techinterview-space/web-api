@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
@@ -25,8 +26,8 @@ public class TotpController : ControllerBase
         _context = context;
     }
 
-    [HttpPost("setup")]
-    public async Task<SetupTotpResponse> SetupTotp(
+    [HttpPost("enable")]
+    public async Task<SetupTotpResponse> EnableTotp(
         CancellationToken cancellationToken)
     {
         var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
@@ -35,7 +36,28 @@ public class TotpController : ControllerBase
             throw new BadRequestException("TOTP MFA is already enabled for this user.");
         }
 
+        if (!user.Has(Role.Admin))
+        {
+            throw new BadRequestException("Only admin users can enable TOTP MFA.");
+        }
+
         user.GenerateTotpSecretKey();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return new SetupTotpResponse(user);
+    }
+
+    [HttpPost("disable")]
+    public async Task<SetupTotpResponse> DisableTotp(
+        CancellationToken cancellationToken)
+    {
+        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        if (!user.IsMfaEnabled())
+        {
+            throw new BadRequestException("TOTP MFA is already enabled for this user.");
+        }
+
+        user.DisableTotp();
         await _context.TrySaveChangesAsync(cancellationToken);
 
         return new SetupTotpResponse(user);
