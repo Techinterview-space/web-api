@@ -11,7 +11,7 @@ public record SetupTotpResponse
         User user)
     {
         TotpMfaUrl = $"otpauth://totp/{Issuer}:{user.Email}?secret={user.TotpSecret}&issuer={Issuer}";
-        TotpSetupQRBase64 = new QRCodeImage(TotpMfaUrl).ToString();
+        TotpSetupQRBase64 = new QRCodeImage(TotpMfaUrl).AsBase64();
     }
 
     public string TotpMfaUrl { get; set; }
