@@ -65,13 +65,13 @@ public class AdminToolsController : ControllerBase
     }
 
     [HttpPost("generate-qr")]
-    public IActionResult GenerateQrCode(
+    public GenerateQRCodeResponse GenerateQrCode(
         [FromBody] GenerateQRCodeRequestBody requestBody)
     {
         var qr = new QRCodeImage(requestBody.Value);
         var qrImage = qr.AsBase64(requestBody.PixelSize);
 
-        return Ok(qrImage);
+        return new GenerateQRCodeResponse(qrImage);
     }
 
     private IDictionary<string, object> GetSectionValues(IEnumerable<IConfigurationSection> sections)
