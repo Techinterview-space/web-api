@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,18 @@ public class AccountController : ControllerBase
     public async Task<UserAdminDto> MeAsync(
         CancellationToken cancellationToken)
     {
-        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var user = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        if (user == null)
+        {
+            throw new AuthenticationException("The current user is not authenticated");
+        }
+
+        if (user.IsMfaEnabled() &&
+            user.TotpVerificationExpired())
+        {
+            throw new AuthenticationException("TOTP verification is expired");
+        }
+
         return new (user);
     }
 }

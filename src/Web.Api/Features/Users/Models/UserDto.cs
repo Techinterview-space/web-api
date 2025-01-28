@@ -24,6 +24,7 @@ public record UserDto : IHasId
         LastName = user.LastName;
         Roles = user.UserRoles?.Select(x => x.RoleId).ToList() ?? new List<Role>(0);
         EmailConfirmed = user.EmailConfirmed;
+        IsMfaEnabled = user.IsMfaEnabled();
         CreatedAt = user.CreatedAt;
         DeletedAt = user.DeletedAt;
     }
@@ -39,6 +40,8 @@ public record UserDto : IHasId
     public string LastName { get; init; }
 
     public string Fullname => $"{FirstName} {LastName}";
+
+    public bool IsMfaEnabled { get; init; }
 
     public List<Role> Roles { get; init; }
 

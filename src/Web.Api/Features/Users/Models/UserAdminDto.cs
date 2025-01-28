@@ -36,6 +36,7 @@ public record UserAdminDto : UserDto
             SalariesCount = user.Salaries != null
                 ? user.Salaries.Count
                 : 0,
+            IsMfaEnabled = user.TotpSecret != null,
             CreatedAt = user.CreatedAt,
             DeletedAt = user.DeletedAt,
         };

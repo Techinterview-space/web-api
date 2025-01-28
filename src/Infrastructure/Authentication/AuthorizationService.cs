@@ -43,7 +43,7 @@ public record AuthorizationService : IAuthorization
 
         return _userFromDatabase
             ??= await new CurrentUserProvider(_context, _http.CurrentUser)
-                .GetOrCreateAsync();
+                .GetOrCreateAsync(cancellationToken);
     }
 
     public CurrentUser CurrentUser

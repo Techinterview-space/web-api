@@ -19,7 +19,8 @@ public class CurrentUserProvider
         _currentUser = currentUser;
     }
 
-    public async Task<User> GetOrCreateAsync()
+    public async Task<User> GetOrCreateAsync(
+        CancellationToken cancellationToken = default)
     {
         var user = await _context.Users
             .Include(x => x.UserRoles)
@@ -29,34 +30,28 @@ public class CurrentUserProvider
         if (user == null)
         {
             var claimsUser = new User(_currentUser);
-            user = await _context.AddEntityAsync(claimsUser);
-            await _context.TrySaveChangesAsync();
+            user = await _context.AddEntityAsync(claimsUser, cancellationToken);
+            await _context.TrySaveChangesAsync(cancellationToken);
             return user;
         }
 
-        var save = false;
         if (!user.EmailConfirmed)
         {
             user.ConfirmEmail();
-            save = true;
         }
 
         if (user.IdentityId == null)
         {
             user.SetIdentityId(_currentUser);
-            save = true;
         }
 
-        if (user.Roles.Count == 0 && _currentUser.Roles.Count > 0)
+        if (user.GetRoles().Count == 0 && _currentUser.Roles.Count > 0)
         {
             user.SetRoles(_currentUser.Roles);
-            save = true;
         }
 
-        if (save)
-        {
-            await _context.TrySaveChangesAsync();
-        }
+        user.RenewLastLoginTime();
+        await _context.TrySaveChangesAsync(cancellationToken);
 
         return user;
     }
