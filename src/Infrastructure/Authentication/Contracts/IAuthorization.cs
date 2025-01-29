@@ -14,9 +14,14 @@ public interface IAuthorization
 
     CurrentUser CurrentUser { get; }
 
+    bool HasUserClaims { get; }
+
     Task HasRoleOrFailAsync(
         Role role,
         CancellationToken cancellationToken = default);
 
     Task HasAnyRoleOrFailAsync(params Role[] roles);
+
+    Task<User> GetOrCreateAsync(
+        CancellationToken cancellationToken);
 }

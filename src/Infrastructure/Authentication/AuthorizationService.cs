@@ -49,6 +49,9 @@ public record AuthorizationService : IAuthorization
     public CurrentUser CurrentUser
         => _http.CurrentUser;
 
+    public bool HasUserClaims
+        => _http.HasUserClaims;
+
     public async Task HasRoleOrFailAsync(
         Role role,
         CancellationToken cancellationToken = default)

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Users;
 using Domain.Enums;
@@ -31,6 +32,9 @@ public class FakeAuth : IAuthorization
     public CurrentUser CurrentUser
         => new FakeCurrentUser(_user);
 
+    public bool HasUserClaims
+        => true;
+
     public Task HasRoleOrFailAsync(
         Role role,
         CancellationToken cancellationToken = default)
@@ -43,5 +47,11 @@ public class FakeAuth : IAuthorization
     {
         _user.HasAnyOrFail(roles);
         return Task.CompletedTask;
+    }
+
+    public Task<User> GetOrCreateAsync(
+        CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException();
     }
 }

@@ -15,7 +15,6 @@ namespace Web.Api.Features.Accounts;
 
 [ApiController]
 [Route("api/account")]
-[HasAnyRole]
 public class AccountController : ControllerBase
 {
     private readonly IAuthorization _auth;
@@ -30,6 +29,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("me")]
+    [HasAnyRole]
     public async Task<UserAdminDto> Me(
         CancellationToken cancellationToken)
     {
@@ -52,6 +52,14 @@ public class AccountController : ControllerBase
     public async Task<CheckTotpRequiredResponse> CheckTotp(
         CancellationToken cancellationToken)
     {
+        if (!_auth.HasUserClaims)
+        {
+            return new CheckTotpRequiredResponse
+            {
+                IsMfaEnabled = false,
+            };
+        }
+
         var currentUser = _auth.CurrentUser;
 
         var upperEmail = currentUser.Email.ToUpperInvariant();
@@ -64,11 +72,17 @@ public class AccountController : ControllerBase
             })
             .FirstOrDefaultAsync(x => x.Email.ToUpper() == upperEmail, cancellationToken);
 
-        if (user == null)
+        if (user != null)
         {
-            throw new AuthenticationException("The current user is not authenticated");
+            return user;
         }
 
-        return user;
+        var newUser = await _auth.GetOrCreateAsync(cancellationToken);
+        return new CheckTotpRequiredResponse
+        {
+            Id = newUser.Id,
+            Email = newUser.Email,
+            IsMfaEnabled = newUser.TotpSecret != null,
+        };
     }
 }
