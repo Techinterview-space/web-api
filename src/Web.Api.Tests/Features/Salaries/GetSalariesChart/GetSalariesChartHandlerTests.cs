@@ -168,17 +168,6 @@ public class GetSalariesChartHandlerTests
         Assert.Equal(250_000, salariesResponse.SalariesByMoneyBarChart.Step);
         Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.Items[0]);
 
-        Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.ItemsByProfession.Count);
-        Assert.Equal(
-            (long)UserProfessionEnum.BusinessAnalyst,
-            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[0].ProfessionId);
-        Assert.Equal(
-            (long)UserProfessionEnum.Tester,
-            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[1].ProfessionId);
-        Assert.Equal(
-            (long)UserProfessionEnum.Developer,
-            salariesResponse.SalariesByMoneyBarChart.ItemsByProfession[2].ProfessionId);
-
         Assert.Equal(3, salariesResponse.Currencies.Count);
     }
 

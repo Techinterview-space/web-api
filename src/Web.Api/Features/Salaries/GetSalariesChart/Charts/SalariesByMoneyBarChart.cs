@@ -9,16 +9,20 @@ namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 public record SalariesByMoneyBarChart
 {
     public const int StepValue = 250_000;
+    public const double Toleration = 0.01;
+    public const double ItemsRateToCut = 0.05;
 
     public SalariesByMoneyBarChart(
-        List<UserSalaryDto> salaries)
+        List<double> orderedSalaryValues)
     {
-        var values = salaries
-            .Select(x => x.Value)
+        var removeCount = (int)Math.Floor(orderedSalaryValues.Count * ItemsRateToCut);
+        var salariesToBeProcessed = orderedSalaryValues
+            .Skip(removeCount)
+            .Take(orderedSalaryValues.Count - (removeCount * 2))
             .ToList();
 
-        var minSalary = values.Min();
-        var maxSalary = values.Max();
+        var minSalary = salariesToBeProcessed.Min();
+        var maxSalary = salariesToBeProcessed.Max();
 
         var splitter = new RoundedValuesByRangesSplitter(minSalary, maxSalary, StepValue).ToList();
         Labels = splitter
@@ -27,22 +31,9 @@ public record SalariesByMoneyBarChart
 
         Items = splitter
             .Select(x =>
-                values.Count(y =>
+                salariesToBeProcessed.Count(y =>
                     y >= x.Start &&
-                    (y < x.End || (Math.Abs(x.End - maxSalary) < 0.01 && Math.Abs(y - maxSalary) < 0.01))))
-            .ToList();
-
-        ItemsByProfession = salaries
-            .GroupBy(x => x.ProfessionId)
-            .Select(x => new ItemsByProfessionByValuePeriods(
-                x.Key.GetValueOrDefault(),
-                x.Key,
-                splitter
-                    .Select(y =>
-                        x.Count(z =>
-                            z.Value >= y.Start &&
-                            (z.Value < y.End || (Math.Abs(y.End - maxSalary) < 0.01 && Math.Abs(z.Value - maxSalary) < 0.01))))
-                    .ToList()))
+                    (y < x.End || (Math.Abs(x.End - maxSalary) < Toleration && Math.Abs(y - maxSalary) < Toleration))))
             .ToList();
 
         Step = StepValue;
@@ -52,14 +43,5 @@ public record SalariesByMoneyBarChart
 
     public List<int> Items { get; }
 
-    public List<ItemsByProfessionByValuePeriods> ItemsByProfession { get; }
-
     public int Step { get; }
-
-#pragma warning disable SA1313
-    public record ItemsByProfessionByValuePeriods(
-        long Profession,
-        long? ProfessionId,
-        List<int> Items);
-#pragma warning restore SA1313
 }

@@ -73,10 +73,15 @@ public record SalariesChartResponse
             .Where(x => x.Company == CompanyType.Foreign)
             .ToList();
 
-        if (localSalaries.Any())
+        if (localSalaries.Count != 0)
         {
-            AverageSalary = localSalaries.Select(x => x.Value).Average();
-            MedianSalary = localSalaries.Select(x => x.Value).Median();
+            var localSalaryValues = localSalaries
+                .Select(x => x.Value)
+                .Order()
+                .ToList();
+
+            AverageSalary = localSalaryValues.Average();
+            MedianSalary = localSalaryValues.Median();
 
             LocalSalariesByGrade = _gradesToBeUsedInChart
                 .Select(x => new MedianAndAverageSalariesByGrade(
@@ -86,11 +91,11 @@ public record SalariesChartResponse
                         .ToList()))
                 .ToList();
 
-            SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaries);
+            SalariesByMoneyBarChart = new SalariesByMoneyBarChart(localSalaryValues);
             PeopleByGradesChartDataForLocal = new PeopleByGradesChartData(localSalaries);
         }
 
-        if (remoteSalaries.Any())
+        if (remoteSalaries.Count != 0)
         {
             var values = remoteSalaries
                 .Select(x => x.Value)
@@ -107,7 +112,7 @@ public record SalariesChartResponse
                         .ToList()))
                 .ToList();
 
-            SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(remoteSalaries);
+            SalariesByMoneyBarChartForRemote = new SalariesByMoneyBarChart(values);
             PeopleByGradesChartDataForRemote = new PeopleByGradesChartData(remoteSalaries);
         }
 
