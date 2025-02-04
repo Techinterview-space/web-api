@@ -127,6 +127,9 @@ public record SalariesChartResponse
 
         SalariesByUserAgeChartForLocalSalaries = new SalariesByUserAgeChart(localSalaries);
         SalariesByUserAgeChartForRemoteSalaries = new SalariesByUserAgeChart(remoteSalaries);
+
+        SalariesByCityChartForLocal = new SalariesByCityChart(localSalaries);
+        SalariesByCityChartForRemote = new SalariesByCityChart(remoteSalaries);
     }
 
     public static SalariesChartResponse RequireOwnSalary(
@@ -225,4 +228,8 @@ public record SalariesChartResponse
     public SalariesByUserAgeChart SalariesByUserAgeChartForLocalSalaries { get; }
 
     public SalariesByUserAgeChart SalariesByUserAgeChartForRemoteSalaries { get; }
+
+    public SalariesByCityChart SalariesByCityChartForLocal { get; }
+
+    public SalariesByCityChart SalariesByCityChartForRemote { get; }
 }
