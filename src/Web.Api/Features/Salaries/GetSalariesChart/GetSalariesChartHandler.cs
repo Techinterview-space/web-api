@@ -62,7 +62,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             }
 
             var query = salariesQuery.ToQueryable();
-            if (currentUser == null || !userSalariesForLastYear.Any())
+            if (currentUser == null || userSalariesForLastYear.Count == 0)
             {
                 var salaryValues = await query
                     .Select(x => new { x.Company, x.Value })

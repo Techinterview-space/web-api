@@ -23,7 +23,7 @@ public record DevelopersByAgeChartData
             .Select(x => x.Age.Value)
             .ToList();
 
-        var splitter = new ValuesByRangesSplitter(15, 55, 5);
+        var splitter = new PeopleAgeValuesSplitter();
         var ranges = splitter.ToList();
 
         for (var index = 0; index < ranges.Count; index++)

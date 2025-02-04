@@ -121,6 +121,12 @@ public record SalariesChartResponse
 
         ProfessionsDistributionDataForLocal = new ProfessionsDistributionData(localSalaries);
         ProfessionsDistributionDataForRemote = new ProfessionsDistributionData(remoteSalaries);
+
+        SalariesByExperienceChartForLocalSalaries = new SalariesByExperienceChart(localSalaries);
+        SalariesByExperienceChartForRemoteSalaries = new SalariesByExperienceChart(remoteSalaries);
+
+        SalariesByUserAgeChartForLocalSalaries = new SalariesByUserAgeChart(localSalaries);
+        SalariesByUserAgeChartForRemoteSalaries = new SalariesByUserAgeChart(remoteSalaries);
     }
 
     public static SalariesChartResponse RequireOwnSalary(
@@ -211,4 +217,12 @@ public record SalariesChartResponse
     public DevelopersByAgeChartData DevelopersByAgeChartData { get; }
 
     public DevelopersByExperienceYears DevelopersByExperienceYearsChartData { get; }
+
+    public SalariesByExperienceChart SalariesByExperienceChartForLocalSalaries { get; }
+
+    public SalariesByExperienceChart SalariesByExperienceChartForRemoteSalaries { get; }
+
+    public SalariesByUserAgeChart SalariesByUserAgeChartForLocalSalaries { get; }
+
+    public SalariesByUserAgeChart SalariesByUserAgeChartForRemoteSalaries { get; }
 }

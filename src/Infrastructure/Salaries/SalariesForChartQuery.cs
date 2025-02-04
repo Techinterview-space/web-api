@@ -69,7 +69,7 @@ public record SalariesForChartQuery
         : this(
             context,
             request,
-            now.AddMonths(-12),
+            now.AddMonths(-18),
             now)
     {
     }

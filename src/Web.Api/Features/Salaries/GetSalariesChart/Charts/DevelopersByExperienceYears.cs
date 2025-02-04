@@ -8,8 +8,6 @@ namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 public record DevelopersByExperienceYears
 {
-    private const int DefaultMaxExperience = 65;
-
     public List<IntRange> Labels { get; }
 
     public List<int> Data { get; }
@@ -25,7 +23,7 @@ public record DevelopersByExperienceYears
             .Select(x => x.YearsOfExperience.Value)
             .ToList();
 
-        var splitter = new ValuesByRangesSplitter(0, 15, 1);
+        var splitter = new UserExperienceValuesSplitter();
         var ranges = splitter.ToList();
 
         for (var index = 0; index < ranges.Count; index++)
