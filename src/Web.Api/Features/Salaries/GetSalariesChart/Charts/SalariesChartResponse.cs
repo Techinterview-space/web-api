@@ -130,6 +130,9 @@ public record SalariesChartResponse
 
         SalariesByCityChartForLocal = new SalariesByCityChart(localSalaries);
         SalariesByCityChartForRemote = new SalariesByCityChart(remoteSalaries);
+
+        SalariesByGenderChartForLocal = new SalariesByGenderChart(localSalaries);
+        SalariesByGenderChartForRemote = new SalariesByGenderChart(remoteSalaries);
     }
 
     public static SalariesChartResponse RequireOwnSalary(
@@ -232,4 +235,8 @@ public record SalariesChartResponse
     public SalariesByCityChart SalariesByCityChartForLocal { get; }
 
     public SalariesByCityChart SalariesByCityChartForRemote { get; }
+
+    public SalariesByGenderChart SalariesByGenderChartForLocal { get; }
+
+    public SalariesByGenderChart SalariesByGenderChartForRemote { get; }
 }
