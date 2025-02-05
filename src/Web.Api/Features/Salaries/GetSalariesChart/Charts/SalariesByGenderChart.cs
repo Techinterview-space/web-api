@@ -21,7 +21,6 @@ public record SalariesByGenderChart
     {
         Gender.Female,
         Gender.Male,
-        Gender.PreferNotToSay,
     };
 
     public List<string> Labels { get; }
