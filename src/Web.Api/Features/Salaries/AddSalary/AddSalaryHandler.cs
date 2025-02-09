@@ -30,7 +30,7 @@ public class AddSalaryHandler : IRequestHandler<AddSalaryCommand, CreateOrEditSa
     {
         request.IsValidOrFail();
 
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Id == currentUser.Id, cancellationToken);
 
@@ -90,7 +90,10 @@ public class AddSalaryHandler : IRequestHandler<AddSalaryCommand, CreateOrEditSa
                 profession,
                 request.City,
                 shouldShowInStats,
-                null),
+                null,
+                request.Age,
+                request.YearOfStartingWork,
+                request.Gender),
             cancellationToken);
 
         return CreateOrEditSalaryRecordResponse.Success(
