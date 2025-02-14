@@ -45,9 +45,7 @@ public record SurveyResultsByWeeksChart
                 new SurveyResultsByWeeksChartItem(
                     localData.TotalCount + remoteData.TotalCount,
                     localData.GetUsefulnessReport(),
-                    remoteData.GetUsefulnessReport(),
-                    localData.GetExpectationReport(),
-                    remoteData.GetExpectationReport()));
+                    remoteData.GetUsefulnessReport()));
 
             if (!addGradeChartData)
             {
@@ -77,9 +75,7 @@ public record SurveyResultsByWeeksChart
                         remoteGradeData.TotalCount,
                         localGradeData.TotalCount + remoteGradeData.TotalCount,
                         localGradeData.GetUsefulnessReport(),
-                        remoteGradeData.GetUsefulnessReport(),
-                        localGradeData.GetExpectationReport(),
-                        remoteGradeData.GetExpectationReport()));
+                        remoteGradeData.GetUsefulnessReport()));
             }
         }
     }
@@ -88,24 +84,18 @@ public record SurveyResultsByWeeksChart
 #pragma warning disable SA1313
     public record SurveyResultsByWeeksChartItem(
         int TotalCount,
-        List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> LocalUsefulnessPercentage,
-        List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> RemoteUsefulnessPercentage,
-        List<HistoricalSurveyReplyItem<ExpectationReplyType>> LocalExpectationPercentage,
-        List<HistoricalSurveyReplyItem<ExpectationReplyType>> RemoteExpectationPercentage);
+        List<HistoricalSurveyReplyItem> LocalUsefulnessPercentage,
+        List<HistoricalSurveyReplyItem> RemoteUsefulnessPercentage);
 
     public record SurveyResultsByWeeksChartGradeItem(
         DeveloperGrade Grade,
         int LocalCount,
         int RemoteCount,
         int TotalCount,
-        List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> LocalUsefulnessPercentage,
-        List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> RemoteUsefulnessPercentage,
-        List<HistoricalSurveyReplyItem<ExpectationReplyType>> LocalExpectationPercentage,
-        List<HistoricalSurveyReplyItem<ExpectationReplyType>> RemoteExpectationPercentage)
+        List<HistoricalSurveyReplyItem> LocalUsefulnessPercentage,
+        List<HistoricalSurveyReplyItem> RemoteUsefulnessPercentage)
         : SurveyResultsByWeeksChartItem(
             TotalCount,
             LocalUsefulnessPercentage,
-            RemoteUsefulnessPercentage,
-            LocalExpectationPercentage,
-            RemoteExpectationPercentage);
+            RemoteUsefulnessPercentage);
 }

@@ -1,19 +1,16 @@
-﻿using System;
+﻿namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
-namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
-
-public record HistoricalSurveyReplyItem<T>
-    where T : Enum
+public record HistoricalSurveyReplyItem
 {
     public HistoricalSurveyReplyItem(
-        T replyType,
+        int ratingValue,
         double percentage)
     {
-        ReplyType = replyType;
+        RatingValue = ratingValue;
         Percentage = percentage;
     }
 
-    public T ReplyType { get; }
+    public int RatingValue { get; }
 
     public double Percentage { get; }
 }

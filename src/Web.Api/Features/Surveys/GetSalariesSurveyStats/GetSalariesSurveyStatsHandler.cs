@@ -26,14 +26,14 @@ public class GetSalariesSurveyStatsHandler
         GetSalariesSurveyStatsQuery request,
         CancellationToken cancellationToken)
     {
-        var createdAt = DateTime.UtcNow.AddDays(-SalariesSurveyUserService.RecentRepliesDays);
+        var createdAt = DateTime.UtcNow.AddYears(-1);
         var records = await _context.SalariesSurveyReplies
-            .Where(x => x.CreatedAt >= createdAt)
+            .Where(x =>
+                x.CreatedAt >= createdAt)
             .AsNoTracking()
             .Select(x => new SalariesSurveyStatsDbData
             {
-                UsefulnessReply = x.UsefulnessReply,
-                ExpectationReply = x.ExpectationReply,
+                UsefulnessRating = x.UsefulnessRating,
             })
             .ToListAsync(cancellationToken);
 
@@ -42,42 +42,13 @@ public class GetSalariesSurveyStatsHandler
         return new SalariesSurveyStatsData
         {
             CountOfRecords = records.Count,
-            UsefulnessData = new List<SalariesSurveyStatsData.ReplyDataItem<SurveyUsefulnessReplyType>>
-            {
-                new (
-                    SurveyUsefulnessReplyType.Yes,
+            UsefulnessData = SalariesSurveyReply.RatingValues
+                .Select(ratingValue => new SalariesSurveyStatsData.ReplyDataItem(
+                    ratingValue,
                     new SalariesSurveyStatsDataItem(
-                        records.Count(x => x.UsefulnessReply == SurveyUsefulnessReplyType.Yes),
-                        totalCount)),
-                new (
-                    SurveyUsefulnessReplyType.No,
-                    new SalariesSurveyStatsDataItem(
-                        records.Count(x => x.UsefulnessReply == SurveyUsefulnessReplyType.No),
-                        totalCount)),
-                new (
-                    SurveyUsefulnessReplyType.NotSure,
-                    new SalariesSurveyStatsDataItem(
-                        records.Count(x => x.UsefulnessReply == SurveyUsefulnessReplyType.NotSure),
-                        totalCount)),
-            },
-            ExpectationData = new List<SalariesSurveyStatsData.ReplyDataItem<ExpectationReplyType>>
-            {
-                new (
-                    ExpectationReplyType.Expected,
-                    new SalariesSurveyStatsDataItem(
-                        records.Count(x => x.ExpectationReply == ExpectationReplyType.Expected),
-                        totalCount)),
-                new (
-                    ExpectationReplyType.MoreThanExpected,
-                    new SalariesSurveyStatsDataItem(
-                        records.Count(x => x.ExpectationReply == ExpectationReplyType.MoreThanExpected),
-                        totalCount)),
-                new (
-                    ExpectationReplyType.LessThanExpected,
-                    new SalariesSurveyStatsDataItem(
-                        records.Count(x => x.ExpectationReply == ExpectationReplyType.LessThanExpected),
-                        totalCount)),
-            },
+                        records.Count(x => x.UsefulnessRating == ratingValue),
+                        totalCount)))
+                .ToList(),
         };
     }
 }

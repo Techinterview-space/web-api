@@ -28,8 +28,6 @@ public class ReplyOnSalariesSurveyHandler
         ReplyOnSalariesSurveyCommand request,
         CancellationToken cancellationToken)
     {
-        request.IsValidOrFail();
-
         var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
 
         var surveyUserService = new SalariesSurveyUserService(_context);
@@ -41,8 +39,7 @@ public class ReplyOnSalariesSurveyHandler
         }
 
         var reply = new SalariesSurveyReply(
-            request.UsefulnessReply,
-            request.ExpectationReply,
+            request.UsefulnessRating,
             currentUser);
 
         _context.Add(reply);

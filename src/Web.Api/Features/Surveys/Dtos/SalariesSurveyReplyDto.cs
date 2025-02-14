@@ -13,17 +13,14 @@ public record SalariesSurveyReplyDto
         SalariesSurveyReply reply)
     {
         Id = reply.Id;
-        UsefulnessReply = reply.UsefulnessReply;
-        ExpectationReply = reply.ExpectationReply;
+        UsefulnessRating = reply.UsefulnessRating;
         CreatedByUserId = reply.CreatedByUserId;
         CreatedAt = reply.CreatedAt;
     }
 
     public Guid Id { get; init; }
 
-    public SurveyUsefulnessReplyType UsefulnessReply { get; init; }
-
-    public ExpectationReplyType ExpectationReply { get; init; }
+    public int UsefulnessRating { get; init; }
 
     public long? CreatedByUserId { get; init; }
 

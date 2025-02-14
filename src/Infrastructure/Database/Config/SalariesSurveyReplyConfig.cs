@@ -12,6 +12,10 @@ public class SalariesSurveyReplyConfig : IEntityTypeConfiguration<SalariesSurvey
         builder.ToTable("SalariesSurveyReplies");
 
         builder
+            .Property(x => x.UsefulnessRating)
+            .IsRequired();
+
+        builder
             .HasOne(x => x.CreatedByUser)
             .WithMany()
             .HasForeignKey(x => x.CreatedByUserId);

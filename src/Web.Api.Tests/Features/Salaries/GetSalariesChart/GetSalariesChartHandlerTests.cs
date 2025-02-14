@@ -27,7 +27,7 @@ public class GetSalariesChartHandlerTests
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-190),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
@@ -41,7 +41,7 @@ public class GetSalariesChartHandlerTests
         var salary21 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-190),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
@@ -55,7 +55,7 @@ public class GetSalariesChartHandlerTests
         var salary31 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-190),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
@@ -103,7 +103,7 @@ public class GetSalariesChartHandlerTests
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-190),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
@@ -117,7 +117,7 @@ public class GetSalariesChartHandlerTests
         var salary21 = await context.SaveAsync(new UserSalaryFake(
                 user2,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-190),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 
@@ -131,7 +131,7 @@ public class GetSalariesChartHandlerTests
         var salary31 = await context.SaveAsync(new UserSalaryFake(
                 user3,
                 value: 400_000,
-                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-1),
+                createdAt: DateTimeOffset.Now.AddYears(-1).AddDays(-190),
                 professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
             .AsDomain());
 

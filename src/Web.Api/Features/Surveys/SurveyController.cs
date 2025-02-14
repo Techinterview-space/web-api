@@ -13,7 +13,7 @@ namespace Web.Api.Features.Surveys;
 [HasAnyRole]
 [ApiController]
 [Route("api/survey")]
-public class SurveyController
+public class SurveyController : Controller
 {
     private readonly IMediator _mediator;
 
@@ -42,8 +42,7 @@ public class SurveyController
         var result = await _mediator.Send(
             new ReplyOnSalariesSurveyCommand
             {
-                UsefulnessReply = requestBody.UsefulnessReply,
-                ExpectationReply = requestBody.ExpectationReply,
+                UsefulnessRating = requestBody.UsefulnessRating,
             },
             cancellationToken);
 
