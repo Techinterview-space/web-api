@@ -7,22 +7,19 @@ public record SalariesSurveyStatsData
 {
     public int CountOfRecords { get; init; }
 
-    public List<ReplyDataItem<SurveyUsefulnessReplyType>> UsefulnessData { get; init; }
+    public List<ReplyDataItem> UsefulnessData { get; init; }
 
-    public List<ReplyDataItem<ExpectationReplyType>> ExpectationData { get; init; }
-
-    public record ReplyDataItem<TEnum>
-        where TEnum : struct
+    public record ReplyDataItem
     {
         public ReplyDataItem(
-            TEnum replyType,
+            int ratingValue,
             SalariesSurveyStatsDataItem data)
         {
-            ReplyType = replyType;
+            RatingValue = ratingValue;
             Data = data;
         }
 
-        public TEnum ReplyType { get; }
+        public int RatingValue { get; }
 
         public SalariesSurveyStatsDataItem Data { get; }
     }

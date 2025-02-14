@@ -8,9 +8,7 @@ namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
 public record SurveyDatabaseData
 {
-    public SurveyUsefulnessReplyType UsefulnessReply { get; init; }
-
-    public ExpectationReplyType ExpectationReply { get; init; }
+    public int UsefulnessRating { get; init; }
 
     public UserLastSalaryData LastSalaryOrNull { get; init; }
 

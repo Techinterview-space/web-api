@@ -83,8 +83,7 @@ public class GetSurveyHistoricalChartHandler
                         .Where(x => x.CreatedAt >= from && x.CreatedAt <= to)
                         .Select(x => new
                         {
-                            x.ExpectationReply,
-                            x.UsefulnessReply,
+                            x.UsefulnessRating,
                             x.CreatedAt,
                             LastSalaryOrNull = x.CreatedByUser.Salaries
                                 .OrderBy(s => s.CreatedAt)
@@ -109,8 +108,7 @@ public class GetSurveyHistoricalChartHandler
                                 request.ProfessionsToInclude.Contains(x.LastSalaryOrNull.ProfessionId.Value))
                         .Select(x => new SurveyDatabaseData
                         {
-                            ExpectationReply = x.ExpectationReply,
-                            UsefulnessReply = x.UsefulnessReply,
+                            UsefulnessRating = x.UsefulnessRating,
                             CreatedAt = x.CreatedAt,
                             LastSalaryOrNull = x.LastSalaryOrNull != null
                                 ? new SurveyDatabaseData.UserLastSalaryData

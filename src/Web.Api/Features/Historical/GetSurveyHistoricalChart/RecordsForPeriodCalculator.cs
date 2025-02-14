@@ -7,9 +7,7 @@ namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
 public record RecordsForPeriodCalculator
 {
-    public Dictionary<SurveyUsefulnessReplyType, int> UsefulnessData { get; }
-
-    public Dictionary<ExpectationReplyType, int> ExpectationData { get; }
+    public Dictionary<int, int> UsefulnessRatingData { get; }
 
     public List<SurveyDatabaseData> RecordsForPeriod { get; }
 
@@ -20,27 +18,13 @@ public record RecordsForPeriodCalculator
         DateTimeOffset end)
     {
         RecordsForPeriod = new List<SurveyDatabaseData>();
-        UsefulnessData = new Dictionary<SurveyUsefulnessReplyType, int>
-        {
-            { SurveyUsefulnessReplyType.Yes, 0 },
-            { SurveyUsefulnessReplyType.No, 0 },
-            { SurveyUsefulnessReplyType.NotSure, 0 },
-        };
-
-        ExpectationData = new Dictionary<ExpectationReplyType, int>
-        {
-            { ExpectationReplyType.Expected, 0 },
-            { ExpectationReplyType.MoreThanExpected, 0 },
-            { ExpectationReplyType.LessThanExpected, 0 },
-        };
+        UsefulnessRatingData = SalariesSurveyReply.RatingValues.ToDictionary(x => x, _ => 0);
 
         foreach (var s in records)
         {
             if (s.CreatedAt <= end)
             {
-                UsefulnessData[s.UsefulnessReply]++;
-                ExpectationData[s.ExpectationReply]++;
-
+                UsefulnessRatingData[s.UsefulnessRating]++;
                 RecordsForPeriod.Add(s);
             }
             else
@@ -50,37 +34,20 @@ public record RecordsForPeriodCalculator
         }
     }
 
-    public List<HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>> GetUsefulnessReport()
+    public List<HistoricalSurveyReplyItem> GetUsefulnessReport()
     {
-        return UsefulnessData
-                .Select(x => new HistoricalSurveyReplyItem<SurveyUsefulnessReplyType>(
+        return UsefulnessRatingData
+                .Select(x => new HistoricalSurveyReplyItem(
                     x.Key,
                     GetUsefulnessPercentage(x.Key)))
                 .ToList();
     }
 
-    public List<HistoricalSurveyReplyItem<ExpectationReplyType>> GetExpectationReport()
-    {
-        return ExpectationData
-            .Select(x => new HistoricalSurveyReplyItem<ExpectationReplyType>(
-                x.Key,
-                GetExpectationPercentage(x.Key)))
-            .ToList();
-    }
-
     private double GetUsefulnessPercentage(
-        SurveyUsefulnessReplyType replyType)
+        int ratingValue)
     {
         return RecordsForPeriod.Count == 0
             ? 0
-            : ((double)UsefulnessData[replyType] / RecordsForPeriod.Count) * 100;
-    }
-
-    private double GetExpectationPercentage(
-        ExpectationReplyType replyType)
-    {
-        return RecordsForPeriod.Count == 0
-            ? 0
-            : ((double)ExpectationData[replyType] / RecordsForPeriod.Count) * 100;
+            : ((double)UsefulnessRatingData[ratingValue] / RecordsForPeriod.Count) * 100;
     }
 }

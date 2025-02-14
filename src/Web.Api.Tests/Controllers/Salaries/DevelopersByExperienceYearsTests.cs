@@ -49,8 +49,8 @@ public class DevelopersByExperienceYearsTests
         var target = new DevelopersByExperienceYears(
             salaries);
 
-        Assert.Equal(15, target.Labels.Count);
-        Assert.Equal(15, target.Data.Count);
+        Assert.Equal(20, target.Labels.Count);
+        Assert.Equal(20, target.Data.Count);
 
         Assert.Equal(1, target.Data[0]);
         Assert.Equal(1, target.Data[1]);
@@ -67,6 +67,11 @@ public class DevelopersByExperienceYearsTests
         Assert.Equal(0, target.Data[11]);
         Assert.Equal(0, target.Data[12]);
         Assert.Equal(0, target.Data[13]);
-        Assert.Equal(1, target.Data[14]);
+        Assert.Equal(0, target.Data[14]);
+        Assert.Equal(0, target.Data[15]);
+        Assert.Equal(0, target.Data[16]);
+        Assert.Equal(0, target.Data[17]);
+        Assert.Equal(1, target.Data[18]);
+        Assert.Equal(0, target.Data[19]);
     }
 }

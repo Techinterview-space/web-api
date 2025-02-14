@@ -19,32 +19,27 @@ public class GetSalariesSurveyStatsHandlerTests
         var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
 
         var reply1 = await new FakeSalariesSurveyReply(
-            SurveyUsefulnessReplyType.Yes,
-            ExpectationReplyType.Expected,
+            5,
             user1)
             .PleaseAsync(context);
 
         var reply2 = await new FakeSalariesSurveyReply(
-                SurveyUsefulnessReplyType.Yes,
-                ExpectationReplyType.Expected,
+                5,
                 user2)
             .PleaseAsync(context);
 
         var reply3 = await new FakeSalariesSurveyReply(
-                SurveyUsefulnessReplyType.No,
-                ExpectationReplyType.MoreThanExpected,
+                3,
                 user1)
             .PleaseAsync(context);
 
         var reply4 = await new FakeSalariesSurveyReply(
-                SurveyUsefulnessReplyType.No,
-                ExpectationReplyType.MoreThanExpected,
+                4,
                 user2)
             .PleaseAsync(context);
 
         var reply5 = await new FakeSalariesSurveyReply(
-                SurveyUsefulnessReplyType.Yes,
-                ExpectationReplyType.MoreThanExpected,
+                2,
                 user1)
             .PleaseAsync(context);
 
@@ -54,27 +49,23 @@ public class GetSalariesSurveyStatsHandlerTests
         Assert.Equal(5, result.CountOfRecords);
 
         Assert.Equal(
-            3,
-            result.UsefulnessData.First(x => x.ReplyType == SurveyUsefulnessReplyType.Yes).Data.CountOfReplies);
+            2,
+            result.UsefulnessData.First(x => x.RatingValue == 5).Data.CountOfReplies);
 
         Assert.Equal(
-            2,
-            result.UsefulnessData.First(x => x.ReplyType == SurveyUsefulnessReplyType.No).Data.CountOfReplies);
+            1,
+            result.UsefulnessData.First(x => x.RatingValue == 4).Data.CountOfReplies);
+
+        Assert.Equal(
+            1,
+            result.UsefulnessData.First(x => x.RatingValue == 3).Data.CountOfReplies);
+
+        Assert.Equal(
+            1,
+            result.UsefulnessData.First(x => x.RatingValue == 2).Data.CountOfReplies);
 
         Assert.Equal(
             0,
-            result.UsefulnessData.First(x => x.ReplyType == SurveyUsefulnessReplyType.NotSure).Data.CountOfReplies);
-
-        Assert.Equal(
-            2,
-            result.ExpectationData.First(x => x.ReplyType == ExpectationReplyType.Expected).Data.CountOfReplies);
-
-        Assert.Equal(
-            3,
-            result.ExpectationData.First(x => x.ReplyType == ExpectationReplyType.MoreThanExpected).Data.CountOfReplies);
-
-        Assert.Equal(
-            0,
-            result.ExpectationData.First(x => x.ReplyType == ExpectationReplyType.LessThanExpected).Data.CountOfReplies);
+            result.UsefulnessData.First(x => x.RatingValue == 1).Data.CountOfReplies);
     }
 }

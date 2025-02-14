@@ -16,10 +16,13 @@ namespace Web.Api.Tests.Features.Survey.ReplyOnSalariesSurvey;
 public class ReplyOnSalariesSurveyHandlerTests
 {
     [Theory]
-    [InlineData(ExpectationReplyType.Expected)]
-    [InlineData(ExpectationReplyType.MoreThanExpected)]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
     public async Task Handle_NoReplies_SavesReply(
-        ExpectationReplyType replyType)
+        int ratingValue)
     {
         await using var context = new InMemoryDatabaseContext();
 
@@ -34,15 +37,14 @@ public class ReplyOnSalariesSurveyHandlerTests
         var result = await handler.Handle(
             new ReplyOnSalariesSurveyCommand
             {
-                UsefulnessReply = SurveyUsefulnessReplyType.Yes,
-                ExpectationReply = replyType,
+                UsefulnessRating = ratingValue,
             },
             default);
 
         Assert.Equal(1, context.SalariesSurveyReplies.Count());
 
         Assert.NotNull(result);
-        Assert.Equal(replyType, result.ExpectationReply);
+        Assert.Equal(ratingValue, result.UsefulnessRating);
         Assert.Equal(currentUser.Id, result.CreatedByUserId);
     }
 
@@ -55,8 +57,7 @@ public class ReplyOnSalariesSurveyHandlerTests
         var auth = new FakeAuth(currentUser);
 
         var reply = await new FakeSalariesSurveyReply(
-            SurveyUsefulnessReplyType.Yes,
-            ExpectationReplyType.Expected,
+            5,
             currentUser,
             DateTime.UtcNow.AddDays(-1)).PleaseAsync(context);
 
@@ -69,7 +70,7 @@ public class ReplyOnSalariesSurveyHandlerTests
             handler.Handle(
                 new ReplyOnSalariesSurveyCommand
                 {
-                    ExpectationReply = ExpectationReplyType.Expected,
+                    UsefulnessRating = 4,
                 },
                 default));
 
@@ -77,7 +78,7 @@ public class ReplyOnSalariesSurveyHandlerTests
     }
 
     [Fact]
-    public async Task Handle_HasOldReplies_Exception()
+    public async Task Handle_HasOldReplies_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
 
@@ -89,8 +90,7 @@ public class ReplyOnSalariesSurveyHandlerTests
             .AddDays(-1);
 
         var reply = await new FakeSalariesSurveyReply(
-            SurveyUsefulnessReplyType.Yes,
-            ExpectationReplyType.Expected,
+            5,
             currentUser,
             oldDate).PleaseAsync(context);
 
@@ -102,15 +102,14 @@ public class ReplyOnSalariesSurveyHandlerTests
         var result = await handler.Handle(
             new ReplyOnSalariesSurveyCommand
             {
-                UsefulnessReply = SurveyUsefulnessReplyType.Yes,
-                ExpectationReply = ExpectationReplyType.Expected,
+                UsefulnessRating = 5,
             },
             default);
 
         Assert.Equal(2, context.SalariesSurveyReplies.Count());
 
         Assert.NotNull(result);
-        Assert.Equal(ExpectationReplyType.Expected, result.ExpectationReply);
+        Assert.Equal(5, result.UsefulnessRating);
         Assert.Equal(currentUser.Id, result.CreatedByUserId);
     }
 }
