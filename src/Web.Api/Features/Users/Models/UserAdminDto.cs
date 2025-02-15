@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Domain.Entities.Users;
+using Infrastructure.Salaries;
 
 namespace Web.Api.Features.Users.Models;
 
@@ -15,10 +17,14 @@ public record UserAdminDto : UserDto
         User user)
         : base(user)
     {
-        SalariesCount = user.Salaries?.Count ?? 0;
+        Salaries = user.Salaries?
+            .Select(x => new UserSalaryDto(x))
+            .ToList();
     }
 
-    public int SalariesCount { get; init; }
+    public List<UserSalaryDto> Salaries { get; init; }
+
+    public int SalariesCount => Salaries?.Count ?? 0;
 
     public static readonly Expression<Func<User, UserAdminDto>> Transformation =
         user => new UserAdminDto
@@ -33,9 +39,29 @@ public record UserAdminDto : UserDto
                     .Select(x => x.RoleId)
                     .ToList()
                 : null,
-            SalariesCount = user.Salaries != null
-                ? user.Salaries.Count
-                : 0,
+            Salaries = user.Salaries != null
+                ? user.Salaries
+                    .Select(x => new UserSalaryDto
+                    {
+                        Age = x.Age,
+                        City = x.City,
+                        Company = x.Company,
+                        CreatedAt = x.CreatedAt,
+                        Currency = x.Currency,
+                        Gender = x.Gender,
+                        Grade = x.Grade,
+                        ProfessionId = x.ProfessionId,
+                        Quarter = x.Quarter,
+                        SkillId = x.SkillId,
+                        SourceType = x.SourceType,
+                        UpdatedAt = x.UpdatedAt,
+                        Value = x.Value,
+                        WorkIndustryId = x.WorkIndustryId,
+                        Year = x.Year,
+                        YearOfStartingWork = x.YearOfStartingWork,
+                    })
+                    .ToList()
+                : null,
             IsMfaEnabled = user.TotpSecret != null,
             CreatedAt = user.CreatedAt,
             DeletedAt = user.DeletedAt,

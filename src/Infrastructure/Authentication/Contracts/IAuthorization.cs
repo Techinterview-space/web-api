@@ -20,7 +20,8 @@ public interface IAuthorization
         Role role,
         CancellationToken cancellationToken = default);
 
-    Task HasAnyRoleOrFailAsync(params Role[] roles);
+    Task HasAnyRoleOrFailAsync(
+        params Role[] roles);
 
     Task<User> GetOrCreateAsync(
         CancellationToken cancellationToken);
