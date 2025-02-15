@@ -34,7 +34,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("")]
-    public async Task<Pageable<UserAdminDto>> All(
+    public async Task<Pageable<UserDto>> All(
         [FromQuery] PageModel pageParams = null)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
@@ -44,19 +44,19 @@ public class AdminUsersController : ControllerBase
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
-            .Select(UserAdminDto.Transformation)
+            .Select(UserDto.Transformation)
             .AsPaginatedAsync(pageParams);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserAdminDto> GetUser(
+    public async Task<UserDto> GetUser(
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
         return await _context.Users
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
-            .Select(UserAdminDto.Transformation)
+            .Select(UserDto.Transformation)
             .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
     }
 
@@ -175,13 +175,13 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("inactive")]
-    public async Task<IEnumerable<UserAdminDto>> AllInactiveAsync(
+    public async Task<IEnumerable<UserDto>> AllInactiveAsync(
         CancellationToken cancellationToken)
     {
         return await _context.Users
             .Include(x => x.UserRoles)
             .Where(x => x.DeletedAt != null)
-            .Select(UserAdminDto.Transformation)
+            .Select(UserDto.Transformation)
             .ToListAsync(cancellationToken);
     }
 }

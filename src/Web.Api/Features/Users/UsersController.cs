@@ -29,7 +29,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserAdminDto> GetUser(
+    public async Task<UserDto> GetUser(
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
@@ -51,6 +51,6 @@ public class UsersController : ControllerBase
             .IncludeWhen(currentUserId == id, x => x.Salaries)
             .ByIdOrFailAsync(id, cancellationToken);
 
-        return new UserAdminDto(user);
+        return new UserDto(user);
     }
 }

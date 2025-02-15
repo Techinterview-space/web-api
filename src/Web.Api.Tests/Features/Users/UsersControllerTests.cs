@@ -27,9 +27,6 @@ public class UsersControllerTests
         context.ChangeTracker.Clear();
         var result = await controller.GetUser(user1.Id, default);
         Assert.Equal(user1.Id, result.Id);
-        Assert.Equal(2, result.Salaries.Count);
-        Assert.Equal(salary1.Value, result.Salaries[0].Value);
-        Assert.Equal(salary2.Value, result.Salaries[1].Value);
     }
 
     [Fact]
@@ -49,6 +46,5 @@ public class UsersControllerTests
         context.ChangeTracker.Clear();
         var result = await controller.GetUser(user1.Id, default);
         Assert.Equal(user1.Id, result.Id);
-        Assert.Empty(result.Salaries);
     }
 }
