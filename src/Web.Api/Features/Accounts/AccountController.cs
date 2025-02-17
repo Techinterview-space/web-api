@@ -7,7 +7,6 @@ using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Accounts.Dtos;
-using Web.Api.Features.Users.Models;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Accounts;
@@ -29,7 +28,7 @@ public class AccountController : ControllerBase
 
     [HttpGet("me")]
     [HasAnyRole]
-    public async Task<UserDto> Me(
+    public async Task<GetMeResponse> Me(
         CancellationToken cancellationToken)
     {
         var user = await _auth.CurrentUserOrNullAsync(cancellationToken);
@@ -44,7 +43,7 @@ public class AccountController : ControllerBase
             throw new AuthenticationException("TOTP verification is expired");
         }
 
-        return new UserDto(user);
+        return new GetMeResponse(user);
     }
 
     [HttpGet("check-totp")]
