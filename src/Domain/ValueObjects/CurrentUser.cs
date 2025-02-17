@@ -77,4 +77,6 @@ public record CurrentUser
     }
 
     public string Fullname => $"{FirstName} {LastName}";
+
+    public string EmailUpper => Email.ToUpperInvariant();
 }

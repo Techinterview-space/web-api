@@ -1,12 +1,15 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
+using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Accounts.Dtos;
+using Web.Api.Features.Users.Models;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Accounts;
@@ -28,7 +31,7 @@ public class AccountController : ControllerBase
 
     [HttpGet("me")]
     [HasAnyRole]
-    public async Task<GetMeResponse> Me(
+    public async Task<UserDto> Me(
         CancellationToken cancellationToken)
     {
         var user = await _auth.CurrentUserOrNullAsync(cancellationToken);
@@ -43,7 +46,28 @@ public class AccountController : ControllerBase
             throw new AuthenticationException("TOTP verification is expired");
         }
 
-        return new GetMeResponse(user);
+        return new UserDto(user);
+    }
+
+    [HttpGet("my-salaries")]
+    [HasAnyRole]
+    public async Task<List<UserSalaryDto>> GetMySalaries(
+        CancellationToken cancellationToken)
+    {
+        var user = _auth.CurrentUser;
+        if (user == null)
+        {
+            throw new AuthenticationException("The current user is not authenticated");
+        }
+
+        var emailUpper = user.EmailUpper;
+        var salaries = await _context.Salaries
+            .Include(x => x.User)
+            .Where(x => x.User.Email.ToUpper() == emailUpper)
+            .Select(UserSalaryDto.Transform)
+            .ToListAsync(cancellationToken);
+
+        return salaries;
     }
 
     [HttpGet("check-totp")]

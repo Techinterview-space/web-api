@@ -11,7 +11,7 @@ namespace Web.Api.Tests.Controllers.Accounts;
 public class AccountControllerTests
 {
     [Fact]
-    public async Task GetMe_UserHimself_ReturnsSalaries()
+    public async Task GetMySalaries_UserHimself_ReturnsSalaries()
     {
         await using var context = new InMemoryDatabaseContext();
         var user = await new FakeUser(Role.Interviewer)
@@ -28,17 +28,15 @@ public class AccountControllerTests
             context);
 
         context.ChangeTracker.Clear();
-        var result = await controller.Me(default);
+        var result = await controller.GetMySalaries(default);
 
-        Assert.Equal(user.Id, result.Id);
-        Assert.Equal(user.Email, result.Email);
-        Assert.Equal(2, result.Salaries.Count);
-        Assert.Equal(salary1.Value, result.Salaries[0].Value);
-        Assert.Equal(salary2.Value, result.Salaries[1].Value);
+        Assert.Equal(2, result.Count);
+        Assert.Equal(salary1.Value, result[0].Value);
+        Assert.Equal(salary2.Value, result[1].Value);
     }
 
     [Fact]
-    public async Task GetMe_OtherUser_OtherUserProfile()
+    public async Task GetMySalaries_OtherUser_OtherUserProfile()
     {
         await using var context = new InMemoryDatabaseContext();
         var user1 = await new FakeUser(Role.Interviewer)
@@ -58,10 +56,8 @@ public class AccountControllerTests
             context);
 
         context.ChangeTracker.Clear();
-        var result = await controller.Me(default);
+        var result = await controller.GetMySalaries(default);
 
-        Assert.Equal(user2.Id, result.Id);
-        Assert.Equal(user2.Email, result.Email);
-        Assert.Empty(result.Salaries);
+        Assert.Empty(result);
     }
 }
