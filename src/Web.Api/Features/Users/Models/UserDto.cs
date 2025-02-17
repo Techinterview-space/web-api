@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Domain.Entities;
 using Domain.Entities.Users;
 using Domain.Enums;
@@ -54,4 +55,22 @@ public record UserDto : IHasId
     {
         return user is not null ? new UserDto(user) : null;
     }
+
+    public static readonly Expression<Func<User, UserDto>> Transformation =
+        user => new UserDto
+        {
+            Id = user.Id,
+            Email = user.Email,
+            EmailConfirmed = user.EmailConfirmed,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Roles = user.UserRoles != null
+                ? user.UserRoles
+                    .Select(x => x.RoleId)
+                    .ToList()
+                : null,
+            IsMfaEnabled = user.TotpSecret != null,
+            CreatedAt = user.CreatedAt,
+            DeletedAt = user.DeletedAt,
+        };
 }

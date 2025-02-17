@@ -34,7 +34,7 @@ public class AdminUsersController : ControllerBase
     }
 
     [HttpGet("")]
-    public async Task<Pageable<UserAdminDto>> All(
+    public async Task<Pageable<UserDto>> All(
         [FromQuery] PageModel pageParams = null)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
@@ -44,20 +44,20 @@ public class AdminUsersController : ControllerBase
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
-            .Select(UserAdminDto.Transformation)
+            .Select(UserDto.Transformation)
             .AsPaginatedAsync(pageParams);
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserAdminDto> GetUser(
-        [FromRoute] long id)
+    public async Task<UserDto> GetUser(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
     {
-        await _auth.HasRoleOrFailAsync(Role.Admin);
         return await _context.Users
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
-            .Select(UserAdminDto.Transformation)
-            .ByIdOrFailAsync(id);
+            .Select(UserDto.Transformation)
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
     }
 
     [HttpPost("")]
@@ -87,14 +87,14 @@ public class AdminUsersController : ControllerBase
 
     [HttpPut("")]
     public async Task<IActionResult> Update(
-        [FromBody] UserUpdateRequest request)
+        [FromBody] UserUpdateRequest request,
+        CancellationToken cancellationToken)
     {
         request.ThrowIfInvalid();
 
-        await _auth.HasRoleOrFailAsync(Role.Admin);
         var user = await _context.Users
             .Include(x => x.UserRoles)
-            .ByIdOrFailAsync(request.Id);
+            .ByIdOrFailAsync(request.Id, cancellationToken: cancellationToken);
 
         user.Update(request.FirstName, request.LastName);
         if (request.HasRoles())
@@ -102,38 +102,41 @@ public class AdminUsersController : ControllerBase
             user.SyncRoles(request.Roles);
         }
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
     }
 
     [HttpPut("roles")]
-    public async Task<IActionResult> Update([FromBody] UserUpdateRolesRequest request)
+    public async Task<IActionResult> Update(
+        [FromBody] UserUpdateRolesRequest request,
+        CancellationToken cancellationToken)
     {
         request.ThrowIfInvalid();
 
-        await _auth.HasRoleOrFailAsync(Role.Admin);
         var user = await _context.Users
             .Include(x => x.UserRoles)
-            .ByIdOrFailAsync(request.Id);
+            .ByIdOrFailAsync(request.Id, cancellationToken: cancellationToken);
 
         if (request.HasRoles())
         {
             user.SyncRoles(request.Roles);
         }
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
     }
 
     [HttpDelete("{id:long}")]
-    public async Task<IActionResult> Delete([FromRoute] long id)
+    public async Task<IActionResult> Delete(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
         currentUser.HasAnyOrFail(Role.Admin);
 
         var user = (await _context.Users
                 .Include(x => x.UserRoles)
-                .ByIdOrFailAsync(id))
+                .ByIdOrFailAsync(id, cancellationToken: cancellationToken))
             .ActiveOrFail();
 
         if (currentUser.Id == user.Id)
@@ -143,19 +146,21 @@ public class AdminUsersController : ControllerBase
 
         user.Delete();
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
     }
 
     [HttpPut("{id:long}/restore")]
-    public async Task<IActionResult> Restore([FromRoute] long id)
+    public async Task<IActionResult> Restore(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
         currentUser.HasAnyOrFail(Role.Admin);
 
         var user = (await _context.Users
                 .Include(x => x.UserRoles)
-                .ByIdOrFailAsync(id))
+                .ByIdOrFailAsync(id, cancellationToken))
             .InactiveOrFail();
 
         if (currentUser.Id == user.Id)
@@ -165,17 +170,18 @@ public class AdminUsersController : ControllerBase
 
         user.Restore();
 
-        await _context.TrySaveChangesAsync();
+        await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
     }
 
     [HttpGet("inactive")]
-    public async Task<IEnumerable<UserAdminDto>> AllInactiveAsync()
+    public async Task<IEnumerable<UserDto>> AllInactiveAsync(
+        CancellationToken cancellationToken)
     {
-        await _auth.HasRoleOrFailAsync(Role.Admin);
         return await _context.Users
             .Include(x => x.UserRoles)
             .Where(x => x.DeletedAt != null)
-            .AllAsync(x => new UserAdminDto(x));
+            .Select(UserDto.Transformation)
+            .ToListAsync(cancellationToken);
     }
 }

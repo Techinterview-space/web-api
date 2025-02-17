@@ -20,27 +20,37 @@ public class UsersController : ControllerBase
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
 
-    public UsersController(IAuthorization auth, DatabaseContext context)
+    public UsersController(
+        IAuthorization auth,
+        DatabaseContext context)
     {
         _auth = auth;
         _context = context;
     }
 
     [HttpGet("{id:long}")]
-    public async Task<UserAdminDto> UserAsync(
+    public async Task<UserDto> GetUser(
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
-        if (currentUser.Has(Role.Admin) || currentUser.Id == id)
+        var currentUser = _auth.CurrentUser;
+        var currentUserEmail = currentUser.Email.ToLowerInvariant();
+
+        var currentUserId = await _context.Users
+            .Where(x => x.Email == currentUserEmail)
+            .Select(x => x.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (!currentUser.Has(Role.Admin) && id != currentUserId)
         {
-            return await _context.Users
-                .Include(x => x.UserRoles)
-                .Include(x => x.Salaries)
-                .Select(UserAdminDto.Transformation)
-                .ByIdOrFailAsync(id, cancellationToken);
+            throw new NoPermissionsException("You do not have permission to view this user");
         }
 
-        throw new NoPermissionsException("You do not have permission to view this user");
+        var user = await _context.Users
+            .Include(x => x.UserRoles)
+            .IncludeWhen(currentUserId == id, x => x.Salaries)
+            .ByIdOrFailAsync(id, cancellationToken);
+
+        return new UserDto(user);
     }
 }

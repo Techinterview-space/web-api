@@ -58,12 +58,4 @@ public record UserSalaryDto : UserSalarySimpleDto
     public DateTimeOffset UpdatedAt { get; init; }
 
     public SalarySourceType? SourceType { get; init; }
-
-    private bool RequireAdditionalData =>
-        SkillId.HasValue ||
-        WorkIndustryId.HasValue ||
-        ProfessionId.HasValue ||
-        YearOfStartingWork.HasValue ||
-        Gender.HasValue ||
-        Grade.HasValue;
 }
