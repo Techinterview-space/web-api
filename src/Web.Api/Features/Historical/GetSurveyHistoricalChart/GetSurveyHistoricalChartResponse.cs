@@ -9,14 +9,6 @@ namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
 public record GetSurveyHistoricalChartResponse
 {
-    public static readonly List<DeveloperGrade> GradesToBeUsedInChart = new ()
-    {
-        DeveloperGrade.Junior,
-        DeveloperGrade.Middle,
-        DeveloperGrade.Senior,
-        DeveloperGrade.Lead,
-    };
-
     private GetSurveyHistoricalChartResponse()
     {
     }
@@ -33,7 +25,7 @@ public record GetSurveyHistoricalChartResponse
         ChartTo = to;
         LastSurveyReplyDate = lastSurveyReplyDate;
 
-        var someWeeksAgo = to.DateTime.AddDays(-70);
+        var someWeeksAgo = to.DateTime.AddYears(-1);
         var firstSalaryDate = records[0].CreatedAt;
         var fromDateToCalculateWeeks = firstSalaryDate.Earlier(someWeeksAgo)
             ? someWeeksAgo
@@ -46,28 +38,27 @@ public record GetSurveyHistoricalChartResponse
         var rangeSplitter = new DateTimeRangeSplitter(
             weekSplitterFrom,
             to.DateTime,
-            TimeSpan.FromDays(30));
+            TimeSpan.FromDays(15));
 
-        var localSalaries = new List<SurveyDatabaseData>();
-        var remoteSalaries = new List<SurveyDatabaseData>();
+        var localSurveyReplies = new List<SurveyDatabaseData>();
+        var remoteSurveyReplies = new List<SurveyDatabaseData>();
 
         foreach (var salary in records)
         {
             if (salary.LastSalaryOrNull?.CompanyType is CompanyType.Local)
             {
-                localSalaries.Add(salary);
+                localSurveyReplies.Add(salary);
             }
             else if (salary.LastSalaryOrNull?.CompanyType is CompanyType.Foreign)
             {
-                remoteSalaries.Add(salary);
+                remoteSurveyReplies.Add(salary);
             }
         }
 
         SurveyResultsByWeeksChart = new SurveyResultsByWeeksChart(
-            localSalaries,
-            remoteSalaries,
-            rangeSplitter,
-            true);
+            localSurveyReplies,
+            remoteSurveyReplies,
+            rangeSplitter);
     }
 
     public bool HasRecentSurveyReply => LastSurveyReplyDate.HasValue;
