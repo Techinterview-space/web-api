@@ -358,6 +358,10 @@ Last name: {message.From?.LastName}";
                 $"на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
         }
 
+        var ctaText = $"\n\n<em>Ещё не заполнял анкету? <a href=\"{salariesChartPageLink}\">Заполни сейчас</a></em>";
+
+        replyText += ctaText;
+
         return new TelegramBotReplyData(
             replyText.Trim(),
             new InlineKeyboardMarkup(
