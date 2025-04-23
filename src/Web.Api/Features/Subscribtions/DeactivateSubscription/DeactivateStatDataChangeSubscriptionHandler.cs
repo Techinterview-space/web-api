@@ -7,9 +7,8 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
 
-namespace Web.Api.Features.Telegram.DeactivateStatDataChangeSubscription;
+namespace Web.Api.Features.Subscribtions.DeactivateSubscription;
 
 public class DeactivateStatDataChangeSubscriptionHandler : IRequestHandler<DeactivateStatDataChangeSubscriptionCommand, Unit>
 {

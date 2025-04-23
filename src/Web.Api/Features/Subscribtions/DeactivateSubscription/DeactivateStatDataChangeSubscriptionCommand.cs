@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace Web.Api.Features.Telegram.DeactivateStatDataChangeSubscription;
+namespace Web.Api.Features.Subscribtions.DeactivateSubscription;
 
 public record DeactivateStatDataChangeSubscriptionCommand : IRequest<Unit>
 {

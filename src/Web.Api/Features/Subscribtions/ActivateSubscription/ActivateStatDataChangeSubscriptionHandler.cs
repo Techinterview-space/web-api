@@ -8,7 +8,7 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
+namespace Web.Api.Features.Subscribtions.ActivateSubscription;
 
 public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
 {

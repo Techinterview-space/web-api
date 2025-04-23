@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
+namespace Web.Api.Features.Subscribtions.ActivateSubscription;
 
 public record ActivateStatDataChangeSubscriptionCommand : IRequest<Unit>
 {

@@ -5,7 +5,7 @@ using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using MediatR;
 
-namespace Web.Api.Features.Telegram.GetStatDataChangeSubscriptions;
+namespace Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 public class GetStatDataChangeSubscriptionsHandler
     : IRequestHandler<GetStatDataChangeSubscriptionsQuery, Pageable<StatDataChangeSubscriptionDto>>

@@ -81,7 +81,10 @@ public class StatDataChangeSubscriptionCalculateJob
 
             var filterData = new TelegramBotUserCommandParameters(
                 allProfessions
-                    .Where(x => subscription.ProfessionIds.Contains(x.Id))
+                    .When(
+                        subscription.ProfessionIds != null &&
+                        subscription.ProfessionIds.Count > 0,
+                        x => subscription.ProfessionIds.Contains(x.Id))
                     .ToList());
 
             var salariesQuery = new SalariesForChartQuery(
@@ -161,7 +164,6 @@ public class StatDataChangeSubscriptionCalculateJob
             if (lastCacheItemOrNull is not null &&
                 totalCount > lastCacheItemOrNull.Data.TotalSalaryCount)
             {
-                hasAnyDifference = hasAnyDifference || true;
                 calculatedBasedOnLine += $" (+{totalCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
             }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Domain.Entities.StatData;
 
-namespace Web.Api.Features.Telegram.GetStatDataChangeSubscriptions;
+namespace Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 public record StatDataChangeSubscriptionDto
 {

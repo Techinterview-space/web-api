@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Web.Api.Features.Telegram.ActivateStatDataChangeSubscription;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
-using Web.Api.Features.Telegram.DeactivateStatDataChangeSubscription;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
-using Web.Api.Features.Telegram.GetStatDataChangeSubscriptions;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 using Web.Api.Features.Telegram.UpdateTelegramUserSettings;
@@ -81,40 +77,6 @@ public class TelegramBotController : ControllerBase
     {
         await _mediator.Send(
             new DeleteTelegramUserSettingsCommand(id),
-            cancellationToken);
-
-        return NoContent();
-    }
-
-    [HttpGet("stat-data-change-subscriptions")]
-    public async Task<Pageable<StatDataChangeSubscriptionDto>> GetStatDataChangeSubscriptions(
-        [FromQuery] GetStatDataChangeSubscriptionsQuery request,
-        CancellationToken cancellationToken)
-    {
-        return await _mediator.Send(
-            request,
-            cancellationToken);
-    }
-
-    [HttpPut("stat-data-change-subscriptions/{id:guid}/activate")]
-    public async Task<IActionResult> ActivateCacheChangeSubscription(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken)
-    {
-        await _mediator.Send(
-            new ActivateStatDataChangeSubscriptionCommand(id),
-            cancellationToken);
-
-        return NoContent();
-    }
-
-    [HttpPut("stat-data-change-subscriptions/{id:guid}/deactivate")]
-    public async Task<IActionResult> DeactivateCacheChangeSubscription(
-        [FromRoute] Guid id,
-        CancellationToken cancellationToken)
-    {
-        await _mediator.Send(
-            new DeactivateStatDataChangeSubscriptionCommand(id),
             cancellationToken);
 
         return NoContent();
