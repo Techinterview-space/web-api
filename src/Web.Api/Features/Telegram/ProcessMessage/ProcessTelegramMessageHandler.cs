@@ -345,7 +345,7 @@ Last name: {message.From?.LastName}";
             }
 
             replyText += $"<em>\n\nРассчитано на основе {totalCount} анкет(ы)</em>" +
-                $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
+                $"\n<em>Разные графики и фильтры доступны по ссылке <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
                 $"\n\n#статистика_зарплат";
         }
         else

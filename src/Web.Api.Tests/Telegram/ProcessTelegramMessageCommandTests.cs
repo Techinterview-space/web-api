@@ -23,7 +23,15 @@ namespace Web.Api.Tests.Telegram
 {
     public class ProcessTelegramMessageCommandTests
     {
-        public const string ProcessMessage1 = "Зарплаты специалистов IT в Казахстане по грейдам:\n\nДжуны: <b>2,222</b> тг. (~5$)\nМиддлы: <b>5,556</b> тг. (~12$)\nСеньоры: <b>8,889</b> тг. (~20$)\nЛиды: <b>11,111</b> тг. (~25$)<em>\n\nРассчитано на основе 12 анкет(ы)</em>\n<em>Подробно на сайте <a href=\"https://techinterview.space/salaries?utm_source=0&utm_campaign=telegram-reply\">techinterview.space/salaries</a></em>\n\n#статистика_зарплат";
+        public const string ProcessMessage1 = "Зарплаты специалистов IT в Казахстане по грейдам:\n\n" +
+                                              "Джуны: <b>2,222</b> тг. (~5$)\n" +
+                                              "Миддлы: <b>5,556</b> тг. (~12$)\n" +
+                                              "Сеньоры: <b>8,889</b> тг. (~20$)\n" +
+                                              "Лиды: <b>11,111</b> тг. (~25$)<em>\n\n" +
+                                              "Рассчитано на основе 12 анкет(ы)</em>\n" +
+                                              "<em>Разные графики и фильтры доступны по ссылке <a href=\"https://techinterview.space/salaries?utm_source=0&utm_campaign=telegram-reply\">techinterview.space/salaries</a></em>\n\n" +
+                                              "#статистика_зарплат";
+
         public const string ProcessMessage2 = "Пока никто не оставлял информации о зарплатах.\n\n<em>Посмотреть зарплаты по другим специальностям можно на сайте <a href=\"https://techinterview.space/salaries?utm_source=0&utm_campaign=telegram-reply\">techinterview.space/salaries</a></em>";
 
         [Fact]

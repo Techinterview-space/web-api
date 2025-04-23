@@ -137,7 +137,7 @@ public class StatDataChangeSubscriptionCalculateJob
 
                         if (diffInPercent is > 0 or < 0)
                         {
-                            var sign = diffInPercent > 0 ? "+" : "-";
+                            var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
                             line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
                         }
                     }
@@ -145,16 +145,16 @@ public class StatDataChangeSubscriptionCalculateJob
 
                 foreach (var currencyContent in currencies)
                 {
-                    line +=
-                        $"(~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString}) ";
+                    var currencyValue = (median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture);
+                    line += $"(~{currencyValue}{currencyContent.CurrencyString}) ";
                 }
 
                 line = line.Trim();
-
                 textMessageToBeSent += line + "\n";
             }
 
             var calculatedBasedOnLine = $"Рассчитано на основе {totalCount} анкет(ы)";
+
             if (lastCacheItemOrNull is not null &&
                 totalCount > lastCacheItemOrNull.Data.TotalSalaryCount)
             {
@@ -163,7 +163,7 @@ public class StatDataChangeSubscriptionCalculateJob
 
             textMessageToBeSent +=
                 $"\n<em>{calculatedBasedOnLine}</em>" +
-                $"\n<em>Подробно на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
+                $"\n<em>Разные графики и фильтры доступны по ссылке <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
                 $"\n\n#статистика_зарплат";
 
             var dataTobeSent = new TelegramBotReplyData(
