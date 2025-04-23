@@ -20,5 +20,10 @@ public class StatDataChangeSubscriptionEntityConfig : IEntityTypeConfiguration<S
         builder
             .Property(x => x.ProfessionIds)
             .HasJsonConversion();
+
+        builder
+            .Property(x => x.PreventNotificationIfNoDifference)
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }

@@ -113,6 +113,7 @@ public class StatDataChangeSubscriptionCalculateJob
             var professions = filterData.GetProfessionsTitleOrNull();
             var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n\n";
 
+            var hasAnyDifference = lastCacheItemOrNull == null;
             foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
                 var median = salaries
@@ -131,12 +132,14 @@ public class StatDataChangeSubscriptionCalculateJob
                 if (lastCacheItemOrNull is not null)
                 {
                     var oldGradeValue = lastCacheItemOrNull.Data.GetMedianLocalSalaryByGrade(gradeGroup);
-                    if (oldGradeValue.HasValue && oldGradeValue.Value > 0)
+                    if (oldGradeValue is > 0)
                     {
                         var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
 
                         if (diffInPercent is > 0 or < 0)
                         {
+                            hasAnyDifference = hasAnyDifference || true;
+
                             var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
                             line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
                         }
@@ -158,7 +161,15 @@ public class StatDataChangeSubscriptionCalculateJob
             if (lastCacheItemOrNull is not null &&
                 totalCount > lastCacheItemOrNull.Data.TotalSalaryCount)
             {
+                hasAnyDifference = hasAnyDifference || true;
                 calculatedBasedOnLine += $" (+{totalCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
+            }
+
+            if (!hasAnyDifference &&
+                subscription.PreventNotificationIfNoDifference)
+            {
+                // TODO mgorbatyuk: log
+                continue;
             }
 
             textMessageToBeSent +=

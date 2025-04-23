@@ -13,6 +13,12 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
 
     public List<long> ProfessionIds { get; protected set; }
 
+    /// <summary>
+    /// That means that notification will not be sent if there is no difference
+    /// between current and previous data.
+    /// </summary>
+    public bool PreventNotificationIfNoDifference { get; protected set; }
+
     public DateTimeOffset? DeletedAt { get; protected set; }
 
     public virtual List<StatDataChangeSubscriptionRecord> Records { get; protected set; }
@@ -24,12 +30,14 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     public StatDataChangeSubscription(
         string name,
         long telegramChatId,
-        List<long> professionIds)
+        List<long> professionIds,
+        bool preventNotificationIfNoDifference)
     {
         Id = Guid.NewGuid();
         Name = name;
         TelegramChatId = telegramChatId;
         ProfessionIds = professionIds;
+        PreventNotificationIfNoDifference = preventNotificationIfNoDifference;
         DeletedAt = null;
     }
 
