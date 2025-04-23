@@ -18,6 +18,7 @@ public record StatDataChangeSubscriptionDto
         Name = entity.Name;
         TelegramChatId = entity.TelegramChatId;
         ProfessionIds = entity.ProfessionIds;
+        PreventNotificationIfNoDifference = entity.PreventNotificationIfNoDifference;
         DeletedAt = entity.DeletedAt;
         CreatedAt = entity.CreatedAt;
         UpdatedAt = entity.UpdatedAt;
@@ -31,6 +32,8 @@ public record StatDataChangeSubscriptionDto
 
     public List<long> ProfessionIds { get; init; }
 
+    public bool PreventNotificationIfNoDifference { get; init; }
+
     public DateTimeOffset? DeletedAt { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
@@ -43,6 +46,7 @@ public record StatDataChangeSubscriptionDto
         Name = x.Name,
         TelegramChatId = x.TelegramChatId,
         ProfessionIds = x.ProfessionIds,
+        PreventNotificationIfNoDifference = x.PreventNotificationIfNoDifference,
         DeletedAt = x.DeletedAt,
         CreatedAt = x.CreatedAt,
         UpdatedAt = x.UpdatedAt,
