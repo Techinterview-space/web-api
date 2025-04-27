@@ -54,7 +54,7 @@ jobs:
           source: "docker-compose.deploy.yml"
           target: "/home/devops/deploy"
       - name: Execute commands
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.IP }}
           username: devops
