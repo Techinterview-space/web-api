@@ -55,7 +55,6 @@ jobs:
           target: "/home/devops/deploy"
       - name: Execute commands
         uses: appleboy/ssh-action@v1.2.2
-        shell: sh
         with:
           host: ${{ secrets.IP }}
           username: devops
