@@ -17,7 +17,7 @@ public class GetApprovedSalariesHandlerTests
     public async Task All_ReturnsAllData_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var salary1 = await context.SaveAsync(new UserSalaryFake(
                 user,

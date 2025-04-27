@@ -44,6 +44,140 @@ namespace Domain.Migrations
                     b.ToTable("UserCsvDownloads", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Companies.Company", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Links")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("ReviewsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName");
+
+                    b.ToTable("Companies", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Companies.CompanyRatingHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CompanyRatingHistory", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Companies.CompanyReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CareerOpportunities")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CodeQuality")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("CompensationAndBenefits")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Cons")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CultureAndValues")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IWorkHere")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Management")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("OutdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Pros")
+                        .HasColumnType("text");
+
+                    b.Property<double>("TotalRating")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserEmployment")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("WorkLifeBalance")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CompanyReviews", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Interviews.Interview", b =>
                 {
                     b.Property<Guid>("Id")
@@ -938,6 +1072,36 @@ namespace Domain.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Companies.CompanyRatingHistory", b =>
+                {
+                    b.HasOne("Domain.Entities.Companies.Company", "Company")
+                        .WithMany("RatingHistory")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Companies.CompanyReview", b =>
+                {
+                    b.HasOne("Domain.Entities.Companies.Company", "Company")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Users.User", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Entities.Interviews.Interview", b =>
                 {
                     b.HasOne("Domain.Entities.Users.User", "Interviewer")
@@ -1117,6 +1281,13 @@ namespace Domain.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.Companies.Company", b =>
+                {
+                    b.Navigation("RatingHistory");
+
+                    b.Navigation("Reviews");
+                });
+
             modelBuilder.Entity("Domain.Entities.Interviews.Interview", b =>
                 {
                     b.Navigation("ShareLink");
@@ -1149,6 +1320,8 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
                 {
+                    b.Navigation("Reviews");
+
                     b.Navigation("Salaries");
 
                     b.Navigation("UserRoles");

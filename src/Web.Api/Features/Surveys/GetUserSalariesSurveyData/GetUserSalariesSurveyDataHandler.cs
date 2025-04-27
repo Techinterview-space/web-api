@@ -24,7 +24,7 @@ public class GetUserSalariesSurveyDataHandler : IRequestHandler<GetUserSalariesS
         GetUserSalariesSurveyDataQuery request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
         if (currentUser is null)
         {
             return new GetUserSalariesSurveyDataResponse(null);

@@ -27,7 +27,7 @@ public class AuthorizationServiceTests
 
         Assert.False(await context.Users.AnyAsync());
 
-        var currentUser = await target.CurrentUserOrNullAsync();
+        var currentUser = await target.GetCurrentUserOrNullAsync();
         Assert.Equal(1, await context.Users.CountAsync());
 
         Assert.Equal("42", currentUser.IdentityId);
@@ -41,7 +41,7 @@ public class AuthorizationServiceTests
     public async Task CurrentUserAsync_NotNewUser_DoesntCreateAsync()
     {
         await using var context = new SqliteContext();
-        var oldUser = await new FakeUser(
+        var oldUser = await new UserFake(
                 role: Role.Interviewer,
                 firstName: "John",
                 lastName: "Smith")
@@ -54,7 +54,7 @@ public class AuthorizationServiceTests
             context);
 
         Assert.Equal(1, await context.Users.CountAsync());
-        var currentUser = await target.CurrentUserOrNullAsync();
+        var currentUser = await target.GetCurrentUserOrNullAsync();
         Assert.Equal(1, await context.Users.CountAsync());
 
         Assert.Equal(oldUser.Id, currentUser.Id);

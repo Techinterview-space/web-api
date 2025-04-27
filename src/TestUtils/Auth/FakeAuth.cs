@@ -20,10 +20,10 @@ public class FakeAuth : IAuthorization
     public Task<User> CurrentUserOrFailAsync(
         CancellationToken cancellationToken = default)
     {
-        return CurrentUserOrNullAsync(cancellationToken);
+        return GetCurrentUserOrNullAsync(cancellationToken);
     }
 
-    public Task<User> CurrentUserOrNullAsync(
+    public Task<User> GetCurrentUserOrNullAsync(
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_user);

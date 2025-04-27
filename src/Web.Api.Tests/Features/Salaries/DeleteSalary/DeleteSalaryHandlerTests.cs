@@ -15,7 +15,7 @@ public class DeleteSalaryHandlerTests
     public async Task Delete_SalaryDoesExist_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Admin).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Admin).PleaseAsync(context);
 
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,

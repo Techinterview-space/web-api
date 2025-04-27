@@ -31,11 +31,11 @@ public record AuthorizationService : IAuthorization
     public async Task<User> CurrentUserOrFailAsync(
         CancellationToken cancellationToken = default)
     {
-        return await CurrentUserOrNullAsync(cancellationToken)
+        return await GetCurrentUserOrNullAsync(cancellationToken)
             ?? throw new InvalidOperationException("The current user is not authenticated");
     }
 
-    public async Task<User> CurrentUserOrNullAsync(
+    public async Task<User> GetCurrentUserOrNullAsync(
         CancellationToken cancellationToken = default)
     {
         if (!_http.HasUserClaims)
@@ -56,12 +56,12 @@ public record AuthorizationService : IAuthorization
         Role role,
         CancellationToken cancellationToken = default)
     {
-        (await CurrentUserOrNullAsync(cancellationToken)).HasOrFail(role);
+        (await GetCurrentUserOrNullAsync(cancellationToken)).HasOrFail(role);
     }
 
     public async Task HasAnyRoleOrFailAsync(params Role[] roles)
     {
-        (await CurrentUserOrNullAsync()).HasAnyOrFail(roles);
+        (await GetCurrentUserOrNullAsync()).HasAnyOrFail(roles);
     }
 
     public async Task<User> GetOrCreateAsync(

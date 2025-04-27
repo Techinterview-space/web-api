@@ -12,7 +12,7 @@ public class FakseUserTests
     public async Task PleaseAsync_OkAsync()
     {
         await using var context = new SqliteContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
         Assert.Contains(user.UserRoles, x => x.RoleId == Role.Interviewer);
     }
 }

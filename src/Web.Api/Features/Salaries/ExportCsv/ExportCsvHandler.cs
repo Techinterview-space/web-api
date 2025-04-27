@@ -35,7 +35,7 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
         ExportCsvQuery request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
         if (currentUser is null)
         {
             throw new NoPermissionsException("No user found");

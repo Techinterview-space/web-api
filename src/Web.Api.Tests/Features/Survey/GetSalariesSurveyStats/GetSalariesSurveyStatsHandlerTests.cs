@@ -15,30 +15,30 @@ public class GetSalariesSurveyStatsHandlerTests
     public async Task Handle_HasSomeReplies_ReturnsStat()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
-        var reply1 = await new FakeSalariesSurveyReply(
+        var reply1 = await new SalariesSurveyReplyFake(
             5,
             user1)
             .PleaseAsync(context);
 
-        var reply2 = await new FakeSalariesSurveyReply(
+        var reply2 = await new SalariesSurveyReplyFake(
                 5,
                 user2)
             .PleaseAsync(context);
 
-        var reply3 = await new FakeSalariesSurveyReply(
+        var reply3 = await new SalariesSurveyReplyFake(
                 3,
                 user1)
             .PleaseAsync(context);
 
-        var reply4 = await new FakeSalariesSurveyReply(
+        var reply4 = await new SalariesSurveyReplyFake(
                 4,
                 user2)
             .PleaseAsync(context);
 
-        var reply5 = await new FakeSalariesSurveyReply(
+        var reply5 = await new SalariesSurveyReplyFake(
                 2,
                 user1)
             .PleaseAsync(context);

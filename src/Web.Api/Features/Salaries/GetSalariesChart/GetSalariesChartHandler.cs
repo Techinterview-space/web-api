@@ -37,7 +37,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             ISalariesChartQueryParams request,
             CancellationToken cancellationToken)
         {
-            var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
+            var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
 
             var userSalariesForLastYear = new List<UserSalary>();
 

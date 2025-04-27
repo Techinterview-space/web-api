@@ -14,7 +14,7 @@ public class InterviewMarkdownTest
     public async Task ToString_OkAsync()
     {
         await using var context = new SqliteContext();
-        var user = await new FakeUser(Role.Interviewer, "Maxim", "Gorbatyuk", "m.gorbatyuk@gmail.com").PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer, "Maxim", "Gorbatyuk", "m.gorbatyuk@gmail.com").PleaseAsync(context);
         var interview = await new InterviewFake(user).AsPlease().PleaseAsync(context);
 
         Assert.NotEqual(default(Guid), interview.Id);

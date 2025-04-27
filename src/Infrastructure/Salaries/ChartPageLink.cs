@@ -17,7 +17,7 @@ public record ChartPageLink
     {
         _requestOrNull = requestOrNull;
         _frontendBaseUrl = baseUrl;
-        _additionalQueryParams = new ();
+        _additionalQueryParams = new Dictionary<string, string>();
     }
 
     public ChartPageLink(

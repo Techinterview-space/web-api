@@ -54,7 +54,7 @@ public class InterviewsControllerTests
     public async Task MyAsync_OnlyMyAreBeingReturned_OkAsync()
     {
         await using var context = new InMemoryDatabaseContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -84,8 +84,8 @@ public class InterviewsControllerTests
     public async Task MyAsync_IHaveNotCreatedAnyTemplate_OkAsync()
     {
         await using var context = new InMemoryDatabaseContext();
-        var otherPerson = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var otherPerson = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(otherPerson),
             context,
@@ -117,7 +117,7 @@ public class InterviewsControllerTests
     public async Task CreateAsync_ValidData_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -173,7 +173,7 @@ public class InterviewsControllerTests
     public async Task CreateAsync_EmptySubjects_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -200,8 +200,8 @@ public class InterviewsControllerTests
     public async Task UpdateAsync_OtherPersonTriesToUpdate_ExceptionAsync()
     {
         await using var context = new SqliteContext();
-        var otherPerson = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var otherPerson = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -256,8 +256,8 @@ public class InterviewsControllerTests
     public async Task UpdateAsync_Mix_OkAsync()
     {
         await using var context = new SqliteContext();
-        var otherPerson = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var otherPerson = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -332,7 +332,7 @@ public class InterviewsControllerTests
     public async Task DeleteAsync_EmptySubjects_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -361,8 +361,8 @@ public class InterviewsControllerTests
     public async Task DeleteAsync_OtherPersonTriesToUpdate_ExceptionAsync()
     {
         await using var context = new SqliteContext();
-        var otherPerson = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var otherPerson = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -403,7 +403,7 @@ public class InterviewsControllerTests
     public async Task ShareWithLink_InterviewWithShareToken_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -460,7 +460,7 @@ public class InterviewsControllerTests
     public async Task ShareWithLink_InterviewWithoutShareToken_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -510,7 +510,7 @@ public class InterviewsControllerTests
     public async Task GetInterviewByShareToken_ValidShareToken_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -580,7 +580,7 @@ public class InterviewsControllerTests
     public async Task GetInterviewByShareToken_NotValidShareToken_ExceptionAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var target = new InterviewsController(
             new FakeAuth(currentUser),
@@ -624,7 +624,7 @@ public class InterviewsControllerTests
     public async Task RevokeShareLink_InterviewWithShareToken_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,
@@ -683,7 +683,7 @@ public class InterviewsControllerTests
     public async Task RevokeShareLink_InterviewWithOutShareToken_OkAsync()
     {
         await using var context = new SqliteContext();
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var target = new InterviewsController(
             new FakeAuth(currentUser),
             context,

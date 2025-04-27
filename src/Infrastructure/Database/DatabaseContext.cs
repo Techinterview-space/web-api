@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Companies;
 using Domain.Entities.CSV;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
@@ -52,12 +53,18 @@ public class DatabaseContext : DbContext
 
     public DbSet<StatDataChangeSubscriptionRecord> StatDataChangeSubscriptionRecords { get; set; }
 
+    public DbSet<Company> Companies { get; set; }
+
+    public DbSet<CompanyRatingHistory> CompanyRatingHistoryRecords { get; set; }
+
+    public DbSet<CompanyReview> CompanyReviews { get; set; }
+
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel
     {
         entities.ThrowIfNullOrEmpty(nameof(entities));
-        foreach (TEntity entity in entities)
+        foreach (var entity in entities)
         {
             entity.ThrowIfInvalid();
         }

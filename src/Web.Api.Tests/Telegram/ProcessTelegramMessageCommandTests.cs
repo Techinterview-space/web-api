@@ -38,7 +38,7 @@ namespace Web.Api.Tests.Telegram
         public async Task TestBasicHandle_WithData()
         {
             await using var context = new InMemoryDatabaseContext();
-            var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+            var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
             await GenerateUserSalaries(
                 context,
@@ -96,7 +96,7 @@ namespace Web.Api.Tests.Telegram
         public async Task TestBasicHandle_WithNoData()
         {
             await using var context = new InMemoryDatabaseContext();
-            var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+            var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
             var logger = new Mock<ILogger<ProcessTelegramMessageHandler>>();
             var currencyService = new CurrenciesServiceFake();

@@ -26,7 +26,7 @@ public class ReplyOnSalariesSurveyHandlerTests
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var auth = new FakeAuth(currentUser);
 
         var handler = new ReplyOnSalariesSurveyHandler(context, auth);
@@ -53,10 +53,10 @@ public class ReplyOnSalariesSurveyHandlerTests
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var auth = new FakeAuth(currentUser);
 
-        var reply = await new FakeSalariesSurveyReply(
+        var reply = await new SalariesSurveyReplyFake(
             5,
             currentUser,
             DateTime.UtcNow.AddDays(-1)).PleaseAsync(context);
@@ -82,14 +82,14 @@ public class ReplyOnSalariesSurveyHandlerTests
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var currentUser = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var currentUser = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var auth = new FakeAuth(currentUser);
 
         var oldDate = DateTime.UtcNow
             .AddDays(-SalariesSurveyUserService.RecentRepliesDays)
             .AddDays(-1);
 
-        var reply = await new FakeSalariesSurveyReply(
+        var reply = await new SalariesSurveyReplyFake(
             5,
             currentUser,
             oldDate).PleaseAsync(context);

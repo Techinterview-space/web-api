@@ -22,7 +22,7 @@ public class AddSalaryHandlerTests
         Role userRole)
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(userRole).PleaseAsync(context);
+        var user = await new UserFake(userRole).PleaseAsync(context);
 
         var salary1 = await context.SaveAsync(new UserSalaryFake(
                 user,
@@ -62,7 +62,7 @@ public class AddSalaryHandlerTests
         Role userRole)
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(userRole).PleaseAsync(context);
+        var user = await new UserFake(userRole).PleaseAsync(context);
 
         var request = new AddSalaryCommand
         {
@@ -104,7 +104,7 @@ public class AddSalaryHandlerTests
         int quarter)
     {
         await using var context = new SqliteContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var request = new AddSalaryCommand
         {
@@ -135,7 +135,7 @@ public class AddSalaryHandlerTests
         int year)
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var request = new AddSalaryCommand
         {
@@ -165,7 +165,7 @@ public class AddSalaryHandlerTests
         double value)
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var request = new AddSalaryCommand
         {

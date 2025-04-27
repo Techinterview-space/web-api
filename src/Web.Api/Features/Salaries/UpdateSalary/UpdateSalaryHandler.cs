@@ -35,7 +35,7 @@ public class UpdateSalaryHandler : IRequestHandler<UpdateSalaryCommand, CreateOr
                          .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
                      ?? throw new NotFoundException("Salary record not found");
 
-        var currentUser = await _auth.CurrentUserOrNullAsync();
+        var currentUser = await _auth.GetCurrentUserOrNullAsync();
 
         if (!currentUser.Has(Role.Admin) &&
             salary.UserId != currentUser.Id)

@@ -8,7 +8,8 @@ using Domain.Enums;
 
 namespace Domain.Entities.Interviews;
 
-public class InterviewTemplate : HasLabelsEntity<InterviewTemplate, UserLabel>, IHasIdBase<Guid>
+public class InterviewTemplate
+    : HasLabelsEntity<InterviewTemplate, UserLabel>, IHasIdBase<Guid>
 {
     protected InterviewTemplate()
     {
