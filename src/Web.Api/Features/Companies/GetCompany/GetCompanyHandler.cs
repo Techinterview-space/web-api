@@ -28,9 +28,15 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
         GetCompanyQuery request,
         CancellationToken cancellationToken)
     {
+        var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
+        var userIsAdmin = user != null && user.Has(Role.Admin);
+
         var company = await _context.Companies
-            .Include(x => x.Reviews
-                .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
+            .IncludeWhen(userIsAdmin, x => x.Reviews)
+            .IncludeWhen(
+                !userIsAdmin,
+                x => x.Reviews
+                    .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
@@ -39,7 +45,6 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
             throw new NotFoundException("Company not found");
         }
 
-        var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
         var userIsAllowedToLeaveReview =
             user == null ||
             company.IsUserAllowedToLeaveReview(user.Id);
