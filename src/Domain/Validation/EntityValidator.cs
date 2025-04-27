@@ -55,9 +55,9 @@ public class EntityValidator<T>
         foreach (var info in propertyInfo)
         {
             var attributes = info.GetCustomAttributes(false).OfType<ValidationAttribute>();
-            foreach (ValidationAttribute attribute in attributes)
+            foreach (var attribute in attributes)
             {
-                PropertyInfo objPropInfo = _entity.GetType().GetProperty(info.Name)
+                var objPropInfo = _entity.GetType().GetProperty(info.Name)
                                            ?? throw new InvalidOperationException($"No property info '{info.Name}'");
 
                 if (attribute.GetValidationResult(objPropInfo.GetValue(_entity, null), new ValidationContext(_entity)) != ValidationResult.Success)
@@ -67,6 +67,6 @@ public class EntityValidator<T>
             }
         }
 
-        return !_errors.Any();
+        return _errors.Count == 0;
     }
 }

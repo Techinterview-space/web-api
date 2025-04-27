@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Domain.Entities.Companies;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
@@ -85,6 +86,8 @@ public class User : BaseModel, IHasDeletedAt
 
     [JsonIgnore]
     public virtual List<UserSalary> Salaries { get; protected set; } = new ();
+
+    public virtual List<CompanyReview> Reviews { get; protected set; } = new ();
 
     public string GetFullname()
     {

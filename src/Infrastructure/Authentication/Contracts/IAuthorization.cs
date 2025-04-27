@@ -9,7 +9,7 @@ public interface IAuthorization
     Task<User> CurrentUserOrFailAsync(
         CancellationToken cancellationToken = default);
 
-    Task<User> CurrentUserOrNullAsync(
+    Task<User> GetCurrentUserOrNullAsync(
         CancellationToken cancellationToken = default);
 
     CurrentUser CurrentUser { get; }

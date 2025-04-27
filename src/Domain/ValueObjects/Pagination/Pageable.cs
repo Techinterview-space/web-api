@@ -7,7 +7,11 @@ public record Pageable<T> : PaginatedListBase
 {
     public IReadOnlyCollection<T> Results { get; protected set; }
 
-    public Pageable(int currentPage, int pageSize, int totalItems, IReadOnlyCollection<T> results)
+    public Pageable(
+        int currentPage,
+        int pageSize,
+        int totalItems,
+        IReadOnlyCollection<T> results)
     {
         CurrentPage = currentPage;
         PageSize = pageSize;

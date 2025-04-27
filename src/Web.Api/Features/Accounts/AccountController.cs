@@ -34,7 +34,7 @@ public class AccountController : ControllerBase
     public async Task<UserDto> Me(
         CancellationToken cancellationToken)
     {
-        var user = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        var user = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
         if (user == null)
         {
             throw new AuthenticationException("The current user is not authenticated");

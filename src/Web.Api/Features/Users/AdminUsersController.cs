@@ -131,7 +131,7 @@ public class AdminUsersController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
         currentUser.HasAnyOrFail(Role.Admin);
 
         var user = (await _context.Users
@@ -155,7 +155,7 @@ public class AdminUsersController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
         currentUser.HasAnyOrFail(Role.Admin);
 
         var user = (await _context.Users

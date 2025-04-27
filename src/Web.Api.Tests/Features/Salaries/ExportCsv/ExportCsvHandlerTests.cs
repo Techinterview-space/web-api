@@ -19,7 +19,7 @@ public class ExportCsvHandlerTests
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var salary1 = await context.SaveAsync(new UserSalaryFake(
                 user,
@@ -52,7 +52,7 @@ public class ExportCsvHandlerTests
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var oldDownload = await new UserCsvDownloadFake(user, DateTime.UtcNow.AddDays(-2)).PleaseAsync(context);
 
         var salary1 = await context.SaveAsync(new UserSalaryFake(
@@ -86,7 +86,7 @@ public class ExportCsvHandlerTests
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var oldDownload = await new UserCsvDownloadFake(user, DateTime.UtcNow.AddHours(-2)).PleaseAsync(context);
 
         var salary1 = await context.SaveAsync(new UserSalaryFake(

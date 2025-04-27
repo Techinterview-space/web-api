@@ -70,6 +70,14 @@ public record CurrentUser
         return Roles.Contains(role);
     }
 
+    public void HasOrFail(Role role)
+    {
+        if (!Has(role))
+        {
+            throw new UnauthorizedAccessException($"User does not have {role} role");
+        }
+    }
+
     public bool HasAny(IReadOnlyCollection<Role> roles)
     {
         roles.ThrowIfNullOrEmpty(nameof(roles));

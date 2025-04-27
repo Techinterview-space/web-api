@@ -14,7 +14,7 @@ public class AccountControllerTests
     public async Task GetMySalaries_UserHimself_ReturnsSalaries()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Interviewer)
+        var user = await new UserFake(Role.Interviewer)
             .PleaseAsync(context);
 
         var salary1 = await new UserSalaryFake(user, 400_000)
@@ -39,10 +39,10 @@ public class AccountControllerTests
     public async Task GetMySalaries_OtherUser_OtherUserProfile()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Interviewer)
+        var user1 = await new UserFake(Role.Interviewer)
             .PleaseAsync(context);
 
-        var user2 = await new FakeUser(Role.Admin)
+        var user2 = await new UserFake(Role.Admin)
             .PleaseAsync(context);
 
         var salary1 = await new UserSalaryFake(user1, 400_000)

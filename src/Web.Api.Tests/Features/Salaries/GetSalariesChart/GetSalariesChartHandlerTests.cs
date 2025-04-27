@@ -20,9 +20,9 @@ public class GetSalariesChartHandlerTests
     public async Task Handle_NoCurrentUser_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var user3 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user3 = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
@@ -96,9 +96,9 @@ public class GetSalariesChartHandlerTests
     public async Task Handle_UserHasSalaryForLastQuarter_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var user3 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user3 = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,
@@ -175,7 +175,7 @@ public class GetSalariesChartHandlerTests
     public async Task Handle_UserHasSeveralSalariesForYear_OnlyLastBeingReturned_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var salary1 = await context.SaveAsync(new UserSalaryFake(
                 user1,
@@ -232,8 +232,8 @@ public class GetSalariesChartHandlerTests
     public async Task Handle_UserHasNoSalaryForLastQuarter_ReturnsFalse()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
-        var user2 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var salary11 = await context.SaveAsync(new UserSalaryFake(
                 user1,

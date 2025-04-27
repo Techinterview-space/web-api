@@ -40,7 +40,7 @@ public class GetSurveyHistoricalChartHandler
         GetSurveyHistoricalChartQuery request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrNullAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
 
         var hasAuthentication = currentUser != null;
         var shouldAddOwnSalary = false;

@@ -14,7 +14,7 @@ public class AppHttpContext : IHttpContext
         _http = http;
     }
 
-    public CurrentUser CurrentUser => new (
+    public CurrentUser CurrentUser => new CurrentUser(
         _http.HttpContext?.User
         ?? throw new InvalidOperationException("The Http Context does not exist"));
 

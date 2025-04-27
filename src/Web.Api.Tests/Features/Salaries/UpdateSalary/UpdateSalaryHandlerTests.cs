@@ -18,7 +18,7 @@ public class UpdateSalaryHandlerTests
     public async Task Update_HasNoRecordForNewQuarterAlready_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
         var profession = await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer);
         var salary = await new UserSalaryFake(user, professionOrNull: profession).PleaseAsync(context);
@@ -55,8 +55,8 @@ public class UpdateSalaryHandlerTests
     public async Task Update_HasNoRecordForNewQuarterAlready_UpdateByAdmin_Ok()
     {
         await using var context = new InMemoryDatabaseContext();
-        var user = await new FakeUser(Role.Admin).PleaseAsync(context);
-        var user1 = await new FakeUser(Role.Interviewer).PleaseAsync(context);
+        var user = await new UserFake(Role.Admin).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var salary = await new UserSalaryFake(user1).PleaseAsync(context);
 
         var request = new UpdateSalaryCommand
