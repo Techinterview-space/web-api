@@ -44,6 +44,7 @@ jobs:
       - name: Deploy ssh
         run: |
           sed -i "s,{api},${{ secrets.CR }}/backend:${{ github.sha }},g" docker-compose.deploy.yml
+        shell: sh
       - name: copy file via ssh key
         uses: appleboy/scp-action@v1.0.0
         with:
