@@ -34,7 +34,7 @@ jobs:
   deploy-ssh:
     if: github.event_name == 'push'
     container:
-      image: docker:stable
+      image: docker:28.1.1-cli
     env:
       DO_TOKEN: ${{ secrets.DO_TOKEN }}
     runs-on: ubuntu-latest
