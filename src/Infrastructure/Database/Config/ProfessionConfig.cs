@@ -23,10 +23,11 @@ public class ProfessionConfig : IEntityTypeConfiguration<Profession>
             .WithMany()
             .HasForeignKey(x => x.CreatedById);
 
+        var creationDate = new DateTime(2024, 1, 1);
         builder.HasData(
             EnumHelper
                 .Values<UserProfessionEnum>()
                 .Where(x => x != UserProfessionEnum.Undefined)
-                .Select(x => new Profession((long)x, x.ToString(), new HexColor("#C00C50"))));
+                .Select(x => new Profession((long)x, x.ToString(), new HexColor("#C00C50"), creationDate)));
     }
 }

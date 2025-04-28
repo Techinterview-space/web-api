@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Enums;
@@ -59,7 +60,11 @@ public class AppInitializeService : IHostedService
     {
         try
         {
-            await context.Database.MigrateAsync(cancellationToken);
+            var migrations = (await context.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
+            if (migrations.Count > 0)
+            {
+                await context.Database.MigrateAsync(cancellationToken);
+            }
         }
         catch (Exception exception)
         {

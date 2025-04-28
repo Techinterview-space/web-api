@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
@@ -16,9 +17,9 @@ public class Profession : EntityLabelBase
     public Profession(
         long id,
         string title,
-        HexColor hexcolor = null,
-        User createdBy = null)
-        : this(title, hexcolor, createdBy)
+        HexColor hexcolor,
+        DateTime createdAt)
+        : this(title, hexcolor, null)
     {
         Id = id;
     }
