@@ -42,7 +42,8 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
 
         if (company is null)
         {
-            throw new NotFoundException("Company not found");
+            throw new NotFoundException(
+                "Company not found");
         }
 
         var userIsAllowedToLeaveReview =
@@ -53,7 +54,8 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
             !user.Has(Role.Admin) &&
             company.DeletedAt != null)
         {
-            throw new NotFoundException("Company not found");
+            throw new NotFoundException(
+                "Company by ID was not found");
         }
 
         return new CompanyDto(
