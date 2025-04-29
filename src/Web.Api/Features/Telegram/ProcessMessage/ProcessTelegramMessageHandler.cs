@@ -317,7 +317,7 @@ Last name: {message.From?.LastName}";
         string replyText;
         if (salaries.Count > 0)
         {
-            var currencyContent = await _currencyService.GetCurrencyAsync(
+            var currencyContentOrNull = await _currencyService.GetCurrencyAsync(
                 Currency.USD,
                 cancellationToken);
 
@@ -336,11 +336,14 @@ Last name: {message.From?.LastName}";
 
                 if (median > 0)
                 {
-                    var resStr =
-                        $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг." +
-                        $" (~{(median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContent.CurrencyString})";
+                    var resultString = $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг.";
+                    if (currencyContentOrNull is not null)
+                    {
+                        resultString +=
+                            $" (~{(median / currencyContentOrNull.Value).ToString("N0", CultureInfo.InvariantCulture)}{currencyContentOrNull.CurrencyString})";
+                    }
 
-                    replyText += $"\n{gradeGroup.ToCustomString()}: {resStr}";
+                    replyText += $"\n{gradeGroup.ToCustomString()}: {resultString}";
                 }
             }
 
