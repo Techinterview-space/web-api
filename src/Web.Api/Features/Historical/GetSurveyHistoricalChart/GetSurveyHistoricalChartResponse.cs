@@ -79,6 +79,21 @@ public record GetSurveyHistoricalChartResponse
 
     public DateTimeOffset ChartTo { get; private set; }
 
+    public static GetSurveyHistoricalChartResponse Empty(
+        DateTimeOffset from,
+        DateTimeOffset to)
+    {
+        return new GetSurveyHistoricalChartResponse
+        {
+            HasAuthentication = true,
+            ShouldAddOwnSalary = false,
+            From = from,
+            To = to,
+            ChartFrom = from,
+            ChartTo = to,
+        };
+    }
+
     public static GetSurveyHistoricalChartResponse NoSalaryOrAuthorization(
         bool hasAuthentication,
         bool shouldAddOwnSalary,

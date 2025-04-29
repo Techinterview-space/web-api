@@ -31,7 +31,7 @@ public class CreateSubscriptionHandler
             throw new BadRequestException("Name is required.");
         }
 
-        if (request.TelegramChatId <= 0)
+        if (request.TelegramChatId == 0)
         {
             throw new BadRequestException("Telegram chat ID is required.");
         }

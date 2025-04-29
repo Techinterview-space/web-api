@@ -151,6 +151,13 @@ public class GetSurveyHistoricalChartHandler
                         .ToListAsync(cancellationToken);
                 });
 
+        if (surveyReplies.Count == 0)
+        {
+            return GetSurveyHistoricalChartResponse.Empty(
+                from,
+                to);
+        }
+
         return new GetSurveyHistoricalChartResponse(
             surveyReplies,
             from,
