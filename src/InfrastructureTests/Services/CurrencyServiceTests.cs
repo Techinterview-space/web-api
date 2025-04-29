@@ -8,6 +8,8 @@ using Infrastructure.Currencies;
 using InfrastructureTests.Fakes.Data;
 using InfrastructureTests.Mocks;
 using MemoryCache.Testing.Moq;
+using Microsoft.Extensions.Logging;
+using Moq;
 using TestUtils.Fakes;
 using Xunit;
 
@@ -31,7 +33,8 @@ namespace InfrastructureTests.Services
             var currencyService = new CurrencyService(
                 mockHttpClientFactory.Object,
                 memoryConfig.Value(),
-                mockedCache);
+                mockedCache,
+                new Mock<ILogger<CurrencyService>>().Object);
 
             // Act
             var currencies = await currencyService.GetCurrenciesAsync(
@@ -61,7 +64,8 @@ namespace InfrastructureTests.Services
             var currencyService = new CurrencyService(
                 mockHttpClientFactory.Object,
                 memoryConfig.Value(),
-                mockedCache);
+                mockedCache,
+                new Mock<ILogger<CurrencyService>>().Object);
 
             // Act
             var currencies = await currencyService.GetAllCurrenciesAsync(default);
