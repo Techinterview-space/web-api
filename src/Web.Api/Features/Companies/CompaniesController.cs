@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Companies.AddCompanyReview;
 using Web.Api.Features.Companies.ApproveReview;
 using Web.Api.Features.Companies.CreateCompany;
+using Web.Api.Features.Companies.DeleteCompanyReview;
 using Web.Api.Features.Companies.GetCompany;
 using Web.Api.Features.Companies.MarkReviewOutdated;
 using Web.Api.Features.Companies.SearchCompanies;
@@ -123,6 +124,20 @@ public class CompaniesController : ControllerBase
     {
         await _mediator.Send(
             new MarkReviewOutdatedCommand(companyId, reviewId),
+            cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpDelete("{companyId:guid}/reviews/{reviewId:guid}")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> DeleteCompanyReview(
+        [FromRoute] Guid companyId,
+        [FromRoute] Guid reviewId,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new DeleteCompanyReviewCommand(companyId, reviewId),
             cancellationToken);
 
         return Ok();
