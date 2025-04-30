@@ -11,6 +11,7 @@ using Web.Api.Features.Companies.CreateCompany;
 using Web.Api.Features.Companies.GetCompany;
 using Web.Api.Features.Companies.MarkReviewOutdated;
 using Web.Api.Features.Companies.SearchCompanies;
+using Web.Api.Features.Companies.SearchReviewsToBeApproved;
 using Web.Api.Features.Companies.SoftDeleteCompany;
 using Web.Api.Setup.Attributes;
 
@@ -87,6 +88,16 @@ public class CompaniesController : ControllerBase
             cancellationToken);
 
         return Ok();
+    }
+
+    [HttpGet("reviews/to-approve")]
+    public async Task<IActionResult> SearchReviewsToBeApproved(
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _mediator.Send(
+                new SearchReviewsToBeApprovedQuery(),
+                cancellationToken));
     }
 
     [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/approve")]
