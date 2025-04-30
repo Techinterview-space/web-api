@@ -31,6 +31,8 @@ public record CompanyReviewDto
 
     public Guid CompanyId { get; init; }
 
+    public DateTimeOffset CreatedAt { get; init; }
+
     public DateTime? ApprovedAt { get; init; }
 
     public DateTime? OutdatedAt { get; init; }
@@ -55,6 +57,7 @@ public record CompanyReviewDto
         IWorkHere = review.IWorkHere;
         UserEmployment = review.UserEmployment;
         CompanyId = review.CompanyId;
+        CreatedAt = review.CreatedAt;
         ApprovedAt = review.ApprovedAt;
         OutdatedAt = review.OutdatedAt;
     }

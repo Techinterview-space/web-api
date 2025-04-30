@@ -24,6 +24,10 @@ public record CompanyDto
 
     public List<CompanyRatingHistoryRecordDto> RatingHistory { get; init; }
 
+    public DateTimeOffset CreatedAt { get; init; }
+
+    public DateTimeOffset UpdatedAt { get; init; }
+
     public DateTime? DeletedAt { get; init; }
 
     public bool UserIsAllowedToLeaveReview { get; init; }
@@ -45,6 +49,8 @@ public record CompanyDto
         ReviewsCount = company.ReviewsCount;
         Reviews = company.Reviews?.ConvertAll(review => new CompanyReviewDto(review));
         RatingHistory = company.RatingHistory?.ConvertAll(record => new CompanyRatingHistoryRecordDto(record));
+        CreatedAt = company.CreatedAt;
+        UpdatedAt = company.UpdatedAt;
         DeletedAt = company.DeletedAt;
         UserIsAllowedToLeaveReview = userIsAllowedToLeaveReview;
     }

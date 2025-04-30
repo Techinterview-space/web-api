@@ -30,11 +30,13 @@ public class SearchCompaniesHandler
         CancellationToken cancellationToken)
     {
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
-        var loadDeleted = user != null && user.Has(Role.Admin);
+        var userIsAdmin = user != null && user.Has(Role.Admin);
 
         var companies = await _context.Companies
             .AsNoTracking()
-            .When(!loadDeleted, x => x.DeletedAt == null)
+            .IncludeWhen(userIsAdmin, x => x.Reviews)
+            .IncludeWhen(userIsAdmin, x => x.RatingHistory)
+            .When(!userIsAdmin, x => x.DeletedAt == null)
             .OrderBy(x => x.Name)
             .AsPaginatedAsync(
                 request,

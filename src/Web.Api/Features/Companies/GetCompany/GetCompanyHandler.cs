@@ -33,6 +33,7 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
 
         var company = await _context.Companies
             .IncludeWhen(userIsAdmin, x => x.Reviews)
+            .IncludeWhen(userIsAdmin, x => x.RatingHistory)
             .IncludeWhen(
                 !userIsAdmin,
                 x => x.Reviews
