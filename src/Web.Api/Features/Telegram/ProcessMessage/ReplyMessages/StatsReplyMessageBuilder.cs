@@ -44,6 +44,10 @@ public class StatsReplyMessageBuilder
             .Where(x => x.CreatedAt >= dayAgo)
             .CountAsync(cancellationToken);
 
+        var newCompanyReviewsCount = await _context.CompanyReviews
+            .Where(x => x.CreatedAt >= dayAgo)
+            .CountAsync(cancellationToken);
+
         var messageToSend = $@"
 Всего анкет: {allSalariesCount}
 
@@ -52,6 +56,7 @@ public class StatsReplyMessageBuilder
 - Добавлено релевантных анкет: <b>+{addedRelevantSalariesCount}</b>
 - Добавлено нерелевантных анкет: <b>+{addedIrrelevantSalariesCount}</b>
 - Прошли опрос: <b>+{surveyPassedCount}</b>
+- Отзывов о компаниях: <b>+{newCompanyReviewsCount}</b>
 
 <em>Даты выборки: [{dayAgo:yyyy-MM-dd HH:mm:ss} - {now:yyyy-MM-dd HH:mm:ss}]</em>";
 
