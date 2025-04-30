@@ -170,7 +170,11 @@ public class StatDataChangeSubscriptionCalculateJob
             if (!hasAnyDifference &&
                 subscription.PreventNotificationIfNoDifference)
             {
-                // TODO mgorbatyuk: log
+                Logger.LogInformation(
+                    "No difference in salaries for subscription {SubscriptionId} ({Name}). Skipping notification.",
+                    subscription.Id,
+                    subscription.Name);
+
                 continue;
             }
 
@@ -238,9 +242,10 @@ public class StatDataChangeSubscriptionCalculateJob
         if (failedToSend.Count > 0)
         {
             Logger.LogError(
-                "Failed to send regular stats updates chats to {Count} users. Errors: {Errors}",
+                "Failed to send regular stats updates chats to {Count} users/groups. Errors: {Errors}",
                 failedToSend.Count,
-                failedToSend.Select(x => x.Ex.Message + ", " + x.Ex.GetType().FullName));
+                failedToSend
+                    .Select(x => $"Subscription {x.SubscriptionRecord?.SubscriptionId}. Error {x.Ex.Message}. Type: {x.Ex.GetType().FullName}"));
         }
 
         if (hasAnySubscriptionToUpdate)

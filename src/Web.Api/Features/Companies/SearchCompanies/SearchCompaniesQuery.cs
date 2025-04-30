@@ -11,5 +11,6 @@ public record SearchCompaniesQuery : SearchCompaniesQueryParams, IRequest<Pageab
     {
         Page = queryParams.Page;
         PageSize = queryParams.PageSize;
+        SearchQuery = queryParams.SearchQuery;
     }
 }
