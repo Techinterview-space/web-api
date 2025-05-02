@@ -7,26 +7,14 @@ namespace Infrastructure.Jwt;
 
 public record TechinterviewJwtTokenGenerator
 {
-    public const string DefaultIssuer = "techinterview-space";
-    public const string DefaultAudience = "techinterview-space-bot";
-
     private readonly string _secretKey;
-    private readonly string _issuer;
-    private readonly string _audience;
-    private readonly int _expirationMinutes;
 
     private string _result;
 
     public TechinterviewJwtTokenGenerator(
-        string secretKey,
-        string issuer = DefaultIssuer,
-        string audience = DefaultAudience,
-        int expirationMinutes = 60)
+        string secretKey)
     {
         _secretKey = secretKey;
-        _issuer = issuer;
-        _audience = audience;
-        _expirationMinutes = expirationMinutes;
     }
 
     public override string ToString()
@@ -47,10 +35,8 @@ public record TechinterviewJwtTokenGenerator
         };
 
         var token = new JwtSecurityToken(
-            issuer: _issuer,
-            audience: _audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_expirationMinutes),
+            expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
