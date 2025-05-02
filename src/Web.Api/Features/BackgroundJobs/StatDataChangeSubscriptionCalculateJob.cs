@@ -73,11 +73,14 @@ public class StatDataChangeSubscriptionCalculateJob
 
         foreach (var subscription in subscriptions)
         {
-            var lastCacheItemOrNull = await _context.StatDataChangeSubscriptionRecords
+            List<StatDataChangeSubscriptionRecord> lastCacheItems = await _context.StatDataChangeSubscriptionRecords
                 .AsNoTracking()
                 .Where(x => x.SubscriptionId == subscription.Id)
                 .OrderByDescending(x => x.CreatedAt)
-                .FirstOrDefaultAsync(cancellationToken);
+                .Take(3)
+                .ToListAsync(cancellationToken);
+
+            var lastCacheItemOrNull = lastCacheItems.FirstOrDefault();
 
             var filterData = new TelegramBotUserCommandParameters(
                 allProfessions
@@ -132,20 +135,17 @@ public class StatDataChangeSubscriptionCalculateJob
 
                 line += $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг. ";
 
-                if (lastCacheItemOrNull is not null)
+                var oldGradeValue = lastCacheItemOrNull?.Data.GetMedianLocalSalaryByGrade(gradeGroup);
+                if (oldGradeValue is > 0)
                 {
-                    var oldGradeValue = lastCacheItemOrNull.Data.GetMedianLocalSalaryByGrade(gradeGroup);
-                    if (oldGradeValue is > 0)
+                    var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
+
+                    if (diffInPercent is > 0 or < 0)
                     {
-                        var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
+                        hasAnyDifference = hasAnyDifference || true;
 
-                        if (diffInPercent is > 0 or < 0)
-                        {
-                            hasAnyDifference = hasAnyDifference || true;
-
-                            var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
-                            line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
-                        }
+                        var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
+                        line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
                     }
                 }
 

@@ -24,7 +24,7 @@ public record TechinterviewJwtTokenGenerator
 
     private string GenerateInternal()
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_secretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
         var claims = new List<Claim>
