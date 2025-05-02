@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Jwt;
 
-public record JwtTokenGenerator
+public record TechinterviewJwtTokenGenerator
 {
     public const string DefaultIssuer = "techinterview-space";
     public const string DefaultAudience = "techinterview-space-bot";
@@ -17,7 +17,7 @@ public record JwtTokenGenerator
 
     private string _result;
 
-    public JwtTokenGenerator(
+    public TechinterviewJwtTokenGenerator(
         string secretKey,
         string issuer = DefaultIssuer,
         string audience = DefaultAudience,
@@ -37,9 +37,14 @@ public record JwtTokenGenerator
     private string GenerateInternal()
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
-        var claims = new List<Claim>();
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Name, "TechInterview.space Bot"),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+        };
 
         var token = new JwtSecurityToken(
             issuer: _issuer,
