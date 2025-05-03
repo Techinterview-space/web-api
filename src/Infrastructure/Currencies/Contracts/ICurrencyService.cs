@@ -4,7 +4,7 @@ namespace Infrastructure.Currencies.Contracts
 {
     public interface ICurrencyService
     {
-        Task<CurrencyContent> GetCurrencyAsync(
+        Task<CurrencyContent> GetCurrencyOrNullAsync(
             Currency currency,
             CancellationToken cancellationToken);
 

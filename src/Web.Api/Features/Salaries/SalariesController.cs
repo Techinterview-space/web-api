@@ -69,7 +69,7 @@ public class SalariesController : ControllerBase
             new GetSalariesChartQuery
             {
                 Grade = request.Grade,
-                ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+                SelectedProfessionIds = new DeveloperProfessionsCollection(request.SelectedProfessionIds).ToList(),
                 Cities = request.Cities,
                 Skills = request.Skills,
                 SalarySourceTypes = request.SalarySourceTypes,
@@ -90,7 +90,7 @@ public class SalariesController : ControllerBase
                 Page = request.Page,
                 PageSize = request.PageSize,
                 Grade = request.Grade,
-                ProfessionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList(),
+                SelectedProfessionIds = new DeveloperProfessionsCollection(request.SelectedProfessionIds).ToList(),
                 Cities = request.Cities,
                 Skills = request.Skills,
                 SalarySourceTypes = request.SalarySourceTypes,

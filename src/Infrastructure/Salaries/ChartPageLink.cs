@@ -45,9 +45,9 @@ public record ChartPageLink
         if (_requestOrNull != null || _additionalQueryParams.Count > 0)
         {
             string queryParams = null;
-            if (_requestOrNull?.ProfessionsToInclude.Count > 0)
+            if (_requestOrNull?.SelectedProfessionIds.Count > 0)
             {
-                queryParams += $"?profsInclude={string.Join(",", _requestOrNull.ProfessionsToInclude)}";
+                queryParams += $"?profsInclude={string.Join(",", _requestOrNull.SelectedProfessionIds)}";
             }
 
             if (_requestOrNull?.Grade != null)

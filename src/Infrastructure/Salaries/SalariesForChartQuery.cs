@@ -84,7 +84,7 @@ public record SalariesForChartQuery
         : this(
             context,
             request.Grade,
-            request.ProfessionsToInclude,
+            request.SelectedProfessionIds,
             request.Skills,
             request.Cities,
             from,

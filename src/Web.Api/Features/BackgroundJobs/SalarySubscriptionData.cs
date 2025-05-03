@@ -19,13 +19,15 @@ public record SalarySubscriptionData
     private readonly DatabaseContext _context;
     private readonly SalariesForChartQuery _salariesForChartQuery;
 
+    private bool _isInitianlized;
+
     public TelegramBotUserCommandParameters FilterData { get; }
 
     public List<StatDataChangeSubscriptionRecord> LastCacheItems { get; private set; }
 
     public StatDataChangeSubscriptionRecord LastCacheItemOrNull { get; private set; }
 
-    public List<SalaryGraveValue> Salaries { get; private set; }
+    public List<SalaryBaseData> Salaries { get; private set; }
 
     public int TotalSalaryCount { get; private set; }
 
@@ -37,6 +39,7 @@ public record SalarySubscriptionData
     {
         _subscription = subscription;
         _context = context;
+        _isInitianlized = false;
 
         FilterData = new TelegramBotUserCommandParameters(
             allProfessions
@@ -52,7 +55,7 @@ public record SalarySubscriptionData
             now);
     }
 
-    public async Task<SalarySubscriptionData> Initialize(
+    public async Task<SalarySubscriptionData> InitializeAsync(
         CancellationToken cancellationToken)
     {
         LastCacheItems = await _context.StatDataChangeSubscriptionRecords
@@ -68,14 +71,28 @@ public record SalarySubscriptionData
         Salaries = await _salariesForChartQuery
             .ToQueryable(CompanyType.Local)
             .Where(x => x.Grade.HasValue)
-            .Select(x => new SalaryGraveValue
+            .Select(x => new SalaryBaseData
             {
+                ProfessionId = x.ProfessionId,
                 Grade = x.Grade.Value,
                 Value = x.Value,
+                CreatedAt = x.CreatedAt,
             })
             .ToListAsync(cancellationToken);
 
+        _isInitianlized = true;
         return this;
+    }
+
+    public SalarySubscriptionData IsInitializedOrFail()
+    {
+        if (_isInitianlized)
+        {
+            return this;
+        }
+
+        throw new InvalidOperationException(
+            $"SalarySubscriptionData is not initialized. Call {nameof(InitializeAsync)}() method first.");
     }
 
     public StatDataCacheItemSalaryData GetStatDataCacheItemSalaryData()

@@ -29,7 +29,7 @@ namespace Infrastructure.Currencies
             _logger = logger;
         }
 
-        public async Task<CurrencyContent> GetCurrencyAsync(
+        public async Task<CurrencyContent> GetCurrencyOrNullAsync(
             Currency currency,
             CancellationToken cancellationToken)
         {

@@ -1,19 +1,34 @@
-﻿namespace Web.Api.Integrations.OpenAiAnalysisIntegration;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Domain.Entities.StatData;
+using Domain.Extensions;
+
+namespace Web.Api.Integrations.OpenAiAnalysisIntegration;
 
 public record OpenAiBodyReportRoleSalaryData
 {
     public OpenAiBodyReportRoleSalaryData(
-        double average,
-        double median,
-        double min,
-        double max,
-        int count)
+        List<SalaryBaseData> salaries)
     {
-        Average = average;
-        Median = median;
-        Min = min;
-        Max = max;
-        Count = count;
+        if (salaries.Count == 0)
+        {
+            Average = 0;
+            Median = 0;
+            Min = null;
+            Max = null;
+            Count = 0;
+            return;
+        }
+
+        var salaryValues = salaries
+            .Select(x => x.Value)
+            .ToList();
+
+        Average = salaryValues.Average();
+        Median = salaryValues.Median();
+        Min = salaryValues.Min();
+        Max = salaryValues.Max();
+        Count = salaryValues.Count;
     }
 
     public double Average { get; }

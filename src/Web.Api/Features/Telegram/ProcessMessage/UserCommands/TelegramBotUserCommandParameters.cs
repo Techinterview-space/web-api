@@ -31,14 +31,14 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
     {
         Grade = null;
         SelectedProfessions = professionsToInclude;
-        ProfessionsToInclude = professionsToInclude
+        SelectedProfessionIds = professionsToInclude
             .Select(x => x.Id)
             .ToList();
     }
 
     public DeveloperGrade? Grade { get; }
 
-    public List<long> ProfessionsToInclude { get; } = new ();
+    public List<long> SelectedProfessionIds { get; } = new ();
 
     public List<long> Skills { get; } = new ();
 
@@ -55,7 +55,7 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
     public string GetKeyPostfix()
     {
         var grade = Grade?.ToString() ?? "all";
-        var professions = ProfessionsToInclude.Count == 0 ? "all" : string.Join("_", ProfessionsToInclude);
+        var professions = SelectedProfessionIds.Count == 0 ? "all" : string.Join("_", SelectedProfessionIds);
         return $"{grade}_{professions}";
     }
 

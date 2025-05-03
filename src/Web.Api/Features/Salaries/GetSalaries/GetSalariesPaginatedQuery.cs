@@ -17,7 +17,7 @@ public record GetSalariesPaginatedQuery
     public DeveloperGrade? Grade { get; init; }
 
     [FromQuery(Name = "profsInclude")]
-    public List<long> ProfessionsToInclude { get; init; } = new ();
+    public List<long> SelectedProfessionIds { get; init; } = new ();
 
     [FromQuery(Name = "cities")]
     public List<KazakhstanCity> Cities { get; init; } = new ();
@@ -35,12 +35,12 @@ public record GetSalariesPaginatedQuery
     public int? YearTo { get; init; }
 
     public bool HasAnyFilter =>
-        Grade.HasValue || ProfessionsToInclude.Count > 0 || Cities.Count > 0;
+        Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;
 
     public string GetKeyPostfix()
     {
         var grade = Grade?.ToString() ?? "all";
-        var professions = ProfessionsToInclude.Count == 0 ? "all" : string.Join("_", ProfessionsToInclude);
+        var professions = SelectedProfessionIds.Count == 0 ? "all" : string.Join("_", SelectedProfessionIds);
         return $"{grade}_{professions}";
     }
 }

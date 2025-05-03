@@ -64,10 +64,9 @@ public class StatDataChangeSubscriptionCalculateJob
         }
 
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
-        var usdCurrency = (await _currencyService.GetCurrenciesAsync(
-            [Currency.USD],
-            cancellationToken))
-            .FirstOrDefault();
+        var usdCurrencyOrNull = await _currencyService.GetCurrencyOrNullAsync(
+            Currency.USD,
+            cancellationToken);
 
         var listOfDataToBeSent = new List<(StatDataChangeSubscriptionRecord Item, TelegramBotReplyData Data)>();
         var now = DateTimeOffset.Now;
@@ -79,7 +78,7 @@ public class StatDataChangeSubscriptionCalculateJob
                     subscription: subscription,
                     context: _context,
                     now: now)
-                .Initialize(cancellationToken);
+                .InitializeAsync(cancellationToken);
 
             var lastCacheItemOrNull = subscriptionData.LastCacheItemOrNull;
             if (subscriptionData.Salaries.Count == 0)
@@ -125,10 +124,10 @@ public class StatDataChangeSubscriptionCalculateJob
                     }
                 }
 
-                if (usdCurrency != null)
+                if (usdCurrencyOrNull != null)
                 {
-                    var currencyValue = (median / usdCurrency.Value).ToString("N0", CultureInfo.InvariantCulture);
-                    line += $"(~{currencyValue}{usdCurrency.CurrencyString}) ";
+                    var currencyValue = (median / usdCurrencyOrNull.Value).ToString("N0", CultureInfo.InvariantCulture);
+                    line += $"(~{currencyValue}{usdCurrencyOrNull.CurrencyString}) ";
                 }
 
                 line = line.Trim();

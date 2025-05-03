@@ -1,22 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domain.Entities.Salaries;
-using Domain.Entities.StatData;
+using Web.Api.Features.BackgroundJobs;
 
 namespace Web.Api.Integrations.OpenAiAnalysisIntegration;
 
 public record OpenAiBodyReport
 {
-    private readonly List<long> _professions;
-    private readonly Currency _currency;
+    private readonly SalarySubscriptionData _subscriptionData;
 
     public OpenAiBodyReport(
-        List<long> professions,
-        List<StatDataChangeSubscriptionRecord> subscriptionStatData,
+        SalarySubscriptionData subscriptionData,
         Currency currency)
     {
-        _professions = professions;
-        _currency = currency;
-        ReportMetadata = new OpenAiBodyReportMetadata(_currency);
+        _subscriptionData = subscriptionData.IsInitializedOrFail();
+        ReportMetadata = new OpenAiBodyReportMetadata(currency);
+        Roles = new List<OpenAiBodyReportRole>();
+
+        var now = DateTimeOffset.UtcNow;
+
+        foreach (var profession in subscriptionData.FilterData.SelectedProfessions)
+        {
+            var salariesForProfession = subscriptionData.Salaries
+                .Where(x => x.ProfessionId == profession.Id)
+                .ToList();
+
+            Roles.Add(
+                new OpenAiBodyReportRole(
+                    profession,
+                    salariesForProfession,
+                    now));
+        }
     }
 
     public OpenAiBodyReportMetadata ReportMetadata { get; }

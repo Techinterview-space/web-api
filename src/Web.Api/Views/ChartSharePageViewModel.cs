@@ -24,10 +24,10 @@ public record ChartSharePageViewModel
         if (requestParams.HasAnyFilter)
         {
             description = "Специалисты ";
-            if (requestParams.ProfessionsToInclude.Count > 0)
+            if (requestParams.SelectedProfessionIds.Count > 0)
             {
                 description += string.Join(", ", professionsToInclude);
-                queryParams += $"?profsInclude={string.Join(",", requestParams.ProfessionsToInclude)}";
+                queryParams += $"?profsInclude={string.Join(",", requestParams.SelectedProfessionIds)}";
             }
 
             if (requestParams.Grade.HasValue)

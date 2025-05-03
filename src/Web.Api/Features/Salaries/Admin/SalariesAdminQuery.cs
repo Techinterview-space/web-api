@@ -58,7 +58,7 @@ public record SalariesAdminQuery
     {
         _query = _query
             .When(queryParams.Grade.HasValue, x => x.Grade == queryParams.Grade.Value)
-            .When(queryParams.ProfessionsToInclude.Count > 0, x => x.ProfessionId.HasValue && queryParams.ProfessionsToInclude.Contains(x.ProfessionId.Value))
+            .When(queryParams.SelectedProfessionIds.Count > 0, x => x.ProfessionId.HasValue && queryParams.SelectedProfessionIds.Contains(x.ProfessionId.Value))
             .When(queryParams.Cities.Count > 0, x => x.City.HasValue && queryParams.Cities.Contains(x.City.Value))
             .When(queryParams.Skills.Count > 0, x => x.SkillId != null && queryParams.Skills.Contains(x.SkillId.Value));
 

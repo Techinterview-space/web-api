@@ -19,7 +19,7 @@ public record StatDataCacheItemSalaryData
     }
 
     public StatDataCacheItemSalaryData(
-        List<SalaryGraveValue> values,
+        List<SalaryBaseData> values,
         int totalCount)
     {
         var salaryValues = values

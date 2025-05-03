@@ -21,9 +21,9 @@ public class QaAndTestersTelegramBotUserCommandParametersTests
 
         var target = new QaAndTestersTelegramBotUserCommandParameters(professions);
 
-        Assert.Equal(3, target.ProfessionsToInclude.Count);
-        Assert.Equal(professions[0].Id, target.ProfessionsToInclude[0]);
-        Assert.Equal(professions[1].Id, target.ProfessionsToInclude[1]);
-        Assert.Equal(professions[2].Id, target.ProfessionsToInclude[2]);
+        Assert.Equal(3, target.SelectedProfessionIds.Count);
+        Assert.Equal(professions[0].Id, target.SelectedProfessionIds[0]);
+        Assert.Equal(professions[1].Id, target.SelectedProfessionIds[1]);
+        Assert.Equal(professions[2].Id, target.SelectedProfessionIds[2]);
     }
 }
