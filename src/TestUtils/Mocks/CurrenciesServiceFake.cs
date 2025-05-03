@@ -38,7 +38,7 @@ public class CurrenciesServiceFake : ICurrencyService
         _currencies = currencies;
     }
 
-    public Task<CurrencyContent> GetCurrencyAsync(
+    public Task<CurrencyContent> GetCurrencyOrNullAsync(
         Currency currency,
         CancellationToken cancellationToken)
     {

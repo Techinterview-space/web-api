@@ -19,13 +19,18 @@ public record StatDataCacheItemSalaryData
     }
 
     public StatDataCacheItemSalaryData(
-        List<SalaryGraveValue> values,
+        List<SalaryBaseData> values,
         int totalCount)
     {
-        var salaryValues = values.Select(x => x.Value).ToList();
+        var salaryValues = values
+            .Select(x => x.Value)
+            .ToList();
+
         MedianLocalSalary = salaryValues.Median();
         AverageLocalSalary = salaryValues.Count > 0 ? salaryValues.Average() : 0;
         TotalSalaryCount = totalCount;
+        MinLocalSalary = salaryValues.Count > 0 ? salaryValues.Min() : null;
+        MaxLocalSalary = salaryValues.Count > 0 ? salaryValues.Max() : null;
 
         MedianLocalSalaryByGrade = new Dictionary<GradeGroup, double>();
 
@@ -50,6 +55,10 @@ public record StatDataCacheItemSalaryData
     public double MedianLocalSalary { get; init; }
 
     public double AverageLocalSalary { get; init; }
+
+    public double? MinLocalSalary { get; init; }
+
+    public double? MaxLocalSalary { get; init; }
 
     public Dictionary<GradeGroup, double> MedianLocalSalaryByGrade { get; init; } = new ();
 

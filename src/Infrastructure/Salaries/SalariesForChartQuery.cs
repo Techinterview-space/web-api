@@ -12,11 +12,11 @@ namespace Infrastructure.Salaries;
 
 public record SalariesForChartQuery
 {
+    public const int MonthsToShow = 18;
+
     public DateQuarter CurrentQuarter { get; }
 
     public DeveloperGrade? Grade { get; }
-
-    public List<long> ProfessionsToInclude { get; }
 
     public List<long> Skills { get; }
 
@@ -32,6 +32,7 @@ public record SalariesForChartQuery
 
     public int? YearTo { get; }
 
+    private readonly List<long> _selectedProfessionIds;
     private readonly DatabaseContext _context;
 
     public SalariesForChartQuery(
@@ -48,7 +49,7 @@ public record SalariesForChartQuery
     {
         _context = context;
         Grade = grade;
-        ProfessionsToInclude = professionsToInclude ?? new List<long>();
+        _selectedProfessionIds = professionsToInclude ?? new List<long>();
         Skills = skills ?? new List<long>();
 
         Cities = cities ?? new List<KazakhstanCity>();
@@ -69,7 +70,7 @@ public record SalariesForChartQuery
         : this(
             context,
             request,
-            now.AddMonths(-18),
+            now.AddMonths(-MonthsToShow),
             now)
     {
     }
@@ -82,7 +83,7 @@ public record SalariesForChartQuery
         : this(
             context,
             request.Grade,
-            request.ProfessionsToInclude,
+            request.SelectedProfessionIds,
             request.Skills,
             request.Cities,
             from,
@@ -179,8 +180,8 @@ public record SalariesForChartQuery
                 Skills.Count > 0,
                 x => x.SkillId != null && Skills.Contains(x.SkillId.Value))
             .When(
-                ProfessionsToInclude.Count > 0,
-                x => x.ProfessionId != null && ProfessionsToInclude.Contains(x.ProfessionId.Value));
+                _selectedProfessionIds.Count > 0,
+                x => x.ProfessionId != null && _selectedProfessionIds.Contains(x.ProfessionId.Value));
 
         return query;
     }

@@ -64,8 +64,8 @@ public class StatDataChangeSubscriptionCalculateJob
         }
 
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
-        var currencies = await _currencyService.GetCurrenciesAsync(
-            [Currency.USD],
+        var usdCurrencyOrNull = await _currencyService.GetCurrencyOrNullAsync(
+            Currency.USD,
             cancellationToken);
 
         var listOfDataToBeSent = new List<(StatDataChangeSubscriptionRecord Item, TelegramBotReplyData Data)>();
@@ -73,53 +73,31 @@ public class StatDataChangeSubscriptionCalculateJob
 
         foreach (var subscription in subscriptions)
         {
-            var lastCacheItemOrNull = await _context.StatDataChangeSubscriptionRecords
-                .AsNoTracking()
-                .Where(x => x.SubscriptionId == subscription.Id)
-                .OrderByDescending(x => x.CreatedAt)
-                .FirstOrDefaultAsync(cancellationToken);
+            var subscriptionData = await new SalarySubscriptionData(
+                    allProfessions: allProfessions,
+                    subscription: subscription,
+                    context: _context,
+                    now: now)
+                .InitializeAsync(cancellationToken);
 
-            var filterData = new TelegramBotUserCommandParameters(
-                allProfessions
-                    .When(
-                        subscription.ProfessionIds != null &&
-                        subscription.ProfessionIds.Count > 0,
-                        x => subscription.ProfessionIds.Contains(x.Id))
-                    .ToList());
-
-            var salariesQuery = new SalariesForChartQuery(
-                _context,
-                filterData,
-                now);
-
-            var totalCount = await salariesQuery.CountAsync(cancellationToken);
-            var salaries = await salariesQuery
-                .ToQueryable(CompanyType.Local)
-                .Where(x => x.Grade.HasValue)
-                .Select(x => new SalaryGraveValue
-                {
-                    Grade = x.Grade.Value,
-                    Value = x.Value,
-                })
-                .ToListAsync(cancellationToken);
-
-            var salariesChartPageLink = new ChartPageLink(_global, filterData)
-                .AddQueryParam("utm_source", subscription.TelegramChatId.ToString())
-                .AddQueryParam("utm_campaign", "telegram-regular-stats-update");
-
-            if (salaries.Count == 0)
+            var lastCacheItemOrNull = subscriptionData.LastCacheItemOrNull;
+            if (subscriptionData.Salaries.Count == 0)
             {
-                // TODO log
+                Logger.LogInformation(
+                    "No salaries found for subscription {SubscriptionId} ({Name}). Skipping notification.",
+                    subscription.Id,
+                    subscription.Name);
+
                 continue;
             }
 
-            var professions = filterData.GetProfessionsTitleOrNull();
+            var professions = subscriptionData.FilterData.GetProfessionsTitleOrNull();
             var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n\n";
 
             var hasAnyDifference = lastCacheItemOrNull == null;
             foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
-                var median = salaries
+                var median = subscriptionData.Salaries
                     .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
                     .Select(x => x.Value)
                     .Median();
@@ -132,39 +110,36 @@ public class StatDataChangeSubscriptionCalculateJob
 
                 line += $"<b>{median.ToString("N0", CultureInfo.InvariantCulture)}</b> тг. ";
 
-                if (lastCacheItemOrNull is not null)
+                var oldGradeValue = lastCacheItemOrNull?.Data.GetMedianLocalSalaryByGrade(gradeGroup);
+                if (oldGradeValue is > 0)
                 {
-                    var oldGradeValue = lastCacheItemOrNull.Data.GetMedianLocalSalaryByGrade(gradeGroup);
-                    if (oldGradeValue is > 0)
+                    var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
+
+                    if (diffInPercent is > 0 or < 0)
                     {
-                        var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
+                        hasAnyDifference = true;
 
-                        if (diffInPercent is > 0 or < 0)
-                        {
-                            hasAnyDifference = hasAnyDifference || true;
-
-                            var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
-                            line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
-                        }
+                        var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
+                        line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
                     }
                 }
 
-                foreach (var currencyContent in currencies)
+                if (usdCurrencyOrNull != null)
                 {
-                    var currencyValue = (median / currencyContent.Value).ToString("N0", CultureInfo.InvariantCulture);
-                    line += $"(~{currencyValue}{currencyContent.CurrencyString}) ";
+                    var currencyValue = (median / usdCurrencyOrNull.Value).ToString("N0", CultureInfo.InvariantCulture);
+                    line += $"(~{currencyValue}{usdCurrencyOrNull.CurrencyString}) ";
                 }
 
                 line = line.Trim();
                 textMessageToBeSent += line + "\n";
             }
 
-            var calculatedBasedOnLine = $"Рассчитано на основе {totalCount} анкет(ы)";
+            var calculatedBasedOnLine = $"Рассчитано на основе {subscriptionData.TotalSalaryCount} анкет(ы)";
 
             if (lastCacheItemOrNull is not null &&
-                totalCount > lastCacheItemOrNull.Data.TotalSalaryCount)
+                subscriptionData.TotalSalaryCount > lastCacheItemOrNull.Data.TotalSalaryCount)
             {
-                calculatedBasedOnLine += $" (+{totalCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
+                calculatedBasedOnLine += $" (+{subscriptionData.TotalSalaryCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
             }
 
             if (!hasAnyDifference &&
@@ -177,6 +152,10 @@ public class StatDataChangeSubscriptionCalculateJob
 
                 continue;
             }
+
+            var salariesChartPageLink = GetChartPageLink(
+                subscription,
+                subscriptionData.FilterData);
 
             textMessageToBeSent +=
                 $"\n<em>{calculatedBasedOnLine}</em>" +
@@ -192,10 +171,8 @@ public class StatDataChangeSubscriptionCalculateJob
 
             var subscriptionRecord = new StatDataChangeSubscriptionRecord(
                 subscription,
-                lastCacheItemOrNull,
-                new StatDataCacheItemSalaryData(
-                    salaries,
-                    totalCount));
+                subscriptionData.LastCacheItemOrNull,
+                subscriptionData.GetStatDataCacheItemSalaryData());
 
             _context.Add(subscriptionRecord);
             listOfDataToBeSent.Add((subscriptionRecord, dataTobeSent));
@@ -252,6 +229,15 @@ public class StatDataChangeSubscriptionCalculateJob
         {
             await _context.TrySaveChangesAsync(cancellationToken);
         }
+    }
+
+    private ChartPageLink GetChartPageLink(
+        StatDataChangeSubscription subscription,
+        TelegramBotUserCommandParameters filterData)
+    {
+        return new ChartPageLink(_global, filterData)
+            .AddQueryParam("utm_source", subscription.TelegramChatId.ToString())
+            .AddQueryParam("utm_campaign", "telegram-regular-stats-update");
     }
 
     private async Task<StatDataChangeSubscriptionCalculateJobSendTgData> TrySendTelegramMessageAsync(

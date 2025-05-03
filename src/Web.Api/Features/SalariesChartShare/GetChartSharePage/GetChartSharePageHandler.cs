@@ -38,12 +38,12 @@ namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
             GetChartSharePageQuery request,
             CancellationToken cancellationToken)
         {
-            var professionsToInclude = new DeveloperProfessionsCollection(request.ProfessionsToInclude).ToList();
+            var professionsToInclude = new DeveloperProfessionsCollection(request.SelectedProfessionIds).ToList();
             var chartResponse = await _mediator.Send(
                 new GetSalariesChartQuery
                 {
                     Grade = request.Grade,
-                    ProfessionsToInclude = professionsToInclude,
+                    SelectedProfessionIds = professionsToInclude,
                     Cities = request.Cities,
                 },
                 cancellationToken);

@@ -101,11 +101,11 @@ public class GetSurveyHistoricalChartHandler
                                 x.LastSalaryOrNull.SkillId != null &&
                                 request.Skills.Contains(x.LastSalaryOrNull.SkillId.Value))
                         .When(
-                            request.ProfessionsToInclude.Count > 0,
+                            request.SelectedProfessionIds.Count > 0,
                             x =>
                                 x.LastSalaryOrNull != null &&
                                 x.LastSalaryOrNull.ProfessionId != null &&
-                                request.ProfessionsToInclude.Contains(x.LastSalaryOrNull.ProfessionId.Value))
+                                request.SelectedProfessionIds.Contains(x.LastSalaryOrNull.ProfessionId.Value))
                         .Select(x => new SurveyDatabaseData
                         {
                             UsefulnessRating = x.UsefulnessRating,

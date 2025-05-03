@@ -9,6 +9,7 @@ using Infrastructure.Services.Files;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
+using Infrastructure.Services.OpenAi;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
@@ -26,18 +27,18 @@ public static class ServiceRegistration
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddHttpContextAccessor();
-        services.AddScoped<IHttpContext, AppHttpContext>();
-        services.AddScoped<IAuthorization, AuthorizationService>();
-        services.AddScoped<IGlobal, Global>();
-        services.AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>();
-
-        services.AddScoped<IPdf, QuestPdfBasedRender>();
-        services.AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>();
-        services.AddTransient<TelegramBotClientProvider>();
-        services.AddTransient<TelegramBotService>();
-        services.AddTransient<ICurrencyService, CurrencyService>();
-        services.AddTransient<IProfessionsCacheService, ProfessionsCacheService>();
+        services.AddHttpContextAccessor()
+            .AddScoped<IHttpContext, AppHttpContext>()
+            .AddScoped<IAuthorization, AuthorizationService>()
+            .AddScoped<IGlobal, Global>()
+            .AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>()
+            .AddScoped<IPdf, QuestPdfBasedRender>()
+            .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
+            .AddScoped<IOpenAiService, OpenAiService>()
+            .AddTransient<TelegramBotClientProvider>()
+            .AddTransient<TelegramBotService>()
+            .AddTransient<ICurrencyService, CurrencyService>()
+            .AddTransient<IProfessionsCacheService, ProfessionsCacheService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

@@ -298,10 +298,12 @@ Last name: {message.From?.LastName}";
                 var salaries = await salariesQuery
                     .ToQueryable(CompanyType.Local)
                     .Where(x => x.Grade != null)
-                    .Select(x => new SalaryGraveValue
+                    .Select(x => new SalaryBaseData
                     {
+                        ProfessionId = x.ProfessionId,
                         Grade = x.Grade.Value,
                         Value = x.Value,
+                        CreatedAt = x.CreatedAt,
                     })
                     .ToListAsync(cancellationToken);
 
@@ -317,17 +319,13 @@ Last name: {message.From?.LastName}";
         string replyText;
         if (salaries.Count > 0)
         {
-            var currencyContentOrNull = await _currencyService.GetCurrencyAsync(
+            var currencyContentOrNull = await _currencyService.GetCurrencyOrNullAsync(
                 Currency.USD,
                 cancellationToken);
 
-            var gradeGroups = EnumHelper
-                     .Values<GradeGroup>()
-                     .Where(x => x is not(GradeGroup.Undefined or GradeGroup.Trainee));
-
             replyText = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
 
-            foreach (var gradeGroup in gradeGroups)
+            foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
                 var median = salaries
                                 .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
