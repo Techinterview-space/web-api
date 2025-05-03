@@ -12,6 +12,8 @@ namespace Infrastructure.Salaries;
 
 public record SalariesForChartQuery
 {
+    public const int MonthsToShow = 18;
+
     public DateQuarter CurrentQuarter { get; }
 
     public DeveloperGrade? Grade { get; }
@@ -69,7 +71,7 @@ public record SalariesForChartQuery
         : this(
             context,
             request,
-            now.AddMonths(-18),
+            now.AddMonths(-MonthsToShow),
             now)
     {
     }

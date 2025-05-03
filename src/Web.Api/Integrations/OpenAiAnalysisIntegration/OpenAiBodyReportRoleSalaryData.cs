@@ -20,9 +20,9 @@ public record OpenAiBodyReportRoleSalaryData
 
     public double Median { get; }
 
-    public double Min { get; }
+    public double? Min { get; }
 
-    public double Max { get; }
+    public double? Max { get; }
 
     public int Count { get; }
 }
