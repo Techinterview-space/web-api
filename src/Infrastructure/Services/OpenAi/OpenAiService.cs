@@ -23,14 +23,14 @@ public class OpenAiService : IOpenAiService
 
     public string GetBearer()
     {
-        var secret = _configuration["OpenAiApi:Secret"];
+        var secret = _configuration["OpenAiApiSecret"];
         return new TechinterviewJwtTokenGenerator(secret).ToString();
     }
 
     public async Task<string> GetAnalysisAsync(
         CancellationToken cancellationToken = default)
     {
-        var apiUrl = _configuration["OpenAiApi:Url"];
+        var apiUrl = _configuration["OpenAiApiUrl"];
         if (string.IsNullOrEmpty(apiUrl))
         {
             throw new InvalidOperationException("OpenAI API url is not set");
