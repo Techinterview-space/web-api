@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
+using Infrastructure.Salaries;
+using Infrastructure.Services.OpenAi.Models;
 using Infrastructure.Services.Professions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.BackgroundJobs;
-using Web.Api.Integrations.OpenAiAnalysisIntegration;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReport;
 

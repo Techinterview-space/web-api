@@ -2,7 +2,7 @@
 using Infrastructure.Services.Global;
 using Telegram.Bot.Types.Enums;
 
-namespace Web.Api.Features.Telegram.ProcessMessage.ReplyMessages;
+namespace Infrastructure.Services.Telegram.ReplyMessages;
 
 public record HelpCommandMessageBuilder
 {

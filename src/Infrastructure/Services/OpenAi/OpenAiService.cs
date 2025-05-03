@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Infrastructure.Jwt;
+using Infrastructure.Services.OpenAi.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +30,7 @@ public class OpenAiService : IOpenAiService
     }
 
     public async Task<string> GetAnalysisAsync(
+        OpenAiBodyReport report,
         CancellationToken cancellationToken = default)
     {
         var apiUrl = _configuration["OpenAiApiUrl"];
@@ -45,8 +48,28 @@ public class OpenAiService : IOpenAiService
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", GetBearer());
 
-            responseContent = await client.GetStringAsync(string.Empty, cancellationToken);
-            return responseContent;
+            var response = await client.SendAsync(
+                new HttpRequestMessage(
+                    HttpMethod.Post,
+                    string.Empty)
+                {
+                    Content = JsonContent.Create(report),
+                },
+                cancellationToken);
+
+            responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (response.IsSuccessStatusCode)
+            {
+                return responseContent;
+            }
+
+            _logger.LogError(
+                "Failed request to OpenAI {Url}. Status {Status}, Response {Response}",
+                apiUrl,
+                response.StatusCode,
+                responseContent);
+
+            return string.Empty;
         }
         catch (Exception e)
         {

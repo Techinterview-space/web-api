@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Domain.Entities.Salaries;
+﻿using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
 
-namespace Web.Api.Integrations.OpenAiAnalysisIntegration;
+namespace Infrastructure.Services.OpenAi.Models;
 
 public record OpenAiBodyReportRole
 {

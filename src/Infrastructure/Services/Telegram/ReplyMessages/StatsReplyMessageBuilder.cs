@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Infrastructure.Database;
+﻿using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types.Enums;
 
-namespace Web.Api.Features.Telegram.ProcessMessage.ReplyMessages;
+namespace Infrastructure.Services.Telegram.ReplyMessages;
 
 public class StatsReplyMessageBuilder
 {

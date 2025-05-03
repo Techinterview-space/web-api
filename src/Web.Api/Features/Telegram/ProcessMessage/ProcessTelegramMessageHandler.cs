@@ -14,6 +14,8 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
+using Infrastructure.Services.Telegram.ReplyMessages;
+using Infrastructure.Services.Telegram.UserCommands;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -23,8 +25,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using Web.Api.Features.Telegram.ProcessMessage.ReplyMessages;
-using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
 namespace Web.Api.Features.Telegram.ProcessMessage;
 

@@ -1,6 +1,6 @@
 ﻿using System;
+using Infrastructure.Services.OpenAi.Models;
 using MediatR;
-using Web.Api.Integrations.OpenAiAnalysisIntegration;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReport;
 

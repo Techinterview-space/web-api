@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Domain.Entities.Salaries;
-using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
+using Infrastructure.Services.Telegram.UserCommands;
 using Xunit;
 
 namespace InfrastructureTests.Telegram;

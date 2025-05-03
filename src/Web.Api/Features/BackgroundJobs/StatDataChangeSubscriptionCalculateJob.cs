@@ -12,6 +12,8 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
+using Infrastructure.Services.Telegram.ReplyMessages;
+using Infrastructure.Services.Telegram.UserCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -19,7 +21,6 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
 using Web.Api.Features.Telegram;
 using Web.Api.Features.Telegram.ProcessMessage;
-using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
 namespace Web.Api.Features.BackgroundJobs;
 

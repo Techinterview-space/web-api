@@ -1,7 +1,6 @@
-﻿using System;
-using Domain.Entities.Salaries;
+﻿using Domain.Entities.Salaries;
 
-namespace Web.Api.Integrations.OpenAiAnalysisIntegration;
+namespace Infrastructure.Services.OpenAi.Models;
 
 public record OpenAiBodyReportMetadata
 {

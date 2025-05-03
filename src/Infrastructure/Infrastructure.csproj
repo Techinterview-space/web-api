@@ -40,4 +40,8 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\Telegram\" />
+    </ItemGroup>
+
 </Project>

@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
+using Infrastructure.Salaries;
 using Infrastructure.Services.OpenAi;
+using Infrastructure.Services.OpenAi.Models;
 using Infrastructure.Services.Professions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.BackgroundJobs;
-using Web.Api.Integrations.OpenAiAnalysisIntegration;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 
@@ -49,9 +49,10 @@ public class GetOpenAiReportAnalysisHandler : IRequestHandler<GetOpenAiReportAna
                 DateTimeOffset.UtcNow)
             .InitializeAsync(cancellationToken);
 
+        var report = new OpenAiBodyReport(data, Currency.KZT);
         return new GetOpenAiReportAnalysisResponse(
-            await _openApiService.GetAnalysisAsync(cancellationToken),
-            new OpenAiBodyReport(data, Currency.KZT),
+            await _openApiService.GetAnalysisAsync(report, cancellationToken),
+            report,
             _openApiService.GetBearer());
     }
 }

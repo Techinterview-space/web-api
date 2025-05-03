@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Entities.Salaries;
+﻿using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
 using Domain.Extensions;
 using Infrastructure.Database;
-using Infrastructure.Salaries;
+using Infrastructure.Services.Telegram.UserCommands;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Telegram.ProcessMessage.UserCommands;
 
-namespace Web.Api.Features.BackgroundJobs;
+namespace Infrastructure.Salaries;
 
 public record SalarySubscriptionData
 {

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Domain.Entities.Enums;
+﻿using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.ValueObjects;
-using Infrastructure.Salaries;
 
-namespace Web.Api.Features.Telegram.ProcessMessage.UserCommands;
+namespace Infrastructure.Services.Telegram.UserCommands;
 
 public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 {

@@ -1,4 +1,4 @@
-﻿using Web.Api.Integrations.OpenAiAnalysisIntegration;
+﻿using Infrastructure.Services.OpenAi.Models;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 

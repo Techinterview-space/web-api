@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Domain.Entities.Salaries;
+﻿using Domain.Entities.Salaries;
 
-namespace Web.Api.Features.Telegram.ProcessMessage.UserCommands;
+namespace Infrastructure.Services.Telegram.UserCommands;
 
 public record ProductManagersTelegramBotUserCommandParameters
     : TelegramBotUserCommandParameters
