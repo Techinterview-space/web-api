@@ -97,6 +97,7 @@ public record SalarySubscriptionData
 
     public StatDataCacheItemSalaryData GetStatDataCacheItemSalaryData()
     {
+        IsInitializedOrFail();
         return new StatDataCacheItemSalaryData(
             Salaries,
             TotalSalaryCount);
