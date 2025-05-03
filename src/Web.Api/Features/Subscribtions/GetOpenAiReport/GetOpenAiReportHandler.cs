@@ -38,15 +38,13 @@ public record GetOpenAiReportHandler : IRequestHandler<GetOpenAiReportQuery, Ope
             ?? throw new NotFoundException($"Subscription {request.SubscriptionId} not found");
 
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
+        var data = await new SalarySubscriptionData(
+            allProfessions,
+            subscription,
+            _context,
+            DateTimeOffset.UtcNow)
+            .InitializeAsync(cancellationToken);
 
-        var result = new OpenAiBodyReport(
-            new SalarySubscriptionData(
-                allProfessions,
-                subscription,
-                _context,
-                DateTimeOffset.UtcNow),
-            Currency.KZT);
-
-        return result;
+        return new OpenAiBodyReport(data, Currency.KZT);
     }
 }
