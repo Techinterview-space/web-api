@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using Infrastructure.Jwt;
 using Infrastructure.Services.OpenAi.Models;
 using Microsoft.Extensions.Configuration;
@@ -45,17 +46,14 @@ public class OpenAiService : IOpenAiService
             using var client = _httpClientFactory.CreateClient();
 
             client.BaseAddress = new Uri(apiUrl);
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", GetBearer());
+            var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", GetBearer());
+            request.Content = new StringContent(
+                JsonContent.Create(report).ToString(),
+                Encoding.UTF8,
+                "application/json");
 
-            var response = await client.SendAsync(
-                new HttpRequestMessage(
-                    HttpMethod.Post,
-                    string.Empty)
-                {
-                    Content = JsonContent.Create(report),
-                },
-                cancellationToken);
+            var response = await client.SendAsync(request, cancellationToken);
 
             responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
             if (response.IsSuccessStatusCode)
