@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using Infrastructure.Jwt;
 using Infrastructure.Services.OpenAi.Models;
 using Microsoft.Extensions.Configuration;
@@ -49,7 +50,7 @@ public class OpenAiService : IOpenAiService
             var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", GetBearer());
             request.Content = new StringContent(
-                JsonContent.Create(report).ToString(),
+                JsonSerializer.Serialize(report),
                 Encoding.UTF8,
                 "application/json");
 
