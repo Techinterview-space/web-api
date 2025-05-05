@@ -20,7 +20,7 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     /// </summary>
     public bool PreventNotificationIfNoDifference { get; protected set; }
 
-    public bool RequestAiAnalysis { get; protected set; }
+    public bool UseAiAnalysis { get; protected set; }
 
     public DateTimeOffset? DeletedAt { get; protected set; }
 

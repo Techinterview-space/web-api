@@ -19,7 +19,7 @@ public record StatDataChangeSubscriptionDto
         TelegramChatId = entity.TelegramChatId;
         ProfessionIds = entity.ProfessionIds;
         PreventNotificationIfNoDifference = entity.PreventNotificationIfNoDifference;
-        RequestAiAnalysis = entity.RequestAiAnalysis;
+        UseAiAnalysis = entity.UseAiAnalysis;
         DeletedAt = entity.DeletedAt;
         CreatedAt = entity.CreatedAt;
         UpdatedAt = entity.UpdatedAt;
@@ -35,7 +35,7 @@ public record StatDataChangeSubscriptionDto
 
     public bool PreventNotificationIfNoDifference { get; init; }
 
-    public bool RequestAiAnalysis { get; init; }
+    public bool UseAiAnalysis { get; init; }
 
     public DateTimeOffset? DeletedAt { get; init; }
 
@@ -50,7 +50,7 @@ public record StatDataChangeSubscriptionDto
         TelegramChatId = x.TelegramChatId,
         ProfessionIds = x.ProfessionIds,
         PreventNotificationIfNoDifference = x.PreventNotificationIfNoDifference,
-        RequestAiAnalysis = x.RequestAiAnalysis,
+        UseAiAnalysis = x.UseAiAnalysis,
         DeletedAt = x.DeletedAt,
         CreatedAt = x.CreatedAt,
         UpdatedAt = x.UpdatedAt,

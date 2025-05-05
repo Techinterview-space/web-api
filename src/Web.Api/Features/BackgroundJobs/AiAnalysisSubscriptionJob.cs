@@ -41,7 +41,7 @@ public class AiAnalysisSubscriptionJob
         var subscriptions = await _context.StatDataChangeSubscriptions
             .Where(x =>
                 x.DeletedAt == null &&
-                x.RequestAiAnalysis)
+                x.UseAiAnalysis)
             .ToListAsync(cancellationToken);
 
         if (subscriptions.Count == 0)

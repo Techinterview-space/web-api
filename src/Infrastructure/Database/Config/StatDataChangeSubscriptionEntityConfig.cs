@@ -27,7 +27,7 @@ public class StatDataChangeSubscriptionEntityConfig : IEntityTypeConfiguration<S
             .HasDefaultValue(false);
 
         builder
-            .Property(x => x.RequestAiAnalysis)
+            .Property(x => x.UseAiAnalysis)
             .IsRequired()
             .HasDefaultValue(false);
     }

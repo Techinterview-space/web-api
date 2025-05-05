@@ -163,7 +163,7 @@ public class StatDataChangeSubscriptionCalculateJob
                 $"\n<em>{calculatedBasedOnLine}</em>" +
                 $"\n<em>Разные графики и фильтры доступны по ссылке <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
 
-            if (subscription.RequestAiAnalysis)
+            if (subscription.UseAiAnalysis)
             {
                 var analysis = subscription.GetLastAiAnalysisRecordForTodayOrNull();
                 if (analysis != null)
