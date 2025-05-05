@@ -10,7 +10,7 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
 
     public virtual StatDataChangeSubscription Subscription { get; protected set; }
 
-    public string AitReportSource { get; protected set; }
+    public string AiReportSource { get; protected set; }
 
     public string AiReport { get; protected set; }
 
@@ -18,7 +18,7 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
 
     public AiAnalysisRecord(
         StatDataChangeSubscription subscription,
-        string aitReportSource,
+        string aiReportSource,
         string aiReport,
         double processingTimeMs)
     {
@@ -26,12 +26,12 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
         SubscriptionId = subscription.Id;
         Subscription = subscription;
 
-        aitReportSource = aitReportSource?.Trim();
+        aiReportSource = aiReportSource?.Trim();
         aiReport = aiReport?.Trim();
 
-        if (string.IsNullOrEmpty(aitReportSource))
+        if (string.IsNullOrEmpty(aiReportSource))
         {
-            throw new ArgumentNullException(nameof(aitReportSource));
+            throw new ArgumentNullException(nameof(aiReportSource));
         }
 
         if (string.IsNullOrEmpty(aiReport))
@@ -39,7 +39,7 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
             throw new ArgumentNullException(nameof(aiReport));
         }
 
-        AitReportSource = aitReportSource;
+        AiReportSource = aiReportSource;
         AiReport = aiReport;
         ProcessingTimeMs = processingTimeMs;
     }

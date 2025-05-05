@@ -17,7 +17,7 @@ public class AiAnalysisRecordEntityConfig : IEntityTypeConfiguration<AiAnalysisR
             .IsRequired();
 
         builder
-            .Property(x => x.AitReportSource)
+            .Property(x => x.AiReportSource)
             .IsRequired();
 
         builder

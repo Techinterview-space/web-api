@@ -46,8 +46,8 @@ public class AiAnalysisSubscriptionJob
 
         if (subscriptions.Count == 0)
         {
-            Logger.LogInformation(
-                "No Subscriptions found. Exiting job.");
+            Logger.LogInformation("No Subscriptions found. Exiting job.");
+            return;
         }
 
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
@@ -87,10 +87,10 @@ public class AiAnalysisSubscriptionJob
             }
 
             var analysis = new AiAnalysisRecord(
-                subscription,
-                response,
-                report.ToJson(),
-                elapsed.TotalMilliseconds);
+                subscription: subscription,
+                aiReportSource: report.ToJson(),
+                aiReport: response,
+                processingTimeMs: elapsed.TotalMilliseconds);
 
             results.Add(analysis);
         }
