@@ -19,9 +19,13 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     /// </summary>
     public bool PreventNotificationIfNoDifference { get; protected set; }
 
+    public bool RequestAiAnalysis { get; protected set; }
+
     public DateTimeOffset? DeletedAt { get; protected set; }
 
     public virtual List<StatDataChangeSubscriptionRecord> Records { get; protected set; }
+
+    public virtual List<AiAnalysisSubscriptionRecord> AiAnalysisSubscriptionRecords { get; protected set; }
 
     protected StatDataChangeSubscription()
     {

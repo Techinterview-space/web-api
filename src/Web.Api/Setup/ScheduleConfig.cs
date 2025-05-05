@@ -16,7 +16,8 @@ public static class ScheduleConfig
             .AddScheduler()
             .AddTransient<CurrenciesResetJob>()
             .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
-            .AddTransient<StatDataChangeSubscriptionCalculateJob>();
+            .AddTransient<StatDataChangeSubscriptionCalculateJob>()
+            .AddTransient<AiAnalysisSubscriptionJob>();
 
         return services;
     }
@@ -41,9 +42,16 @@ public static class ScheduleConfig
                 .Wednesday()
                 .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob));
 
+            // this job should go before StatDataChangeSubscriptionCalculateJob
+            scheduler
+                .Schedule<AiAnalysisSubscriptionJob>()
+                .DailyAt(5, 0)
+                .Wednesday()
+                .PreventOverlapping(nameof(AiAnalysisSubscriptionJob));
+
             scheduler
                 .Schedule<StatDataChangeSubscriptionCalculateJob>()
-                .EveryThirtySeconds()
+                .EveryMinute()
                 .When(() => Task.FromResult(Debugger.IsAttached))
                 .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob));
         });

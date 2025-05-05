@@ -1,7 +1,7 @@
 ﻿using System;
 using Domain.Entities.StatData;
 
-namespace Web.Api.Features.BackgroundJobs;
+namespace Web.Api.Features.BackgroundJobs.Models;
 
 public record StatDataChangeSubscriptionCalculateJobSendTgData
 {

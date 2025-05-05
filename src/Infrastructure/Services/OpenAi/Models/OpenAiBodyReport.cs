@@ -34,4 +34,9 @@ public record OpenAiBodyReport
     public OpenAiBodyReportMetadata ReportMetadata { get; }
 
     public List<OpenAiBodyReportRole> Roles { get; }
+
+    public string ToJson()
+    {
+        return System.Text.Json.JsonSerializer.Serialize(this);
+    }
 }

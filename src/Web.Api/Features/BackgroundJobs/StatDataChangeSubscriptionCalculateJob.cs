@@ -19,8 +19,8 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
+using Web.Api.Features.BackgroundJobs.Models;
 using Web.Api.Features.Telegram;
-using Web.Api.Features.Telegram.ProcessMessage;
 
 namespace Web.Api.Features.BackgroundJobs;
 

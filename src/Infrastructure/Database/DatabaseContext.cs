@@ -59,6 +59,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<CompanyReview> CompanyReviews { get; set; }
 
+    public DbSet<AiAnalysisSubscriptionRecord> CompanyReviewComments { get; set; }
+
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel
