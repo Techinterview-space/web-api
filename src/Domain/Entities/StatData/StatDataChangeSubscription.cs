@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Entities.StatData;
 
@@ -19,9 +20,13 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     /// </summary>
     public bool PreventNotificationIfNoDifference { get; protected set; }
 
+    public bool UseAiAnalysis { get; protected set; }
+
     public DateTimeOffset? DeletedAt { get; protected set; }
 
     public virtual List<StatDataChangeSubscriptionRecord> Records { get; protected set; }
+
+    public virtual List<AiAnalysisRecord> AiAnalysisRecords { get; protected set; }
 
     protected StatDataChangeSubscription()
     {
@@ -56,5 +61,19 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     {
         TelegramChatId = telegramChatId;
         UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public AiAnalysisRecord GetLastAiAnalysisRecordForTodayOrNull()
+    {
+        if (AiAnalysisRecords is null)
+        {
+            throw new InvalidOperationException("AI records are not loaded.");
+        }
+
+        var dayAgoEdge = DateTimeOffset.UtcNow.AddDays(-1);
+        return AiAnalysisRecords
+            .Where(x => x.CreatedAt >= dayAgoEdge)
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefault();
     }
 }

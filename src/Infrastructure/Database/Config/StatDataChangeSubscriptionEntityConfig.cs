@@ -25,5 +25,10 @@ public class StatDataChangeSubscriptionEntityConfig : IEntityTypeConfiguration<S
             .Property(x => x.PreventNotificationIfNoDifference)
             .IsRequired()
             .HasDefaultValue(false);
+
+        builder
+            .Property(x => x.UseAiAnalysis)
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }
