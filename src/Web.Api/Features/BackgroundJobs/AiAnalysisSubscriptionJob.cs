@@ -52,7 +52,7 @@ public class AiAnalysisSubscriptionJob
 
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
 
-        var results = new List<AiAnalysisSubscriptionRecord>();
+        var results = new List<AiAnalysisRecord>();
         foreach (var subscription in subscriptions)
         {
             var data = await new SalarySubscriptionData(
@@ -86,7 +86,7 @@ public class AiAnalysisSubscriptionJob
                 continue;
             }
 
-            var analysis = new AiAnalysisSubscriptionRecord(
+            var analysis = new AiAnalysisRecord(
                 subscription,
                 response,
                 report.ToJson(),

@@ -2,7 +2,7 @@
 
 namespace Domain.Entities.StatData;
 
-public class AiAnalysisSubscriptionRecord : HasDatesBase, IHasIdBase<Guid>
+public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
 
@@ -16,7 +16,7 @@ public class AiAnalysisSubscriptionRecord : HasDatesBase, IHasIdBase<Guid>
 
     public double ProcessingTimeMs { get; protected set; }
 
-    public AiAnalysisSubscriptionRecord(
+    public AiAnalysisRecord(
         StatDataChangeSubscription subscription,
         string aitReportSource,
         string aiReport,
@@ -48,7 +48,8 @@ public class AiAnalysisSubscriptionRecord : HasDatesBase, IHasIdBase<Guid>
     {
         return AiReport
             .Trim()
-            .Trim('`');
+            .Trim('`')
+            .Trim('\r', '\n');
     }
 
     public long GetChatId()
@@ -61,7 +62,7 @@ public class AiAnalysisSubscriptionRecord : HasDatesBase, IHasIdBase<Guid>
         return Subscription.TelegramChatId;
     }
 
-    protected AiAnalysisSubscriptionRecord()
+    protected AiAnalysisRecord()
     {
     }
 }

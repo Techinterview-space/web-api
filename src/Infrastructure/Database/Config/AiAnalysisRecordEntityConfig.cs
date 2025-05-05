@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Database.Config;
 
-public class AiAnalysisSubscriptionRecordEntityConfig : IEntityTypeConfiguration<AiAnalysisSubscriptionRecord>
+public class AiAnalysisRecordEntityConfig : IEntityTypeConfiguration<AiAnalysisRecord>
 {
     public void Configure(
-        EntityTypeBuilder<AiAnalysisSubscriptionRecord> builder)
+        EntityTypeBuilder<AiAnalysisRecord> builder)
     {
-        builder.ToTable("AiAnalysisSubscriptionRecords");
+        builder.ToTable("AiAnalysisRecords");
         builder.HasKey(x => x.Id);
 
         builder
@@ -22,7 +22,7 @@ public class AiAnalysisSubscriptionRecordEntityConfig : IEntityTypeConfiguration
 
         builder
             .HasOne(x => x.Subscription)
-            .WithMany(x => x.AiAnalysisSubscriptionRecords)
+            .WithMany(x => x.AiAnalysisRecords)
             .HasForeignKey(x => x.SubscriptionId);
     }
 }

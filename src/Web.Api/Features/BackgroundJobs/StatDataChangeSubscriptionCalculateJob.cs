@@ -55,6 +55,7 @@ public class StatDataChangeSubscriptionCalculateJob
         CancellationToken cancellationToken = default)
     {
         var subscriptions = await _context.StatDataChangeSubscriptions
+            .Include(x => x.AiAnalysisRecords)
             .Where(x => x.DeletedAt == null)
             .ToListAsync(cancellationToken);
 
@@ -160,8 +161,18 @@ public class StatDataChangeSubscriptionCalculateJob
 
             textMessageToBeSent +=
                 $"\n<em>{calculatedBasedOnLine}</em>" +
-                $"\n<em>Разные графики и фильтры доступны по ссылке <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>" +
-                $"\n\n#статистика_зарплат";
+                $"\n<em>Разные графики и фильтры доступны по ссылке <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
+
+            if (subscription.RequestAiAnalysis)
+            {
+                var analysis = subscription.GetLastAiAnalysisRecordForTodayOrNull();
+                if (analysis != null)
+                {
+                    textMessageToBeSent += $"\n\n<em>AI анализ:</em>\n{analysis.GetClearedReport()}";
+                }
+            }
+
+            textMessageToBeSent += "\n\n#статистика_зарплат";
 
             var dataTobeSent = new TelegramBotReplyData(
                 textMessageToBeSent.Trim(),
