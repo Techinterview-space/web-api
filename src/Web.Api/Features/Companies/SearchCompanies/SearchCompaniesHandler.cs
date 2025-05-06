@@ -32,7 +32,7 @@ public class SearchCompaniesHandler
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
         var userIsAdmin = user != null && user.Has(Role.Admin);
 
-        var searchQuery = request.SearchQuery?.Trim();
+        var searchQuery = request.SearchQuery?.Trim().ToLowerInvariant();
         var companies = await _context.Companies
             .AsNoTracking()
             .IncludeWhen(userIsAdmin, x => x.Reviews)
