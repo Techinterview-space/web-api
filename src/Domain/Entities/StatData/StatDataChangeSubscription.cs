@@ -83,7 +83,8 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
         int daysCount)
     {
         var latestMessageSentDifference = GetDifferenceBetweenNowAndLatestSentMessage();
-        return latestMessageSentDifference != null && latestMessageSentDifference.Value > TimeSpan.FromDays(daysCount);
+        return latestMessageSentDifference == null ||
+               latestMessageSentDifference.Value > TimeSpan.FromDays(daysCount);
     }
 
     public TimeSpan? GetDifferenceBetweenNowAndLatestSentMessage()
