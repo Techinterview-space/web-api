@@ -90,7 +90,7 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
     {
         if (StatDataChangeSubscriptionTgMessages is null)
         {
-            throw new InvalidOperationException("AI records are not loaded.");
+            throw new InvalidOperationException("StatDataChangeSubscriptionTgMessages are not loaded.");
         }
 
         var lastMessage = StatDataChangeSubscriptionTgMessages
