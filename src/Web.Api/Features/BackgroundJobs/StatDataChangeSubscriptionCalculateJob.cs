@@ -55,6 +55,7 @@ public class StatDataChangeSubscriptionCalculateJob
         CancellationToken cancellationToken = default)
     {
         var subscriptions = await _context.StatDataChangeSubscriptions
+            .Include(x => x.StatDataChangeSubscriptionTgMessages)
             .Include(x => x.AiAnalysisRecords)
             .Where(x => x.DeletedAt == null)
             .ToListAsync(cancellationToken);
@@ -145,7 +146,8 @@ public class StatDataChangeSubscriptionCalculateJob
             }
 
             if (!hasAnyDifference &&
-                subscription.PreventNotificationIfNoDifference)
+                subscription.PreventNotificationIfNoDifference &&
+                !subscription.LastMessageWasSentDaysAgo(24))
             {
                 Logger.LogInformation(
                     "No difference in salaries for subscription {SubscriptionId} ({Name}). Skipping notification.",
@@ -186,7 +188,7 @@ public class StatDataChangeSubscriptionCalculateJob
                 subscriptionData.LastCacheItemOrNull,
                 subscriptionData.GetStatDataCacheItemSalaryData());
 
-            _context.Add(subscriptionRecord);
+            _context.StatDataChangeSubscriptionRecords.Add(subscriptionRecord);
             listOfDataToBeSent.Add((subscriptionRecord, dataTobeSent));
         }
 
@@ -206,7 +208,7 @@ public class StatDataChangeSubscriptionCalculateJob
 
         var failedToSend = new List<(StatDataChangeSubscriptionRecord SubscriptionRecord, Exception Ex)>();
 
-        var hasAnySubscriptionToUpdate = false;
+        var shouldSaveDatabaseAgain = false;
         foreach (var data in listOfDataToBeSent)
         {
             var result = await TrySendTelegramMessageAsync(
@@ -219,12 +221,21 @@ public class StatDataChangeSubscriptionCalculateJob
             {
                 failedToSend.Add((data.Item, result.RaisedException));
             }
+            else
+            {
+                _context.StatDataChangeSubscriptionTgMessages.Add(
+                    new StatDataChangeSubscriptionTgMessage(
+                        data.Item.Subscription,
+                        data.Data.ReplyText));
+
+                shouldSaveDatabaseAgain = true;
+            }
 
             if (result.HasSubscription)
             {
                 var subscription = result.SubscriptionToBeUpdated.Subscription;
                 subscription.ChangeChatId(result.SubscriptionToBeUpdated.ChatId);
-                hasAnySubscriptionToUpdate = true;
+                shouldSaveDatabaseAgain = true;
             }
         }
 
@@ -237,7 +248,7 @@ public class StatDataChangeSubscriptionCalculateJob
                     .Select(x => $"Subscription {x.SubscriptionRecord?.SubscriptionId}. Error {x.Ex.Message}. Type: {x.Ex.GetType().FullName}"));
         }
 
-        if (hasAnySubscriptionToUpdate)
+        if (shouldSaveDatabaseAgain)
         {
             await _context.TrySaveChangesAsync(cancellationToken);
         }

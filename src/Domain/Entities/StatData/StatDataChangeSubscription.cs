@@ -28,6 +28,8 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
 
     public virtual List<AiAnalysisRecord> AiAnalysisRecords { get; protected set; }
 
+    public virtual List<StatDataChangeSubscriptionTgMessage> StatDataChangeSubscriptionTgMessages { get; protected set; }
+
     protected StatDataChangeSubscription()
     {
     }
@@ -75,5 +77,32 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
             .Where(x => x.CreatedAt >= dayAgoEdge)
             .OrderByDescending(x => x.CreatedAt)
             .FirstOrDefault();
+    }
+
+    public bool LastMessageWasSentDaysAgo(
+        int daysCount)
+    {
+        var latestMessageSentDifference = GetDifferenceBetweenNowAndLatestSentMessage();
+        return latestMessageSentDifference != null && latestMessageSentDifference.Value > TimeSpan.FromDays(daysCount);
+    }
+
+    public TimeSpan? GetDifferenceBetweenNowAndLatestSentMessage()
+    {
+        if (StatDataChangeSubscriptionTgMessages is null)
+        {
+            throw new InvalidOperationException("AI records are not loaded.");
+        }
+
+        var lastMessage = StatDataChangeSubscriptionTgMessages
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefault();
+
+        if (lastMessage is null)
+        {
+            return null;
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        return now - lastMessage.CreatedAt;
     }
 }

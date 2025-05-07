@@ -61,6 +61,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<AiAnalysisRecord> AiAnalysisSubscriptionRecords { get; set; }
 
+    public DbSet<StatDataChangeSubscriptionTgMessage> StatDataChangeSubscriptionTgMessages { get; set; }
+
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel
