@@ -109,7 +109,7 @@ public class TelegramSubscriptionsController : ControllerBase
                 cancellationToken));
     }
 
-    [HttpGet("{id:guid}/send-updates")]
+    [HttpPost("{id:guid}/send-updates")]
     public async Task<IActionResult> SendUpdates(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)

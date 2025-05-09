@@ -35,14 +35,13 @@ public record SalarySubscriptionData
         _context = context;
         _isInitianlized = false;
 
-        FilterData = new TelegramBotUserCommandParameters(
-            allProfessions
-                .When(
-                    subscription.ProfessionIds != null &&
-                    subscription.ProfessionIds.Count > 0,
-                    x => subscription.ProfessionIds.Contains(x.Id))
-                .ToList());
+        var professionsToInclude = subscription.ProfessionIds != null && subscription.ProfessionIds.Count > 0
+            ? allProfessions
+                .Where(x => subscription.ProfessionIds.Contains(x.Id))
+                .ToList()
+            : new List<Profession>();
 
+        FilterData = new TelegramBotUserCommandParameters(professionsToInclude);
         _salariesForChartQuery = new SalariesForChartQuery(
             _context,
             FilterData,
