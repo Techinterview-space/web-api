@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Infrastructure.Services.Correlation;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Core;
@@ -39,6 +40,8 @@ public class ElkSerilog
             return new LoggerConfiguration()
                 .WriteTo.Elasticsearch(ElasticsearchSinkOptions())
                 .WriteTo.Console()
+                .Enrich.WithProperty("Environment", "prod")
+                .Enrich.With(new CorrelationIdEnricher())
                 .CreateLogger();
         }
         catch (Exception e)

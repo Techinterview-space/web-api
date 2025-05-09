@@ -5,6 +5,7 @@ using Infrastructure.Currencies;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
+using Infrastructure.Services.Correlation;
 using Infrastructure.Services.Files;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Web.Api.Features.Salaries.Providers;
 using Web.Api.Features.Telegram;
+using Web.Api.Services.Salaries;
 
 namespace Web.Api.Setup;
 
@@ -28,6 +30,7 @@ public static class ServiceRegistration
         IConfiguration configuration)
     {
         services.AddHttpContextAccessor()
+            .AddTransient<ICorrelationIdAccessor, CorrelationIdAccessor>()
             .AddScoped<IHttpContext, AppHttpContext>()
             .AddScoped<IAuthorization, AuthorizationService>()
             .AddScoped<IGlobal, Global>()
@@ -38,7 +41,8 @@ public static class ServiceRegistration
             .AddTransient<TelegramBotClientProvider>()
             .AddTransient<TelegramBotService>()
             .AddTransient<ICurrencyService, CurrencyService>()
-            .AddTransient<IProfessionsCacheService, ProfessionsCacheService>();
+            .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
+            .AddTransient<StatDataChangeSubscriptionService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

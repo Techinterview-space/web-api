@@ -12,6 +12,7 @@ using Web.Api.Features.Subscribtions.DeleteSubscription;
 using Web.Api.Features.Subscribtions.GetOpenAiReport;
 using Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
+using Web.Api.Features.Subscribtions.SendUpdatesToSubscriptionChat;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Subscribtions;
@@ -106,5 +107,17 @@ public class TelegramSubscriptionsController : ControllerBase
             await _mediator.Send(
                 new GetOpenAiReportQuery(id),
                 cancellationToken));
+    }
+
+    [HttpGet("{id:guid}/send-updates")]
+    public async Task<IActionResult> SendUpdates(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _mediator.Send(
+            new SendUpdatesToSubscriptionChatCommand(id),
+            cancellationToken);
+
+        return NoContent();
     }
 }
