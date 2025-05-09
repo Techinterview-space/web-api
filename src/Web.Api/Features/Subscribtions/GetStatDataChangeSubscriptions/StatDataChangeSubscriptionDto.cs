@@ -58,7 +58,9 @@ public record StatDataChangeSubscriptionDto
         ProfessionIds = x.ProfessionIds,
         PreventNotificationIfNoDifference = x.PreventNotificationIfNoDifference,
         LastMessageSent = x.StatDataChangeSubscriptionTgMessages != null && x.StatDataChangeSubscriptionTgMessages.Count > 0
-            ? x.StatDataChangeSubscriptionTgMessages.Last().CreatedAt
+            ? x.StatDataChangeSubscriptionTgMessages
+                .OrderBy(z => z.CreatedAt)
+                .Last().CreatedAt
             : null,
         UseAiAnalysis = x.UseAiAnalysis,
         DeletedAt = x.DeletedAt,

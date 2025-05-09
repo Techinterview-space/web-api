@@ -24,7 +24,7 @@ public class GetStatDataChangeSubscriptionsHandler
         CancellationToken cancellationToken)
     {
         return await _context.StatDataChangeSubscriptions
-            .Include(x => x.StatDataChangeSubscriptionTgMessages)
+            .Include(x => x.StatDataChangeSubscriptionTgMessages.OrderBy(z => z.CreatedAt))
             .OrderBy(x => x.CreatedAt)
             .Select(StatDataChangeSubscriptionDto.Transform)
             .AsPaginatedAsync(request, cancellationToken);

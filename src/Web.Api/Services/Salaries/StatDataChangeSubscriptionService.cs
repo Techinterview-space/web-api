@@ -81,8 +81,8 @@ public class StatDataChangeSubscriptionService
         CancellationToken cancellationToken)
     {
         var subscriptions = await _context.StatDataChangeSubscriptions
-            .Include(x => x.StatDataChangeSubscriptionTgMessages)
-            .Include(x => x.AiAnalysisRecords)
+            .Include(x => x.StatDataChangeSubscriptionTgMessages.OrderBy(z => z.CreatedAt))
+            .Include(x => x.AiAnalysisRecords.OrderBy(z => z.CreatedAt))
             .Where(x => x.DeletedAt == null)
             .When(subscriptionIds is { Count: > 0 }, x => subscriptionIds.Contains(x.Id))
             .ToListAsync(cancellationToken);
