@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
@@ -23,6 +24,7 @@ public class GetStatDataChangeSubscriptionsHandler
         CancellationToken cancellationToken)
     {
         return await _context.StatDataChangeSubscriptions
+            .Include(x => x.StatDataChangeSubscriptionTgMessages)
             .OrderBy(x => x.CreatedAt)
             .Select(StatDataChangeSubscriptionDto.Transform)
             .AsPaginatedAsync(request, cancellationToken);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Domain.Entities.StatData;
 
@@ -19,6 +20,10 @@ public record StatDataChangeSubscriptionDto
         TelegramChatId = entity.TelegramChatId;
         ProfessionIds = entity.ProfessionIds;
         PreventNotificationIfNoDifference = entity.PreventNotificationIfNoDifference;
+        LastMessageSent = entity.StatDataChangeSubscriptionTgMessages is { Count: > 0 }
+            ? entity.StatDataChangeSubscriptionTgMessages.Last().CreatedAt
+            : null;
+
         UseAiAnalysis = entity.UseAiAnalysis;
         DeletedAt = entity.DeletedAt;
         CreatedAt = entity.CreatedAt;
@@ -37,6 +42,8 @@ public record StatDataChangeSubscriptionDto
 
     public bool UseAiAnalysis { get; init; }
 
+    public DateTimeOffset? LastMessageSent { get; init; }
+
     public DateTimeOffset? DeletedAt { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
@@ -50,6 +57,9 @@ public record StatDataChangeSubscriptionDto
         TelegramChatId = x.TelegramChatId,
         ProfessionIds = x.ProfessionIds,
         PreventNotificationIfNoDifference = x.PreventNotificationIfNoDifference,
+        LastMessageSent = x.StatDataChangeSubscriptionTgMessages != null && x.StatDataChangeSubscriptionTgMessages.Count > 0
+            ? x.StatDataChangeSubscriptionTgMessages.Last().CreatedAt
+            : null,
         UseAiAnalysis = x.UseAiAnalysis,
         DeletedAt = x.DeletedAt,
         CreatedAt = x.CreatedAt,

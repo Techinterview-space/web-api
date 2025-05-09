@@ -82,8 +82,7 @@ public class Startup
     {
         if (_environment.IsDevelopment())
         {
-            app
-                .UseMiddleware<DevelopmentEnvironmentMiddleware>();
+            app.UseMiddleware<DevelopmentEnvironmentMiddleware>();
             app.UseDeveloperExceptionPage();
             IdentityModelEventSource.ShowPII = true;
         }
@@ -91,6 +90,7 @@ public class Startup
         loggerFactory.AddSerilog();
 
         app
+            .UseMiddleware<CorrelationIdMiddleware>()
             .UseMiddleware<ExceptionHttpMiddleware>()
             .UseLoggingMiddleware();
 
