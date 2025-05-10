@@ -101,6 +101,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             }
 
             await GetOrCreateTelegramBotUsageAsync(
+                message.Chat.Id,
                 userOrChatName,
                 chat.Title ?? chat.Username ?? chat.Id.ToString(),
                 chat.Id,
@@ -164,6 +165,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         {
             var chat = message.SenderChat ?? message.Chat;
             await GetOrCreateTelegramBotUsageAsync(
+                message.Chat.Id,
                 message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
                 chat.Title ?? chat.Username ?? chat.Id.ToString(),
                 chat.Id,
@@ -217,11 +219,11 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         {
             var replyMessage = $@"
 Chat ID: {message.Chat.Id}
-Chat type: {message.Chat.Type}
-User ID: {message.From?.Id}
-Username: {message.From?.Username}
-First name: {message.From?.FirstName}
-Last name: {message.From?.LastName}";
+Тип чата: {message.Chat.Type}
+Ваш айди: {message.From?.Id}
+Никнейм: {message.From?.Username}
+Имя: {message.From?.FirstName}
+Фамилия: {message.From?.LastName}";
 
             await request.BotClient.SendMessage(
                 message.Chat.Id,
@@ -459,6 +461,7 @@ Last name: {message.From?.LastName}";
                            ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
 
             await GetOrCreateTelegramBotUsageAsync(
+                null,
                 userName,
                 null,
                 null,
@@ -496,6 +499,7 @@ Last name: {message.From?.LastName}";
     }
 
     private async Task GetOrCreateTelegramBotUsageAsync(
+        long? chatId,
         string username,
         string channelName,
         long? channelId,
@@ -512,6 +516,7 @@ Last name: {message.From?.LastName}";
         if (usage == null)
         {
             usage = new TelegramBotUsage(
+                chatId,
                 username,
                 channelName,
                 channelId,

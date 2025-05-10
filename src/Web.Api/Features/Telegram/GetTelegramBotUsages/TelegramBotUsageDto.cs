@@ -7,6 +7,8 @@ public record TelegramBotUsageDto
 {
     public Guid Id { get; init; }
 
+    public long? ChatId { get; init; }
+
     public long UsageCount { get; init; }
 
     public string Username { get; init; }

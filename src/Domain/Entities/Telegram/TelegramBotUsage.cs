@@ -7,6 +7,8 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
 
+    public long? ChatId { get; protected set; }
+
     public long UsageCount { get; protected set; }
 
     public string Username { get; protected set; }
@@ -20,6 +22,7 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
     public TelegramBotUsageType UsageType { get; protected set; }
 
     public TelegramBotUsage(
+        long? chatId,
         string username,
         string channelName,
         long? channelId,
@@ -33,6 +36,7 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
             throw new BadRequestException("Username is not defined.");
         }
 
+        ChatId = chatId;
         UsageCount = 0;
         Username = username;
         ChannelName = channelName;
