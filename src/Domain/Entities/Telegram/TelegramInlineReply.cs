@@ -22,6 +22,7 @@ public class TelegramInlineReply : IHasIdBase<Guid>
         Username = username;
         UserId = userId;
         ChatId = chatId;
+        CreatedAt = DateTime.UtcNow;
     }
 
     protected TelegramInlineReply()
