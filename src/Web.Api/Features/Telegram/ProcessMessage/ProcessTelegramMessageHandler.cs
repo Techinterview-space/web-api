@@ -93,29 +93,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         if (messageSentByBot)
         {
-            var chat = message.Chat;
-            var userOrChatName = message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim();
-            if (string.IsNullOrEmpty(userOrChatName))
-            {
-                userOrChatName = chat.Title ?? chat.Username ?? chat.Id.ToString();
-            }
-
-            await IncrementTelegramBotUsageAsync(
-                message.Chat.Id,
-                userOrChatName,
-                chat.Title ?? chat.Username ?? chat.Id.ToString(),
-                chat.Id,
-                messageText,
-                message.Chat.Type switch
-                {
-                    ChatType.Private => TelegramBotUsageType.DirectMessage,
-                    ChatType.Sender => TelegramBotUsageType.DirectMessage,
-                    ChatType.Group => TelegramBotUsageType.GroupMention,
-                    ChatType.Supergroup => TelegramBotUsageType.SupergroupMention,
-                    _ => TelegramBotUsageType.Undefined,
-                },
-                cancellationToken);
-
             return null;
         }
 
@@ -137,6 +114,15 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         if (directMessageResult.Processed)
         {
+            await IncrementTelegramBotUsageAsync(
+                chatId: message.Chat.Id,
+                username: message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim(),
+                channelName: message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
+                channelId: message.Chat.Id,
+                receivedMessageTextOrNull: messageText,
+                usageType: TelegramBotUsageType.DirectMessage,
+                cancellationToken: cancellationToken);
+
             return directMessageResult.ReplyText;
         }
 
