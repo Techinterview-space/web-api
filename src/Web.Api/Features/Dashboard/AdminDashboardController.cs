@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
@@ -27,11 +28,14 @@ public class AdminDashboardController : ControllerBase
     public async Task<AdminDashboardData> GetDashboard(
         CancellationToken cancellationToken)
     {
+        var yearAgo = DateTime.UtcNow.AddYears(-1);
         var feedbackReviews = await _context.SalariesSurveyReplies
+            .Where(x => x.CreatedAt >= yearAgo)
             .Select(x => x.UsefulnessRating)
             .ToListAsync(cancellationToken);
 
         var telegramBotInlineUsages = await _context.TelegramInlineReplies
+            .Where(x => x.CreatedAt >= yearAgo)
             .Select(x => new TelegramInlineUsageItem
             {
                 CreatedAt = x.CreatedAt,
