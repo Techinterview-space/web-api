@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
@@ -432,6 +433,8 @@ Chat ID: {message.Chat.Id}
                 updateRequest.InlineQuery!.Id,
                 results,
                 cancellationToken: cancellationToken);
+
+            await AddInlineQueryReplyAsync(updateRequest, cancellationToken);
         }
         catch (Exception e)
         {
@@ -440,6 +443,32 @@ Chat ID: {message.Chat.Id}
                 "An error occurred while answering inline query: {Message}",
                 e.Message);
         }
+    }
+
+    private async Task AddInlineQueryReplyAsync(
+        Update request,
+        CancellationToken cancellationToken)
+    {
+        var inlineQuery = request.InlineQuery!;
+        var username = inlineQuery.From.Username?.Trim();
+        if (string.IsNullOrEmpty(username))
+        {
+            username = $"{inlineQuery.From.FirstName} {inlineQuery.From.LastName}".Trim();
+        }
+
+        _logger.LogInformation(
+            "TO REMOVE. Inline query from {Username} ({UserId}). Data {Data}",
+            username,
+            inlineQuery.From.Id,
+            JsonSerializer.Serialize(request));
+
+        _context.Add(
+            new TelegramInlineReply(
+                username,
+                inlineQuery.From.Id,
+                request.Message?.Chat.Id));
+
+        await _context.TrySaveChangesAsync(cancellationToken);
     }
 
     private async Task<InlineQueryResultArticle> GetProfessionsGroupInlineResultAsync(
