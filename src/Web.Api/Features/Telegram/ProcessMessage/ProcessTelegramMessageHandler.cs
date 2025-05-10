@@ -93,14 +93,14 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         if (messageSentByBot)
         {
-            var chat = message.SenderChat ?? message.Chat;
+            var chat = message.Chat;
             var userOrChatName = message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim();
             if (string.IsNullOrEmpty(userOrChatName))
             {
                 userOrChatName = chat.Title ?? chat.Username ?? chat.Id.ToString();
             }
 
-            await GetOrCreateTelegramBotUsageAsync(
+            await IncrementTelegramBotUsageAsync(
                 message.Chat.Id,
                 userOrChatName,
                 chat.Title ?? chat.Username ?? chat.Id.ToString(),
@@ -161,25 +161,21 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             replyMarkup: replyData.InlineKeyboardMarkup,
             cancellationToken: cancellationToken);
 
-        if (message.From! is not null)
-        {
-            var chat = message.SenderChat ?? message.Chat;
-            await GetOrCreateTelegramBotUsageAsync(
-                message.Chat.Id,
-                message.From.Username ?? $"{message.From.FirstName} {message.From.LastName}".Trim(),
-                chat.Title ?? chat.Username ?? chat.Id.ToString(),
-                chat.Id,
-                messageText,
-                message.Chat.Type switch
-                {
-                    ChatType.Private => TelegramBotUsageType.DirectMessage,
-                    ChatType.Sender => TelegramBotUsageType.DirectMessage,
-                    ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
-                    ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
-                    _ => TelegramBotUsageType.Undefined,
-                },
-                cancellationToken);
-        }
+        await IncrementTelegramBotUsageAsync(
+            chatId: message.Chat.Id,
+            username: message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim(),
+            channelName: message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
+            channelId: message.Chat.Id,
+            receivedMessageTextOrNull: messageText,
+            usageType: message.Chat.Type switch
+            {
+                ChatType.Private => TelegramBotUsageType.DirectMessage,
+                ChatType.Sender => TelegramBotUsageType.DirectMessage,
+                ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
+                ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
+                _ => TelegramBotUsageType.Undefined,
+            },
+            cancellationToken: cancellationToken);
 
         return replyData.ReplyText;
     }
@@ -460,7 +456,7 @@ Chat ID: {message.Chat.Id}
             var userName = updateRequest.InlineQuery.From.Username
                            ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
 
-            await GetOrCreateTelegramBotUsageAsync(
+            await IncrementTelegramBotUsageAsync(
                 null,
                 userName,
                 null,
@@ -498,7 +494,7 @@ Chat ID: {message.Chat.Id}
             });
     }
 
-    private async Task GetOrCreateTelegramBotUsageAsync(
+    private async Task IncrementTelegramBotUsageAsync(
         long? chatId,
         string username,
         string channelName,
@@ -507,11 +503,23 @@ Chat ID: {message.Chat.Id}
         TelegramBotUsageType usageType,
         CancellationToken cancellationToken)
     {
-        var usage = await _context
-            .TelegramBotUsages
-            .FirstOrDefaultAsync(
-                x => x.Username == username && x.UsageType == usageType,
-                cancellationToken);
+        TelegramBotUsage usage = null;
+        if (!string.IsNullOrEmpty(username))
+        {
+            usage = await _context
+                .TelegramBotUsages
+                .FirstOrDefaultAsync(
+                    x => x.Username == username && x.UsageType == usageType,
+                    cancellationToken);
+        }
+        else if (chatId.HasValue)
+        {
+            usage = await _context
+                .TelegramBotUsages
+                .FirstOrDefaultAsync(
+                    x => x.ChatId == chatId,
+                    cancellationToken);
+        }
 
         if (usage == null)
         {
