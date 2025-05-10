@@ -6,6 +6,8 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -26,7 +28,8 @@ public class AuthorizationServiceTests
                     role: Role.Interviewer,
                     firstName: "John",
                     lastName: "Smith")),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.False(await context.Users.AnyAsync());
 
@@ -59,7 +62,8 @@ public class AuthorizationServiceTests
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.Equal(1, await context.Users.CountAsync());
         var currentUser = await target.GetCurrentUserOrNullAsync();
@@ -93,7 +97,8 @@ public class AuthorizationServiceTests
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.Equal(1, await context.Users.CountAsync());
         var currentUser = await target.GetCurrentUserOrNullAsync();
@@ -130,7 +135,8 @@ public class AuthorizationServiceTests
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.Equal(1, await context.Users.CountAsync());
         await Assert.ThrowsAsync<AuthenticationException>(() => target.GetCurrentUserOrNullAsync());
@@ -160,7 +166,8 @@ public class AuthorizationServiceTests
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.Equal(1, await context.Users.CountAsync());
         var user = await target.GetCurrentUserOrNullAsync();
@@ -191,7 +198,8 @@ public class AuthorizationServiceTests
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.Equal(1, await context.Users.CountAsync());
         await Assert.ThrowsAsync<AuthenticationException>(() => target.GetCurrentUserOrNullAsync());
@@ -218,7 +226,8 @@ public class AuthorizationServiceTests
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
-            context);
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
 
         Assert.Equal(1, await context.Users.CountAsync());
         await Assert.ThrowsAsync<AuthenticationException>(() => target.GetCurrentUserOrNullAsync());

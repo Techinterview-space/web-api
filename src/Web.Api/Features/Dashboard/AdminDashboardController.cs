@@ -32,10 +32,15 @@ public class AdminDashboardController : ControllerBase
             .ToListAsync(cancellationToken);
 
         var telegramBotInlineUsages = await _context.TelegramInlineReplies
-            .Select(x => x.CreatedAt)
+            .Select(x => new TelegramInlineUsageItem
+            {
+                CreatedAt = x.CreatedAt,
+                Username = x.Username
+            })
             .ToListAsync(cancellationToken);
 
         return new AdminDashboardData(
-            new AverageRatingData(feedbackReviews));
+            new AverageRatingData(feedbackReviews),
+            new TelegramInlineUsagesData(telegramBotInlineUsages));
     }
 }

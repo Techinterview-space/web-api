@@ -6,6 +6,7 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Database.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Authentication;
 
@@ -13,12 +14,14 @@ public record AuthorizationService : IAuthorization
 {
     private readonly IHttpContext _http;
     private readonly DatabaseContext _context;
+    private readonly ILogger<AuthorizationService> _logger;
 
     private User _userFromDatabase;
 
     public AuthorizationService(
         IHttpContext http,
-        DatabaseContext context)
+        DatabaseContext context,
+        ILogger<AuthorizationService> logger)
     {
         if (!http.Exists)
         {
@@ -27,6 +30,7 @@ public record AuthorizationService : IAuthorization
 
         _http = http;
         _context = context;
+        _logger = logger;
     }
 
     public async Task<User> CurrentUserOrFailAsync(
@@ -83,6 +87,16 @@ public record AuthorizationService : IAuthorization
 
         if (!user.CheckIdentity(_http.CurrentUser))
         {
+            _logger.LogError(
+                "User {Email} is not authenticated. " +
+                "UserId: {UserId}, IdentityId: {IdentityId}, " +
+                "CurrentUserId: {CurrentUserId}, CurrentIdentityId: {CurrentIdentityId}",
+                user.Email,
+                user.Id,
+                user.IdentityId,
+                _http.CurrentUser.Id,
+                _http.CurrentUser.Subj);
+
             throw new AuthenticationException("User tries to use incorrect account to login");
         }
 

@@ -3,10 +3,14 @@
 public record AdminDashboardData
 {
     public AdminDashboardData(
-        AverageRatingData averageRatingData)
+        AverageRatingData averageRatingData,
+        TelegramInlineUsagesData telegramInlineUsagesData)
     {
         AverageRatingData = averageRatingData;
+        TelegramInlineUsagesData = telegramInlineUsagesData;
     }
 
     public AverageRatingData AverageRatingData { get; }
+
+    public TelegramInlineUsagesData TelegramInlineUsagesData { get; }
 }
