@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
+using Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 using Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 using Web.Api.Setup.Attributes;
@@ -80,5 +81,14 @@ public class TelegramBotController : ControllerBase
             cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpGet("inline-reply-stats")]
+    public async Task<TelegramInlineUsagesData> GetTelegramInlineReplyStats(
+        CancellationToken cancellationToken)
+    {
+        return await _mediator.Send(
+            new GetTelegramInlineUsageStatsQuery(),
+            cancellationToken);
     }
 }

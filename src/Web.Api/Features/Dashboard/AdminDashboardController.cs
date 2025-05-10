@@ -28,25 +28,28 @@ public class AdminDashboardController : ControllerBase
     public async Task<AdminDashboardData> GetDashboard(
         CancellationToken cancellationToken)
     {
-        var yearAgo = DateTime.UtcNow.AddYears(-1);
+        var yearAgo = DateTimeOffset.UtcNow.AddYears(-1);
         var feedbackReviews = await _context.SalariesSurveyReplies
             .Where(x => x.CreatedAt >= yearAgo)
             .Select(x => x.UsefulnessRating)
             .ToListAsync(cancellationToken);
 
-        var telegramBotInlineUsages = await _context.TelegramInlineReplies
-            .Where(x => x.CreatedAt >= yearAgo)
-            .Select(x => new TelegramInlineUsageSourceItem
-            {
-                CreatedAt = x.CreatedAt,
-                Username = x.Username,
-                ChatId = x.ChatId,
-                ChatName = x.ChatName
-            })
-            .ToListAsync(cancellationToken);
+        var salariesCount = await _context.Salaries
+            .Where(x =>
+                x.CreatedAt >= yearAgo &&
+                x.UseInStats)
+            .CountAsync(cancellationToken);
+
+        var reviewsCount = await _context.CompanyReviews
+            .Where(x =>
+                x.CreatedAt >= yearAgo &&
+                x.ApprovedAt != null &&
+                x.OutdatedAt == null)
+            .CountAsync(cancellationToken);
 
         return new AdminDashboardData(
             new AverageRatingData(feedbackReviews),
-            new TelegramInlineUsagesData(telegramBotInlineUsages));
+            salariesCount,
+            reviewsCount);
     }
 }
