@@ -21,11 +21,11 @@ internal class TelegramBotUserConfig : IEntityTypeConfiguration<TelegramBotUsage
             .IsRequired(true);
 
         builder
-            .HasIndex(x => new
-            {
-                x.Username,
-                x.UsageType,
-            })
-            .IsUnique(false);
+            .Property(x => x.ChatId)
+            .IsRequired(true);
+
+        builder
+            .HasIndex(x => x.ChatId)
+            .IsUnique(true);
     }
 }

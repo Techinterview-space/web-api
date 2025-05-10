@@ -115,10 +115,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
         if (directMessageResult.Processed)
         {
             await IncrementTelegramBotUsageAsync(
-                chatId: message.Chat.Id,
-                username: message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim(),
-                channelName: message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
-                channelId: message.Chat.Id,
+                message,
                 receivedMessageTextOrNull: messageText,
                 usageType: TelegramBotUsageType.DirectMessage,
                 cancellationToken: cancellationToken);
@@ -148,10 +145,7 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
             cancellationToken: cancellationToken);
 
         await IncrementTelegramBotUsageAsync(
-            chatId: message.Chat.Id,
-            username: message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim(),
-            channelName: message.Chat.Title ?? message.Chat.Username ?? message.Chat.Id.ToString(),
-            channelId: message.Chat.Id,
+            message,
             receivedMessageTextOrNull: messageText,
             usageType: message.Chat.Type switch
             {
@@ -438,18 +432,6 @@ Chat ID: {message.Chat.Id}
                 updateRequest.InlineQuery!.Id,
                 results,
                 cancellationToken: cancellationToken);
-
-            var userName = updateRequest.InlineQuery.From.Username
-                           ?? $"{updateRequest.InlineQuery.From.FirstName} {updateRequest.InlineQuery.From.LastName}".Trim();
-
-            await IncrementTelegramBotUsageAsync(
-                null,
-                userName,
-                null,
-                null,
-                updateRequest.InlineQuery?.Query,
-                TelegramBotUsageType.InlineQuery,
-                cancellationToken);
         }
         catch (Exception e)
         {
@@ -481,49 +463,34 @@ Chat ID: {message.Chat.Id}
     }
 
     private async Task IncrementTelegramBotUsageAsync(
-        long? chatId,
-        string username,
-        string channelName,
-        long? channelId,
+        Message message,
         string receivedMessageTextOrNull,
         TelegramBotUsageType usageType,
         CancellationToken cancellationToken)
     {
+        var username = message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim();
+
         TelegramBotUsage usage = null;
         if (!string.IsNullOrEmpty(username))
         {
             usage = await _context
                 .TelegramBotUsages
                 .FirstOrDefaultAsync(
-                    x => x.Username == username && x.UsageType == usageType,
-                    cancellationToken);
-        }
-        else if (chatId.HasValue)
-        {
-            usage = await _context
-                .TelegramBotUsages
-                .FirstOrDefaultAsync(
-                    x => x.ChatId == chatId,
+                    x => x.ChatId == message.Chat.Id,
                     cancellationToken);
         }
 
         if (usage == null)
         {
             usage = new TelegramBotUsage(
-                chatId,
+                message.Chat.Id,
                 username,
-                channelName,
-                channelId,
                 usageType);
 
             _context.TelegramBotUsages.Add(usage);
         }
 
-        usage.IncrementUsageCount(
-            receivedMessageTextOrNull,
-            channelName,
-            channelId);
-
+        usage.IncrementUsageCount(receivedMessageTextOrNull);
         await _context.SaveChangesAsync(cancellationToken);
     }
 

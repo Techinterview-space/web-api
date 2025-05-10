@@ -32,8 +32,6 @@ public class GetTelegramBotUsagesHandler : IRequestHandler<GetTelegramBotUsagesQ
                 ReceivedMessageText = x.ReceivedMessageText,
                 UsageCount = x.UsageCount,
                 Username = x.Username,
-                ChannelName = x.ChannelName,
-                ChannelId = x.ChannelId,
                 UsageType = x.UsageType,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
