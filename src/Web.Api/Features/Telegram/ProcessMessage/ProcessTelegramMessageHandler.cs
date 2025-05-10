@@ -94,6 +94,10 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
 
         if (messageSentByBot)
         {
+            await AddInlineQueryClickAsync(
+                message,
+                cancellationToken);
+
             return null;
         }
 
@@ -143,19 +147,6 @@ public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMess
                 MessageId = replyToMessageId,
             },
             replyMarkup: replyData.InlineKeyboardMarkup,
-            cancellationToken: cancellationToken);
-
-        await IncrementTelegramBotUsageAsync(
-            message,
-            receivedMessageTextOrNull: messageText,
-            usageType: message.Chat.Type switch
-            {
-                ChatType.Private => TelegramBotUsageType.DirectMessage,
-                ChatType.Sender => TelegramBotUsageType.DirectMessage,
-                ChatType.Group when mentionedInGroupChat => TelegramBotUsageType.GroupMention,
-                ChatType.Supergroup when mentionedInGroupChat => TelegramBotUsageType.SupergroupMention,
-                _ => TelegramBotUsageType.Undefined,
-            },
             cancellationToken: cancellationToken);
 
         return replyData.ReplyText;
@@ -433,8 +424,6 @@ Chat ID: {message.Chat.Id}
                 updateRequest.InlineQuery!.Id,
                 results,
                 cancellationToken: cancellationToken);
-
-            await AddInlineQueryReplyAsync(updateRequest, cancellationToken);
         }
         catch (Exception e)
         {
@@ -445,28 +434,25 @@ Chat ID: {message.Chat.Id}
         }
     }
 
-    private async Task AddInlineQueryReplyAsync(
-        Update request,
+    private async Task AddInlineQueryClickAsync(
+        Message message,
         CancellationToken cancellationToken)
     {
-        var inlineQuery = request.InlineQuery!;
-        var username = inlineQuery.From.Username?.Trim();
-        if (string.IsNullOrEmpty(username))
+        if (message.From == null)
         {
-            username = $"{inlineQuery.From.FirstName} {inlineQuery.From.LastName}".Trim();
+            return;
         }
 
-        _logger.LogInformation(
-            "TO REMOVE. Inline query from {Username} ({UserId}). Data {Data}",
-            username,
-            inlineQuery.From.Id,
-            JsonSerializer.Serialize(request));
+        var username = message.From.Username?.Trim() ?? message.From.Id.ToString();
+        var chatId = message.Chat.Id;
+        var chatName = message.Chat.Title?.Trim();
 
         _context.Add(
             new TelegramInlineReply(
                 username,
-                inlineQuery.From.Id,
-                request.Message?.Chat.Id));
+                message.From.Id,
+                chatId,
+                chatName));
 
         await _context.TrySaveChangesAsync(cancellationToken);
     }

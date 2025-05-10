@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,8 +34,19 @@ public class AdminDashboardController : ControllerBase
             .Select(x => x.UsefulnessRating)
             .ToListAsync(cancellationToken);
 
+        var telegramBotInlineUsages = await _context.TelegramInlineReplies
+            .Where(x => x.CreatedAt >= yearAgo)
+            .Select(x => new TelegramInlineUsageSourceItem
+            {
+                CreatedAt = x.CreatedAt,
+                Username = x.Username,
+                ChatId = x.ChatId,
+                ChatName = x.ChatName
+            })
+            .ToListAsync(cancellationToken);
+
         return new AdminDashboardData(
             new AverageRatingData(feedbackReviews),
-            new TelegramInlineUsagesData(new List<TelegramInlineUsageItem>()));
+            new TelegramInlineUsagesData(telegramBotInlineUsages));
     }
 }
