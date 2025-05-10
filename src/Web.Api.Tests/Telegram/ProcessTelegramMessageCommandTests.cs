@@ -64,7 +64,7 @@ namespace Web.Api.Tests.Telegram
             var logger = new Mock<ILogger<ProcessTelegramMessageHandler>>();
             var currencyService = new CurrenciesServiceFake();
 
-            var mockedCache = Create.MockedMemoryCache();
+            using var mockedCache = Create.MockedMemoryCache();
             var telegramBotClient = new Mock<ITelegramBotClient>();
 
             var processTelegramMessageHandler = new ProcessTelegramMessageHandler(
@@ -82,12 +82,19 @@ namespace Web.Api.Tests.Telegram
                 Chat = new Chat()
                 {
                     Type = ChatType.Private,
+                    Username = "test_username",
+                },
+                From = new User
+                {
+                    Username = "test_username",
                 }
             };
 
             var replyText = await processTelegramMessageHandler.Handle(
                 new ProcessTelegramMessageCommand(
-                    telegramBotClient.Object, mockUpdate.Object), default);
+                    telegramBotClient.Object,
+                    mockUpdate.Object),
+                default);
 
             Assert.Equal(ProcessMessage1, replyText);
         }
@@ -101,7 +108,7 @@ namespace Web.Api.Tests.Telegram
             var logger = new Mock<ILogger<ProcessTelegramMessageHandler>>();
             var currencyService = new CurrenciesServiceFake();
 
-            var mockedCache = Create.MockedMemoryCache();
+            using var mockedCache = Create.MockedMemoryCache();
             var telegramBotClient = new Mock<ITelegramBotClient>();
 
             var processTelegramMessageHandler = new ProcessTelegramMessageHandler(
@@ -118,6 +125,11 @@ namespace Web.Api.Tests.Telegram
                 Chat = new Chat()
                 {
                     Type = ChatType.Private,
+                    Username = "test_username",
+                },
+                From = new User
+                {
+                    Username = "test_username",
                 }
             };
 

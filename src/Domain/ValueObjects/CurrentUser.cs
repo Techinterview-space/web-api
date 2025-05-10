@@ -10,6 +10,10 @@ namespace Domain.ValueObjects;
 
 public record CurrentUser
 {
+    public const string GoogleOAuth2Prefix = "google-oauth2|";
+    public const string GithubPrefix = "github|";
+    public const string Auth0Prefix = "auth0|";
+
     // For test purposes
     protected CurrentUser()
     {
@@ -30,6 +34,8 @@ public record CurrentUser
         IsEmailVerified = principal.GetClaimValue("email_verified", false) == "true";
         FirstName = principal.GetClaimValue(ClaimTypes.GivenName, false);
         LastName = principal.GetClaimValue(ClaimTypes.Surname, false);
+        Subj = principal.GetClaimValue("sub", false);
+        ProfilePicture = principal.GetClaimValue("picture", false);
 
         if (LastName is null && FirstName is null)
         {
@@ -63,6 +69,16 @@ public record CurrentUser
 
     public string LastName { get; protected set; }
 
+    /// <summary>
+    /// Auth0 will store there smth like 'google-oauth2|12345'.
+    /// </summary>
+    public string Subj { get; protected set; }
+
+    /// <summary>
+    /// Claims picture.
+    /// </summary>
+    public string ProfilePicture { get; protected set; }
+
     public IReadOnlyCollection<Role> Roles { get; protected set; }
 
     public bool Has(Role role)
@@ -87,4 +103,22 @@ public record CurrentUser
     public string Fullname => $"{FirstName} {LastName}";
 
     public string EmailUpper => Email.ToUpperInvariant();
+
+    public bool IsGoogleAuth()
+    {
+        return Subj != null &&
+               Subj.StartsWith(GoogleOAuth2Prefix);
+    }
+
+    public bool IsGithubAuth()
+    {
+        return Subj != null &&
+               Subj.StartsWith(GithubPrefix);
+    }
+
+    public bool IsAuth0Auth()
+    {
+        return Subj != null &&
+               Subj.StartsWith(Auth0Prefix);
+    }
 }

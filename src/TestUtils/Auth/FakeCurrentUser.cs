@@ -12,7 +12,7 @@ public record FakeCurrentUser : CurrentUser
     public FakeCurrentUser(
         User user)
     {
-        Id = user.Id.ToString();
+        Id = $"google-oauth2|{Guid.NewGuid():N}";
         FirstName = user.FirstName;
         LastName = user.LastName;
         Email = user.Email;
@@ -38,5 +38,12 @@ public record FakeCurrentUser : CurrentUser
         {
             role
         };
+    }
+
+    public FakeCurrentUser WithSubject(
+        string subject)
+    {
+        Subj = subject;
+        return this;
     }
 }

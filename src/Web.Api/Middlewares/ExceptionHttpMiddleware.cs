@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
+using Infrastructure.Services.Correlation;
 using Microsoft.AspNetCore.Http;
 using Web.Api.Middlewares.Error;
 
@@ -30,19 +31,24 @@ public class ExceptionHttpMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(
+        HttpContext context)
     {
         try
         {
             await _next(context);
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            await HandleExceptionAsync(context, e);
+            await HandleExceptionAsync(
+                context,
+                exception);
         }
     }
 
-    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception)
     {
         var statusCode = StatusCodes.Status500InternalServerError;
         string message = null;
@@ -64,16 +70,29 @@ public class ExceptionHttpMiddleware
             exception);
     }
 
-    protected virtual Task WriteResponseAsync(
-        HttpContext context, int statusCode, string message, Exception exception)
+    private Task WriteResponseAsync(
+        HttpContext context,
+        int statusCode,
+        string message,
+        Exception exception)
     {
+        var correlationId = new CorrelationIdAccessor(context).GetValue();
+        var serialized = Serialize(
+            new ErrorDetails(
+                statusCode,
+                message,
+                exception,
+                correlationId));
+
         return new JsonErrorResponse(
             context: context,
-            serializedError: Serialize(new ErrorDetails(statusCode, message, exception)),
-            statusCode: statusCode).WriteAsync();
+            serializedError: serialized,
+            statusCode: statusCode)
+            .WriteAsync();
     }
 
-    protected string Serialize<T>(T instance)
+    private string Serialize<T>(
+        T instance)
     {
         return System.Text.Json.JsonSerializer.Serialize(instance);
     }

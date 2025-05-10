@@ -54,7 +54,7 @@ public class User : BaseModel, IHasDeletedAt
             currentUser.Roles.ToArray())
     {
         IdentityId = currentUser.Id;
-        EmailConfirmed = true;
+        EmailConfirmed = currentUser.IsGoogleAuth() || currentUser.IsGithubAuth();
     }
 
     [Required]
@@ -70,6 +70,8 @@ public class User : BaseModel, IHasDeletedAt
     public string LastName { get; protected set; }
 
     public string IdentityId { get; protected set; }
+
+    public string ProfilePicture { get; protected set; }
 
     public bool EmailConfirmed { get; protected set; }
 
@@ -114,30 +116,79 @@ public class User : BaseModel, IHasDeletedAt
         EmailConfirmed = true;
     }
 
-    public void SetIdentityId(
+    public bool CheckIdentity(
+        CurrentUser currentUser)
+    {
+        if (string.IsNullOrWhiteSpace(IdentityId))
+        {
+            return true;
+        }
+
+        var identity = currentUser.Subj?.Trim();
+        if (string.IsNullOrWhiteSpace(identity))
+        {
+            return false;
+        }
+
+        var result = IdentityId.Equals(identity, StringComparison.InvariantCultureIgnoreCase);
+        if (result)
+        {
+            return true;
+        }
+
+        if (Has(Role.Admin))
+        {
+            return false;
+        }
+
+        var isLoggedAsSocial = IsAuth0Auth() &&
+               (currentUser.IsGoogleAuth() || currentUser.IsGithubAuth());
+
+        if (isLoggedAsSocial)
+        {
+            EmailConfirmed = true;
+        }
+
+        return isLoggedAsSocial;
+    }
+
+    public bool UpdateData(
         CurrentUser currentUser)
     {
         currentUser.ThrowIfNull(nameof(currentUser));
-        if (IdentityId != null)
+
+        var needUpdates = false;
+        if (IdentityId == null)
         {
-            throw new InvalidOperationException($"The user {Id} has identity Id");
+            IdentityId = currentUser.Id;
+            needUpdates = true;
         }
 
-        IdentityId = currentUser.Id;
-    }
-
-    public void SetRoles(
-        IReadOnlyCollection<Role> roles)
-    {
-        if (UserRoles.Count != 0)
+        if (ProfilePicture == null ||
+            ProfilePicture != currentUser.ProfilePicture)
         {
-            throw new InvalidOperationException($"The user Id:{Id} has roles");
+            ProfilePicture = currentUser.ProfilePicture;
+            needUpdates = true;
         }
 
-        foreach (var role in roles)
+        if (GetRoles().Count == 0 && currentUser.Roles.Count > 0)
         {
-            UserRoles.Add(new UserRole(role, this));
+            foreach (var role in currentUser.Roles)
+            {
+                UserRoles.Add(new UserRole(role, this));
+            }
+
+            needUpdates = true;
         }
+
+        if (!EmailConfirmed &&
+            (currentUser.IsGoogleAuth() || currentUser.IsGithubAuth()))
+        {
+            EmailConfirmed = true;
+            needUpdates = true;
+        }
+
+        return needUpdates;
     }
 
     public void AddRole(
@@ -305,5 +356,23 @@ public class User : BaseModel, IHasDeletedAt
         }
 
         return result;
+    }
+
+    public bool IsGoogleAuth()
+    {
+        return IdentityId != null &&
+               IdentityId.StartsWith(CurrentUser.GoogleOAuth2Prefix);
+    }
+
+    public bool IsGithubAuth()
+    {
+        return IdentityId != null &&
+               IdentityId.StartsWith(CurrentUser.GithubPrefix);
+    }
+
+    public bool IsAuth0Auth()
+    {
+        return IdentityId != null &&
+               IdentityId.StartsWith(CurrentUser.Auth0Prefix);
     }
 }

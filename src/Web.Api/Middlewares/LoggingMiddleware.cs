@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Domain.Validation.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -17,6 +18,7 @@ public class LoggingMiddleware
     private readonly IReadOnlyCollection<Type> _exceptionsToIgnore = new List<Type>
     {
         typeof(AuthenticationException),
+        typeof(BadRequestException),
     };
 
     public LoggingMiddleware(ILoggerFactory loggerFactory, RequestDelegate next)

@@ -41,6 +41,13 @@ public class UserFake : User, IPlease<User>
             .ByIdOrFailAsync(userEntry.Entity.Id);
     }
 
+    public UserFake WithIdentity(
+        string identity)
+    {
+        IdentityId = identity;
+        return this;
+    }
+
     public User Please()
     {
         return this;

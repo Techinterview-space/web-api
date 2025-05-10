@@ -9,17 +9,23 @@ public class CorrelationIdAccessor : ICorrelationIdAccessor
     /// </summary>
     public const string CorrelationIdHeaderName = "X-Correlation-Id";
 
-    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly HttpContext _httpContextOrNull;
 
     public CorrelationIdAccessor(
         IHttpContextAccessor contextAccessor)
+        : this(contextAccessor.HttpContext)
     {
-        _contextAccessor = contextAccessor;
+    }
+
+    public CorrelationIdAccessor(
+        HttpContext httpContext)
+    {
+        _httpContextOrNull = httpContext;
     }
 
     public string GetValue()
     {
-        return _contextAccessor.HttpContext?.Items.TryGetValue(CorrelationIdHeaderName, out var value) == true
+        return _httpContextOrNull?.Items.TryGetValue(CorrelationIdHeaderName, out var value) == true
             ? value?.ToString()
             : null;
     }

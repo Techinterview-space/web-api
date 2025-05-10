@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Users;
+﻿using System.Security.Authentication;
+using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
@@ -32,7 +33,7 @@ public record AuthorizationService : IAuthorization
         CancellationToken cancellationToken = default)
     {
         return await GetCurrentUserOrNullAsync(cancellationToken)
-            ?? throw new InvalidOperationException("The current user is not authenticated");
+            ?? throw new AuthenticationException("The current user is not authenticated");
     }
 
     public async Task<User> GetCurrentUserOrNullAsync(
@@ -80,22 +81,14 @@ public record AuthorizationService : IAuthorization
             return user;
         }
 
-        if (!user.EmailConfirmed)
+        if (!user.CheckIdentity(_http.CurrentUser))
         {
-            user.ConfirmEmail();
+            throw new AuthenticationException("User tries to use incorrect account to login");
         }
 
-        if (user.IdentityId == null)
-        {
-            user.SetIdentityId(_http.CurrentUser);
-        }
-
-        if (user.GetRoles().Count == 0 && _http.CurrentUser.Roles.Count > 0)
-        {
-            user.SetRoles(_http.CurrentUser.Roles);
-        }
-
+        user.UpdateData(_http.CurrentUser);
         user.RenewLastLoginTime();
+
         await _context.TrySaveChangesAsync(cancellationToken);
 
         return user;

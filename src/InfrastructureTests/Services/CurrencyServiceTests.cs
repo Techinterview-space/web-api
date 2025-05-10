@@ -27,7 +27,7 @@ namespace InfrastructureTests.Services
             };
 
             var memoryConfig = new InMemoryConfig(configDic);
-            var mockedCache = Create.MockedMemoryCache();
+            using var mockedCache = Create.MockedMemoryCache();
             var mockHttpClientFactory = new HttpClientFactoryMock(FakeXml.CurrenciesXml);
 
             var currencyService = new CurrencyService(
@@ -58,7 +58,7 @@ namespace InfrastructureTests.Services
             };
 
             var memoryConfig = new InMemoryConfig(configDic);
-            var mockedCache = Create.MockedMemoryCache();
+            using var mockedCache = Create.MockedMemoryCache();
             var mockHttpClientFactory = new HttpClientFactoryMock(FakeXml.CurrenciesXml);
 
             var currencyService = new CurrencyService(

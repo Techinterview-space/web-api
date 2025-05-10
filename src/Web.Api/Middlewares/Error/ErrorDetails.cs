@@ -9,12 +9,14 @@ public record ErrorDetails
     public ErrorDetails(
         int status,
         string message = null,
-        Exception exception = null)
+        Exception exception = null,
+        string correlationId = null)
     {
         Status = status;
         Message = message ?? exception?.Message ?? DefaultServerErrorMessage;
         ExceptionType = exception?.GetType().FullName;
         StackTrace = exception?.StackTrace;
+        CorrelationId = correlationId;
 
         if (exception?.InnerException != null)
         {
@@ -38,5 +40,5 @@ public record ErrorDetails
 
     public string InnerExceptionStackTrace { get; }
 
-    public string RequestId => Guid.NewGuid().ToString();
+    public string CorrelationId { get; }
 }
