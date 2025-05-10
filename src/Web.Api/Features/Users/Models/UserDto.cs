@@ -26,6 +26,11 @@ public record UserDto : IHasId
         Roles = user.UserRoles?.Select(x => x.RoleId).ToList() ?? new List<Role>(0);
         EmailConfirmed = user.EmailConfirmed;
         IsMfaEnabled = user.IsMfaEnabled();
+        IsGoogleAuth = user.IsGoogleAuth();
+        IsGithubAuth = user.IsGithubAuth();
+        IsAuth0Auth = user.IsAuth0Auth();
+        PictureProfile = user.ProfilePicture;
+
         CreatedAt = user.CreatedAt;
         DeletedAt = user.DeletedAt;
     }
@@ -40,9 +45,17 @@ public record UserDto : IHasId
 
     public string LastName { get; init; }
 
+    public string PictureProfile { get; init; }
+
     public string Fullname => $"{FirstName} {LastName}";
 
     public bool IsMfaEnabled { get; init; }
+
+    public bool IsGoogleAuth { get; init; }
+
+    public bool IsGithubAuth { get; init; }
+
+    public bool IsAuth0Auth { get; init; }
 
     public List<Role> Roles { get; init; }
 
@@ -70,6 +83,7 @@ public record UserDto : IHasId
                     .ToList()
                 : null,
             IsMfaEnabled = user.TotpSecret != null,
+            PictureProfile = user.ProfilePicture,
             CreatedAt = user.CreatedAt,
             DeletedAt = user.DeletedAt,
         };

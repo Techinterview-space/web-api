@@ -13,11 +13,11 @@ namespace Web.Api.Features.Dashboard;
 [ApiController]
 [Route("api/admin/dashboard")]
 [HasAnyRole(Role.Admin)]
-public class DashboardController : ControllerBase
+public class AdminDashboardController : ControllerBase
 {
     private readonly DatabaseContext _context;
 
-    public DashboardController(
+    public AdminDashboardController(
         DatabaseContext context)
     {
         _context = context;
@@ -29,6 +29,10 @@ public class DashboardController : ControllerBase
     {
         var feedbackReviews = await _context.SalariesSurveyReplies
             .Select(x => x.UsefulnessRating)
+            .ToListAsync(cancellationToken);
+
+        var telegramBotInlineUsages = await _context.TelegramInlineReplies
+            .Select(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
         return new AdminDashboardData(
