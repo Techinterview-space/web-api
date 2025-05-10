@@ -89,13 +89,13 @@ public record AuthorizationService : IAuthorization
         {
             _logger.LogError(
                 "User {Email} is not authenticated. " +
-                "UserId: {UserId}, IdentityId: {IdentityId}, " +
-                "CurrentUserId: {CurrentUserId}, CurrentIdentityId: {CurrentIdentityId}",
+                "Id: {UserId}," +
+                "IdentityId: {IdentityId}, " +
+                "Auth0 Id: {AuthId}",
                 user.Email,
                 user.Id,
                 user.IdentityId,
-                _http.CurrentUser.Id,
-                _http.CurrentUser.Subj);
+                _http.CurrentUser.Id);
 
             throw new AuthenticationException("User tries to use incorrect account to login");
         }

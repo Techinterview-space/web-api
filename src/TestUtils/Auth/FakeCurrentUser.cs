@@ -40,10 +40,10 @@ public record FakeCurrentUser : CurrentUser
         };
     }
 
-    public FakeCurrentUser WithSubject(
-        string subject)
+    public FakeCurrentUser WithUserId(
+        string userId)
     {
-        Subj = subject;
+        Id = userId;
         return this;
     }
 }

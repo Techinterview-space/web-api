@@ -124,13 +124,13 @@ public class User : BaseModel, IHasDeletedAt
             return true;
         }
 
-        var identity = currentUser.Subj?.Trim();
-        if (string.IsNullOrWhiteSpace(identity))
+        var userId = currentUser.Id?.Trim();
+        if (string.IsNullOrWhiteSpace(userId))
         {
             return false;
         }
 
-        var result = IdentityId.Equals(identity, StringComparison.InvariantCultureIgnoreCase);
+        var result = IdentityId.Equals(userId, StringComparison.InvariantCultureIgnoreCase);
         if (result)
         {
             return true;

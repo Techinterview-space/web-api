@@ -34,7 +34,6 @@ public record CurrentUser
         IsEmailVerified = principal.GetClaimValue("email_verified", false) == "true";
         FirstName = principal.GetClaimValue(ClaimTypes.GivenName, false);
         LastName = principal.GetClaimValue(ClaimTypes.Surname, false);
-        Subj = principal.GetClaimValue("sub", false);
         ProfilePicture = principal.GetClaimValue("picture", false);
 
         if (LastName is null && FirstName is null)
@@ -59,6 +58,9 @@ public record CurrentUser
             .ToArray();
     }
 
+    /// <summary>
+    /// Auth0 will store there smth like 'google-oauth2|12345'.
+    /// </summary>
     public string Id { get; protected set; }
 
     public string Email { get; protected set; }
@@ -68,11 +70,6 @@ public record CurrentUser
     public string FirstName { get; protected set; }
 
     public string LastName { get; protected set; }
-
-    /// <summary>
-    /// Auth0 will store there smth like 'google-oauth2|12345'.
-    /// </summary>
-    public string Subj { get; protected set; }
 
     /// <summary>
     /// Claims picture.
@@ -106,19 +103,19 @@ public record CurrentUser
 
     public bool IsGoogleAuth()
     {
-        return Subj != null &&
-               Subj.StartsWith(GoogleOAuth2Prefix);
+        return Id != null &&
+               Id.StartsWith(GoogleOAuth2Prefix);
     }
 
     public bool IsGithubAuth()
     {
-        return Subj != null &&
-               Subj.StartsWith(GithubPrefix);
+        return Id != null &&
+               Id.StartsWith(GithubPrefix);
     }
 
     public bool IsAuth0Auth()
     {
-        return Subj != null &&
-               Subj.StartsWith(Auth0Prefix);
+        return Id != null &&
+               Id.StartsWith(Auth0Prefix);
     }
 }

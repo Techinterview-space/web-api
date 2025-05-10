@@ -58,7 +58,7 @@ public class AuthorizationServiceTests
         Assert.False(oldUser.EmailConfirmed);
 
         var fakeUser = new FakeCurrentUser(oldUser)
-            .WithSubject("google-oauth2|1234");
+            .WithUserId("google-oauth2|1234");
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
@@ -93,7 +93,7 @@ public class AuthorizationServiceTests
         Assert.False(oldUser.EmailConfirmed);
 
         var fakeUser = new FakeCurrentUser(oldUser)
-            .WithSubject(oldUser.IdentityId);
+            .WithUserId(oldUser.IdentityId);
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
@@ -131,7 +131,7 @@ public class AuthorizationServiceTests
         Assert.False(oldUser.EmailConfirmed);
 
         var fakeUser = new FakeCurrentUser(oldUser)
-            .WithSubject($"auth2|{Guid.NewGuid():N}");
+            .WithUserId($"auth2|{Guid.NewGuid():N}");
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
@@ -162,7 +162,7 @@ public class AuthorizationServiceTests
         Assert.False(oldUser.EmailConfirmed);
 
         var fakeUser = new FakeCurrentUser(oldUser)
-            .WithSubject($"{socialPrefix}{Guid.NewGuid():N}");
+            .WithUserId($"{socialPrefix}{Guid.NewGuid():N}");
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
@@ -194,7 +194,7 @@ public class AuthorizationServiceTests
         Assert.False(oldUser.EmailConfirmed);
 
         var fakeUser = new FakeCurrentUser(oldUser)
-            .WithSubject($"{socialPrefix}{Guid.NewGuid():N}");
+            .WithUserId($"{socialPrefix}{Guid.NewGuid():N}");
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
@@ -222,7 +222,7 @@ public class AuthorizationServiceTests
         Assert.False(oldUser.EmailConfirmed);
 
         var fakeUser = new FakeCurrentUser(oldUser)
-            .WithSubject($"auth2|{Guid.NewGuid():N}");
+            .WithUserId($"auth2|{Guid.NewGuid():N}");
 
         var target = new AuthorizationService(
             new FakeHttpContext(fakeUser),
