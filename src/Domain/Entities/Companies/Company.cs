@@ -108,15 +108,12 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         }
 
         review.Approve();
-        var relevantReviews = GetRelevantReviews();
+        var newRating = RecalculateRating();
 
-        Rating = relevantReviews
-            .Select(x => x.TotalRating)
-            .DefaultIfEmpty(0)
-            .Average();
-
-        ReviewsCount = relevantReviews.Count;
-        RatingHistory.Add(new CompanyRatingHistory(Rating, this));
+        RatingHistory.Add(
+            new CompanyRatingHistory(
+                newRating,
+                this));
     }
 
     public void MarkReviewAsOutdated(
@@ -136,6 +133,16 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         }
 
         review.MarkAsOutdated();
+        var newRating = RecalculateRating();
+
+        RatingHistory.Add(
+            new CompanyRatingHistory(
+                newRating,
+                this));
+    }
+
+    public double RecalculateRating()
+    {
         var relevantReviews = GetRelevantReviews();
 
         Rating = relevantReviews
@@ -144,7 +151,7 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
             .Average();
 
         ReviewsCount = relevantReviews.Count;
-        RatingHistory.Add(new CompanyRatingHistory(Rating, this));
+        return Rating;
     }
 
     public void Delete()
