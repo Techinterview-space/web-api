@@ -19,9 +19,13 @@ public class LoggingMiddleware
     {
         typeof(AuthenticationException),
         typeof(BadRequestException),
+        typeof(EntityInvalidException),
+        typeof(NotFoundException),
     };
 
-    public LoggingMiddleware(ILoggerFactory loggerFactory, RequestDelegate next)
+    public LoggingMiddleware(
+        ILoggerFactory loggerFactory,
+        RequestDelegate next)
     {
         _next = next;
         _logger = loggerFactory.CreateLogger<LoggingMiddleware>();
@@ -37,7 +41,10 @@ public class LoggingMiddleware
         {
             if (!Ignore(exception))
             {
-                _logger.LogError(exception, exception.Message);
+                _logger.LogError(
+                    exception,
+                    "Unhandled error occured. Message {Message}",
+                    exception.Message);
             }
 
             throw;

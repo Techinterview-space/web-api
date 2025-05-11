@@ -165,6 +165,32 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         }
     }
 
+    public void Update(
+        string name,
+        string description,
+        string logoUrl,
+        List<string> links)
+    {
+        name = name?.Trim();
+        description = description?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new BadRequestException("Company name cannot be empty.");
+        }
+
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            throw new BadRequestException("Company description cannot be empty.");
+        }
+
+        Name = name;
+        NormalizedName = name.ToUpperInvariant();
+        Description = description;
+        LogoUrl = logoUrl;
+        Links = links ?? new List<string>();
+    }
+
     protected Company()
     {
     }
