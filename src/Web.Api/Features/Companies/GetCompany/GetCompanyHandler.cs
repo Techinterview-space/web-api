@@ -38,7 +38,6 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
                 !userIsAdmin,
                 x => x.Reviews
                     .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
-            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         if (company is null)
@@ -52,11 +51,16 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
             company.IsUserAllowedToLeaveReview(user.Id);
 
         if (user is not null &&
-            !user.Has(Role.Admin) &&
-            company.DeletedAt != null)
+            !user.Has(Role.Admin))
         {
-            throw new NotFoundException(
-                "Company by ID was not found");
+            if (company.DeletedAt != null)
+            {
+                throw new NotFoundException(
+                    "Company by ID was not found");
+            }
+
+            company.IncreaseViewsCount();
+            await _context.TrySaveChangesAsync(cancellationToken);
         }
 
         return new CompanyDto(

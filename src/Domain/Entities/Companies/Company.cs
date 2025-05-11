@@ -24,6 +24,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
 
     public int ReviewsCount { get; protected set; }
 
+    public int ViewsCount { get; protected set; }
+
     public DateTime? DeletedAt { get; protected set; }
 
     public virtual List<CompanyRatingHistory> RatingHistory { get; protected set; }
@@ -152,6 +154,16 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
 
         ReviewsCount = relevantReviews.Count;
         return Rating;
+    }
+
+    public void IncreaseViewsCount()
+    {
+        NotDeletedOrFail();
+
+        if (ViewsCount < int.MaxValue)
+        {
+            ViewsCount++;
+        }
     }
 
     public void Delete()
