@@ -1,6 +1,6 @@
 ﻿namespace Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
 
-public class TelegramInlineUsageChatDataItem
+public record TelegramInlineUsageChatDataItem
 {
     public TelegramInlineUsageChatDataItem(
         long? chatId,

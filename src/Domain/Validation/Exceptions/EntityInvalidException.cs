@@ -11,16 +11,17 @@ public class EntityInvalidException : InvalidOperationException
     {
     }
 
-    public static EntityInvalidException FromInstance<T>(ICollection<string> errors)
+    public static EntityInvalidException FromInstance<T>(
+        ICollection<string> errors)
     {
         errors.ThrowIfNull(nameof(errors));
-        if (!errors.Any())
+        if (errors.Count == 0)
         {
             throw new InvalidOperationException("Collection of errors could not be empty");
         }
 
         var message = $"Instance of {typeof(T).Name} is invalid";
-        if (errors.Any())
+        if (errors.Count != 0)
         {
             message += "\r\n" + errors.Aggregate((result, item) => result + item + "\r\n");
         }

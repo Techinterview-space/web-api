@@ -14,6 +14,7 @@ using Web.Api.Features.Companies.MarkReviewOutdated;
 using Web.Api.Features.Companies.SearchCompanies;
 using Web.Api.Features.Companies.SearchReviewsToBeApproved;
 using Web.Api.Features.Companies.SoftDeleteCompany;
+using Web.Api.Features.Companies.UpdateCompany;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Companies;
@@ -44,12 +45,27 @@ public class CompaniesController : ControllerBase
     [HttpPost("")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> CreateCompany(
-        [FromBody] CreateCompanyBodyRequest request,
+        [FromBody] EditCompanyBodyRequest request,
         CancellationToken cancellationToken)
     {
         return Ok(
             await _mediator.Send(
                 new CreateCompanyCommand(request),
+                cancellationToken));
+    }
+
+    [HttpPost("{companyId:guid}")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> UpdateCompany(
+        [FromRoute] Guid companyId,
+        [FromBody] EditCompanyBodyRequest request,
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _mediator.Send(
+                new UpdateCompanyCommand(
+                    companyId,
+                    request),
                 cancellationToken));
     }
 

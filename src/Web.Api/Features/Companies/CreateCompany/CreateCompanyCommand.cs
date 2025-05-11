@@ -5,10 +5,10 @@ using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.CreateCompany;
 
-public record CreateCompanyCommand : CreateCompanyBodyRequest, IRequest<CompanyDto>
+public record CreateCompanyCommand : EditCompanyBodyRequest, IRequest<CompanyDto>
 {
     public CreateCompanyCommand(
-        CreateCompanyBodyRequest request)
+        EditCompanyBodyRequest request)
     {
         request.ThrowIfInvalid();
 
