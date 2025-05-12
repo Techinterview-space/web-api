@@ -46,6 +46,8 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
                 "Company not found");
         }
 
+        var viewsCounterShouldBeIncreased = false;
+
         var userIsAllowedToLeaveReview =
             user == null ||
             company.IsUserAllowedToLeaveReview(user.Id);
@@ -59,6 +61,15 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
                     "Company by ID was not found");
             }
 
+            viewsCounterShouldBeIncreased = true;
+        }
+        else if (user is null)
+        {
+            viewsCounterShouldBeIncreased = true;
+        }
+
+        if (viewsCounterShouldBeIncreased)
+        {
             company.IncreaseViewsCount();
             await _context.TrySaveChangesAsync(cancellationToken);
         }
