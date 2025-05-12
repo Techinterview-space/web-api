@@ -14,6 +14,8 @@ namespace Web.Api.Features.Companies.SearchCompanies;
 public class SearchCompaniesHandler
     : IRequestHandler<SearchCompaniesQuery, Pageable<CompanyDto>>
 {
+    private const int MaxPageSize = 100;
+
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 
@@ -29,6 +31,10 @@ public class SearchCompaniesHandler
         SearchCompaniesQuery request,
         CancellationToken cancellationToken)
     {
+        var pageSize = request.PageSize > MaxPageSize
+            ? MaxPageSize
+            : request.PageSize;
+
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
         var userIsAdmin = user != null && user.Has(Role.Admin);
 
@@ -41,12 +47,14 @@ public class SearchCompaniesHandler
             .When(searchQuery?.Length >= 3, x => x.Name.ToLower().Contains(searchQuery))
             .OrderBy(x => x.Name)
             .AsPaginatedAsync(
-                request,
+                new PageModel(
+                    request.Page,
+                    pageSize),
                 cancellationToken);
 
         return new Pageable<CompanyDto>(
             request.Page,
-            companies.PageSize,
+            pageSize,
             companies.TotalItems,
             companies.Results
                 .Select(x => new CompanyDto(x, true))
