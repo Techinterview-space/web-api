@@ -22,6 +22,8 @@ public record CompanyDto
 
     public int ViewsCount { get; init; }
 
+    public string Slug { get; init; }
+
     public List<CompanyReviewDto> Reviews { get; init; }
 
     public List<CompanyRatingHistoryRecordDto> RatingHistory { get; init; }
@@ -50,6 +52,7 @@ public record CompanyDto
         Rating = company.Rating;
         ReviewsCount = company.ReviewsCount;
         ViewsCount = company.ViewsCount;
+        Slug = company.Slug;
         Reviews = company.Reviews?.ConvertAll(review => new CompanyReviewDto(review));
         RatingHistory = company.RatingHistory?.ConvertAll(record => new CompanyRatingHistoryRecordDto(record));
         CreatedAt = company.CreatedAt;

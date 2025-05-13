@@ -7,10 +7,20 @@ namespace Web.Api.Features.Companies.GetCompany;
 public record GetCompanyQuery : IRequest<CompanyDto>
 {
     public GetCompanyQuery(
-        Guid id)
+        string identifier)
     {
-        Id = id;
+        Identifier = identifier;
     }
 
-    public Guid Id { get; }
+    public string Identifier { get; }
+
+    public Guid? GetIdentifierAsGuid()
+    {
+        if (Guid.TryParse(Identifier, out var guid))
+        {
+            return guid;
+        }
+
+        return null;
+    }
 }

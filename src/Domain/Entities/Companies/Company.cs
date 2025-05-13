@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Validation.Exceptions;
+using Domain.ValueObjects;
 
 namespace Domain.Entities.Companies;
 
@@ -26,6 +27,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
 
     public int ViewsCount { get; protected set; }
 
+    public string Slug { get; protected set; }
+
     public DateTime? DeletedAt { get; protected set; }
 
     public virtual List<CompanyRatingHistory> RatingHistory { get; protected set; }
@@ -38,6 +41,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         List<string> links,
         string logoUrl)
     {
+        name = name?.Trim();
+
         Name = name ?? throw new ArgumentNullException(nameof(name));
         NormalizedName = name.ToUpperInvariant();
 
@@ -46,6 +51,7 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         LogoUrl = logoUrl;
         Rating = 0;
         ReviewsCount = 0;
+        Slug = new CompanySlug(Name).ToString();
 
         Reviews = new List<CompanyReview>();
         RatingHistory = new List<CompanyRatingHistory>();
@@ -208,6 +214,14 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         Description = description;
         LogoUrl = logoUrl;
         Links = links ?? new List<string>();
+    }
+
+    public void GenerateSlug()
+    {
+        if (Slug == null)
+        {
+            Slug = new CompanySlug(Name).ToString();
+        }
     }
 
     protected Company()

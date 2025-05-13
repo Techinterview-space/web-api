@@ -69,14 +69,14 @@ public class CompaniesController : ControllerBase
                 cancellationToken));
     }
 
-    [HttpGet("{companyId:guid}")]
+    [HttpGet("{companyIdentifier}")]
     public async Task<IActionResult> GetCompany(
-        Guid companyId,
+        string companyIdentifier,
         CancellationToken cancellationToken)
     {
         return Ok(
             await _mediator.Send(
-                new GetCompanyQuery(companyId),
+                new GetCompanyQuery(companyIdentifier),
                 cancellationToken));
     }
 

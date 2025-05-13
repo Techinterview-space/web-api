@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Companies;
+using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
@@ -29,22 +31,11 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
         CancellationToken cancellationToken)
     {
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
-        var userIsAdmin = user != null && user.Has(Role.Admin);
 
-        var company = await _context.Companies
-            .IncludeWhen(userIsAdmin, x => x.Reviews)
-            .IncludeWhen(userIsAdmin, x => x.RatingHistory)
-            .IncludeWhen(
-                !userIsAdmin,
-                x => x.Reviews
-                    .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
-            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
-
-        if (company is null)
-        {
-            throw new NotFoundException(
-                "Company not found");
-        }
+        var company = await GetCompanyAsync(
+            user,
+            request,
+            cancellationToken);
 
         var viewsCounterShouldBeIncreased = false;
 
@@ -77,5 +68,42 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
         return new CompanyDto(
             company,
             userIsAllowedToLeaveReview);
+    }
+
+    private async Task<Company> GetCompanyAsync(
+        User user,
+        GetCompanyQuery request,
+        CancellationToken cancellationToken)
+    {
+        var userIsAdmin = user != null && user.Has(Role.Admin);
+
+        var query = _context.Companies
+            .IncludeWhen(userIsAdmin, x => x.Reviews)
+            .IncludeWhen(userIsAdmin, x => x.RatingHistory)
+            .IncludeWhen(
+                !userIsAdmin,
+                x => x.Reviews
+                    .Where(r => r.ApprovedAt != null && r.OutdatedAt == null));
+
+        Company company = null;
+        var identifierAsGuid = request.GetIdentifierAsGuid();
+        if (identifierAsGuid.HasValue)
+        {
+            company = await query
+                .FirstOrDefaultAsync(c => c.Id == identifierAsGuid.Value, cancellationToken);
+        }
+        else
+        {
+            company = await query
+                .FirstOrDefaultAsync(c => c.Slug == request.Identifier, cancellationToken);
+        }
+
+        if (company is null)
+        {
+            throw new NotFoundException(
+                "Company not found");
+        }
+
+        return company;
     }
 }

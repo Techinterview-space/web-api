@@ -17,7 +17,8 @@ public static class ScheduleConfig
             .AddTransient<CurrenciesResetJob>()
             .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
             .AddTransient<StatDataChangeSubscriptionCalculateJob>()
-            .AddTransient<AiAnalysisSubscriptionJob>();
+            .AddTransient<AiAnalysisSubscriptionJob>()
+            .AddTransient<CompanySlugGenerateJob>();
 
         return services;
     }
@@ -26,6 +27,11 @@ public static class ScheduleConfig
     {
         app.ApplicationServices.UseScheduler((scheduler) =>
         {
+            scheduler.Schedule<CurrenciesResetJob>()
+                .EveryFifteenMinutes()
+                .RunOnceAtStart()
+                .PreventOverlapping(nameof(CompanySlugGenerateJob));
+
             scheduler
                 .Schedule<CurrenciesResetJob>()
                 .DailyAt(6, 0)

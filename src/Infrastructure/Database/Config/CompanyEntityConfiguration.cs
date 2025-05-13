@@ -31,5 +31,9 @@ public class CompanyEntityConfiguration : IEntityTypeConfiguration<Company>
         builder
             .HasIndex(x => x.NormalizedName)
             .IsUnique(false);
+
+        builder
+            .HasIndex(x => x.Slug)
+            .IsUnique(true);
     }
 }
