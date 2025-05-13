@@ -27,7 +27,7 @@ public static class ScheduleConfig
     {
         app.ApplicationServices.UseScheduler((scheduler) =>
         {
-            scheduler.Schedule<CurrenciesResetJob>()
+            scheduler.Schedule<CompanySlugGenerateJob>()
                 .EveryFifteenMinutes()
                 .RunOnceAtStart()
                 .PreventOverlapping(nameof(CompanySlugGenerateJob));
