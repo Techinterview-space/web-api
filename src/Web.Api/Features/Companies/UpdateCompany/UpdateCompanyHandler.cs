@@ -35,7 +35,8 @@ public record UpdateCompanyHandler : IRequestHandler<UpdateCompanyCommand, Unit>
             request.Body.Name,
             request.Body.Description,
             request.Body.LogoUrl,
-            request.Body.Links);
+            request.Body.Links,
+            request.Body.Slug);
 
         await _context.TrySaveChangesAsync(cancellationToken);
         return Unit.Value;

@@ -45,7 +45,7 @@ public class CompaniesController : ControllerBase
     [HttpPost("")]
     [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> CreateCompany(
-        [FromBody] EditCompanyBodyRequest request,
+        [FromBody] CreateCompanyBodyRequest request,
         CancellationToken cancellationToken)
     {
         return Ok(

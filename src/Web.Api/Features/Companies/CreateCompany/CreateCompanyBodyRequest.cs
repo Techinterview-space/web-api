@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Web.Api.Features.Companies.CreateCompany;
 
-public record EditCompanyBodyRequest
+public record CreateCompanyBodyRequest
 {
     [Required]
     public string Name { get; init; }

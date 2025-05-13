@@ -28,7 +28,7 @@ public record KebabCaseSlug
         _source = source;
 
         // Replace spaces and underscores with hyphens
-        _result = Regex.Replace(_source, @"[._\- ]+", "-");
+        _result = Regex.Replace(_source, @"[()""._\- ]+", "-");
         _result = _result.Trim('-');
 
         // Insert hyphen before uppercase letters (except the first character)

@@ -2,13 +2,14 @@
 using Domain.Validation;
 using MediatR;
 using Web.Api.Features.Companies.Dtos;
+using Web.Api.Features.Companies.UpdateCompany;
 
 namespace Web.Api.Features.Companies.CreateCompany;
 
-public record CreateCompanyCommand : EditCompanyBodyRequest, IRequest<CompanyDto>
+public record CreateCompanyCommand : CreateCompanyBodyRequest, IRequest<CompanyDto>
 {
     public CreateCompanyCommand(
-        EditCompanyBodyRequest request)
+        CreateCompanyBodyRequest request)
     {
         request.ThrowIfInvalid();
 

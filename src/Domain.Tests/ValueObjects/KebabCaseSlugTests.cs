@@ -6,6 +6,8 @@ namespace Domain.Tests.ValueObjects;
 public class KebabCaseSlugTests
 {
     [Theory]
+    [InlineData("Hello (World)", "hello-world")]
+    [InlineData("Hello \"World\"", "hello-world")]
     [InlineData("Hello.World", "hello-world")]
     [InlineData("Hello World", "hello-world")]
     [InlineData("HelloWorld", "hello-world")]

@@ -194,7 +194,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         string name,
         string description,
         string logoUrl,
-        List<string> links)
+        List<string> links,
+        string slug)
     {
         name = name?.Trim();
         description = description?.Trim();
@@ -214,6 +215,7 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         Description = description;
         LogoUrl = logoUrl;
         Links = links ?? new List<string>();
+        Slug = new KebabCaseSlug(slug).ToString();
     }
 
     public void GenerateSlug()
