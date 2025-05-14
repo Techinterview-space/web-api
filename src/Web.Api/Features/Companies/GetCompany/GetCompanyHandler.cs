@@ -2,18 +2,18 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
-using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
+using Infrastructure.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.GetCompany;
 
-public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
+public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -26,38 +26,31 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
         _authorization = authorization;
     }
 
-    public async Task<CompanyDto> Handle(
+    public async Task<GetCompanyResponse> Handle(
         GetCompanyQuery request,
         CancellationToken cancellationToken)
     {
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
 
         var company = await GetCompanyAsync(
-            user,
             request,
             cancellationToken);
 
-        var viewsCounterShouldBeIncreased = false;
+        var viewsCounterShouldBeIncreased =
+            user is null ||
+            !user.Has(Role.Admin);
 
         var userIsAllowedToLeaveReview =
-            user == null ||
+            user is null ||
             company.IsUserAllowedToLeaveReview(user.Id);
 
-        if (user is not null &&
-            !user.Has(Role.Admin))
-        {
-            if (company.DeletedAt != null)
-            {
-                throw new NotFoundException(
-                    "Company by ID was not found");
-            }
-
-            viewsCounterShouldBeIncreased = true;
-        }
-        else if (user is null)
-        {
-            viewsCounterShouldBeIncreased = true;
-        }
+        var userHasAnyReview =
+            user is not null &&
+            await _context.CompanyReviews
+                .Where(r =>
+                    r.OutdatedAt == null &&
+                    r.UserId == user.Id)
+                .AnyAsync(cancellationToken: cancellationToken);
 
         if (viewsCounterShouldBeIncreased)
         {
@@ -65,45 +58,23 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, CompanyDto>
             await _context.TrySaveChangesAsync(cancellationToken);
         }
 
-        return new CompanyDto(
-            company,
-            userIsAllowedToLeaveReview);
+        return new GetCompanyResponse(
+            new CompanyDto(company),
+            userIsAllowedToLeaveReview,
+            userHasAnyReview);
     }
 
     private async Task<Company> GetCompanyAsync(
-        User user,
         GetCompanyQuery request,
         CancellationToken cancellationToken)
     {
-        var userIsAdmin = user != null && user.Has(Role.Admin);
-
-        var query = _context.Companies
-            .IncludeWhen(userIsAdmin, x => x.Reviews)
-            .IncludeWhen(userIsAdmin, x => x.RatingHistory)
-            .IncludeWhen(
-                !userIsAdmin,
-                x => x.Reviews
-                    .Where(r => r.ApprovedAt != null && r.OutdatedAt == null));
-
-        Company company = null;
-        var identifierAsGuid = request.GetIdentifierAsGuid();
-        if (identifierAsGuid.HasValue)
-        {
-            company = await query
-                .FirstOrDefaultAsync(c => c.Id == identifierAsGuid.Value, cancellationToken);
-        }
-        else
-        {
-            company = await query
-                .FirstOrDefaultAsync(c => c.Slug == request.Identifier, cancellationToken);
-        }
-
-        if (company is null)
-        {
-            throw new NotFoundException(
-                "Company not found");
-        }
-
-        return company;
+        return await _context.Companies
+            .Include(x => x.Reviews
+                .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
+            .Where(x => x.DeletedAt == null)
+            .GetCompanyByIdentifierOrNullAsync(
+                request.Identifier,
+                cancellationToken)
+            ?? throw new NotFoundException("Company not found");
     }
 }

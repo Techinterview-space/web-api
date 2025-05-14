@@ -10,6 +10,7 @@ using Web.Api.Features.Companies.ApproveReview;
 using Web.Api.Features.Companies.CreateCompany;
 using Web.Api.Features.Companies.DeleteCompanyReview;
 using Web.Api.Features.Companies.GetCompany;
+using Web.Api.Features.Companies.GetCompanyByAdmin;
 using Web.Api.Features.Companies.MarkReviewOutdated;
 using Web.Api.Features.Companies.SearchCompanies;
 using Web.Api.Features.Companies.SearchReviewsToBeApproved;
@@ -77,6 +78,17 @@ public class CompaniesController : ControllerBase
         return Ok(
             await _mediator.Send(
                 new GetCompanyQuery(companyIdentifier),
+                cancellationToken));
+    }
+
+    [HttpGet("{companyIdentifier}/for-admin")]
+    public async Task<IActionResult> GetCompanyByAdmin(
+        string companyIdentifier,
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _mediator.Send(
+                new GetCompanyByAdminQuery(companyIdentifier),
                 cancellationToken));
     }
 

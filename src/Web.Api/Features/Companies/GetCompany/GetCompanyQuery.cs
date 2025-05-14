@@ -4,7 +4,7 @@ using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.GetCompany;
 
-public record GetCompanyQuery : IRequest<CompanyDto>
+public record GetCompanyQuery : IRequest<GetCompanyResponse>
 {
     public GetCompanyQuery(
         string identifier)

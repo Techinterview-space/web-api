@@ -30,7 +30,7 @@ public class TotpController : ControllerBase
     public async Task<SetupTotpResponse> EnableTotp(
         CancellationToken cancellationToken)
     {
-        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var user = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         if (user.IsMfaEnabled())
         {
             throw new BadRequestException("TOTP MFA is already enabled for this user.");
@@ -51,7 +51,7 @@ public class TotpController : ControllerBase
     public async Task<SetupTotpResponse> DisableTotp(
         CancellationToken cancellationToken)
     {
-        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var user = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         if (!user.IsMfaEnabled())
         {
             throw new BadRequestException("TOTP MFA is already enabled for this user.");
@@ -68,7 +68,7 @@ public class TotpController : ControllerBase
         [FromBody] CheckTotpRequest request,
         CancellationToken cancellationToken)
     {
-        var user = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var user = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         if (!user.IsMfaEnabled())
         {
             throw new BadRequestException("TOTP MFA is not enabled for this user.");

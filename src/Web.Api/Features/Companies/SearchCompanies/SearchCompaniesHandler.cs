@@ -58,7 +58,7 @@ public class SearchCompaniesHandler
             pageSize,
             companies.TotalItems,
             companies.Results
-                .Select(x => new CompanyDto(x, true))
+                .Select(x => new CompanyDto(x))
                 .ToList());
     }
 }

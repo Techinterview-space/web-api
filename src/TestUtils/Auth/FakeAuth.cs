@@ -17,7 +17,7 @@ public class FakeAuth : IAuthorization
         _user = user;
     }
 
-    public Task<User> CurrentUserOrFailAsync(
+    public Task<User> GetCurrentUserOrFailAsync(
         CancellationToken cancellationToken = default)
     {
         return GetCurrentUserOrNullAsync(cancellationToken);

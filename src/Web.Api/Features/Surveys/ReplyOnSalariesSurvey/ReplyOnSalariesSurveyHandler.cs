@@ -28,7 +28,7 @@ public class ReplyOnSalariesSurveyHandler
         ReplyOnSalariesSurveyCommand request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _authorization.GetCurrentUserOrFailAsync(cancellationToken);
 
         var surveyUserService = new SalariesSurveyUserService(_context);
         var hasRecentReplies = await surveyUserService.HasFilledSurveyAsync(currentUser, cancellationToken);

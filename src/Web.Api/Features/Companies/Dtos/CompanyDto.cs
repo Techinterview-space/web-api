@@ -34,15 +34,12 @@ public record CompanyDto
 
     public DateTime? DeletedAt { get; init; }
 
-    public bool UserIsAllowedToLeaveReview { get; init; }
-
     public CompanyDto()
     {
     }
 
     public CompanyDto(
-        Company company,
-        bool userIsAllowedToLeaveReview = false)
+        Company company)
     {
         Id = company.Id;
         Name = company.Name;
@@ -58,6 +55,5 @@ public record CompanyDto
         CreatedAt = company.CreatedAt;
         UpdatedAt = company.UpdatedAt;
         DeletedAt = company.DeletedAt;
-        UserIsAllowedToLeaveReview = userIsAllowedToLeaveReview;
     }
 }

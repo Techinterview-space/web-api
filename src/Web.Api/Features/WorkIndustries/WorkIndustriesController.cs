@@ -71,7 +71,7 @@ public class WorkIndustriesController : ControllerBase
         [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(
             cancellationToken);
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
@@ -99,7 +99,7 @@ public class WorkIndustriesController : ControllerBase
         [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(
             cancellationToken);
 
         var item = await _context.WorkIndustries.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
@@ -119,7 +119,7 @@ public class WorkIndustriesController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(
             cancellationToken);
 
         var item = await _context.WorkIndustries.ByIdOrFailAsync(id, cancellationToken: cancellationToken);

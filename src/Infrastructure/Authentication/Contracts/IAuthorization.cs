@@ -6,7 +6,7 @@ namespace Infrastructure.Authentication.Contracts;
 
 public interface IAuthorization
 {
-    Task<User> CurrentUserOrFailAsync(
+    Task<User> GetCurrentUserOrFailAsync(
         CancellationToken cancellationToken = default);
 
     Task<User> GetCurrentUserOrNullAsync(

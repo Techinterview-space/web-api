@@ -69,7 +69,7 @@ public class SkillsController : ControllerBase
         [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(
             cancellationToken);
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
@@ -97,7 +97,7 @@ public class SkillsController : ControllerBase
         [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(
             cancellationToken);
 
         var skill = await _context.Skills.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
@@ -117,7 +117,7 @@ public class SkillsController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(
             cancellationToken);
 
         var skill = await _context.Skills.ByIdOrFailAsync(id, cancellationToken: cancellationToken);

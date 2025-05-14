@@ -33,7 +33,7 @@ public record AuthorizationService : IAuthorization
         _logger = logger;
     }
 
-    public async Task<User> CurrentUserOrFailAsync(
+    public async Task<User> GetCurrentUserOrFailAsync(
         CancellationToken cancellationToken = default)
     {
         return await GetCurrentUserOrNullAsync(cancellationToken)

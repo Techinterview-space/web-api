@@ -54,7 +54,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("my")]
     public async Task<IEnumerable<InterviewDto>> MyInterviewsAsync()
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.GetCurrentUserOrFailAsync();
         return await _context.Interviews
             .Include(x => x.Labels)
             .Where(x => x.InterviewerId == currentUser.Id)
@@ -65,7 +65,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> ByIdAsync(Guid id)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync();
+        var currentUser = await _auth.GetCurrentUserOrFailAsync();
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -85,7 +85,7 @@ public class InterviewsController : ControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -100,7 +100,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/markdown")]
     public async Task<IActionResult> MarkdownAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
@@ -117,7 +117,7 @@ public class InterviewsController : ControllerBase
     [HttpGet("{id:guid}/download-sync")]
     public async Task<FileContentResult> DownloadSyncAsync(Guid id, CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         var interview = await _context.Interviews
             .Include(x => x.Interviewer)
             .Include(x => x.Labels)
@@ -134,7 +134,7 @@ public class InterviewsController : ControllerBase
         [FromBody] InterviewCreateRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
 
         var interview = await _context.AddEntityAsync(
             new Interview(
@@ -163,7 +163,7 @@ public class InterviewsController : ControllerBase
             .Include(x => x.Labels)
             .ByIdOrFailAsync(updateRequest.Id, cancellationToken);
 
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         CheckPermissions(interview, currentUser);
 
         interview
@@ -190,7 +190,7 @@ public class InterviewsController : ControllerBase
             .Include(x => x.Labels)
             .ByIdOrFailAsync(id, cancellationToken);
 
-        CheckPermissions(interview, await _auth.CurrentUserOrFailAsync(cancellationToken));
+        CheckPermissions(interview, await _auth.GetCurrentUserOrFailAsync(cancellationToken));
 
         _context.Interviews.Remove(interview);
 

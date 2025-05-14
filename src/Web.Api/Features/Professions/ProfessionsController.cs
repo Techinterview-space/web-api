@@ -75,7 +75,7 @@ public class ProfessionsController : ControllerBase
         [FromBody] LabelEntityEditRequest createRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
 
         var titleUpper = createRequest.Title?.Trim().ToUpperInvariant();
         if (await _context.Professions.AnyAsync(
@@ -103,7 +103,7 @@ public class ProfessionsController : ControllerBase
         [FromBody] LabelEntityEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         var item = await _context.Professions.ByIdOrFailAsync(updateRequest.Id.GetValueOrDefault(), cancellationToken: cancellationToken);
         item.CouldBeUpdatedByOrFail(currentUser);
 
@@ -122,7 +122,7 @@ public class ProfessionsController : ControllerBase
         [FromRoute] long id,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _auth.GetCurrentUserOrFailAsync(cancellationToken);
         var item = await _context.Professions.ByIdOrFailAsync(id, cancellationToken: cancellationToken);
 
         item.CouldBeUpdatedByOrFail(currentUser);

@@ -27,7 +27,7 @@ public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<Activat
         ActivateStatDataChangeSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _authorization.GetCurrentUserOrFailAsync(cancellationToken);
         if (!currentUser.Has(Role.Admin))
         {
             throw new NoPermissionsException("You don't have permissions to perform this.");

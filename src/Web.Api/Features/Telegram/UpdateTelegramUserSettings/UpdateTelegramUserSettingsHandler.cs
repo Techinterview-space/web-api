@@ -29,7 +29,7 @@ public class UpdateTelegramUserSettingsHandler
         UpdateTelegramUserSettingsCommand request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _authorization.CurrentUserOrFailAsync(cancellationToken);
+        var currentUser = await _authorization.GetCurrentUserOrFailAsync(cancellationToken);
         var userSettings = await _context.TelegramUserSettings
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
             ?? throw NotFoundException.CreateFromEntity<TelegramUserSettings>(request.Id);

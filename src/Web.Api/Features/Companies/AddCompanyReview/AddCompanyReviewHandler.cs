@@ -37,7 +37,7 @@ public class AddCompanyReviewHandler
             throw new NotFoundException("Company not found");
         }
 
-        var user = await _authorization.CurrentUserOrFailAsync(cancellationToken);
+        var user = await _authorization.GetCurrentUserOrFailAsync(cancellationToken);
 
         var hasReviewed = await _context.CompanyReviews
             .AnyAsync(
