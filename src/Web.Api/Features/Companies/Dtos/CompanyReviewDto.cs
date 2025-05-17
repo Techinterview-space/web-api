@@ -32,6 +32,8 @@ public record CompanyReviewDto
 
     public Guid CompanyId { get; init; }
 
+    public string CompanySlug { get; init; }
+
     public string CompanyName { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
@@ -61,6 +63,7 @@ public record CompanyReviewDto
         UserEmployment = review.UserEmployment;
         CompanyId = review.CompanyId;
         CompanyName = review.Company?.Name;
+        CompanySlug = review.Company?.Slug;
         CreatedAt = review.CreatedAt;
         ApprovedAt = review.ApprovedAt;
         OutdatedAt = review.OutdatedAt;
@@ -84,6 +87,9 @@ public record CompanyReviewDto
             CompanyId = company.CompanyId,
             CompanyName = company.Company != null
                 ? company.Company.Name
+                : null,
+            CompanySlug = company.Company != null
+                ? company.Company.Slug
                 : null,
             CreatedAt = company.CreatedAt,
             ApprovedAt = company.ApprovedAt,
