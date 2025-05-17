@@ -1,6 +1,4 @@
-﻿using System;
-using MediatR;
-using Web.Api.Features.Companies.Dtos;
+﻿using MediatR;
 
 namespace Web.Api.Features.Companies.GetCompany;
 
@@ -13,14 +11,4 @@ public record GetCompanyQuery : IRequest<GetCompanyResponse>
     }
 
     public string Identifier { get; }
-
-    public Guid? GetIdentifierAsGuid()
-    {
-        if (Guid.TryParse(Identifier, out var guid))
-        {
-            return guid;
-        }
-
-        return null;
-    }
 }

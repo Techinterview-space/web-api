@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Validation.Exceptions;
@@ -40,32 +41,31 @@ public class AddCompanyReviewHandler
         var user = await _authorization.GetCurrentUserOrFailAsync(cancellationToken);
 
         var hasReviewed = await _context.CompanyReviews
-            .AnyAsync(
-                cr =>
-                    cr.CompanyId == request.CompanyId &&
-                    cr.UserId == user.Id &&
-                    cr.OutdatedAt == null,
-                cancellationToken: cancellationToken);
+            .HasRecentReviewAsync(
+                company.Id,
+                user.Id,
+                cancellationToken);
 
         if (hasReviewed)
         {
             throw new BadRequestException("You have already reviewed this company");
         }
 
-        company.AddReview(
-            new CompanyReview(
-                request.CultureAndValues,
-                request.CodeQuality,
-                request.WorkLifeBalance,
-                request.Management,
-                request.CompensationAndBenefits,
-                request.CareerOpportunities,
-                request.Pros,
-                request.Cons,
-                request.IWorkHere,
-                request.UserEmployment,
-                company,
-                user));
+        var review = new CompanyReview(
+            request.CultureAndValues,
+            request.CodeQuality,
+            request.WorkLifeBalance,
+            request.Management,
+            request.CompensationAndBenefits,
+            request.CareerOpportunities,
+            request.Pros,
+            request.Cons,
+            request.IWorkHere,
+            request.UserEmployment,
+            company,
+            user);
+
+        company.AddReview(review);
 
         await _context.SaveChangesAsync(cancellationToken);
 

@@ -42,6 +42,13 @@ public class CompanyReviewFake : CompanyReview
         return this;
     }
 
+    public CompanyReviewFake SetCreatedAt(
+        DateTimeOffset date)
+    {
+        CreatedAt = date;
+        return this;
+    }
+
     public CompanyReview Please(
         InMemoryDatabaseContext context)
     {

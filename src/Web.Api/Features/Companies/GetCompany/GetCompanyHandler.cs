@@ -30,11 +30,18 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResp
         GetCompanyQuery request,
         CancellationToken cancellationToken)
     {
-        var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
-
         var company = await GetCompanyAsync(
             request,
             cancellationToken);
+
+        var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
+        var userHasAnyReview =
+            user is not null &&
+            await _context.CompanyReviews
+                .HasRecentReviewAsync(
+                    company.Id,
+                    user.Id,
+                    cancellationToken);
 
         var viewsCounterShouldBeIncreased =
             user is null ||
@@ -43,14 +50,6 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResp
         var userIsAllowedToLeaveReview =
             user is null ||
             company.IsUserAllowedToLeaveReview(user.Id);
-
-        var userHasAnyReview =
-            user is not null &&
-            await _context.CompanyReviews
-                .Where(r =>
-                    r.OutdatedAt == null &&
-                    r.UserId == user.Id)
-                .AnyAsync(cancellationToken: cancellationToken);
 
         if (viewsCounterShouldBeIncreased)
         {
@@ -70,7 +69,7 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResp
     {
         return await _context.Companies
             .Include(x => x.Reviews
-                .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
+                    .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
             .Where(x => x.DeletedAt == null)
             .GetCompanyByIdentifierOrNullAsync(
                 request.Identifier,
