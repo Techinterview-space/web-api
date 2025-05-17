@@ -102,7 +102,8 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
 
     public bool IsRelevant()
     {
-        return ApprovedAt != null && OutdatedAt == null;
+        return ApprovedAt != null &&
+               OutdatedAt == null;
     }
 
     public void Approve()

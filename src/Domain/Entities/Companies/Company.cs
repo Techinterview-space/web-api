@@ -86,7 +86,14 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
             throw new InvalidOperationException("Reviews are not initialized.");
         }
 
-        if (GetRelevantReviews().Any(x => x.UserId == review.UserId))
+        var threeMonthAgo = DateTimeOffset.UtcNow.AddMonths(-3);
+        var hasReviewsByUser = Reviews
+            .Any(x =>
+                x.UserId == review.UserId &&
+                x.OutdatedAt == null &&
+                x.CreatedAt >= threeMonthAgo);
+
+        if (hasReviewsByUser)
         {
             throw new BadRequestException("User already has a review.");
         }
