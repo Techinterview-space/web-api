@@ -41,9 +41,11 @@ public class AdminUsersController : ControllerBase
 
         pageParams ??= PageModel.Default;
         return await _context.Users
+            .AsNoTracking()
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
+            .OrderBy(x => x.CreatedAt)
             .Select(UserDto.Transformation)
             .AsPaginatedAsync(pageParams);
     }
