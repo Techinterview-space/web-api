@@ -46,7 +46,9 @@ public class SearchCompaniesHandler
             .When(!userIsAdmin, x => x.DeletedAt == null)
             .When(searchQuery?.Length >= 3, x => x.Name.ToLower().Contains(searchQuery))
             .When(request.WithRating && !request.HasSearchQuery(), x => x.Rating > 0)
-            .OrderBy(x => x.Name)
+            .OrderByDescending(x => x.ReviewsCount)
+            .ThenByDescending(x => x.ViewsCount)
+            .ThenByDescending(x => x.Name)
             .AsPaginatedAsync(
                 new PageModel(
                     request.Page,
