@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
-namespace Web.Api.Features.Telegram;
+namespace Infrastructure.Services.Telegram;
 
 public class TelegramBotClientProvider
 {

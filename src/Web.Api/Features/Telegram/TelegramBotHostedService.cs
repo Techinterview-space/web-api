@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Validation.Exceptions;
+using Infrastructure.Services.Telegram;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -15,7 +14,7 @@ using Web.Api.Features.Telegram.ProcessMessage;
 
 namespace Web.Api.Features.Telegram;
 
-public class TelegramBotService
+public class TelegramBotHostedService
 {
     private static readonly UpdateType[] _updateTypes = new List<UpdateType>
     {
@@ -25,13 +24,13 @@ public class TelegramBotService
     }.ToArray();
 
     private readonly TelegramBotClientProvider _botClientProvider;
-    private readonly ILogger<TelegramBotService> _logger;
+    private readonly ILogger<TelegramBotHostedService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DateTime _startedToListenTo;
 
-    public TelegramBotService(
+    public TelegramBotHostedService(
         TelegramBotClientProvider botClientProvider,
-        ILogger<TelegramBotService> logger,
+        ILogger<TelegramBotHostedService> logger,
         IServiceScopeFactory serviceScopeFactory)
     {
         _botClientProvider = botClientProvider;
@@ -100,16 +99,5 @@ public class TelegramBotService
         await mediator.Send(
             new ProcessTelegramMessageCommand(client, updateRequest),
             cancellationToken);
-    }
-
-    private TelegramBotClient CreateClient(
-        string token)
-    {
-        if (string.IsNullOrEmpty(token))
-        {
-            throw new BadRequestException("Token is not set");
-        }
-
-        return new TelegramBotClient(token);
     }
 }

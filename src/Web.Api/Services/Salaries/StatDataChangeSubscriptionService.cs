@@ -12,6 +12,7 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
+using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.UserCommands;
 using Microsoft.EntityFrameworkCore;

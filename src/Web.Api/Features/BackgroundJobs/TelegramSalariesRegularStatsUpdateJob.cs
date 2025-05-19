@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Telegram;
 using Infrastructure.Database;
+using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

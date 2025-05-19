@@ -8,6 +8,7 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Database;
+using Infrastructure.Services.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,7 +51,7 @@ public class AppInitializeService : IHostedService
         var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
         await MigrateAsync(database, cancellationToken);
 
-        var telegramService = scope.ServiceProvider.GetRequiredService<TelegramBotService>();
+        var telegramService = scope.ServiceProvider.GetRequiredService<TelegramBotHostedService>();
         telegramService.StartReceiving(cancellationToken);
     }
 

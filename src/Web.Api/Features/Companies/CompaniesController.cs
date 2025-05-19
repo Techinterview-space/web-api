@@ -13,6 +13,7 @@ using Web.Api.Features.Companies.GetCompany;
 using Web.Api.Features.Companies.GetCompanyByAdmin;
 using Web.Api.Features.Companies.MarkReviewOutdated;
 using Web.Api.Features.Companies.SearchCompanies;
+using Web.Api.Features.Companies.SearchCompaniesForAdmin;
 using Web.Api.Features.Companies.SearchReviewsToBeApproved;
 using Web.Api.Features.Companies.SoftDeleteCompany;
 using Web.Api.Features.Companies.UpdateCompany;
@@ -40,6 +41,18 @@ public class CompaniesController : ControllerBase
         return Ok(
             await _mediator.Send(
                 new SearchCompaniesQuery(queryParams),
+                cancellationToken));
+    }
+
+    [HttpGet("for-admin")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> SearchCompaniesForAdmin(
+        [FromQuery] SearchCompaniesForAdminQueryParams queryParams,
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _mediator.Send(
+                new SearchCompaniesForAdminQuery(queryParams),
                 cancellationToken));
     }
 

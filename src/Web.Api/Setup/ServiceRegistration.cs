@@ -14,6 +14,7 @@ using Infrastructure.Services.OpenAi;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
+using Infrastructure.Services.Telegram;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,10 +40,11 @@ public static class ServiceRegistration
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
             .AddScoped<IOpenAiService, OpenAiService>()
             .AddTransient<TelegramBotClientProvider>()
-            .AddTransient<TelegramBotService>()
+            .AddTransient<TelegramBotHostedService>()
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
-            .AddTransient<StatDataChangeSubscriptionService>();
+            .AddTransient<StatDataChangeSubscriptionService>()
+            .AddScoped<ITelegramAdminNotificationService, TelegramNotificationService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
