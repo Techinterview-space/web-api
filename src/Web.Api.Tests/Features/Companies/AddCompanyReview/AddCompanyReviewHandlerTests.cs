@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
+using TestUtils.Services;
 using Web.Api.Features.Companies.AddCompanyReview;
 using Xunit;
 
@@ -30,7 +31,8 @@ public class AddCompanyReviewHandlerTests
 
         var handler = new AddCompanyReviewHandler(
             context,
-            new FakeAuth(user));
+            new FakeAuth(user),
+            new TelegramAdminNotificationServiceFake());
 
         var command = new AddCompanyReviewCommand(
             company.Id,
@@ -99,7 +101,8 @@ public class AddCompanyReviewHandlerTests
 
         var handler = new AddCompanyReviewHandler(
             context,
-            new FakeAuth(user));
+            new FakeAuth(user),
+            new TelegramAdminNotificationServiceFake());
 
         var command = new AddCompanyReviewCommand(
             company.Id,
@@ -167,7 +170,8 @@ public class AddCompanyReviewHandlerTests
 
         var handler = new AddCompanyReviewHandler(
             context,
-            new FakeAuth(user));
+            new FakeAuth(user),
+            new TelegramAdminNotificationServiceFake());
 
         var command = new AddCompanyReviewCommand(
             company.Id,
@@ -235,7 +239,8 @@ public class AddCompanyReviewHandlerTests
 
         var handler = new AddCompanyReviewHandler(
             context,
-            new FakeAuth(user));
+            new FakeAuth(user),
+            new TelegramAdminNotificationServiceFake());
 
         var command = new AddCompanyReviewCommand(
             company.Id,
@@ -282,7 +287,8 @@ public class AddCompanyReviewHandlerTests
 
         var handler = new AddCompanyReviewHandler(
             context,
-            new FakeAuth(user));
+            new FakeAuth(user),
+            new TelegramAdminNotificationServiceFake());
 
         var command = new AddCompanyReviewCommand(
             company.Id,
@@ -332,7 +338,8 @@ public class AddCompanyReviewHandlerTests
 
         var handler = new AddCompanyReviewHandler(
             context,
-            new FakeAuth(user));
+            new FakeAuth(user),
+            new TelegramAdminNotificationServiceFake());
 
         var command = new AddCompanyReviewCommand(
             company.Id,

@@ -6,6 +6,7 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
+using Infrastructure.Services.Telegram;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,13 +17,16 @@ public class AddCompanyReviewHandler
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
+    private readonly ITelegramAdminNotificationService _notificationService;
 
     public AddCompanyReviewHandler(
         DatabaseContext context,
-        IAuthorization authorization)
+        IAuthorization authorization,
+        ITelegramAdminNotificationService notificationService)
     {
         _context = context;
         _authorization = authorization;
+        _notificationService = notificationService;
     }
 
     public async Task<Unit> Handle(
