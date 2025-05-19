@@ -73,6 +73,11 @@ public class AddCompanyReviewHandler
 
         await _context.SaveChangesAsync(cancellationToken);
 
+        await _notificationService.NotifyAboutNewCompanyReviewAsync(
+            review,
+            company,
+            cancellationToken);
+
         return Unit.Value;
     }
 }
