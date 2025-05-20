@@ -5,6 +5,7 @@ using Domain.Enums;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
+using Infrastructure.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
@@ -12,10 +13,8 @@ using Web.Api.Features.Companies.Dtos;
 namespace Web.Api.Features.Companies.SearchCompanies;
 
 public class SearchCompaniesHandler
-    : IRequestHandler<SearchCompaniesQuery, Pageable<CompanyDto>>
+    : IRequestHandler<SearchCompaniesQuery, SearchCompaniesResponse>
 {
-    private const int MaxPageSize = 100;
-
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 
@@ -27,23 +26,26 @@ public class SearchCompaniesHandler
         _authorization = authorization;
     }
 
-    public async Task<Pageable<CompanyDto>> Handle(
+    public async Task<SearchCompaniesResponse> Handle(
         SearchCompaniesQuery request,
         CancellationToken cancellationToken)
     {
-        var pageSize = request.PageSize > MaxPageSize
-            ? MaxPageSize
-            : request.PageSize;
+        var pageSize = request.GetPageSize();
 
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
-        var userIsAdmin = user != null && user.Has(Role.Admin);
+        var userHasAnyReview =
+            user is not null &&
+            await _context.CompanyReviews
+                .HasRecentReviewAsync(
+                    companyId: null,
+                    userId: user.Id,
+                    countOfMonthsForEdge: 12,
+                    cancellationToken: cancellationToken);
 
         var searchQuery = request.SearchQuery?.Trim().ToLowerInvariant();
         var companies = await _context.Companies
             .AsNoTracking()
-            .IncludeWhen(userIsAdmin, x => x.Reviews)
-            .IncludeWhen(userIsAdmin, x => x.RatingHistory)
-            .When(!userIsAdmin, x => x.DeletedAt == null)
+            .Where(x => x.DeletedAt == null)
             .When(searchQuery?.Length >= 2, x => x.Name.ToLower().Contains(searchQuery))
             .When(request.WithRating && !request.HasSearchQuery(), x => x.Rating > 0)
             .OrderByDescending(x => x.ReviewsCount)
@@ -55,12 +57,13 @@ public class SearchCompaniesHandler
                     pageSize),
                 cancellationToken);
 
-        return new Pageable<CompanyDto>(
+        return new SearchCompaniesResponse(
             request.Page,
             pageSize,
             companies.TotalItems,
             companies.Results
                 .Select(x => new CompanyDto(x))
-                .ToList());
+                .ToList(),
+            userHasAnyReview);
     }
 }

@@ -4,6 +4,8 @@ namespace Domain.ValueObjects.Pagination;
 
 public record PageModel
 {
+    public const int MaxPageSize = 100;
+
     private const int DefaultPage = 1;
     private const int DefaultPageSize = 20;
 
@@ -23,6 +25,13 @@ public record PageModel
     {
         Page = page;
         PageSize = pageSize;
+    }
+
+    public int GetPageSize()
+    {
+        return PageSize > MaxPageSize
+            ? MaxPageSize
+            : PageSize;
     }
 
     public static PageModel Default => new (DefaultPage, DefaultPageSize);

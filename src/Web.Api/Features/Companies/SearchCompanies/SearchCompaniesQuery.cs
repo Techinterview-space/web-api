@@ -4,7 +4,7 @@ using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.SearchCompanies;
 
-public record SearchCompaniesQuery : SearchCompaniesQueryParams, IRequest<Pageable<CompanyDto>>
+public record SearchCompaniesQuery : SearchCompaniesQueryParams, IRequest<SearchCompaniesResponse>
 {
     public SearchCompaniesQuery(
         SearchCompaniesQueryParams queryParams)
