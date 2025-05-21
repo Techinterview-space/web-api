@@ -39,7 +39,7 @@ public static class ServiceRegistration
             .AddScoped<IPdf, QuestPdfBasedRender>()
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
             .AddScoped<IOpenAiService, OpenAiService>()
-            .AddTransient<TelegramBotClientProvider>()
+            .AddTransient<ITelegramBotClientProvider, TelegramBotClientProvider>()
             .AddTransient<TelegramBotHostedService>()
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()

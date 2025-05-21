@@ -23,13 +23,13 @@ public class TelegramBotHostedService
         UpdateType.ChosenInlineResult,
     }.ToArray();
 
-    private readonly TelegramBotClientProvider _botClientProvider;
+    private readonly ITelegramBotClientProvider _botClientProvider;
     private readonly ILogger<TelegramBotHostedService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DateTime _startedToListenTo;
 
     public TelegramBotHostedService(
-        TelegramBotClientProvider botClientProvider,
+        ITelegramBotClientProvider botClientProvider,
         ILogger<TelegramBotHostedService> logger,
         IServiceScopeFactory serviceScopeFactory)
     {

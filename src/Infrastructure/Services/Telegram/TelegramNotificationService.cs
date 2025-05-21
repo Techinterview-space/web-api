@@ -11,13 +11,13 @@ namespace Infrastructure.Services.Telegram;
 
 public class TelegramNotificationService : ITelegramAdminNotificationService
 {
-    private readonly TelegramBotClientProvider _botClientProvider;
+    private readonly ITelegramBotClientProvider _botClientProvider;
     private readonly ILogger<TelegramNotificationService> _logger;
     private readonly DatabaseContext _context;
     private readonly IGlobal _globalSettings;
 
     public TelegramNotificationService(
-        TelegramBotClientProvider botClientProvider,
+        ITelegramBotClientProvider botClientProvider,
         ILogger<TelegramNotificationService> logger,
         DatabaseContext context,
         IGlobal globalSettings)

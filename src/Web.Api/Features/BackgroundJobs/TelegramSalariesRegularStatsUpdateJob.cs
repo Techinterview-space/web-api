@@ -19,12 +19,12 @@ public class TelegramSalariesRegularStatsUpdateJob
     : InvocableJobBase<TelegramSalariesRegularStatsUpdateJob>
 {
     private readonly DatabaseContext _context;
-    private readonly TelegramBotClientProvider _botClientProvider;
+    private readonly ITelegramBotClientProvider _botClientProvider;
 
     public TelegramSalariesRegularStatsUpdateJob(
         ILogger<TelegramSalariesRegularStatsUpdateJob> logger,
         DatabaseContext context,
-        TelegramBotClientProvider botClientProvider)
+        ITelegramBotClientProvider botClientProvider)
         : base(logger)
     {
         _context = context;

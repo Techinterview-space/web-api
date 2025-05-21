@@ -4,7 +4,7 @@ using Telegram.Bot;
 
 namespace Infrastructure.Services.Telegram;
 
-public class TelegramBotClientProvider
+public class TelegramBotClientProvider : ITelegramBotClientProvider
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<TelegramBotClientProvider> _logger;

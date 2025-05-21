@@ -14,7 +14,7 @@ public class UserSalaryFake : UserSalary
         User user,
         double value = 500_000,
         int quarter = 1,
-        int year = 2024,
+        int year = 2025,
         Currency currency = Currency.KZT,
         DeveloperGrade? grade = null,
         CompanyType company = CompanyType.Local,
@@ -44,6 +44,13 @@ public class UserSalaryFake : UserSalary
         {
             CreatedAt = createdAt.Value;
         }
+    }
+
+    public UserSalaryFake WithProfession(
+        UserProfessionEnum profession)
+    {
+        ProfessionId = (long)profession;
+        return this;
     }
 
     public UserSalary AsDomain() => this;

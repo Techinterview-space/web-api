@@ -21,7 +21,6 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
 using Web.Api.Features.BackgroundJobs.Models;
-using Web.Api.Features.Telegram;
 
 namespace Web.Api.Services.Salaries;
 
@@ -34,7 +33,7 @@ public class StatDataChangeSubscriptionService
     private readonly ICurrencyService _currencyService;
     private readonly IProfessionsCacheService _professionsCacheService;
     private readonly IGlobal _global;
-    private readonly TelegramBotClientProvider _botClientProvider;
+    private readonly ITelegramBotClientProvider _botClientProvider;
     private readonly ILogger<StatDataChangeSubscriptionService> _logger;
 
     public StatDataChangeSubscriptionService(
@@ -42,7 +41,7 @@ public class StatDataChangeSubscriptionService
         ICurrencyService currencyService,
         IProfessionsCacheService professionsCacheService,
         IGlobal global,
-        TelegramBotClientProvider botClientProvider,
+        ITelegramBotClientProvider botClientProvider,
         ILogger<StatDataChangeSubscriptionService> logger)
     {
         _context = context;
