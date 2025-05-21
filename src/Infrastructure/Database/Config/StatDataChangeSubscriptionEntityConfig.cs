@@ -1,6 +1,7 @@
 ﻿using Domain.Entities.StatData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Database.Config;
 
@@ -30,5 +31,11 @@ public class StatDataChangeSubscriptionEntityConfig : IEntityTypeConfiguration<S
             .Property(x => x.UseAiAnalysis)
             .IsRequired()
             .HasDefaultValue(false);
+
+        builder
+            .Property(x => x.Regularity)
+            .IsRequired()
+            .HasConversion<EnumToStringConverter<SubscriptionRegularityType>>()
+            .HasDefaultValue(SubscriptionRegularityType.Weekly);
     }
 }

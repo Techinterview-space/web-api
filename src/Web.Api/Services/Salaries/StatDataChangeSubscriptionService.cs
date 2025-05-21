@@ -28,6 +28,7 @@ namespace Web.Api.Services.Salaries;
 public class StatDataChangeSubscriptionService
 {
     public const string SalariesPageUrl = "techinterview.space/salaries";
+    public const int CountOfDaysToSendMonthlyNotification = 24;
 
     private readonly DatabaseContext _context;
     private readonly ICurrencyService _currencyService;
@@ -174,12 +175,24 @@ public class StatDataChangeSubscriptionService
                 calculatedBasedOnLine += $" (+{subscriptionData.TotalSalaryCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
             }
 
-            if (!hasAnyDifference &&
+            if (subscription.Regularity is SubscriptionRegularityType.Weekly &&
+                !hasAnyDifference &&
                 subscription.PreventNotificationIfNoDifference &&
-                !subscription.LastMessageWasSentDaysAgo(24))
+                !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification))
             {
                 _logger.LogInformation(
-                    "No difference in salaries for subscription {SubscriptionId} ({Name}). Skipping notification.",
+                    "No difference in salaries for subscription weekly {SubscriptionId} ({Name}). Skipping notification.",
+                    subscription.Id,
+                    subscription.Name);
+
+                continue;
+            }
+
+            if (subscription.Regularity is SubscriptionRegularityType.Monthly &&
+                !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification))
+            {
+                _logger.LogInformation(
+                    "Monthly subscription {SubscriptionId} ({Name}) will be skipped due to dates",
                     subscription.Id,
                     subscription.Name);
 

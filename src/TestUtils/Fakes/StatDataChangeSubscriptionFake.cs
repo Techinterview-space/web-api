@@ -15,7 +15,8 @@ public class StatDataChangeSubscriptionFake : StatDataChangeSubscription
                 (long)UserProfessionEnum.BackendDeveloper,
                 (long)UserProfessionEnum.FrontendDeveloper,
             },
-            false)
+            false,
+            SubscriptionRegularityType.Weekly)
     {
     }
 }

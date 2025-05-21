@@ -24,6 +24,7 @@ public record StatDataChangeSubscriptionDto
             ? entity.StatDataChangeSubscriptionTgMessages.Last().CreatedAt
             : null;
 
+        Regularity = entity.Regularity;
         UseAiAnalysis = entity.UseAiAnalysis;
         DeletedAt = entity.DeletedAt;
         CreatedAt = entity.CreatedAt;
@@ -41,6 +42,8 @@ public record StatDataChangeSubscriptionDto
     public bool PreventNotificationIfNoDifference { get; init; }
 
     public bool UseAiAnalysis { get; init; }
+
+    public SubscriptionRegularityType Regularity { get; init; }
 
     public DateTimeOffset? LastMessageSent { get; init; }
 
@@ -63,6 +66,7 @@ public record StatDataChangeSubscriptionDto
                 .Last().CreatedAt
             : null,
         UseAiAnalysis = x.UseAiAnalysis,
+        Regularity = x.Regularity,
         DeletedAt = x.DeletedAt,
         CreatedAt = x.CreatedAt,
         UpdatedAt = x.UpdatedAt,

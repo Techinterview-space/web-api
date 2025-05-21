@@ -13,5 +13,6 @@ public record CreateSubscriptionCommand
         TelegramChatId = request.TelegramChatId;
         ProfessionIds = request.ProfessionIds;
         PreventNotificationIfNoDifference = request.PreventNotificationIfNoDifference;
+        Regularity = request.Regularity;
     }
 }

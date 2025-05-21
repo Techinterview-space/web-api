@@ -60,7 +60,8 @@ public class CreateSubscriptionHandler
                 request.Name,
                 request.TelegramChatId,
                 professions,
-                request.PreventNotificationIfNoDifference));
+                request.PreventNotificationIfNoDifference,
+                request.Regularity));
 
         await _context.SaveChangesAsync(cancellationToken);
         return new StatDataChangeSubscriptionDto(newSubscription.Entity);

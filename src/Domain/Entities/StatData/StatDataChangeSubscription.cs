@@ -22,6 +22,8 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
 
     public bool UseAiAnalysis { get; protected set; }
 
+    public SubscriptionRegularityType Regularity { get; protected set; }
+
     public DateTimeOffset? DeletedAt { get; protected set; }
 
     public virtual List<StatDataChangeSubscriptionRecord> Records { get; protected set; }
@@ -38,7 +40,8 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
         string name,
         long telegramChatId,
         List<long> professionIds,
-        bool preventNotificationIfNoDifference)
+        bool preventNotificationIfNoDifference,
+        SubscriptionRegularityType regularityType)
     {
         Id = Guid.NewGuid();
         Name = name;
@@ -46,6 +49,7 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
         ProfessionIds = professionIds;
         PreventNotificationIfNoDifference = preventNotificationIfNoDifference;
         DeletedAt = null;
+        Regularity = regularityType;
     }
 
     public void Activate()
