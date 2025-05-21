@@ -350,4 +350,61 @@ public class StatDataChangeSubscriptionServiceTests
         Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
         Assert.Equal(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[0].Id);
     }
+
+    [Fact]
+    public async Task ProcessAllSubscriptionsAsync_MonthlySubscription_NoMessagesBefore_Sent()
+    {
+        await using var context = new InMemoryDatabaseContext();
+
+        var salary1 = await new UserSalaryFake(null, grade: DeveloperGrade.Middle)
+            .WithProfession(UserProfessionEnum.BackendDeveloper)
+            .PleaseAsync(context);
+
+        var salary2 = await new UserSalaryFake(null, grade: DeveloperGrade.Middle)
+            .WithProfession(UserProfessionEnum.FrontendDeveloper)
+            .PleaseAsync(context);
+
+        var salary3 = await new UserSalaryFake(null, grade: DeveloperGrade.Middle)
+            .WithProfession(UserProfessionEnum.QualityAssurance)
+            .PleaseAsync(context);
+
+        var salary4 = await new UserSalaryFake(null, grade: DeveloperGrade.Middle)
+            .WithProfession(UserProfessionEnum.Tester)
+            .PleaseAsync(context);
+
+        Assert.Equal(4, context.Salaries.Count());
+
+        var subscription = new StatDataChangeSubscriptionFake()
+            .WithNoPushesValue(true)
+            .WithRegularity(SubscriptionRegularityType.Monthly)
+            .WithProfession(
+                UserProfessionEnum.BackendDeveloper,
+                UserProfessionEnum.FrontendDeveloper,
+                UserProfessionEnum.QualityAssurance,
+                UserProfessionEnum.Tester)
+            .Please(context);
+
+        Assert.Empty(subscription.StatDataChangeSubscriptionTgMessages);
+
+        var tgProvider = new TelegramBotClientProviderFake();
+        var target = new StatDataChangeSubscriptionService(
+            context,
+            new CurrencyServiceFake(),
+            new ProfessionsCacheServiceFake(context),
+            new GlobalFake(),
+            tgProvider,
+            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+
+        context.ChangeTracker.Clear();
+        var result = await target.ProcessAllSubscriptionsAsync(
+            "test",
+            default);
+
+        Assert.Equal(1, result);
+
+        var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
+        Assert.Single(sentMessages);
+
+        Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
+    }
 }
