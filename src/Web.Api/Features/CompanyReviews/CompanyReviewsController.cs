@@ -58,6 +58,7 @@ public class CompanyReviewsController : ControllerBase
     }
 
     [HttpGet("reviews/to-approve")]
+    [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> SearchReviewsToBeApproved(
         CancellationToken cancellationToken)
     {
@@ -96,7 +97,7 @@ public class CompanyReviewsController : ControllerBase
     }
 
     [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/like")]
-    [HasAnyRole(Role.Admin)]
+    [HasAnyRole]
     public async Task<IActionResult> LikeReview(
         [FromRoute] Guid companyId,
         [FromRoute] Guid reviewId,
@@ -113,7 +114,7 @@ public class CompanyReviewsController : ControllerBase
     }
 
     [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/dislike")]
-    [HasAnyRole(Role.Admin)]
+    [HasAnyRole]
     public async Task<IActionResult> DislikeReview(
         [FromRoute] Guid companyId,
         [FromRoute] Guid reviewId,
