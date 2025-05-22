@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Domain.Entities.Users;
 using Domain.Validation.Exceptions;
@@ -31,6 +33,10 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
 
     public bool IWorkHere { get; protected set; }
 
+    public int LikesCount { get; protected set; }
+
+    public int DislikesCount { get; protected set; }
+
     public CompanyEmploymentType UserEmployment { get; protected set; }
 
     public DateTime? ApprovedAt { get; protected set; }
@@ -44,6 +50,8 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
     public long UserId { get; protected set; }
 
     public virtual User User { get; protected set; }
+
+    public virtual List<CompanyReviewVote> Votes { get; protected set; }
 
     public CompanyReview(
         int cultureAndValues,
@@ -100,6 +108,17 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
     {
     }
 
+    public double? GetLikesRateOrNull()
+    {
+        if (LikesCount == 0 && DislikesCount == 0)
+        {
+            return null;
+        }
+
+        return Math.Round(
+            (double)LikesCount / (LikesCount + DislikesCount) * 100);
+    }
+
     public bool IsRelevant()
     {
         return ApprovedAt != null &&
@@ -125,6 +144,36 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
         }
 
         OutdatedAt = DateTime.UtcNow;
+    }
+
+    public bool AddReview(
+        User reviewer,
+        CompanyReviewVoteType voteType)
+    {
+        if (Votes.Any(x => x.UserId == reviewer.Id))
+        {
+            return false;
+        }
+
+        Votes.Add(new CompanyReviewVote(
+            this,
+            reviewer.Id,
+            voteType));
+
+        if (voteType == CompanyReviewVoteType.Like)
+        {
+            LikesCount++;
+        }
+        else if (voteType == CompanyReviewVoteType.Dislike)
+        {
+            DislikesCount++;
+        }
+        else
+        {
+            throw new InvalidOperationException("Vote type must be like or dislike");
+        }
+
+        return true;
     }
 
     protected static double CalculateTotal(

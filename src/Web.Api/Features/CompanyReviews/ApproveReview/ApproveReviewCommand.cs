@@ -1,11 +1,11 @@
 ﻿using System;
 using MediatR;
 
-namespace Web.Api.Features.Companies.DeleteCompanyReview;
+namespace Web.Api.Features.CompanyReviews.ApproveReview;
 
-public record DeleteCompanyReviewCommand : IRequest<Unit>
+public record ApproveReviewCommand : IRequest<Unit>
 {
-    public DeleteCompanyReviewCommand(
+    public ApproveReviewCommand(
         Guid companyId,
         Guid reviewId)
     {

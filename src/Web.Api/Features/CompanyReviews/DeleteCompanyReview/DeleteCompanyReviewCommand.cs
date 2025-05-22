@@ -1,11 +1,11 @@
 ﻿using System;
 using MediatR;
 
-namespace Web.Api.Features.Companies.MarkReviewOutdated;
+namespace Web.Api.Features.CompanyReviews.DeleteCompanyReview;
 
-public record MarkReviewOutdatedCommand : IRequest<Unit>
+public record DeleteCompanyReviewCommand : IRequest<Unit>
 {
-    public MarkReviewOutdatedCommand(
+    public DeleteCompanyReviewCommand(
         Guid companyId,
         Guid reviewId)
     {

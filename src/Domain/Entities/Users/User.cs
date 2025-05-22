@@ -83,13 +83,13 @@ public class User : BaseModel, IHasDeletedAt
 
     public DateTimeOffset? LastLoginAt { get; protected set; }
 
-    [JsonIgnore]
     public virtual List<UserRole> UserRoles { get; protected set; } = new ();
 
-    [JsonIgnore]
     public virtual List<UserSalary> Salaries { get; protected set; } = new ();
 
     public virtual List<CompanyReview> Reviews { get; protected set; } = new ();
+
+    public virtual List<CompanyReviewVote> Votes { get; protected set; }
 
     public string GetFullname()
     {

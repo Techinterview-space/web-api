@@ -59,6 +59,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<CompanyReview> CompanyReviews { get; set; }
 
+    public DbSet<CompanyReviewVote> CompanyReviewVotes { get; set; }
+
     public DbSet<AiAnalysisRecord> AiAnalysisSubscriptionRecords { get; set; }
 
     public DbSet<TelegramInlineReply> TelegramInlineReplies { get; set; }
