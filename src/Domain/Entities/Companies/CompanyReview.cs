@@ -146,7 +146,7 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
         OutdatedAt = DateTime.UtcNow;
     }
 
-    public bool AddReview(
+    public bool AddVote(
         User reviewer,
         CompanyReviewVoteType voteType)
     {

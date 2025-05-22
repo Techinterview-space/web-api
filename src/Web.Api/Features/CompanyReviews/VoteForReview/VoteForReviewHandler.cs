@@ -49,7 +49,7 @@ public class VoteForReviewHandler
                          .FirstOrDefaultAsync(cancellationToken)
                      ?? throw NotFoundException.CreateFromEntity<CompanyReview>(request.ReviewId);
 
-        review.AddReview(
+        review.AddVote(
             user,
             request.VoteType);
 
