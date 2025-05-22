@@ -2,19 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
-using Domain.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Web.Api.Features.Companies.AddCompanyReview;
-using Web.Api.Features.Companies.ApproveReview;
 using Web.Api.Features.Companies.CreateCompany;
-using Web.Api.Features.Companies.DeleteCompanyReview;
 using Web.Api.Features.Companies.GetCompany;
 using Web.Api.Features.Companies.GetCompanyByAdmin;
-using Web.Api.Features.Companies.MarkReviewOutdated;
 using Web.Api.Features.Companies.SearchCompanies;
 using Web.Api.Features.Companies.SearchCompaniesForAdmin;
-using Web.Api.Features.Companies.SearchReviewsToBeApproved;
 using Web.Api.Features.Companies.SoftDeleteCompany;
 using Web.Api.Features.Companies.UpdateCompany;
 using Web.Api.Setup.Attributes;
@@ -114,73 +108,5 @@ public class CompaniesController : ControllerBase
             await _mediator.Send(
                 new SoftDeleteCompanyCommand(companyId),
                 cancellationToken));
-    }
-
-    [HttpPost("{companyId:guid}/reviews")]
-    [HasAnyRole]
-    public async Task<IActionResult> AddCompanyReview(
-        [FromRoute] Guid companyId,
-        [FromBody] AddCompanyReviewBodyRequest request,
-        CancellationToken cancellationToken)
-    {
-        request.ThrowIfInvalid();
-
-        await _mediator.Send(
-            new AddCompanyReviewCommand(companyId, request),
-            cancellationToken);
-
-        return Ok();
-    }
-
-    [HttpGet("reviews/to-approve")]
-    public async Task<IActionResult> SearchReviewsToBeApproved(
-        CancellationToken cancellationToken)
-    {
-        return Ok(
-            await _mediator.Send(
-                new SearchReviewsToBeApprovedQuery(),
-                cancellationToken));
-    }
-
-    [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/approve")]
-    [HasAnyRole(Role.Admin)]
-    public async Task<IActionResult> ApproveReview(
-        [FromRoute] Guid companyId,
-        [FromRoute] Guid reviewId,
-        CancellationToken cancellationToken)
-    {
-        await _mediator.Send(
-            new ApproveReviewCommand(companyId, reviewId),
-            cancellationToken);
-
-        return Ok();
-    }
-
-    [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/outdate")]
-    [HasAnyRole(Role.Admin)]
-    public async Task<IActionResult> MarkReviewOutdated(
-        [FromRoute] Guid companyId,
-        [FromRoute] Guid reviewId,
-        CancellationToken cancellationToken)
-    {
-        await _mediator.Send(
-            new MarkReviewOutdatedCommand(companyId, reviewId),
-            cancellationToken);
-
-        return Ok();
-    }
-
-    [HttpDelete("{companyId:guid}/reviews/{reviewId:guid}")]
-    [HasAnyRole(Role.Admin)]
-    public async Task<IActionResult> DeleteCompanyReview(
-        [FromRoute] Guid companyId,
-        [FromRoute] Guid reviewId,
-        CancellationToken cancellationToken)
-    {
-        await _mediator.Send(
-            new DeleteCompanyReviewCommand(companyId, reviewId),
-            cancellationToken);
-
-        return Ok();
     }
 }

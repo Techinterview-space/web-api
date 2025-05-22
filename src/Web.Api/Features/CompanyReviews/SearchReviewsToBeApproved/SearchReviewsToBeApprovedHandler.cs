@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
-namespace Web.Api.Features.Companies.SearchReviewsToBeApproved;
+namespace Web.Api.Features.CompanyReviews.SearchReviewsToBeApproved;
 
 public class SearchReviewsToBeApprovedHandler
     : IRequestHandler<SearchReviewsToBeApprovedQuery, List<CompanyReviewDto>>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Validation.Exceptions;
@@ -10,7 +9,7 @@ using Infrastructure.Services.Telegram;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Web.Api.Features.Companies.AddCompanyReview;
+namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 
 public class AddCompanyReviewHandler
     : IRequestHandler<AddCompanyReviewCommand, Unit>

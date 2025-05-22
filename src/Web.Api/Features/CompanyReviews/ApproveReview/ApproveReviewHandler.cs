@@ -8,14 +8,14 @@ using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Web.Api.Features.Companies.MarkReviewOutdated;
+namespace Web.Api.Features.CompanyReviews.ApproveReview;
 
-public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedCommand, Unit>
+public class ApproveReviewHandler : IRequestHandler<ApproveReviewCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
 
-    public MarkReviewOutdatedHandler(
+    public ApproveReviewHandler(
         DatabaseContext context,
         IAuthorization authorization)
     {
@@ -24,7 +24,7 @@ public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedComma
     }
 
     public async Task<Unit> Handle(
-        MarkReviewOutdatedCommand request,
+        ApproveReviewCommand request,
         CancellationToken cancellationToken)
     {
         await _authorization.HasRoleOrFailAsync(Role.Admin, cancellationToken);
@@ -38,7 +38,7 @@ public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedComma
                               cancellationToken)
                       ?? throw new NotFoundException("Company not found");
 
-        company.MarkReviewAsOutdated(request.ReviewId);
+        company.ApproveReview(request.ReviewId);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Unit.Value;

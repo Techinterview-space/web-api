@@ -2,7 +2,7 @@
 using Domain.Attributes;
 using Domain.Entities.Companies;
 
-namespace Web.Api.Features.Companies.AddCompanyReview;
+namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 
 public record AddCompanyReviewBodyRequest
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Domain.Entities.Companies;
 using Domain.Entities.Users;
 using Faker;
@@ -46,6 +47,18 @@ public class CompanyReviewFake : CompanyReview
         DateTimeOffset date)
     {
         CreatedAt = date;
+        return this;
+    }
+
+    public CompanyReviewFake AddVoteByFake(
+        User user,
+        CompanyReviewVoteType voteType)
+    {
+        Votes ??= new List<CompanyReviewVote>();
+        AddVote(
+            user,
+            voteType);
+
         return this;
     }
 

@@ -42,6 +42,24 @@ public record CompanyReviewDto
 
     public DateTime? OutdatedAt { get; init; }
 
+    public int LikesCount { get; init; }
+
+    public int DislikesCount { get; init; }
+
+    public double? LikesRate
+    {
+        get
+        {
+            if (LikesCount == 0 && DislikesCount == 0)
+            {
+                return null;
+            }
+
+            return Math.Round(
+                (double)LikesCount / (LikesCount + DislikesCount) * 100);
+        }
+    }
+
     public CompanyReviewDto()
     {
     }
@@ -64,35 +82,39 @@ public record CompanyReviewDto
         CompanyId = review.CompanyId;
         CompanyName = review.Company?.Name;
         CompanySlug = review.Company?.Slug;
+        LikesCount = review.LikesCount;
+        DislikesCount = review.DislikesCount;
         CreatedAt = review.CreatedAt;
         ApprovedAt = review.ApprovedAt;
         OutdatedAt = review.OutdatedAt;
     }
 
     public static Expression<Func<CompanyReview, CompanyReviewDto>> Transformation =>
-        company => new CompanyReviewDto
+        x => new CompanyReviewDto
         {
-            Id = company.Id,
-            CultureAndValues = company.CultureAndValues,
-            CodeQuality = company.CodeQuality,
-            WorkLifeBalance = company.WorkLifeBalance,
-            Management = company.Management,
-            CompensationAndBenefits = company.CompensationAndBenefits,
-            CareerOpportunities = company.CareerOpportunities,
-            TotalRating = company.TotalRating,
-            Pros = company.Pros,
-            Cons = company.Cons,
-            IWorkHere = company.IWorkHere,
-            UserEmployment = company.UserEmployment,
-            CompanyId = company.CompanyId,
-            CompanyName = company.Company != null
-                ? company.Company.Name
+            Id = x.Id,
+            CultureAndValues = x.CultureAndValues,
+            CodeQuality = x.CodeQuality,
+            WorkLifeBalance = x.WorkLifeBalance,
+            Management = x.Management,
+            CompensationAndBenefits = x.CompensationAndBenefits,
+            CareerOpportunities = x.CareerOpportunities,
+            TotalRating = x.TotalRating,
+            Pros = x.Pros,
+            Cons = x.Cons,
+            IWorkHere = x.IWorkHere,
+            UserEmployment = x.UserEmployment,
+            CompanyId = x.CompanyId,
+            CompanyName = x.Company != null
+                ? x.Company.Name
                 : null,
-            CompanySlug = company.Company != null
-                ? company.Company.Slug
+            CompanySlug = x.Company != null
+                ? x.Company.Slug
                 : null,
-            CreatedAt = company.CreatedAt,
-            ApprovedAt = company.ApprovedAt,
-            OutdatedAt = company.OutdatedAt
+            LikesCount = x.LikesCount,
+            DislikesCount = x.DislikesCount,
+            CreatedAt = x.CreatedAt,
+            ApprovedAt = x.ApprovedAt,
+            OutdatedAt = x.OutdatedAt
         };
 }

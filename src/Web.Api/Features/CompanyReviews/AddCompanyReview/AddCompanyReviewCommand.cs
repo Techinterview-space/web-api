@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace Web.Api.Features.Companies.AddCompanyReview;
+namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 
 public record AddCompanyReviewCommand : AddCompanyReviewBodyRequest, IRequest<Unit>
 {

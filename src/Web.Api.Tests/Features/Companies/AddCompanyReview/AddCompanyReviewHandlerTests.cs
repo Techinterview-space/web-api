@@ -11,7 +11,7 @@ using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using TestUtils.Services;
-using Web.Api.Features.Companies.AddCompanyReview;
+using Web.Api.Features.CompanyReviews.AddCompanyReview;
 using Xunit;
 
 namespace Web.Api.Tests.Features.Companies.AddCompanyReview;
