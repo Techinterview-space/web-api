@@ -21,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Web.Api.Features.Salaries.Providers;
 using Web.Api.Features.Telegram;
 using Web.Api.Services.Salaries;
+using Web.Api.Services.Views;
 
 namespace Web.Api.Setup;
 
@@ -44,7 +45,8 @@ public static class ServiceRegistration
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
             .AddTransient<StatDataChangeSubscriptionService>()
-            .AddScoped<ITelegramAdminNotificationService, TelegramNotificationService>();
+            .AddScoped<ITelegramAdminNotificationService, TelegramNotificationService>()
+            .AddScoped<IViewRenderer, ViewRenderer>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

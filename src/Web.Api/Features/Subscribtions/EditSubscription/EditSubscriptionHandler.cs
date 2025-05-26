@@ -2,48 +2,44 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.StatData;
+using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
-namespace Web.Api.Features.Subscribtions.CreateSubscription;
+namespace Web.Api.Features.Subscribtions.EditSubscription;
 
-public class CreateSubscriptionHandler
-    : IRequestHandler<CreateSubscriptionCommand, StatDataChangeSubscriptionDto>
+public class EditSubscriptionHandler : IRequestHandler<EditSubscriptionCommand, StatDataChangeSubscriptionDto>
 {
     private readonly DatabaseContext _context;
 
-    public CreateSubscriptionHandler(
+    public EditSubscriptionHandler(
         DatabaseContext context)
     {
         _context = context;
     }
 
     public async Task<StatDataChangeSubscriptionDto> Handle(
-        CreateSubscriptionCommand request,
+        EditSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
+        request.ThrowIfInvalid();
+
         if (string.IsNullOrEmpty(request.Name))
         {
             throw new BadRequestException("Name is required.");
         }
 
-        if (request.TelegramChatId == 0)
-        {
-            throw new BadRequestException("Telegram chat ID is required.");
-        }
-
         var existingSubscription = await _context.StatDataChangeSubscriptions
             .FirstOrDefaultAsync(
-                x => x.TelegramChatId == request.TelegramChatId,
+                x => x.Id == request.SubscriptionId,
                 cancellationToken);
 
-        if (existingSubscription != null)
+        if (existingSubscription == null)
         {
-            throw new BadRequestException("Subscription already exists.");
+            throw new NotFoundException("Subscription does not exist.");
         }
 
         var professions = new List<long>();
@@ -55,16 +51,14 @@ public class CreateSubscriptionHandler
                 .ToListAsync(cancellationToken);
         }
 
-        var newSubscription = _context.Add(
-            new StatDataChangeSubscription(
-                request.Name,
-                request.TelegramChatId,
-                professions,
-                request.PreventNotificationIfNoDifference,
-                request.Regularity,
-                request.UseAiAnalysis));
+        existingSubscription.Update(
+            request.Name,
+            professions,
+            request.PreventNotificationIfNoDifference,
+            request.Regularity,
+            request.UseAiAnalysis);
 
         await _context.SaveChangesAsync(cancellationToken);
-        return new StatDataChangeSubscriptionDto(newSubscription.Entity);
+        return new StatDataChangeSubscriptionDto(existingSubscription);
     }
 }

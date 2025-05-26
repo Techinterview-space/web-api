@@ -9,10 +9,12 @@ using Web.Api.Features.Subscribtions.ActivateSubscription;
 using Web.Api.Features.Subscribtions.CreateSubscription;
 using Web.Api.Features.Subscribtions.DeactivateSubscription;
 using Web.Api.Features.Subscribtions.DeleteSubscription;
+using Web.Api.Features.Subscribtions.EditSubscription;
 using Web.Api.Features.Subscribtions.GetOpenAiReport;
 using Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 using Web.Api.Features.Subscribtions.SendUpdatesToSubscriptionChat;
+using Web.Api.Features.Subscribtions.Shared;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Subscribtions;
@@ -47,6 +49,19 @@ public class TelegramSubscriptionsController : ControllerBase
     {
         return await _mediator.Send(
             new CreateSubscriptionCommand(
+                request),
+            cancellationToken);
+    }
+
+    [HttpPost("{id:guid}")]
+    public async Task<StatDataChangeSubscriptionDto> Update(
+        [FromRoute] Guid id,
+        [FromBody] EditSubscriptionBodyRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await _mediator.Send(
+            new EditSubscriptionCommand(
+                id,
                 request),
             cancellationToken);
     }

@@ -14,5 +14,6 @@ public record CreateSubscriptionCommand
         ProfessionIds = request.ProfessionIds;
         PreventNotificationIfNoDifference = request.PreventNotificationIfNoDifference;
         Regularity = request.Regularity;
+        UseAiAnalysis = request.UseAiAnalysis;
     }
 }

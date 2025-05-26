@@ -1,22 +1,12 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Domain.Attributes;
-using Domain.Entities.StatData;
+using Web.Api.Features.Subscribtions.Shared;
 
 namespace Web.Api.Features.Subscribtions.CreateSubscription;
 
-public record CreateSubscriptionBodyRequest
+public record CreateSubscriptionBodyRequest : EditSubscriptionBodyRequest
 {
     [Required]
-    public string Name { get; init; }
-
-    [Required]
-    public long TelegramChatId { get; init; }
-
-    public List<long> ProfessionIds { get; init; } = new List<long>();
-
-    public bool PreventNotificationIfNoDifference { get; init; }
-
     [NotDefaultValue]
-    public SubscriptionRegularityType Regularity { get; init; }
+    public long TelegramChatId { get; init; }
 }

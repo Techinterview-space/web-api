@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Validation.Exceptions;
 
 namespace Domain.Entities.StatData;
 
@@ -41,7 +42,8 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
         long telegramChatId,
         List<long> professionIds,
         bool preventNotificationIfNoDifference,
-        SubscriptionRegularityType regularityType)
+        SubscriptionRegularityType regularityType,
+        bool useAiAnalysis)
     {
         Id = Guid.NewGuid();
         Name = name;
@@ -50,6 +52,7 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
         PreventNotificationIfNoDifference = preventNotificationIfNoDifference;
         DeletedAt = null;
         Regularity = regularityType;
+        UseAiAnalysis = useAiAnalysis;
     }
 
     public void Activate()
@@ -63,9 +66,33 @@ public class StatDataChangeSubscription : HasDatesBase, IHasIdBase<Guid>
         DeletedAt = UpdatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void ChangeChatId(long telegramChatId)
+    public void ChangeChatId(
+        long telegramChatId)
     {
         TelegramChatId = telegramChatId;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void Update(
+        string name,
+        List<long> professionIds,
+        bool preventNotificationIfNoDifference,
+        SubscriptionRegularityType regularityType,
+        bool useAiAnalysis)
+    {
+        name = name?.Trim();
+
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new BadRequestException("Name is required.");
+        }
+
+        Name = name;
+        ProfessionIds = professionIds;
+        PreventNotificationIfNoDifference = preventNotificationIfNoDifference;
+        Regularity = regularityType;
+        UseAiAnalysis = useAiAnalysis;
+
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 
