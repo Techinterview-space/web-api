@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Services.Html;
 
-public interface ITechInterviewHtmlGenerator
+public interface IMarkdownToHtmlGenerator
 {
     string FromMarkdown(
         string source);

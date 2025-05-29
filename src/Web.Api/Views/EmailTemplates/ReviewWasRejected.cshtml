@@ -1,0 +1,18 @@
+﻿@model Web.Api.Features.Emails.ViewModels.ReviewWasRejectedViewModel
+@{
+    Layout = "/Views/Shared/_EmailLayout.cshtml";
+    ViewData["EmailTitle"] = "Ваш отзыв был отклонен";
+    ViewData["PreHeader"] = "Ваш отзыв был отклонен";
+}
+
+<p>Спасибо за отзыв о компании!</p>
+<p>
+    К сожалению, он был отклонен администратором Techinterview.space, потому что мог нарушить одну из следующих причин:
+</p>
+<ul>
+    <li>Содержал упоминание конкретных людей</li>
+    <li>Был недостаточно информативным (все единицы или пятерки и нет комментариев)</li>
+</ul>
+<p>
+    Если вы не согласны с решением, вы можете написать в телеграм по нику @@maximgorbatyuk
+</p>

@@ -1,8 +1,8 @@
 ﻿namespace Infrastructure.Emails.Contracts.Requests;
 
-public record EmailSendRequest
+public record SendGridEmailSendRequest
 {
-    public EmailSendRequest(
+    public SendGridEmailSendRequest(
         string subject,
         string recipient,
         string body,
@@ -17,7 +17,7 @@ public record EmailSendRequest
     {
     }
 
-    public EmailSendRequest(
+    public SendGridEmailSendRequest(
         string subject,
         ICollection<string> recipients,
         string body,

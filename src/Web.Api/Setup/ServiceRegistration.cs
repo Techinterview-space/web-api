@@ -20,6 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Web.Api.Features.Salaries.Providers;
 using Web.Api.Features.Telegram;
+using Web.Api.Services.Emails;
 using Web.Api.Services.Salaries;
 using Web.Api.Services.Views;
 
@@ -36,7 +37,7 @@ public static class ServiceRegistration
             .AddScoped<IHttpContext, AppHttpContext>()
             .AddScoped<IAuthorization, AuthorizationService>()
             .AddScoped<IGlobal, Global>()
-            .AddScoped<ITechInterviewHtmlGenerator, TechInterviewHtmlGenerator>()
+            .AddScoped<IMarkdownToHtmlGenerator, MarkdownToHtmlGenerator>()
             .AddScoped<IPdf, QuestPdfBasedRender>()
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
             .AddScoped<IOpenAiService, OpenAiService>()
@@ -65,17 +66,17 @@ public static class ServiceRegistration
         IHostEnvironment environment)
     {
         services
-            .AddScoped<IEmailService, TechInterviewerEmailService>();
+            .AddScoped<ITechinterviewEmailService, TechInterviewerEmailService>();
 
         if (environment.IsDevelopment())
         {
             services
-                .AddScoped<IEmailSender, LocalEmailSender>();
+                .AddScoped<ISendGridEmailSender, LocalEmailSender>();
         }
         else
         {
             services
-                .AddScoped<IEmailSender, SendGridEmailSender>();
+                .AddScoped<ISendGridEmailSender, SendGridEmailSender>();
         }
 
         return services;
