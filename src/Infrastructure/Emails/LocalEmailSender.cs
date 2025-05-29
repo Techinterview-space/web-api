@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Emails;
 
-public class LocalEmailSender : IEmailSender
+public class LocalEmailSender : ISendGridEmailSender
 {
     private readonly ILogger<LocalEmailSender> _logger;
 
@@ -13,7 +13,9 @@ public class LocalEmailSender : IEmailSender
         _logger = logger;
     }
 
-    public Task SendAsync(EmailContent email)
+    public Task SendAsync(
+        EmailContent email,
+        CancellationToken cancellationToken)
     {
         _logger.LogInformation(
             "Email was sent. Subject: {Subject}. Recipients: {RecipientsCount}",

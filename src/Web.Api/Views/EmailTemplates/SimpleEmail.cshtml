@@ -1,0 +1,11 @@
+﻿@model Web.Api.Features.Emails.ViewModels.SimpleEmailViewModel
+@{
+    Layout = "/Views/Shared/_EmailLayout.cshtml";
+    ViewData["EmailTitle"] = Model.BodyTitle;
+    ViewData["PreHeader"] = Model.BodyTitle;
+
+    ViewData["CallToActionTitle"] = null;
+    ViewData["CallToActionLink"] = null;
+}
+
+@Model.Body

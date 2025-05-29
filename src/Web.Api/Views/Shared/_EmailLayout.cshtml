@@ -211,23 +211,28 @@
                                                                <tr>
                                                                   <td class="t32">
                                                                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100% !important;">
-                                                                        <tr>
-                                                                           <td align="left">
-                                                                              <table class="t19" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;">
-                                                                                 <tr>
-                                                                                    <td width="540" class="t18" style="width:800px;">
-                                                                                       <table class="t17" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;">
-                                                                                          <tr>
-                                                                                             <td class="t16">
-                                                                                                <h1 class="t15" style="margin:0;Margin:0;font-family:Montserrat,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:34px;font-weight:800;font-style:normal;font-size:24px;text-decoration:none;text-transform:none;direction:ltr;color:#222222;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">@ViewData["EmailTitle"]</h1>
-                                                                                             </td>
-                                                                                          </tr>
-                                                                                       </table>
-                                                                                    </td>
-                                                                                 </tr>
-                                                                              </table>
-                                                                           </td>
-                                                                        </tr>
+                                                                        @if (ViewData["EmailTitle"] != null)
+                                                                        {
+                                                                           <tr>
+                                                                              <td align="left">
+                                                                                 <table class="t19" role="presentation" cellpadding="0" cellspacing="0" style="Margin-right:auto;">
+                                                                                    <tr>
+                                                                                       <td width="540" class="t18" style="width:800px;">
+                                                                                          <table class="t17" role="presentation" cellpadding="0" cellspacing="0" width="100%" style="width:100%;">
+                                                                                             <tr>
+                                                                                                <td class="t16">
+                                                                                                   <h1 class="t15" style="margin:0;Margin:0;font-family:Montserrat,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Arial,sans-serif;line-height:34px;font-weight:800;font-style:normal;font-size:24px;text-decoration:none;text-transform:none;direction:ltr;color:#222222;text-align:left;mso-line-height-rule:exactly;mso-text-raise:3px;">
+                                                                                                      @ViewData["EmailTitle"]
+                                                                                                   </h1>
+                                                                                                </td>
+                                                                                             </tr>
+                                                                                          </table>
+                                                                                       </td>
+                                                                                    </tr>
+                                                                                 </table>
+                                                                              </td>
+                                                                           </tr>
+                                                                        }
                                                                         <tr>
                                                                            <td>
                                                                               <div class="t20" style="mso-line-height-rule:exactly;mso-line-height-alt:20px;line-height:20px;font-size:1px;display:block;">&nbsp;&nbsp;</div>

@@ -8,7 +8,7 @@ using SendGrid.Helpers.Mail;
 
 namespace Infrastructure.Emails;
 
-public class SendGridEmailSender : IEmailSender
+public class SendGridEmailSender : ISendGridEmailSender
 {
     private readonly SendGridClient _client;
     private readonly ILogger<SendGridEmailSender> _logger;
@@ -21,21 +21,27 @@ public class SendGridEmailSender : IEmailSender
         _client = new SendGridClient(configuration["SendGridApiKey"]);
     }
 
-    public async Task SendAsync(EmailContent email)
+    public async Task SendAsync(
+        EmailContent email,
+        CancellationToken cancellationToken)
     {
         email.ThrowIfNull(nameof(email));
 
         try
         {
-            var response = await _client.SendEmailAsync(Message(email));
+            var response = await _client.SendEmailAsync(Message(email), cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("SendGrid returned unsuccessful status code: {ResponseStatusCode}", response.StatusCode);
+                _logger.LogError(
+                    "SendGrid returned unsuccessful status code: {ResponseStatusCode}",
+                    response.StatusCode);
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Could not send email via SendGrid");
+            _logger.LogError(
+                e,
+                "Could not send email via SendGrid");
         }
     }
 

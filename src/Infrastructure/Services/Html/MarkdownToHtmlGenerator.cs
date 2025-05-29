@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Services.Html;
 
-public class TechInterviewHtmlGenerator : ITechInterviewHtmlGenerator
+public class MarkdownToHtmlGenerator : IMarkdownToHtmlGenerator
 {
     public string FromMarkdown(
         string source)

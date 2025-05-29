@@ -131,6 +131,16 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
                 this));
     }
 
+    public CompanyReview GetReview(Guid reviewId)
+    {
+        if (Reviews == null)
+        {
+            throw new InvalidOperationException("Reviews are not initialized.");
+        }
+
+        return Reviews.FirstOrDefault(x => x.Id == reviewId);
+    }
+
     public void MarkReviewAsOutdated(
         Guid reviewId)
     {

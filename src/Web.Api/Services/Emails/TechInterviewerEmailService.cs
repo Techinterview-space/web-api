@@ -1,31 +1,84 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Emails.Contracts.Requests;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
 using Infrastructure.Services.PDF.Interviews;
 using Microsoft.Extensions.Hosting;
+using Web.Api.Features.Emails.ViewModels;
 
-namespace Infrastructure.Emails;
+namespace Web.Api.Services.Emails;
 
-public class TechInterviewerEmailService : IEmailService
+public class TechInterviewerEmailService : ITechinterviewEmailService
 {
     private readonly IHostEnvironment _env;
     private readonly IGlobal _global;
-    private readonly ITechInterviewHtmlGenerator _html;
+    private readonly IMarkdownToHtmlGenerator _html;
+    private readonly IViewRenderer _viewRenderer;
+    private readonly ISendGridEmailSender _emailSender;
 
     public TechInterviewerEmailService(
         IHostEnvironment env,
         IGlobal global,
-        ITechInterviewHtmlGenerator html)
+        IMarkdownToHtmlGenerator html,
+        IViewRenderer viewRenderer,
+        ISendGridEmailSender emailSender)
     {
         _env = env;
         _global = global;
         _html = html;
+        _viewRenderer = viewRenderer;
+        _emailSender = emailSender;
+    }
+
+    public async Task CompanyReviewWasApprovedAsync(
+        string userEmail,
+        string companyName,
+        CancellationToken cancellationToken)
+    {
+        var view = await _viewRenderer.RenderHtmlAsync(
+            ReviewWasApprovedViewModel.ViewName,
+            new ReviewWasApprovedViewModel(companyName));
+
+        await _emailSender.SendAsync(
+            new EmailContent(
+                _global.NoReplyEmail,
+                "Ваш отзыв был одобрен",
+                view,
+                new List<string>
+                {
+                    userEmail,
+                }),
+            cancellationToken);
+    }
+
+    public async Task CompanyReviewWasRejectedAsync(
+        string userEmail,
+        string companyName,
+        CancellationToken cancellationToken)
+    {
+        var view = await _viewRenderer.RenderHtmlAsync(
+            ReviewWasRejectedViewModel.ViewName,
+            new ReviewWasRejectedViewModel(companyName));
+
+        await _emailSender.SendAsync(
+            new EmailContent(
+                _global.NoReplyEmail,
+                "Ваш отзыв был отклонен",
+                view,
+                new List<string>
+                {
+                    userEmail,
+                }),
+            cancellationToken);
     }
 
     public EmailContent Prepare(
-        EmailSendRequest emailContent) =>
+        SendGridEmailSendRequest emailContent) =>
         new EmailContent(
             _global.NoReplyEmail,
             PrepareSubject(emailContent.Subject),
