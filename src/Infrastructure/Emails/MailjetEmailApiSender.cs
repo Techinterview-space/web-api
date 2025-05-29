@@ -34,33 +34,16 @@ public class MailjetEmailApiSender : IEmailApiSender
             {
                 Resource = Send.Resource,
             }
+            .Property(Send.FromEmail, email.From)
+            .Property(Send.Subject, email.Subject)
+            .Property(Send.HtmlPart, email.HtmlBody)
             .Property(
-                Send.Messages,
+                Send.Recipients,
                 new JArray
                 {
                     new JObject
                     {
-                        {
-                            "From",
-                            new JObject
-                            {
-                                { "Email", email.From },
-                                { "Name", "Techinterview.space" }
-                            }
-                        },
-                        {
-                            "To",
-                            new JArray
-                            {
-                                new JObject
-                                {
-                                    { "Email", email.Recipients.FirstOrDefault() },
-                                }
-                            }
-                        },
-                        { "Subject", email.Subject },
-                        { "TextPart", "Email from techinterview.space" },
-                        { "HTMLPart", email.HtmlBody }
+                        { "Email", email.Recipients.FirstOrDefault() }
                     }
                 });
 
