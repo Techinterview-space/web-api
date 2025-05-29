@@ -98,11 +98,10 @@ public static class ServiceRegistration
             {
                 c.BaseAddress = new Uri($"https://api.mailgun.net/v3/{mailgunDomain}/messages");
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
-                c.DefaultRequestHeaders.Add("User-Agent", "Techinterview.space Email Service");
-                c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                    "Basic",
-                    Convert.ToBase64String(
-                        UTF8Encoding.UTF8.GetBytes($"api:{mailgunApiKey}")));
+                c.DefaultRequestHeaders.Add(
+                    "Authorization",
+                    "Basic " + Convert.ToBase64String(
+                        Encoding.UTF8.GetBytes($"api:{mailgunApiKey}")));
             });
         }
 
