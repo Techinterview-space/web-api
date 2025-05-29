@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Emails.Contracts;
 
-public interface ISendGridEmailSender
+public interface IEmailApiSender
 {
     Task SendAsync(
         EmailContent email,

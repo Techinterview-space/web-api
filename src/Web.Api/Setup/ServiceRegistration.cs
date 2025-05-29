@@ -1,4 +1,7 @@
-﻿using AspNetCore.Aws.S3.Simple.Settings;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Text;
+using AspNetCore.Aws.S3.Simple.Settings;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies;
@@ -63,7 +66,8 @@ public static class ServiceRegistration
 
     public static IServiceCollection SetupEmailIntegration(
         this IServiceCollection services,
-        IHostEnvironment environment)
+        IHostEnvironment environment,
+        IConfiguration configuration)
     {
         services
             .AddScoped<ITechinterviewEmailService, TechInterviewerEmailService>();
@@ -71,12 +75,35 @@ public static class ServiceRegistration
         if (environment.IsDevelopment())
         {
             services
-                .AddScoped<ISendGridEmailSender, LocalEmailSender>();
+                .AddScoped<IEmailApiSender, LocalEmailApiSender>();
         }
         else
         {
             services
-                .AddScoped<ISendGridEmailSender, SendGridEmailSender>();
+                .AddScoped<IEmailApiSender, MailgunEmailSender>();
+
+            var mailgunApiKey = configuration["MailgunApiKey"];
+            if (string.IsNullOrWhiteSpace(mailgunApiKey))
+            {
+                throw new InvalidOperationException("Mailgun API key is not configured.");
+            }
+
+            var mailgunDomain = configuration["MailgunDomain"];
+            if (string.IsNullOrWhiteSpace(mailgunDomain))
+            {
+                throw new InvalidOperationException("Mailgun domain is not configured.");
+            }
+
+            services.AddHttpClient<IEmailApiSender, MailgunEmailSender>(c =>
+            {
+                c.BaseAddress = new Uri($"https://api.mailgun.net/v3/{mailgunDomain}/messages");
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.DefaultRequestHeaders.Add("User-Agent", "Techinterview.space Email Service");
+                c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                    "Basic",
+                    Convert.ToBase64String(
+                        UTF8Encoding.UTF8.GetBytes($"api:{mailgunApiKey}")));
+            });
         }
 
         return services;

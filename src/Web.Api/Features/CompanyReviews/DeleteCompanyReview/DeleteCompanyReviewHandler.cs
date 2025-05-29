@@ -53,7 +53,7 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
         {
             if (review.User.IsGoogleAuth() || review.User.IsGithubAuth())
             {
-                await _emailService.CompanyReviewWasApprovedAsync(
+                await _emailService.CompanyReviewWasRejectedAsync(
                     review.User.Email,
                     review.Company.Name,
                     cancellationToken);

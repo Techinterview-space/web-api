@@ -19,20 +19,20 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
     private readonly IGlobal _global;
     private readonly IMarkdownToHtmlGenerator _html;
     private readonly IViewRenderer _viewRenderer;
-    private readonly ISendGridEmailSender _emailSender;
+    private readonly IEmailApiSender _emailApiSender;
 
     public TechInterviewerEmailService(
         IHostEnvironment env,
         IGlobal global,
         IMarkdownToHtmlGenerator html,
         IViewRenderer viewRenderer,
-        ISendGridEmailSender emailSender)
+        IEmailApiSender emailApiSender)
     {
         _env = env;
         _global = global;
         _html = html;
         _viewRenderer = viewRenderer;
-        _emailSender = emailSender;
+        _emailApiSender = emailApiSender;
     }
 
     public async Task CompanyReviewWasApprovedAsync(
@@ -44,7 +44,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
             ReviewWasApprovedViewModel.ViewName,
             new ReviewWasApprovedViewModel(companyName));
 
-        await _emailSender.SendAsync(
+        await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
                 "Ваш отзыв был одобрен",
@@ -65,7 +65,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
             ReviewWasRejectedViewModel.ViewName,
             new ReviewWasRejectedViewModel(companyName));
 
-        await _emailSender.SendAsync(
+        await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
                 "Ваш отзыв был отклонен",

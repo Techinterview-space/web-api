@@ -15,16 +15,16 @@ namespace Web.Api.Features.Admin;
 [Route("api/debug")]
 public class DebugController : ControllerBase
 {
-    private readonly ISendGridEmailSender _emailSender;
+    private readonly IEmailApiSender _emailApiSender;
     private readonly IViewRenderer _viewRenderer;
     private readonly IGlobal _global;
 
     public DebugController(
-        ISendGridEmailSender emailSender,
+        IEmailApiSender emailApiSender,
         IViewRenderer viewRenderer,
         IGlobal global)
     {
-        _emailSender = emailSender;
+        _emailApiSender = emailApiSender;
         _viewRenderer = viewRenderer;
         _global = global;
     }
@@ -40,7 +40,7 @@ public class DebugController : ControllerBase
                 request.Body,
                 request.BodyTitle));
 
-        await _emailSender.SendAsync(
+        await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
                 "Your email was verified",

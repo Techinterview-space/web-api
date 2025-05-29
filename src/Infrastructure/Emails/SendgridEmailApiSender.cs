@@ -8,14 +8,14 @@ using SendGrid.Helpers.Mail;
 
 namespace Infrastructure.Emails;
 
-public class SendGridEmailSender : ISendGridEmailSender
+public class SendgridEmailApiSender : IEmailApiSender
 {
     private readonly SendGridClient _client;
-    private readonly ILogger<SendGridEmailSender> _logger;
+    private readonly ILogger<SendgridEmailApiSender> _logger;
 
-    public SendGridEmailSender(
+    public SendgridEmailApiSender(
         IConfiguration configuration,
-        ILogger<SendGridEmailSender> logger)
+        ILogger<SendgridEmailApiSender> logger)
     {
         _logger = logger;
         _client = new SendGridClient(configuration["SendGridApiKey"]);

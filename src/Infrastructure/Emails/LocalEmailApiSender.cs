@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Emails;
 
-public class LocalEmailSender : ISendGridEmailSender
+public class LocalEmailApiSender : IEmailApiSender
 {
-    private readonly ILogger<LocalEmailSender> _logger;
+    private readonly ILogger<LocalEmailApiSender> _logger;
 
-    public LocalEmailSender(ILogger<LocalEmailSender> logger)
+    public LocalEmailApiSender(ILogger<LocalEmailApiSender> logger)
     {
         _logger = logger;
     }

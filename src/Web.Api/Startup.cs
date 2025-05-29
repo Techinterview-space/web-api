@@ -66,7 +66,7 @@ public class Startup
             .AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Startup>())
             .SetupDatabase(_configuration, _environment)
             .SetupAppServices(_configuration)
-            .SetupEmailIntegration(_environment)
+            .SetupEmailIntegration(_environment, _configuration)
             .SetupHealthCheck(_configuration)
             .SetupAuthentication(_configuration)
             .SetupScheduler();
