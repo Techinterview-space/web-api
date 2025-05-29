@@ -110,7 +110,7 @@ public class Startup
         app
             .UseSqlEndpoints<DatabaseContext>(
                 checkForAuthentication: true,
-                roleToCheckForAuthorization: Role.Admin.ToString(),
+                roleToCheckForAuthorization: nameof(Role.Admin),
                 sqlEngine: SqlEngine.PostgreSQL)
             .UseTableOutputEndpoint()
             .UseExecuteEndpoint()

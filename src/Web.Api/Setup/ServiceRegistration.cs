@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http.Headers;
-using System.Text;
-using AspNetCore.Aws.S3.Simple.Settings;
+﻿using AspNetCore.Aws.S3.Simple.Settings;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies;
@@ -80,29 +77,7 @@ public static class ServiceRegistration
         else
         {
             services
-                .AddScoped<IEmailApiSender, MailgunEmailSender>();
-
-            var mailgunApiKey = configuration["MailgunApiKey"];
-            if (string.IsNullOrWhiteSpace(mailgunApiKey))
-            {
-                throw new InvalidOperationException("Mailgun API key is not configured.");
-            }
-
-            var mailgunDomain = configuration["MailgunDomain"];
-            if (string.IsNullOrWhiteSpace(mailgunDomain))
-            {
-                throw new InvalidOperationException("Mailgun domain is not configured.");
-            }
-
-            services.AddHttpClient<IEmailApiSender, MailgunEmailSender>(c =>
-            {
-                c.BaseAddress = new Uri($"https://api.mailgun.net/v3/{mailgunDomain}/messages");
-                c.DefaultRequestHeaders.Add("Accept", "application/json");
-                c.DefaultRequestHeaders.Add(
-                    "Authorization",
-                    "Basic " + Convert.ToBase64String(
-                        Encoding.UTF8.GetBytes($"api:{mailgunApiKey}")));
-            });
+                .AddScoped<IEmailApiSender, MailjetEmailApiSender>();
         }
 
         return services;
