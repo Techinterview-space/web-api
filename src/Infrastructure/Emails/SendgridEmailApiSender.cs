@@ -35,7 +35,15 @@ public class SendgridEmailApiSender : IEmailApiSender
                 _logger.LogError(
                     "SendGrid returned unsuccessful status code: {ResponseStatusCode}",
                     response.StatusCode);
+
+                return;
             }
+
+            var responseString = await response.Body.ReadAsStringAsync(cancellationToken);
+            _logger.LogInformation(
+                "Email was sent successfully. StatusCode: {StatusCode}. Response: {Response}",
+                response.StatusCode,
+                responseString);
         }
         catch (Exception e)
         {
