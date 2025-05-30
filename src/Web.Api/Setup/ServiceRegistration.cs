@@ -77,7 +77,7 @@ public static class ServiceRegistration
         else
         {
             services
-                .AddScoped<IEmailApiSender, MailjetEmailApiSender>();
+                .AddScoped<IEmailApiSender, SendgridEmailApiSender>();
         }
 
         return services;
