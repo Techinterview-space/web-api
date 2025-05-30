@@ -3,11 +3,13 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Web.Api.Features.Accounts.Dtos;
 using Web.Api.Features.Users.Models;
 using Web.Api.Setup.Attributes;
@@ -20,13 +22,16 @@ public class AccountController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
+    private readonly ILogger<AccountController> _logger;
 
     public AccountController(
         IAuthorization auth,
-        DatabaseContext context)
+        DatabaseContext context,
+        ILogger<AccountController> logger)
     {
         _auth = auth;
         _context = context;
+        _logger = logger;
     }
 
     [HttpGet("me")]
@@ -106,5 +111,42 @@ public class AccountController : ControllerBase
             Email = newUser.Email,
             IsMfaEnabled = newUser.TotpSecret != null,
         };
+    }
+
+    [HttpPost("unsubscribe-me/{token}")]
+    public async Task<IActionResult> UnsubscribeMe(
+        [FromRoute] string token,
+        CancellationToken cancellationToken)
+    {
+        token = token?.Trim();
+
+        var user = await _context.Users.FirstOrDefaultAsync(
+            x => x.UniqueToken == token,
+            cancellationToken);
+
+        if (user == null)
+        {
+            _logger.LogWarning(
+                "Unsubscribe attempt with invalid token: {Token}",
+                token);
+
+            return Ok(new
+            {
+                result = true,
+            });
+        }
+
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw new BadRequestException("Invalid token");
+        }
+
+        user.UnsubscribeFromAll();
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Ok(new
+        {
+            result = true,
+        });
     }
 }

@@ -19,6 +19,10 @@ internal class UserDbConfig : IEntityTypeConfiguration<User>, IEntityTypeConfigu
         builder
             .Property(x => x.TotpSecret)
             .HasMaxLength(100);
+
+        builder
+            .HasIndex(x => x.UniqueToken)
+            .IsUnique();
     }
 
     public void Configure(EntityTypeBuilder<UserRole> builder)

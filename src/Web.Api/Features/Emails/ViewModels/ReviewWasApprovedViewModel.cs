@@ -1,11 +1,13 @@
 ﻿namespace Web.Api.Features.Emails.ViewModels;
 
-public record ReviewWasApprovedViewModel
+public record ReviewWasApprovedViewModel : ViewModelBase
 {
     public const string ViewName = "/Views/EmailTemplates/ReviewWasApproved.cshtml";
 
     public ReviewWasApprovedViewModel(
-        string companyName)
+        string companyName,
+        string unsubscribeToken)
+        : base(unsubscribeToken)
     {
         CompanyName = companyName;
     }

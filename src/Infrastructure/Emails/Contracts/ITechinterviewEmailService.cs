@@ -1,16 +1,17 @@
-﻿using Infrastructure.Emails.Contracts.Requests;
+﻿using Domain.Entities.Users;
+using Infrastructure.Emails.Contracts.Requests;
 
 namespace Infrastructure.Emails.Contracts;
 
 public interface ITechinterviewEmailService
 {
     Task CompanyReviewWasApprovedAsync(
-        string userEmail,
+        User user,
         string companyName,
         CancellationToken cancellationToken);
 
     Task CompanyReviewWasRejectedAsync(
-        string userEmail,
+        User user,
         string companyName,
         CancellationToken cancellationToken);
 

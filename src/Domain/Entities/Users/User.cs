@@ -42,6 +42,7 @@ public class User : BaseModel, IHasDeletedAt
             UserRoles.Add(new UserRole(role, this));
         }
 
+        UniqueToken = Guid.NewGuid().ToString("N");
         LastLoginAt = DateTimeOffset.Now;
     }
 
@@ -74,6 +75,10 @@ public class User : BaseModel, IHasDeletedAt
     public string ProfilePicture { get; protected set; }
 
     public bool EmailConfirmed { get; protected set; }
+
+    public string UniqueToken { get; protected set; }
+
+    public bool UnsubscribeMeFromAll { get; protected set; }
 
     public string TotpSecret { get; protected set; }
 
@@ -374,5 +379,21 @@ public class User : BaseModel, IHasDeletedAt
     {
         return IdentityId != null &&
                IdentityId.StartsWith(CurrentUser.Auth0Prefix);
+    }
+
+    public bool GenerateNewEmailUnsubscribeTokenIfNecessary()
+    {
+        if (UniqueToken != null)
+        {
+            return false;
+        }
+
+        UniqueToken = Guid.NewGuid().ToString("N");
+        return true;
+    }
+
+    public void UnsubscribeFromAll()
+    {
+        UnsubscribeMeFromAll = true;
     }
 }

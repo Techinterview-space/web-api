@@ -10,8 +10,6 @@ using Infrastructure.Services.Telegram.ReplyMessages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-using Web.Api.Features.Telegram;
 
 namespace Web.Api.Features.BackgroundJobs;
 

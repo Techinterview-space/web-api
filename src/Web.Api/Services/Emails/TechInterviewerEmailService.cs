@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Users;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Emails.Contracts.Requests;
@@ -9,6 +10,7 @@ using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
 using Infrastructure.Services.PDF.Interviews;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Web.Api.Features.Emails.ViewModels;
 
 namespace Web.Api.Services.Emails;
@@ -20,29 +22,37 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
     private readonly IMarkdownToHtmlGenerator _html;
     private readonly IViewRenderer _viewRenderer;
     private readonly IEmailApiSender _emailApiSender;
+    private readonly ILogger<TechInterviewerEmailService> _logger;
 
     public TechInterviewerEmailService(
         IHostEnvironment env,
         IGlobal global,
         IMarkdownToHtmlGenerator html,
         IViewRenderer viewRenderer,
-        IEmailApiSender emailApiSender)
+        IEmailApiSender emailApiSender,
+        ILogger<TechInterviewerEmailService> logger)
     {
         _env = env;
         _global = global;
         _html = html;
         _viewRenderer = viewRenderer;
         _emailApiSender = emailApiSender;
+        _logger = logger;
     }
 
     public async Task CompanyReviewWasApprovedAsync(
-        string userEmail,
+        User user,
         string companyName,
         CancellationToken cancellationToken)
     {
+        if (ShouldSkipEmailSending(user))
+        {
+            return;
+        }
+
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasApprovedViewModel.ViewName,
-            new ReviewWasApprovedViewModel(companyName));
+            new ReviewWasApprovedViewModel(companyName, user.UniqueToken));
 
         await _emailApiSender.SendAsync(
             new EmailContent(
@@ -51,19 +61,24 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
                 view,
                 new List<string>
                 {
-                    userEmail,
+                    user.Email,
                 }),
             cancellationToken);
     }
 
     public async Task CompanyReviewWasRejectedAsync(
-        string userEmail,
+        User user,
         string companyName,
         CancellationToken cancellationToken)
     {
+        if (ShouldSkipEmailSending(user))
+        {
+            return;
+        }
+
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasRejectedViewModel.ViewName,
-            new ReviewWasRejectedViewModel(companyName));
+            new ReviewWasRejectedViewModel(companyName, user.UniqueToken));
 
         await _emailApiSender.SendAsync(
             new EmailContent(
@@ -72,9 +87,45 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
                 view,
                 new List<string>
                 {
-                    userEmail,
+                    user.Email,
                 }),
             cancellationToken);
+    }
+
+    private bool ShouldSkipEmailSending(
+        User user)
+    {
+        if (!user.IsGoogleAuth() && !user.IsGithubAuth())
+        {
+            _logger.LogWarning(
+                "Email about approval was not sent to user {UserId} with email {Email} because they are not authenticated via Google or GitHub.",
+                user.Id,
+                user.Email);
+
+            return true;
+        }
+
+        if (user.UnsubscribeMeFromAll)
+        {
+            _logger.LogWarning(
+                "Email about approval was not sent to user {UserId} with email {Email} because the user has unsubscribed from all emails.",
+                user.Id,
+                user.Email);
+
+            return true;
+        }
+
+        if (user.UniqueToken == null)
+        {
+            _logger.LogWarning(
+                "User {UserId} with email {Email} has no unsubscribe token. Skipping email.",
+                user.Id,
+                user.Email);
+
+            return true;
+        }
+
+        return false;
     }
 
     public EmailContent Prepare(

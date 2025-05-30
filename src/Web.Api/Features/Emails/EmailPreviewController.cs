@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Domain.Enums;
 using Infrastructure.Emails;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,6 @@ namespace Web.Api.Features.Emails;
 
 [ApiController]
 [Route("api/admin/email-previews")]
-[HasAnyRole(Role.Admin)]
 public class EmailPreviewController : ControllerBase
 {
     private readonly IViewRenderer _viewRenderer;
@@ -25,7 +25,17 @@ public class EmailPreviewController : ControllerBase
     {
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasApprovedViewModel.ViewName,
-            new ReviewWasApprovedViewModel("Company Name"));
+            new ReviewWasApprovedViewModel("Company Name", Guid.NewGuid().ToString()));
+
+        return new EmailPreviewResponse(view);
+    }
+
+    [HttpGet("review-rejected")]
+    public async Task<EmailPreviewResponse> ReviewWasRejected()
+    {
+        var view = await _viewRenderer.RenderHtmlAsync(
+            ReviewWasRejectedViewModel.ViewName,
+            new ReviewWasRejectedViewModel("Company Name", Guid.NewGuid().ToString()));
 
         return new EmailPreviewResponse(view);
     }

@@ -7,7 +7,6 @@ using Infrastructure.Database;
 using Infrastructure.Emails.Contracts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Web.Api.Features.CompanyReviews.DeleteCompanyReview;
 
@@ -16,18 +15,15 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
     private readonly ITechinterviewEmailService _emailService;
-    private readonly ILogger<DeleteCompanyReviewHandler> _logger;
 
     public DeleteCompanyReviewHandler(
         DatabaseContext context,
         IAuthorization authorization,
-        ITechinterviewEmailService emailService,
-        ILogger<DeleteCompanyReviewHandler> logger)
+        ITechinterviewEmailService emailService)
     {
         _context = context;
         _authorization = authorization;
         _emailService = emailService;
-        _logger = logger;
     }
 
     public async Task<Unit> Handle(
@@ -47,37 +43,16 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
                      ?? throw new NotFoundException("Review not found");
 
         _context.Remove(review);
+        review.User?.GenerateNewEmailUnsubscribeTokenIfNecessary();
+
         await _context.SaveChangesAsync(cancellationToken);
 
         if (review.User != null)
         {
-            if (review.User.IsGoogleAuth() || review.User.IsGithubAuth())
-            {
-                await _emailService.CompanyReviewWasRejectedAsync(
-                    review.User.Email,
-                    review.Company.Name,
-                    cancellationToken);
-
-                _logger.LogInformation(
-                    "Email about rejection was sent to user {UserId} with email {Email} for review {ReviewId}.",
-                    review.UserId,
-                    review.User.Email,
-                    review.Id);
-            }
-            else
-            {
-                _logger.LogWarning(
-                    "Email about rejection was not sent to user {UserId} with email {Email} because they are not authenticated via Google or GitHub.",
-                    review.UserId,
-                    review.User.Email);
-            }
-        }
-        else
-        {
-            _logger.LogWarning(
-                "Review with ID {ReviewId} was rejected, but user with ID {UserId} does not exist or has no email.",
-                review.Id,
-                review.UserId);
+            await _emailService.CompanyReviewWasRejectedAsync(
+                review.User,
+                review.Company.Name,
+                cancellationToken);
         }
 
         return Unit.Value;

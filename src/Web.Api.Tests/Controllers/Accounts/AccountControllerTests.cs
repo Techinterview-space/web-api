@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
+using Moq;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -25,7 +27,8 @@ public class AccountControllerTests
 
         var controller = new AccountController(
             new FakeAuth(user),
-            context);
+            context,
+            new Mock<ILogger<AccountController>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await controller.GetMySalaries(default);
@@ -53,7 +56,8 @@ public class AccountControllerTests
 
         var controller = new AccountController(
             new FakeAuth(user2),
-            context);
+            context,
+            new Mock<ILogger<AccountController>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await controller.GetMySalaries(default);
