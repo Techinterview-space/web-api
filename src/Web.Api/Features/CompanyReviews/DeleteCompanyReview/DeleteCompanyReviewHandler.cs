@@ -57,6 +57,12 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
                     review.User.Email,
                     review.Company.Name,
                     cancellationToken);
+
+                _logger.LogInformation(
+                    "Email about rejection was sent to user {UserId} with email {Email} for review {ReviewId}.",
+                    review.UserId,
+                    review.User.Email,
+                    review.Id);
             }
             else
             {
