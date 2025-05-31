@@ -25,10 +25,32 @@ public class UserFake : User, IPlease<User>
         userName ??= $"{FirstName.First()}.{LastName}_{DateTimeOffset.Now.Ticks}@example.com".ToLowerInvariant();
         Email = userName;
         EmailConfirmed = emailConfirmed;
+        UniqueToken = Guid.NewGuid().ToString("N");
         UserRoles = new List<UserRole>
         {
             new UserRole(role, this)
         };
+    }
+
+    public UserFake WithUnsubscribeMeFromAll(
+        bool unsubscribeMeFromAll = true)
+    {
+        UnsubscribeMeFromAll = unsubscribeMeFromAll;
+        return this;
+    }
+
+    public UserFake WithUserEmail(
+        UserEmailType type,
+        DateTimeOffset? createdAt = null)
+    {
+        Emails ??= new List<UserEmail>();
+        Emails.Add(
+            new UserEmailFake(
+                type,
+                this,
+                createdAt));
+
+        return this;
     }
 
     public async Task<User> PleaseAsync(

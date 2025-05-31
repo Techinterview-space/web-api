@@ -1,0 +1,18 @@
+﻿@model Web.Api.Features.Emails.ViewModels.SalaryUpdateReminderViewModel
+@{
+    Layout = "/Views/Shared/_EmailLayout.cshtml";
+    ViewData["EmailTitle"] = "Вы давно оставили анкету о зарплате";
+    ViewData["PreHeader"] = "Вы давно оставили анкету о зарплате";
+
+    ViewData["CallToActionTitle"] = "Перейти к форме анкеты";
+    ViewData["CallToActionLink"] = "https://techinterview.space/salaries/add-new?utm_source=from_email";
+}
+
+<p>
+    Более года назад вы оставили анкету на нашем сайте. 
+    Мы будем благодарны, если вы оставите новую анкету, чтобы поддерживать статистику в актуальном
+    состоянии.
+</p>
+<p>
+    Это займет не больше пары минут, но поможет сделать комьюнити IT в Казахстане более прозрачным. 
+</p>
