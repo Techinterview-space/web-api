@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
@@ -50,11 +51,17 @@ public class ApproveReviewHandler : IRequestHandler<ApproveReviewCommand, Unit>
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        if (review.User != null)
-        {
+        if (review.User != null &&
             await _emailService.CompanyReviewWasApprovedAsync(
                 review.User,
                 company.Name,
+                cancellationToken))
+        {
+            await _context.SaveAsync(
+                new UserEmail(
+                    "Отзыв был одобрен",
+                    UserEmailType.CompanyReviewNotification,
+                    review.User),
                 cancellationToken);
         }
 

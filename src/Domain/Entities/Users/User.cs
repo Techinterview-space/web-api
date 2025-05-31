@@ -96,6 +96,8 @@ public class User : BaseModel, IHasDeletedAt
 
     public virtual List<CompanyReviewVote> Votes { get; protected set; }
 
+    public virtual List<UserEmail> Emails { get; protected set; }
+
     public string GetFullname()
     {
         return $"{FirstName} {LastName}";

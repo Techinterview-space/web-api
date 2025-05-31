@@ -39,4 +39,14 @@ public class EmailPreviewController : ControllerBase
 
         return new EmailPreviewResponse(view);
     }
+
+    [HttpGet("salary-reminder")]
+    public async Task<EmailPreviewResponse> UptodateSalaryReminder()
+    {
+        var view = await _viewRenderer.RenderHtmlAsync(
+            SalaryUpdateReminderViewModel.ViewName,
+            new SalaryUpdateReminderViewModel(Guid.NewGuid().ToString()));
+
+        return new EmailPreviewResponse(view);
+    }
 }

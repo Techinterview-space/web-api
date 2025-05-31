@@ -40,14 +40,14 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         _logger = logger;
     }
 
-    public async Task CompanyReviewWasApprovedAsync(
+    public async Task<bool> CompanyReviewWasApprovedAsync(
         User user,
         string companyName,
         CancellationToken cancellationToken)
     {
         if (ShouldSkipEmailSending(user))
         {
-            return;
+            return false;
         }
 
         var view = await _viewRenderer.RenderHtmlAsync(
@@ -57,23 +57,25 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
-                "Ваш отзыв был одобрен",
+                ReviewWasApprovedViewModel.Subject,
                 view,
                 new List<string>
                 {
                     user.Email,
                 }),
             cancellationToken);
+
+        return true;
     }
 
-    public async Task CompanyReviewWasRejectedAsync(
+    public async Task<bool> CompanyReviewWasRejectedAsync(
         User user,
         string companyName,
         CancellationToken cancellationToken)
     {
         if (ShouldSkipEmailSending(user))
         {
-            return;
+            return false;
         }
 
         var view = await _viewRenderer.RenderHtmlAsync(
@@ -83,13 +85,42 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
-                "Ваш отзыв был отклонен",
+                ReviewWasRejectedViewModel.Subject,
                 view,
                 new List<string>
                 {
                     user.Email,
                 }),
             cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> SalaryUpdateReminderEmailAsync(
+        User user,
+        CancellationToken cancellationToken)
+    {
+        if (ShouldSkipEmailSending(user))
+        {
+            return false;
+        }
+
+        var view = await _viewRenderer.RenderHtmlAsync(
+            SalaryUpdateReminderViewModel.ViewName,
+            new SalaryUpdateReminderViewModel(user.UniqueToken));
+
+        await _emailApiSender.SendAsync(
+            new EmailContent(
+                _global.NoReplyEmail,
+                SalaryUpdateReminderViewModel.Subject,
+                view,
+                new List<string>
+                {
+                    user.Email,
+                }),
+            cancellationToken);
+
+        return true;
     }
 
     private bool ShouldSkipEmailSending(

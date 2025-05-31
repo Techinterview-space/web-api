@@ -67,6 +67,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<StatDataChangeSubscriptionTgMessage> StatDataChangeSubscriptionTgMessages { get; set; }
 
+    public DbSet<UserEmail> UserEmails { get; set; }
+
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel

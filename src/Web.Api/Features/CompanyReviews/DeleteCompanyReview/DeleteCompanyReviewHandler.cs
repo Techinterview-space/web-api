@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
@@ -47,11 +48,17 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        if (review.User != null)
-        {
+        if (review.User != null &&
             await _emailService.CompanyReviewWasRejectedAsync(
                 review.User,
                 review.Company.Name,
+                cancellationToken))
+        {
+            await _context.SaveAsync(
+                new UserEmail(
+                    "Отзыв был отклонен",
+                    UserEmailType.CompanyReviewNotification,
+                    review.User),
                 cancellationToken);
         }
 
