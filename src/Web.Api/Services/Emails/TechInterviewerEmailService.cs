@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Users;
+using Infrastructure.Database;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Emails.Contracts.Requests;
@@ -23,6 +24,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
     private readonly IViewRenderer _viewRenderer;
     private readonly IEmailApiSender _emailApiSender;
     private readonly ILogger<TechInterviewerEmailService> _logger;
+    private readonly DatabaseContext _context;
 
     public TechInterviewerEmailService(
         IHostEnvironment env,
@@ -30,7 +32,8 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         IMarkdownToHtmlGenerator html,
         IViewRenderer viewRenderer,
         IEmailApiSender emailApiSender,
-        ILogger<TechInterviewerEmailService> logger)
+        ILogger<TechInterviewerEmailService> logger,
+        DatabaseContext context)
     {
         _env = env;
         _global = global;
@@ -38,6 +41,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         _viewRenderer = viewRenderer;
         _emailApiSender = emailApiSender;
         _logger = logger;
+        _context = context;
     }
 
     public async Task CompanyReviewWasApprovedAsync(
@@ -50,6 +54,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
             return;
         }
 
+        const string subject = "Ваш отзыв одобрен";
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasApprovedViewModel.ViewName,
             new ReviewWasApprovedViewModel(companyName, user.UniqueToken));
@@ -57,12 +62,19 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
-                "Ваш отзыв был одобрен",
+                subject,
                 view,
                 new List<string>
                 {
                     user.Email,
                 }),
+            cancellationToken);
+
+        await _context.SaveAsync(
+            new UserEmail(
+                subject,
+                UserEmailType.CompanyReviewNotification,
+                user),
             cancellationToken);
     }
 
@@ -76,6 +88,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
             return;
         }
 
+        const string subject = "Ваш отзыв был отклонен";
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasRejectedViewModel.ViewName,
             new ReviewWasRejectedViewModel(companyName, user.UniqueToken));
@@ -83,12 +96,19 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
         await _emailApiSender.SendAsync(
             new EmailContent(
                 _global.NoReplyEmail,
-                "Ваш отзыв был отклонен",
+                subject,
                 view,
                 new List<string>
                 {
                     user.Email,
                 }),
+            cancellationToken);
+
+        await _context.SaveAsync(
+            new UserEmail(
+                subject,
+                UserEmailType.CompanyReviewNotification,
+                user),
             cancellationToken);
     }
 
