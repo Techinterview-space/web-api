@@ -50,6 +50,8 @@ public class SalaryUpdateReminderEmailJob
                 "Too many salary reminders have been sent today: {CountOfEmailsSentToday}. CorrelationId: {CorrelationId}",
                 countOfEmailsSentToday,
                 jobCorrelationId);
+
+            return;
         }
 
         var yearAgo = DateTimeOffset.UtcNow.AddYears(-1);

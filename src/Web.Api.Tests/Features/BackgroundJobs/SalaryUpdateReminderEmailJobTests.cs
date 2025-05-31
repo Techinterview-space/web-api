@@ -221,13 +221,17 @@ public class SalaryUpdateReminderEmailJobTests
             .WithUnsubscribeMeFromAll(false)
             .PleaseAsync(context);
 
-        for (int i = 0; i < SalaryUpdateReminderEmailJob.EmailsPerBatch; i++)
+        var user2 = await new UserFake(Role.Interviewer, emailConfirmed: true)
+            .WithUnsubscribeMeFromAll(false)
+            .PleaseAsync(context);
+
+        for (var i = 0; i < SalaryUpdateReminderEmailJob.EmailsPerBatch; i++)
         {
             context.Add(
                 new UserEmail(
                     "Hello!",
                     UserEmailType.SalaryFormReminder,
-                    user1));
+                    user2));
         }
 
         await context.SaveChangesAsync();
