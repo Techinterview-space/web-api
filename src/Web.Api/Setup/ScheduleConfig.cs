@@ -33,14 +33,6 @@ public static class ScheduleConfig
                 .RunOnceAtStart();
 
             scheduler
-                .Schedule<SalaryUpdateReminderEmailJob>()
-                .DailyAt(0, 30);
-
-            scheduler
-                .Schedule<SalaryUpdateReminderEmailJob>()
-                .DailyAt(5, 30);
-
-            scheduler
                 .Schedule<TelegramSalariesRegularStatsUpdateJob>()
                 .DailyAt(7, 0)
                 .RunOnceAtStart();
@@ -63,6 +55,13 @@ public static class ScheduleConfig
                 .EveryMinute()
                 .When(() => Task.FromResult(Debugger.IsAttached))
                 .PreventOverlapping(nameof(StatDataChangeSubscriptionCalculateJob));
+
+            for (var i = 0; i < 10; i++)
+            {
+                scheduler
+                    .Schedule<SalaryUpdateReminderEmailJob>()
+                    .DailyAt(i * 1, 30);
+            }
         });
     }
 }

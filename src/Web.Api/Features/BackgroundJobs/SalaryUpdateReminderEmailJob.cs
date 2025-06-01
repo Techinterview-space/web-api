@@ -15,7 +15,12 @@ public class SalaryUpdateReminderEmailJob
     : InvocableJobBase<SalaryUpdateReminderEmailJob>
 {
     public const int MaximumEmailsPerDay = 80;
-    public const int EmailsPerBatch = MaximumEmailsPerDay / 2;
+    public const int EmailsPerBatch = MaximumEmailsPerDay / 10;
+
+    private static readonly DateTime _startingPoint = new DateTime(
+        new DateOnly(2025, 6, 2),
+        new TimeOnly(0, 0, 0),
+        DateTimeKind.Utc);
 
     private readonly DatabaseContext _context;
     private readonly ITechinterviewEmailService _emailService;
@@ -33,6 +38,17 @@ public class SalaryUpdateReminderEmailJob
     public override async Task ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
+        var now = DateTime.UtcNow;
+        if (now < _startingPoint)
+        {
+            Logger.LogInformation(
+                "SalaryUpdateReminderEmailJob is not started yet. Current time: {CurrentTime}, Starting point: {StartingPoint}",
+                now,
+                _startingPoint);
+
+            return;
+        }
+
         var jobCorrelationId = Guid.NewGuid();
 
         var todayStart = DateTimeOffset.UtcNow.Date;
