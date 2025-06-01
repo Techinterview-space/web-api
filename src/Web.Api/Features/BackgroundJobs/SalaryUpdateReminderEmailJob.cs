@@ -14,7 +14,8 @@ namespace Web.Api.Features.BackgroundJobs;
 public class SalaryUpdateReminderEmailJob
     : InvocableJobBase<SalaryUpdateReminderEmailJob>
 {
-    public const int EmailsPerBatch = 80;
+    public const int MaximumEmailsPerDay = 80;
+    public const int EmailsPerBatch = MaximumEmailsPerDay / 2;
 
     private readonly DatabaseContext _context;
     private readonly ITechinterviewEmailService _emailService;
@@ -44,7 +45,7 @@ public class SalaryUpdateReminderEmailJob
                     x.CreatedAt <= todayEnd,
                 cancellationToken);
 
-        if (countOfEmailsSentToday >= EmailsPerBatch)
+        if (countOfEmailsSentToday >= MaximumEmailsPerDay)
         {
             Logger.LogInformation(
                 "Too many salary reminders have been sent today: {CountOfEmailsSentToday}. CorrelationId: {CorrelationId}",

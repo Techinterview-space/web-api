@@ -18,7 +18,6 @@ public static class ScheduleConfig
             .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
             .AddTransient<StatDataChangeSubscriptionCalculateJob>()
             .AddTransient<AiAnalysisSubscriptionJob>()
-            .AddTransient<UserUniqueTokenSetJob>()
             .AddTransient<SalaryUpdateReminderEmailJob>();
 
         return services;
@@ -35,13 +34,11 @@ public static class ScheduleConfig
 
             scheduler
                 .Schedule<SalaryUpdateReminderEmailJob>()
-                .DailyAt(0, 30)
-                .RunOnceAtStart();
+                .DailyAt(0, 30);
 
             scheduler
-                .Schedule<UserUniqueTokenSetJob>()
-                .EveryMinute()
-                .PreventOverlapping(nameof(UserUniqueTokenSetJob));
+                .Schedule<SalaryUpdateReminderEmailJob>()
+                .DailyAt(5, 30);
 
             scheduler
                 .Schedule<TelegramSalariesRegularStatsUpdateJob>()

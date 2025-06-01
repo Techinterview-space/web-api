@@ -225,7 +225,7 @@ public class SalaryUpdateReminderEmailJobTests
             .WithUnsubscribeMeFromAll(false)
             .PleaseAsync(context);
 
-        for (var i = 0; i < SalaryUpdateReminderEmailJob.EmailsPerBatch; i++)
+        for (var i = 0; i < SalaryUpdateReminderEmailJob.MaximumEmailsPerDay; i++)
         {
             context.Add(
                 new UserEmail(
@@ -248,7 +248,7 @@ public class SalaryUpdateReminderEmailJobTests
             .ReturnsAsync(true);
 
         context.ChangeTracker.Clear();
-        Assert.Equal(SalaryUpdateReminderEmailJob.EmailsPerBatch, context.UserEmails.Count());
+        Assert.Equal(SalaryUpdateReminderEmailJob.MaximumEmailsPerDay, context.UserEmails.Count());
 
         var target = new SalaryUpdateReminderEmailJob(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
@@ -257,7 +257,7 @@ public class SalaryUpdateReminderEmailJobTests
 
         await target.ExecuteAsync();
 
-        Assert.Equal(SalaryUpdateReminderEmailJob.EmailsPerBatch, context.UserEmails.Count());
+        Assert.Equal(SalaryUpdateReminderEmailJob.MaximumEmailsPerDay, context.UserEmails.Count());
 
         emailService.Verify(
             x => x.SalaryUpdateReminderEmailAsync(
