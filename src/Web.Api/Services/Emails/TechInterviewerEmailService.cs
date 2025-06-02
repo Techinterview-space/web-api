@@ -126,10 +126,10 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
     private bool ShouldSkipEmailSending(
         User user)
     {
-        if (!user.IsGoogleAuth() && !user.IsGithubAuth())
+        if (!user.EmailConfirmed)
         {
             _logger.LogWarning(
-                "Email about approval was not sent to user {UserId} with email {Email} because they are not authenticated via Google or GitHub.",
+                "User {UserId} with email {Email} has not confirmed email.",
                 user.Id,
                 user.Email);
 
