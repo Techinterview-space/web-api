@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Web.Api.Features.Dashboard.Dtos;
+namespace Web.Api.Features.Admin.DashboardModels;
 
 public record AverageRatingData
 {

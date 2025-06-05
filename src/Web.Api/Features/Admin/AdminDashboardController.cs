@@ -6,10 +6,10 @@ using Domain.Enums;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Dashboard.Dtos;
+using Web.Api.Features.Admin.DashboardModels;
 using Web.Api.Setup.Attributes;
 
-namespace Web.Api.Features.Dashboard;
+namespace Web.Api.Features.Admin;
 
 [ApiController]
 [Route("api/admin/dashboard")]
@@ -29,6 +29,8 @@ public class AdminDashboardController : ControllerBase
         CancellationToken cancellationToken)
     {
         var yearAgo = DateTimeOffset.UtcNow.AddYears(-1);
+        var tenDaysAgoEdge = DateTimeOffset.UtcNow.AddDays(-10);
+
         var feedbackReviews = await _context.SalariesSurveyReplies
             .Where(x => x.CreatedAt >= yearAgo)
             .Select(x => x.UsefulnessRating)
@@ -47,9 +49,27 @@ public class AdminDashboardController : ControllerBase
                 x.OutdatedAt == null)
             .CountAsync(cancellationToken);
 
+        var userEmailsForLastTenDays = await _context.UserEmails
+            .Where(x => x.CreatedAt >= tenDaysAgoEdge)
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var likesForLastTenDays = await _context.CompanyReviewVotes
+            .Where(x => x.CreatedAt >= tenDaysAgoEdge)
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var reviewsForLastTenDays = await _context.CompanyReviews
+            .Where(x => x.CreatedAt >= tenDaysAgoEdge)
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
         return new AdminDashboardData(
             new AverageRatingData(feedbackReviews),
             salariesCount,
-            reviewsCount);
+            reviewsCount,
+            userEmailsForLastTenDays,
+            likesForLastTenDays,
+            reviewsForLastTenDays);
     }
 }
