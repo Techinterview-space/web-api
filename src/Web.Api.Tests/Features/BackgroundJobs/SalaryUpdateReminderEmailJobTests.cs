@@ -108,10 +108,59 @@ public class SalaryUpdateReminderEmailJobTests
             Times.Never);
     }
 
+    [Fact]
+    public async Task Handle_UserHasOldSalary_SalaryFormReminder_EmailWasSentInThPastEnough_Sent()
+    {
+        await using var context = new InMemoryDatabaseContext();
+
+        var user1 = await new UserFake(Role.Interviewer, emailConfirmed: true)
+            .WithUnsubscribeMeFromAll(false)
+            .WithUserEmail(
+                UserEmailType.SalaryFormReminder,
+                createdAt: DateTimeOffset.UtcNow.AddMonths(-6).AddDays(-1))
+            .PleaseAsync(context);
+
+        var salary1 = await new UserSalaryFake(
+                user1,
+                createdAt: DateTimeOffset.UtcNow.AddYears(-1).AddDays(-1))
+            .PleaseAsync(context);
+
+        var salary2 = await new UserSalaryFake(
+                user1,
+                createdAt: DateTimeOffset.UtcNow.AddYears(-1).AddDays(-10))
+            .PleaseAsync(context);
+
+        var emailService = new Mock<ITechinterviewEmailService>();
+        emailService.Setup(x => x.SalaryUpdateReminderEmailAsync(
+                It.Is<User>(u => u.Id == user1.Id),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
+        context.ChangeTracker.Clear();
+        Assert.Equal(1, context.UserEmails.Count());
+
+        var target = new SalaryUpdateReminderEmailJob(
+            new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
+            context,
+            emailService.Object);
+
+        await target.ExecuteAsync();
+
+        var allEmails = context.UserEmails.ToList();
+        Assert.Equal(2, allEmails.Count);
+
+        Assert.Equal(user1.Id, allEmails[1].UserId);
+
+        emailService.Verify(
+            x => x.SalaryUpdateReminderEmailAsync(
+                It.Is<User>(u => u.Id == user1.Id),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
     [Theory]
     [InlineData(UserEmailType.CompanyReviewNotification)]
-    [InlineData(UserEmailType.SalaryFormReminder)]
-    public async Task Handle_UserHasOldSalary_EmailWasSentInThPastEnough_Sent(
+    public async Task Handle_UserHasOldSalary_EmailWasSentInThPastEnough_OtherEmail_Sent(
         UserEmailType emailInHistory)
     {
         await using var context = new InMemoryDatabaseContext();
@@ -161,19 +210,16 @@ public class SalaryUpdateReminderEmailJobTests
             Times.Once);
     }
 
-    [Theory]
-    [InlineData(UserEmailType.CompanyReviewNotification)]
-    [InlineData(UserEmailType.SalaryFormReminder)]
-    public async Task Handle_UserHasOldSalary_EmailWasSentRecently_NotSent(
-        UserEmailType emailInHistory)
+    [Fact]
+    public async Task Handle_UserHasOldSalary_SalaryFormReminder_EmailWasSentRecently_NotSent()
     {
         await using var context = new InMemoryDatabaseContext();
 
         var user1 = await new UserFake(Role.Interviewer, emailConfirmed: true)
             .WithUnsubscribeMeFromAll(false)
             .WithUserEmail(
-                emailInHistory,
-                createdAt: DateTimeOffset.UtcNow.AddDays(-5))
+                UserEmailType.SalaryFormReminder,
+                createdAt: DateTimeOffset.UtcNow.AddMonths(-3).AddDays(1))
             .PleaseAsync(context);
 
         var salary1 = await new UserSalaryFake(

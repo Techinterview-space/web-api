@@ -86,7 +86,7 @@ public class SalaryUpdateReminderEmailJob
                 x.Salaries.Any(s => s.UseInStats))
             .Where(x =>
                 x.Salaries.All(y => y.CreatedAt < yearAgo) &&
-                (!x.Emails.Any() ||
+                (x.Emails.All(y => y.Type != UserEmailType.SalaryFormReminder) ||
                  x.Emails
                      .Where(y => y.Type == UserEmailType.SalaryFormReminder)
                      .All(y => y.CreatedAt < salaryReminderSentEdge)))
