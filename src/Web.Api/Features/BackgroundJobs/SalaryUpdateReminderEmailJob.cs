@@ -72,6 +72,7 @@ public class SalaryUpdateReminderEmailJob
         }
 
         var yearAgo = DateTimeOffset.UtcNow.AddYears(-1);
+        var salaryReminderSentEdge = DateTimeOffset.UtcNow.AddMonths(-6);
         var emailSentEdge = DateTimeOffset.UtcNow.AddDays(-7);
 
         var usersToSend = await _context.Users
@@ -85,7 +86,10 @@ public class SalaryUpdateReminderEmailJob
                 x.Salaries.Any(s => s.UseInStats))
             .Where(x =>
                 x.Salaries.All(y => y.CreatedAt < yearAgo) &&
-                (!x.Emails.Any() || x.Emails.All(y => y.CreatedAt < emailSentEdge)))
+                (!x.Emails.Any() ||
+                 x.Emails
+                     .Where(y => y.Type == UserEmailType.SalaryFormReminder)
+                     .All(y => y.CreatedAt < salaryReminderSentEdge)))
             .OrderBy(x => x.CreatedAt)
             .Take(EmailsPerBatch)
             .ToListAsync(cancellationToken);
