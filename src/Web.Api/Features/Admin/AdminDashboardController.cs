@@ -49,6 +49,10 @@ public class AdminDashboardController : ControllerBase
                 x.OutdatedAt == null)
             .CountAsync(cancellationToken);
 
+        var usersWithUnsubscribeMeFromAllCount = await _context.Users
+            .Where(x => x.UnsubscribeMeFromAll)
+            .CountAsync(cancellationToken);
+
         var userEmailsForLastTenDays = await _context.UserEmails
             .Where(x => x.CreatedAt >= tenDaysAgoEdge)
             .Select(x => x.CreatedAt)
@@ -68,6 +72,7 @@ public class AdminDashboardController : ControllerBase
             new AverageRatingData(feedbackReviews),
             salariesCount,
             reviewsCount,
+            usersWithUnsubscribeMeFromAllCount,
             userEmailsForLastTenDays,
             likesForLastTenDays,
             reviewsForLastTenDays);

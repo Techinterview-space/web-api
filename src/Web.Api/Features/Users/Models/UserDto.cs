@@ -30,6 +30,7 @@ public record UserDto : IHasId
         IsGithubAuth = user.IsGithubAuth();
         IsAuth0Auth = user.IsAuth0Auth();
         PictureProfile = user.ProfilePicture;
+        UnsubscribeMeFromAll = user.UnsubscribeMeFromAll;
 
         CreatedAt = user.CreatedAt;
         DeletedAt = user.DeletedAt;
@@ -57,6 +58,8 @@ public record UserDto : IHasId
 
     public bool IsAuth0Auth { get; init; }
 
+    public bool UnsubscribeMeFromAll { get; init; }
+
     public List<Role> Roles { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
@@ -83,6 +86,7 @@ public record UserDto : IHasId
                     .ToList()
                 : null,
             IsMfaEnabled = user.TotpSecret != null,
+            UnsubscribeMeFromAll = user.UnsubscribeMeFromAll,
             PictureProfile = user.ProfilePicture,
             CreatedAt = user.CreatedAt,
             DeletedAt = user.DeletedAt,

@@ -9,6 +9,7 @@ public record AdminDashboardData
         AverageRatingData averageRatingData,
         int totalSalaries,
         int totalCompanyReviews,
+        int usersWithUnsubscribeMeFromAllCount,
         List<DateTimeOffset> userEmailsSourceData,
         List<DateTimeOffset> reviewLikesForLastDays,
         List<DateTimeOffset> reviewsForLastDays)
@@ -16,6 +17,8 @@ public record AdminDashboardData
         AverageRatingData = averageRatingData;
         TotalSalaries = totalSalaries;
         TotalCompanyReviews = totalCompanyReviews;
+        UsersWithUnsubscribeMeFromAllCount = usersWithUnsubscribeMeFromAllCount;
+
         UserEmailsForLastDays = new ItemsPerDayChartData(userEmailsSourceData);
         ReviewLikesForLastTenDays = new ItemsPerDayChartData(reviewLikesForLastDays);
         ReviewsForLastTenDays = new ItemsPerDayChartData(reviewsForLastDays);
@@ -26,6 +29,8 @@ public record AdminDashboardData
     public int TotalSalaries { get; }
 
     public int TotalCompanyReviews { get; }
+
+    public int UsersWithUnsubscribeMeFromAllCount { get; }
 
     public ItemsPerDayChartData UserEmailsForLastDays { get; }
 
