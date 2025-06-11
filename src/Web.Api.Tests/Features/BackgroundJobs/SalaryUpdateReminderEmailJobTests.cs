@@ -117,7 +117,7 @@ public class SalaryUpdateReminderEmailJobTests
             .WithUnsubscribeMeFromAll(false)
             .WithUserEmail(
                 UserEmailType.SalaryFormReminder,
-                createdAt: DateTimeOffset.UtcNow.AddMonths(-6).AddDays(-1))
+                createdAt: DateTimeOffset.UtcNow.AddYears(-1).AddDays(-1))
             .PleaseAsync(context);
 
         var salary1 = await new UserSalaryFake(

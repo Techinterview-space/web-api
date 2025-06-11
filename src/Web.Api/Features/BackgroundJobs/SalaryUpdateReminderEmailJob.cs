@@ -72,8 +72,7 @@ public class SalaryUpdateReminderEmailJob
         }
 
         var yearAgo = DateTimeOffset.UtcNow.AddYears(-1);
-        var salaryReminderSentEdge = DateTimeOffset.UtcNow.AddMonths(-6);
-        var emailSentEdge = DateTimeOffset.UtcNow.AddDays(-7);
+        var salaryReminderSentEdge = DateTimeOffset.UtcNow.AddYears(-1);
 
         var usersToSend = await _context.Users
             .Include(x => x.Emails.OrderByDescending(u => u.CreatedAt))
