@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Domain.Enums;
 using Infrastructure.Emails;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Emails.ViewModels;
-using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Emails;
 

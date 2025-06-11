@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.ValueObjects;
-using Infrastructure.Salaries;
 
 namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 

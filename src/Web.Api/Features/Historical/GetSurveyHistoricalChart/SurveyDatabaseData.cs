@@ -1,6 +1,5 @@
 ﻿using System;
 using Domain.Entities.Enums;
-using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 

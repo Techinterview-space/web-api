@@ -32,7 +32,7 @@ public class GetCompanyHandlerTests
             new FakeAuth(user));
 
         var result = await target.Handle(
-            new GetCompanyQuery(company.Id.ToString()),
+            company.Id.ToString(),
             CancellationToken.None);
 
         Assert.Equal(company.Id, result.Company.Id);
@@ -58,7 +58,7 @@ public class GetCompanyHandlerTests
             new FakeAuth(user));
 
         var result = await target.Handle(
-            new GetCompanyQuery(company.Id.ToString()),
+            company.Id.ToString(),
             CancellationToken.None);
 
         Assert.Equal(company.Id, result.Company.Id);
@@ -81,7 +81,7 @@ public class GetCompanyHandlerTests
             new FakeAuth(null));
 
         var result = await target.Handle(
-            new GetCompanyQuery(company.Id.ToString()),
+            company.Id.ToString(),
             CancellationToken.None);
 
         Assert.Equal(company.Id, result.Company.Id);
@@ -122,7 +122,7 @@ public class GetCompanyHandlerTests
             new FakeAuth(user));
 
         var result = await target.Handle(
-            new GetCompanyQuery(company.Id.ToString()),
+            company.Id.ToString(),
             CancellationToken.None);
 
         Assert.Equal(company.Id, result.Company.Id);

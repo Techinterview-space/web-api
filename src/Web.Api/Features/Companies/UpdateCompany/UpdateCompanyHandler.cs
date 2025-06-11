@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Validation;
@@ -10,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Companies.UpdateCompany;
 
-public record UpdateCompanyHandler : IRequestHandler<UpdateCompanyCommand, Unit>
+public record UpdateCompanyHandler : Infrastructure.Services.Mediator.IRequestHandler<UpdateCompanyCommand, Unit>
 {
     private readonly DatabaseContext _context;
 

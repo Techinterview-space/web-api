@@ -1,19 +1,18 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Enums;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.SearchCompanies;
 
 public class SearchCompaniesHandler
-    : IRequestHandler<SearchCompaniesQuery, SearchCompaniesResponse>
+    : IRequestHandler<SearchCompaniesQueryParams, SearchCompaniesResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -27,7 +26,7 @@ public class SearchCompaniesHandler
     }
 
     public async Task<SearchCompaniesResponse> Handle(
-        SearchCompaniesQuery request,
+        SearchCompaniesQueryParams request,
         CancellationToken cancellationToken)
     {
         var pageSize = request.GetPageSize();

@@ -5,12 +5,12 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Companies.SoftDeleteCompany;
 
-public class SoftDeleteCompanyHandler : IRequestHandler<SoftDeleteCompanyCommand, Unit>
+public class SoftDeleteCompanyHandler : IRequestHandler<SoftDeleteCompanyCommand, bool>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -23,7 +23,7 @@ public class SoftDeleteCompanyHandler : IRequestHandler<SoftDeleteCompanyCommand
         _authorization = authorization;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<bool> Handle(
         SoftDeleteCompanyCommand request,
         CancellationToken cancellationToken)
     {
@@ -39,6 +39,6 @@ public class SoftDeleteCompanyHandler : IRequestHandler<SoftDeleteCompanyCommand
         company.Delete();
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return true;
     }
 }

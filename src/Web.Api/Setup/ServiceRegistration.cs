@@ -1,4 +1,6 @@
-﻿using AspNetCore.Aws.S3.Simple.Settings;
+﻿using System;
+using System.Linq;
+using AspNetCore.Aws.S3.Simple.Settings;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies;
@@ -78,6 +80,36 @@ public static class ServiceRegistration
         {
             services
                 .AddScoped<IEmailApiSender, SendgridEmailApiSender>();
+        }
+
+        return services;
+    }
+
+    public static IServiceCollection RegisterAllImplementations(
+        this IServiceCollection services,
+        Type openGenericType,
+        ServiceLifetime lifetime = ServiceLifetime.Scoped)
+    {
+        var typesFromAssemblies = AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Where(a => !a.IsDynamic)
+            .SelectMany(a => a.GetTypes())
+            .Where(t => !t.IsAbstract && !t.IsInterface)
+            .Select(t => new
+            {
+                Implementation = t,
+                Services = t.GetInterfaces()
+                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == openGenericType)
+            })
+            .Where(x => x.Services.Any());
+
+        foreach (var typeInfo in typesFromAssemblies)
+        {
+            foreach (var service in typeInfo.Services)
+            {
+                services.Add(new ServiceDescriptor(service, typeInfo.Implementation, lifetime));
+                services.Add(new ServiceDescriptor(typeInfo.Implementation, typeInfo.Implementation, lifetime));
+            }
         }
 
         return services;

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Linq;
-using Domain.Entities.Salaries;
-using Domain.Extensions;
-using Domain.ValueObjects;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

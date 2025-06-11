@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.CreateCompany;
 
-public class CreateCompanyHandler : IRequestHandler<CreateCompanyCommand, CompanyDto>
+public class CreateCompanyHandler : IRequestHandler<CreateCompanyBodyRequest, CompanyDto>
 {
     private readonly DatabaseContext _context;
 
@@ -19,7 +19,7 @@ public class CreateCompanyHandler : IRequestHandler<CreateCompanyCommand, Compan
     }
 
     public async Task<CompanyDto> Handle(
-        CreateCompanyCommand request,
+        CreateCompanyBodyRequest request,
         CancellationToken cancellationToken)
     {
         var nameUpper = request.Name.ToUpperInvariant();

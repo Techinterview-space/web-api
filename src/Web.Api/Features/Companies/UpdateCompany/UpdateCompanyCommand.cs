@@ -1,6 +1,5 @@
 ﻿using System;
 using MediatR;
-using Web.Api.Features.Companies.CreateCompany;
 
 namespace Web.Api.Features.Companies.UpdateCompany;
 

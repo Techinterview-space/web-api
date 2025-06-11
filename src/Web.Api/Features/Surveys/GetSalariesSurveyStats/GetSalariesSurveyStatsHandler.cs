@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Domain.Entities.Questions;
 using Infrastructure.Database;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Surveys.Services;
 
 namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 

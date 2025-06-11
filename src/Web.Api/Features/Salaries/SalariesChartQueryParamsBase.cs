@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.ValueObjects;
-using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Features.Salaries;

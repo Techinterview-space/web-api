@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
 using Domain.Entities.Telegram;
-using Domain.Enums;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;

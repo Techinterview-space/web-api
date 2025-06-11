@@ -2,6 +2,7 @@
 using Infrastructure.Configs;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
+using Infrastructure.Services.Mediator;
 using MaximGorbatyuk.DatabaseSqlEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -69,7 +70,9 @@ public class Startup
             .SetupEmailIntegration(_environment, _configuration)
             .SetupHealthCheck(_configuration)
             .SetupAuthentication(_configuration)
-            .SetupScheduler();
+            .SetupScheduler()
+            .RegisterAllImplementations(
+                typeof(IRequestHandler<,>));
 
         services
             .AddHostedService<AppInitializeService>();

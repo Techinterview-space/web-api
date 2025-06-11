@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Validation;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.SearchCompaniesForAdmin;
 
 public class SearchCompaniesForAdminHandler
-    : IRequestHandler<SearchCompaniesForAdminQuery, Pageable<CompanyDto>>
+    : IRequestHandler<SearchCompaniesForAdminQueryParams, Pageable<CompanyDto>>
 {
     private const int MaxPageSize = 100;
 
@@ -23,9 +24,11 @@ public class SearchCompaniesForAdminHandler
     }
 
     public async Task<Pageable<CompanyDto>> Handle(
-        SearchCompaniesForAdminQuery request,
+        SearchCompaniesForAdminQueryParams request,
         CancellationToken cancellationToken)
     {
+        request.ThrowIfInvalid();
+
         var pageSize = request.PageSize > MaxPageSize
             ? MaxPageSize
             : request.PageSize;

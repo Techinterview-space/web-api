@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Domain.Entities.Questions;
 
 namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 

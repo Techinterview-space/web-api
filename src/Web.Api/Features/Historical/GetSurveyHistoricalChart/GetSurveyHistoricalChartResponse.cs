@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Dates;

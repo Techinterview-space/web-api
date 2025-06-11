@@ -2,8 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Companies.CreateCompany;
 using Web.Api.Features.Companies.GetCompany;
 using Web.Api.Features.Companies.GetCompanyByAdmin;
@@ -19,12 +20,12 @@ namespace Web.Api.Features.Companies;
 [Route("api/companies")]
 public class CompaniesController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public CompaniesController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("")]
@@ -33,8 +34,8 @@ public class CompaniesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new SearchCompaniesQuery(queryParams),
+            await _serviceProvider.HandleBy<SearchCompaniesHandler, SearchCompaniesQueryParams, SearchCompaniesResponse>(
+                queryParams,
                 cancellationToken));
     }
 
@@ -45,9 +46,8 @@ public class CompaniesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new SearchCompaniesForAdminQuery(queryParams),
-                cancellationToken));
+            await _serviceProvider.GetRequiredService<SearchCompaniesForAdminHandler>()
+                .Handle(queryParams, cancellationToken));
     }
 
     [HttpPost("")]
@@ -57,9 +57,8 @@ public class CompaniesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new CreateCompanyCommand(request),
-                cancellationToken));
+            await _serviceProvider.GetRequiredService<CreateCompanyHandler>()
+                .Handle(request, cancellationToken));
     }
 
     [HttpPost("{companyId:guid}")]
@@ -70,11 +69,12 @@ public class CompaniesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new UpdateCompanyCommand(
-                    companyId,
-                    request),
-                cancellationToken));
+            await _serviceProvider.GetRequiredService<UpdateCompanyHandler>()
+                .Handle(
+                    new UpdateCompanyCommand(
+                        companyId,
+                        request),
+                    cancellationToken));
     }
 
     [HttpGet("{companyIdentifier}")]
@@ -83,30 +83,31 @@ public class CompaniesController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new GetCompanyQuery(companyIdentifier),
+            await _serviceProvider.HandleBy<GetCompanyHandler, string, GetCompanyResponse>(
+                companyIdentifier,
                 cancellationToken));
     }
 
     [HttpGet("{companyIdentifier}/for-admin")]
+    [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> GetCompanyByAdmin(
         string companyIdentifier,
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new GetCompanyByAdminQuery(companyIdentifier),
-                cancellationToken));
+            await _serviceProvider.GetRequiredService<GetCompanyByAdminHandler>()
+                .Handle(companyIdentifier, cancellationToken));
     }
 
     [HttpDelete("{companyId:guid}")]
+    [HasAnyRole(Role.Admin)]
     public async Task<IActionResult> DeleteCompany(
         Guid companyId,
         CancellationToken cancellationToken)
     {
-        return Ok(
-            await _mediator.Send(
-                new SoftDeleteCompanyCommand(companyId),
-                cancellationToken));
+        await _serviceProvider.GetRequiredService<SoftDeleteCompanyHandler>()
+            .Handle(new SoftDeleteCompanyCommand(companyId), cancellationToken);
+
+        return Ok();
     }
 }

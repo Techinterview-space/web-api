@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Companies.SoftDeleteCompany;
 
-public record SoftDeleteCompanyCommand : IRequest<Unit>
+public record SoftDeleteCompanyCommand
 {
     public SoftDeleteCompanyCommand(
         Guid companyId)

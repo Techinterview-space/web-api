@@ -7,13 +7,13 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.GetCompany;
 
-public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResponse>
+public class GetCompanyHandler : IRequestHandler<string, GetCompanyResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -27,11 +27,11 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResp
     }
 
     public async Task<GetCompanyResponse> Handle(
-        GetCompanyQuery request,
+        string identifier,
         CancellationToken cancellationToken)
     {
         var company = await GetCompanyAsync(
-            request,
+            identifier,
             cancellationToken);
 
         var user = await _authorization.GetCurrentUserOrNullAsync(cancellationToken);
@@ -64,7 +64,7 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResp
     }
 
     private async Task<Company> GetCompanyAsync(
-        GetCompanyQuery request,
+        string identifier,
         CancellationToken cancellationToken)
     {
         return await _context.Companies
@@ -72,7 +72,7 @@ public class GetCompanyHandler : IRequestHandler<GetCompanyQuery, GetCompanyResp
                     .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
             .Where(x => x.DeletedAt == null)
             .GetCompanyByIdentifierOrNullAsync(
-                request.Identifier,
+                identifier,
                 cancellationToken)
             ?? throw new NotFoundException("Company not found");
     }

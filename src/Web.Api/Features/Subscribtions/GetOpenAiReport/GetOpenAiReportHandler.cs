@@ -9,7 +9,6 @@ using Infrastructure.Services.OpenAi.Models;
 using Infrastructure.Services.Professions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.BackgroundJobs;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReport;
 
