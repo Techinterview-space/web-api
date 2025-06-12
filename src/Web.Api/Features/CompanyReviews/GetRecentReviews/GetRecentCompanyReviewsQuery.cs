@@ -3,7 +3,7 @@ using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.CompanyReviews.GetRecentReviews;
 
-public record GetRecentCompanyReviewsQuery : PageModel>
+public record GetRecentCompanyReviewsQuery : PageModel
 {
     public GetRecentCompanyReviewsQuery(
         PageModel page)

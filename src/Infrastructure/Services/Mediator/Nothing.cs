@@ -1,3 +1,4 @@
+﻿#nullable enable
 namespace Infrastructure.Services.Mediator;
 
 /// <summary>
@@ -8,7 +9,7 @@ public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>
     /// <summary>
     /// Default and only value of the <see cref="Nothing"/> type.
     /// </summary>
-    public static readonly Nothing Value = new();
+    public static readonly Nothing Value = new ();
 
     /// <summary>
     /// Compares the current object with another object of the same type.

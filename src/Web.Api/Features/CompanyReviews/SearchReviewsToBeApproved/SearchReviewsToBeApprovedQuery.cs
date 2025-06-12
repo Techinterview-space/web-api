@@ -1,6 +1,3 @@
-﻿using System.Collections.Generic;
-using Web.Api.Features.Companies.Dtos;
+﻿namespace Web.Api.Features.CompanyReviews.SearchReviewsToBeApproved;
 
-namespace Web.Api.Features.CompanyReviews.SearchReviewsToBeApproved;
-
-public record SearchReviewsToBeApprovedQuery>;
+public record SearchReviewsToBeApprovedQuery;

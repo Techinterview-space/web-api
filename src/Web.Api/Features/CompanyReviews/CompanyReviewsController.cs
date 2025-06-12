@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Enums;
 using Domain.Validation;
 using Domain.ValueObjects.Pagination;
+using Infrastructure.Services.Mediator;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Web.Api.Features.Companies.Dtos;
 using Web.Api.Features.CompanyReviews.AddCompanyReview;
 using Web.Api.Features.CompanyReviews.ApproveReview;
 using Web.Api.Features.CompanyReviews.DeleteCompanyReview;
@@ -23,11 +26,14 @@ namespace Web.Api.Features.CompanyReviews;
 public class CompanyReviewsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public CompanyReviewsController(
-        IMediator mediator)
+        IMediator mediator,
+        IServiceProvider serviceProvider)
     {
         _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("reviews/recent")]
@@ -63,9 +69,9 @@ public class CompanyReviewsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new SearchReviewsToBeApprovedQuery(),
-                cancellationToken));
+            await _serviceProvider.HandleBy<SearchReviewsToBeApprovedHandler, Nothing, List<CompanyReviewDto>>(
+                Nothing.Value,
+                cancellationToken: cancellationToken));
     }
 
     [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/approve")]

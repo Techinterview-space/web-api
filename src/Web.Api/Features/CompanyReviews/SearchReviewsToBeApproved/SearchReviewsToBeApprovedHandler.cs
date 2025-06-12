@@ -10,7 +10,7 @@ using Web.Api.Features.Companies.Dtos;
 namespace Web.Api.Features.CompanyReviews.SearchReviewsToBeApproved;
 
 public class SearchReviewsToBeApprovedHandler
-    : Infrastructure.Services.Mediator.IRequestHandler<SearchReviewsToBeApprovedQuery, List<CompanyReviewDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<Nothing, List<CompanyReviewDto>>
 {
     private readonly DatabaseContext _context;
 
@@ -21,7 +21,7 @@ public class SearchReviewsToBeApprovedHandler
     }
 
     public async Task<List<CompanyReviewDto>> Handle(
-        SearchReviewsToBeApprovedQuery request,
+        Nothing request,
         CancellationToken cancellationToken)
     {
         var reviews = await _context.CompanyReviews
