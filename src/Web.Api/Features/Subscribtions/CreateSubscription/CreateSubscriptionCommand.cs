@@ -1,4 +1,3 @@
-﻿using MediatR;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 namespace Web.Api.Features.Subscribtions.CreateSubscription;

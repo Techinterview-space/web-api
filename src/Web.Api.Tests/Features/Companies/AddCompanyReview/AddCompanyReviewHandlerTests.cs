@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
-using MediatR;
+
 using Microsoft.EntityFrameworkCore;
 using TestUtils.Auth;
 using TestUtils.Db;

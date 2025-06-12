@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.ValueObjects.Pagination;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 using Web.Api.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
@@ -21,12 +21,12 @@ namespace Web.Api.Features.Salaries;
 [HasAnyRole(Role.Admin)]
 public class SalariesAdminController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public SalariesAdminController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("all")]
@@ -34,7 +34,7 @@ public class SalariesAdminController : ControllerBase
         [FromQuery] GetApprovedSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetApprovedSalariesHandler, GetApprovedSalariesQuery, Pageable<UserSalaryAdminDto>>(
             request,
             cancellationToken);
     }
@@ -44,7 +44,7 @@ public class SalariesAdminController : ControllerBase
         [FromQuery] GetExcludedFromStatsSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetExcludedFromStatsSalariesHandler, GetExcludedFromStatsSalariesQuery, Pageable<UserSalaryAdminDto>>(
             request,
             cancellationToken);
     }
@@ -54,7 +54,7 @@ public class SalariesAdminController : ControllerBase
         [FromQuery] GetSourcedSalariesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetSourcedSalariesHandler, GetSourcedSalariesQuery, Pageable<UserSalaryAdminDto>>(
             request,
             cancellationToken);
     }
@@ -65,7 +65,7 @@ public class SalariesAdminController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new ApproveSalaryCommand(id), cancellationToken);
+        await _serviceProvider.HandleBy<ApproveSalaryHandler, ApproveSalaryCommand, Nothing>(new ApproveSalaryCommand(id), cancellationToken);
         return Ok();
     }
 
@@ -75,7 +75,7 @@ public class SalariesAdminController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new ExcludeFromStatsCommand(id), cancellationToken);
+        await _serviceProvider.HandleBy<ExcludeFromStatsHandler, ExcludeFromStatsCommand, Nothing>(new ExcludeFromStatsCommand(id), cancellationToken);
         return Ok();
     }
 
@@ -85,7 +85,7 @@ public class SalariesAdminController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(new DeleteSalaryCommand(id), cancellationToken);
+        await _serviceProvider.HandleBy<DeleteSalaryHandler, DeleteSalaryCommand, Nothing>(new DeleteSalaryCommand(id), cancellationToken);
         return Ok();
     }
 }

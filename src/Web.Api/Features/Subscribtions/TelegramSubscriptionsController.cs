@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.ValueObjects.Pagination;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Subscribtions.ActivateSubscription;
 using Web.Api.Features.Subscribtions.CreateSubscription;
@@ -24,12 +24,12 @@ namespace Web.Api.Features.Subscribtions;
 [HasAnyRole(Role.Admin)]
 public class TelegramSubscriptionsController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public TelegramSubscriptionsController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("")]
@@ -37,7 +37,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromQuery] GetStatDataChangeSubscriptionsQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetStatDataChangeSubscriptionsHandler, GetStatDataChangeSubscriptionsQuery, Pageable<StatDataChangeSubscriptionDto>>(
             request,
             cancellationToken);
     }
@@ -47,7 +47,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromBody] CreateSubscriptionBodyRequest request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<CreateSubscriptionHandler, CreateSubscriptionCommand, StatDataChangeSubscriptionDto>(
             new CreateSubscriptionCommand(
                 request),
             cancellationToken);
@@ -59,7 +59,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromBody] EditSubscriptionBodyRequest request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<EditSubscriptionHandler, EditSubscriptionCommand, StatDataChangeSubscriptionDto>(
             new EditSubscriptionCommand(
                 id,
                 request),
@@ -71,7 +71,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<ActivateStatDataChangeSubscriptionHandler, ActivateStatDataChangeSubscriptionCommand, Nothing>(
             new ActivateStatDataChangeSubscriptionCommand(id),
             cancellationToken);
 
@@ -83,7 +83,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<DeactivateStatDataChangeSubscriptionHandler, DeactivateStatDataChangeSubscriptionCommand, Nothing>(
             new DeactivateStatDataChangeSubscriptionCommand(id),
             cancellationToken);
 
@@ -95,7 +95,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<DeleteSubscriptionHandler, DeleteSubscriptionCommand, Nothing>(
             new DeleteSubscriptionCommand(id),
             cancellationToken);
 
@@ -108,7 +108,7 @@ public class TelegramSubscriptionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
+            await _serviceProvider.HandleBy<GetOpenAiReportAnalysisHandler, GetOpenAiReportAnalysisQuery, GetOpenAiReportAnalysisResponse>(
                 new GetOpenAiReportAnalysisQuery(id),
                 cancellationToken));
     }
@@ -119,7 +119,7 @@ public class TelegramSubscriptionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
+            await _serviceProvider.HandleBy<GetOpenAiReportHandler, GetOpenAiReportQuery, OpenAiBodyReport>(
                 new GetOpenAiReportQuery(id),
                 cancellationToken));
     }
@@ -129,7 +129,7 @@ public class TelegramSubscriptionsController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<SendUpdatesToSubscriptionChatHandler, SendUpdatesToSubscriptionChatCommand, int>(
             new SendUpdatesToSubscriptionChatCommand(id),
             cancellationToken);
 

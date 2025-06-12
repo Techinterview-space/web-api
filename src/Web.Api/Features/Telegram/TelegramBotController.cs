@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.ValueObjects.Pagination;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
@@ -20,12 +20,12 @@ namespace Web.Api.Features.Telegram;
 [HasAnyRole(Role.Admin)]
 public class TelegramBotController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public TelegramBotController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("bot-usages")]
@@ -33,7 +33,7 @@ public class TelegramBotController : ControllerBase
         [FromQuery] GetTelegramBotUsagesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetTelegramBotUsagesHandler, GetTelegramBotUsagesQuery, Pageable<TelegramBotUsageDto>>(
             request,
             cancellationToken);
     }
@@ -43,7 +43,7 @@ public class TelegramBotController : ControllerBase
         [FromQuery] GetTelegramUserSettingsQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetTelegramUserSettingsHandler, GetTelegramUserSettingsQuery, Pageable<TelegramUserSettingsDto>>(
             request,
             cancellationToken);
     }
@@ -53,7 +53,7 @@ public class TelegramBotController : ControllerBase
         AddTelegramUserSettingsRequest request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<AddTelegramUserSettingsHandler, AddTelegramUserSettingsCommand, TelegramUserSettingsDto>(
             new AddTelegramUserSettingsCommand(request),
             cancellationToken);
     }
@@ -64,7 +64,7 @@ public class TelegramBotController : ControllerBase
         UpdateTelegramUserSettingsBody request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<UpdateTelegramUserSettingsHandler, UpdateTelegramUserSettingsCommand, TelegramUserSettingsDto>(
             new UpdateTelegramUserSettingsCommand(
                 id,
                 request),
@@ -76,7 +76,7 @@ public class TelegramBotController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<DeleteTelegramUserSettingsHandler, DeleteTelegramUserSettingsCommand, Nothing>(
             new DeleteTelegramUserSettingsCommand(id),
             cancellationToken);
 
@@ -87,7 +87,7 @@ public class TelegramBotController : ControllerBase
     public async Task<TelegramInlineUsagesData> GetTelegramInlineReplyStats(
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetTelegramInlineUsageStatsHandler, GetTelegramInlineUsageStatsQuery, TelegramInlineUsagesData>(
             new GetTelegramInlineUsageStatsQuery(),
             cancellationToken);
     }

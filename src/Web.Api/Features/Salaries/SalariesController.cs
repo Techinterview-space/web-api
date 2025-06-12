@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Salaries.AddSalary;
 using Web.Api.Features.Salaries.ExportCsv;
@@ -23,19 +23,19 @@ namespace Web.Api.Features.Salaries;
 [Route("api/salaries")]
 public class SalariesController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public SalariesController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("select-box-items")]
     public async Task<SelectBoxItemsResponse> GetSelectBoxItems(
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetSelectBoxItemsHandler, GetSelectBoxItemsQuery, SelectBoxItemsResponse>(
             new GetSelectBoxItemsQuery(),
             cancellationToken);
     }
@@ -45,7 +45,7 @@ public class SalariesController : ControllerBase
         [FromQuery] GetAddingTrendChartQuery request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetAddingTrendChartHandler, GetAddingTrendChartQuery, GetAddingTrendChartResponse>(
             new GetAddingTrendChartQuery
             {
                 Grade = request.Grade,
@@ -65,7 +65,7 @@ public class SalariesController : ControllerBase
         [FromQuery] GetSalariesChartQuery request,
         CancellationToken cancellationToken)
     {
-        return _mediator.Send(
+        return _serviceProvider.HandleBy<GetSalariesChartHandler, GetSalariesChartQuery, SalariesChartResponse>(
             new GetSalariesChartQuery
             {
                 Grade = request.Grade,
@@ -84,7 +84,7 @@ public class SalariesController : ControllerBase
         [FromQuery] GetSalariesPaginatedQuery request,
         CancellationToken cancellationToken)
     {
-        return _mediator.Send(
+        return _serviceProvider.HandleBy<GetSalariesPaginatedQueryHandler, GetSalariesPaginatedQuery, Pageable<UserSalaryDto>>(
             new GetSalariesPaginatedQuery
             {
                 Page = request.Page,
@@ -104,7 +104,7 @@ public class SalariesController : ControllerBase
     public async Task<IActionResult> Export(
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(
+        var response = await _serviceProvider.HandleBy<ExportCsvHandler, ExportCsvQuery, SalariesCsvResponse>(
             new ExportCsvQuery(),
             cancellationToken);
 
@@ -117,7 +117,7 @@ public class SalariesController : ControllerBase
         [FromBody] AddSalaryCommand request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<AddSalaryHandler, AddSalaryCommand, CreateOrEditSalaryRecordResponse>(
             request,
             cancellationToken);
     }
@@ -129,7 +129,7 @@ public class SalariesController : ControllerBase
         [FromBody] EditSalaryRequest request,
         CancellationToken cancellationToken)
     {
-        return await _mediator.Send(
+        return await _serviceProvider.HandleBy<UpdateSalaryHandler, UpdateSalaryCommand, CreateOrEditSalaryRecordResponse>(
             new UpdateSalaryCommand(
                 id,
                 request),
