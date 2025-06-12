@@ -9,7 +9,6 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 using Web.Api.Features.Salaries.Models;
@@ -17,7 +16,7 @@ using Web.Api.Features.Surveys.Services;
 
 namespace Web.Api.Features.Salaries.GetSalariesChart
 {
-    public class GetSalariesChartHandler : IRequestHandler<GetSalariesChartQuery, SalariesChartResponse>
+    public class GetSalariesChartHandler : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesChartQuery, SalariesChartResponse>
     {
         private readonly IAuthorization _auth;
         private readonly DatabaseContext _context;

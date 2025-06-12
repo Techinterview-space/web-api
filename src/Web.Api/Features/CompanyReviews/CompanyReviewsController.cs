@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Enums;
 using Domain.Validation;
 using Domain.ValueObjects.Pagination;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Web.Api.Features.Companies.Dtos;
 using Web.Api.Features.CompanyReviews.AddCompanyReview;
 using Web.Api.Features.CompanyReviews.ApproveReview;
 using Web.Api.Features.CompanyReviews.DeleteCompanyReview;
@@ -22,12 +24,12 @@ namespace Web.Api.Features.CompanyReviews;
 [Route("api/companies")]
 public class CompanyReviewsController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public CompanyReviewsController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("reviews/recent")]
@@ -36,7 +38,7 @@ public class CompanyReviewsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
+            await _serviceProvider.HandleBy<GetRecentCompanyReviewsHandler, GetRecentCompanyReviewsQuery, Pageable<CompanyReviewDto>>(
                 new GetRecentCompanyReviewsQuery(queryParams),
                 cancellationToken));
     }
@@ -50,7 +52,7 @@ public class CompanyReviewsController : ControllerBase
     {
         request.ThrowIfInvalid();
 
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<AddCompanyReviewHandler, AddCompanyReviewCommand, Nothing>(
             new AddCompanyReviewCommand(companyId, request),
             cancellationToken);
 
@@ -63,9 +65,9 @@ public class CompanyReviewsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _mediator.Send(
-                new SearchReviewsToBeApprovedQuery(),
-                cancellationToken));
+            await _serviceProvider.HandleBy<SearchReviewsToBeApprovedHandler, Nothing, List<CompanyReviewDto>>(
+                Nothing.Value,
+                cancellationToken: cancellationToken));
     }
 
     [HttpPost("{companyId:guid}/reviews/{reviewId:guid}/approve")]
@@ -75,7 +77,7 @@ public class CompanyReviewsController : ControllerBase
         [FromRoute] Guid reviewId,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<ApproveReviewHandler, ApproveReviewCommand, Nothing>(
             new ApproveReviewCommand(companyId, reviewId),
             cancellationToken);
 
@@ -89,7 +91,7 @@ public class CompanyReviewsController : ControllerBase
         [FromRoute] Guid reviewId,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<MarkReviewOutdatedHandler, MarkReviewOutdatedCommand, Nothing>(
             new MarkReviewOutdatedCommand(companyId, reviewId),
             cancellationToken);
 
@@ -103,7 +105,7 @@ public class CompanyReviewsController : ControllerBase
         [FromRoute] Guid reviewId,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(
+        var result = await _serviceProvider.HandleBy<VoteForReviewHandler, VoteForReviewCommand, VoteForReviewResponse>(
             new VoteForReviewCommand(
                 companyId,
                 reviewId,
@@ -120,7 +122,7 @@ public class CompanyReviewsController : ControllerBase
         [FromRoute] Guid reviewId,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(
+        var result = await _serviceProvider.HandleBy<VoteForReviewHandler, VoteForReviewCommand, VoteForReviewResponse>(
             new VoteForReviewCommand(
                 companyId,
                 reviewId,
@@ -137,7 +139,7 @@ public class CompanyReviewsController : ControllerBase
         [FromRoute] Guid reviewId,
         CancellationToken cancellationToken)
     {
-        await _mediator.Send(
+        await _serviceProvider.HandleBy<DeleteCompanyReviewHandler, DeleteCompanyReviewCommand, Nothing>(
             new DeleteCompanyReviewCommand(companyId, reviewId),
             cancellationToken);
 

@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using Domain.Validation;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.SearchCompaniesForAdmin;
 
 public class SearchCompaniesForAdminHandler
-    : IRequestHandler<SearchCompaniesForAdminQueryParams, Pageable<CompanyDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<SearchCompaniesForAdminQueryParams, Pageable<CompanyDto>>
 {
     private const int MaxPageSize = 100;
 

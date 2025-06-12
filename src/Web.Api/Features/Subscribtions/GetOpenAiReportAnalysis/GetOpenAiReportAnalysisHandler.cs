@@ -8,12 +8,11 @@ using Infrastructure.Salaries;
 using Infrastructure.Services.OpenAi;
 using Infrastructure.Services.OpenAi.Models;
 using Infrastructure.Services.Professions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 
-public class GetOpenAiReportAnalysisHandler : IRequestHandler<GetOpenAiReportAnalysisQuery, GetOpenAiReportAnalysisResponse>
+public class GetOpenAiReportAnalysisHandler : Infrastructure.Services.Mediator.IRequestHandler<GetOpenAiReportAnalysisQuery, GetOpenAiReportAnalysisResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IProfessionsCacheService _professionsCacheService;

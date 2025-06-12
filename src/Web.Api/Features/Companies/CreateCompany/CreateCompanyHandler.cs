@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.CreateCompany;
 
-public class CreateCompanyHandler : IRequestHandler<CreateCompanyBodyRequest, CompanyDto>
+public class CreateCompanyHandler : Infrastructure.Services.Mediator.IRequestHandler<CreateCompanyBodyRequest, CompanyDto>
 {
     private readonly DatabaseContext _context;
 

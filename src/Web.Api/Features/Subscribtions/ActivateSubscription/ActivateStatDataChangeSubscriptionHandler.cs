@@ -5,12 +5,12 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.ActivateSubscription;
 
-public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
+public class ActivateStatDataChangeSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -23,7 +23,7 @@ public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<Activat
         _authorization = authorization;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         ActivateStatDataChangeSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
@@ -40,6 +40,6 @@ public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<Activat
         cacheRecord.Activate();
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using MediatR;
-
-namespace Web.Api.Features.Import.ImportKolesaCsv;
+﻿namespace Web.Api.Features.Import.ImportKolesaCsv;
 
 public record ImportKolesaDevelopersCsvCommand
-    : ImportKolesaDevelopersCsvRequestBody, IRequest<List<ImportCsvResponseItem>>
+    : ImportKolesaDevelopersCsvRequestBody
 {
     public ImportKolesaDevelopersCsvCommand(
         ImportKolesaDevelopersCsvRequestBody body)

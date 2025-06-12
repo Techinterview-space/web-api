@@ -3,13 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 public class GetStatDataChangeSubscriptionsHandler
-    : IRequestHandler<GetStatDataChangeSubscriptionsQuery, Pageable<StatDataChangeSubscriptionDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetStatDataChangeSubscriptionsQuery, Pageable<StatDataChangeSubscriptionDto>>
 {
     private readonly DatabaseContext _context;
 

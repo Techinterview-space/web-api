@@ -5,14 +5,13 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 
 namespace Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 
 public class UpdateTelegramUserSettingsHandler
-    : IRequestHandler<UpdateTelegramUserSettingsCommand, TelegramUserSettingsDto>
+    : Infrastructure.Services.Mediator.IRequestHandler<UpdateTelegramUserSettingsCommand, TelegramUserSettingsDto>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

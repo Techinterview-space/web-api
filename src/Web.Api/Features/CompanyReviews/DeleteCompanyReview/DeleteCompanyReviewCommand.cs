@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.CompanyReviews.DeleteCompanyReview;
 
-public record DeleteCompanyReviewCommand : IRequest<Unit>
+public record DeleteCompanyReviewCommand
 {
     public DeleteCompanyReviewCommand(
         Guid companyId,

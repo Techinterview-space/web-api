@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
 using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 
 public class GetApprovedSalariesHandler
-    : IRequestHandler<GetApprovedSalariesQuery, Pageable<UserSalaryAdminDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetApprovedSalariesQuery, Pageable<UserSalaryAdminDto>>
 {
     private readonly DatabaseContext _context;
 

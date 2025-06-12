@@ -5,13 +5,13 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Telegram.DeleteTelegramUserSettings;
 
 public class DeleteTelegramUserSettingsHandler
-    : IRequestHandler<DeleteTelegramUserSettingsCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<DeleteTelegramUserSettingsCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -24,7 +24,7 @@ public class DeleteTelegramUserSettingsHandler
         _authorization = authorization;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         DeleteTelegramUserSettingsCommand request,
         CancellationToken cancellationToken)
     {
@@ -41,6 +41,6 @@ public class DeleteTelegramUserSettingsHandler
         _context.TelegramUserSettings.Remove(userSettings);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

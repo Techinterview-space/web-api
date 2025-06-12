@@ -1,7 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Import.ImportKolesaCsv;
 using Web.Api.Setup.Attributes;
@@ -13,11 +14,11 @@ namespace Web.Api.Features.Import;
 [HasAnyRole(Role.Admin)]
 public class ImportController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
-    public ImportController(IMediator mediator)
+    public ImportController(IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpPost("kolesa-developers-csv")]
@@ -25,7 +26,7 @@ public class ImportController : ControllerBase
         [FromForm] ImportKolesaDevelopersCsvRequestBody request,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(
+        var result = await _serviceProvider.HandleBy<ImportKolesaDevelopersCsvHandler, ImportKolesaDevelopersCsvCommand, System.Collections.Generic.List<ImportCsvResponseItem>>(
             new ImportKolesaDevelopersCsvCommand(request),
             cancellationToken);
 

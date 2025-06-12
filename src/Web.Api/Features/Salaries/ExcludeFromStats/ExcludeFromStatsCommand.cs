@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Salaries.ExcludeFromStats;
 
-public record ExcludeFromStatsCommand : IRequest<Unit>
+public record ExcludeFromStatsCommand
 {
     public ExcludeFromStatsCommand(
         Guid id)

@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Domain.Entities.StatData;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.DeleteSubscription;
 
 public class DeleteSubscriptionHandler
-    : IRequestHandler<DeleteSubscriptionCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<DeleteSubscriptionCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -19,7 +19,7 @@ public class DeleteSubscriptionHandler
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         DeleteSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
@@ -30,6 +30,6 @@ public class DeleteSubscriptionHandler
         _context.StatDataChangeSubscriptions.Remove(cacheRecord);
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

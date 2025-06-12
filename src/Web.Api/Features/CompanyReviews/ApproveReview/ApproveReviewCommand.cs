@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.CompanyReviews.ApproveReview;
 
-public record ApproveReviewCommand : IRequest<Unit>
+public record ApproveReviewCommand
 {
     public ApproveReviewCommand(
         Guid companyId,

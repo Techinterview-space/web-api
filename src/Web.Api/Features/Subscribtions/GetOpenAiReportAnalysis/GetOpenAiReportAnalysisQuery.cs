@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 
-public record GetOpenAiReportAnalysisQuery : IRequest<GetOpenAiReportAnalysisResponse>
+public record GetOpenAiReportAnalysisQuery
 {
     public GetOpenAiReportAnalysisQuery(
         Guid subscriptionId)

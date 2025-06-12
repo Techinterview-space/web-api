@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.Admin.GetSourcedSalaries;

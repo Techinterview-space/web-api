@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
 using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.Admin.GetExcludedFromStatsSalaries;
 
 public class GetExcludedFromStatsSalariesHandler
-    : IRequestHandler<GetExcludedFromStatsSalariesQuery, Pageable<UserSalaryAdminDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetExcludedFromStatsSalariesQuery, Pageable<UserSalaryAdminDto>>
 {
     private readonly DatabaseContext _context;
 

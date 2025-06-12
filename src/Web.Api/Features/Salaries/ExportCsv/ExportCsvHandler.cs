@@ -7,13 +7,13 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Salaries.Providers;
 
 namespace Web.Api.Features.Salaries.ExportCsv;
 
-public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvResponse>
+public class ExportCsvHandler : Infrastructure.Services.Mediator.IRequestHandler<Nothing, SalariesCsvResponse>
 {
     private const string NoValue = "";
 
@@ -32,7 +32,7 @@ public class ExportCsvHandler : IRequestHandler<ExportCsvQuery, SalariesCsvRespo
     }
 
     public async Task<SalariesCsvResponse> Handle(
-        ExportCsvQuery request,
+        Nothing request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);

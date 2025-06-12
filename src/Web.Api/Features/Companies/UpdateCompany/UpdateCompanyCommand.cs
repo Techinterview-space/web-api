@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Companies.UpdateCompany;
 
-public record UpdateCompanyCommand : IRequest<Unit>
+public record UpdateCompanyCommand
 {
     public UpdateCompanyCommand(
         Guid companyId,

@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Historical.GetSalariesHistoricalChart;
 using Web.Api.Features.Historical.GetSurveyHistoricalChart;
@@ -13,12 +14,12 @@ namespace Web.Api.Features.Historical;
 [Route("api/historical-charts")]
 public class HistoricalChartsController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public HistoricalChartsController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("salaries")]
@@ -26,8 +27,8 @@ public class HistoricalChartsController : ControllerBase
         [FromQuery] GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        return _mediator.Send(
-            new GetSalariesHistoricalChartQuery
+        return _serviceProvider.HandleBy<GetSalariesHistoricalChartHandler, GetSalariesHistoricalChartQueryParams, GetSalariesHistoricalChartResponse>(
+            new GetSalariesHistoricalChartQueryParams
             {
                 From = request.From,
                 To = request.To,
@@ -47,7 +48,7 @@ public class HistoricalChartsController : ControllerBase
         [FromQuery] GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        return _mediator.Send(
+        return _serviceProvider.HandleBy<GetSurveyHistoricalChartHandler, GetSurveyHistoricalChartQuery, GetSurveyHistoricalChartResponse>(
             new GetSurveyHistoricalChartQuery
             {
                 From = request.From,

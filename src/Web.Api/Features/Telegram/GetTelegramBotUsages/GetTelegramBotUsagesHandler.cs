@@ -3,12 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Telegram.GetTelegramBotUsages;
 
-public class GetTelegramBotUsagesHandler : IRequestHandler<GetTelegramBotUsagesQuery, Pageable<TelegramBotUsageDto>>
+public class GetTelegramBotUsagesHandler : Infrastructure.Services.Mediator.IRequestHandler<GetTelegramBotUsagesQuery, Pageable<TelegramBotUsageDto>>
 {
     private readonly DatabaseContext _context;
 

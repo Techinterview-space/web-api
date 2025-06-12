@@ -4,13 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 
 public class GetSalariesSurveyStatsHandler
-    : IRequestHandler<GetSalariesSurveyStatsQuery, SalariesSurveyStatsData>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesSurveyStatsQuery, SalariesSurveyStatsData>
 {
     private readonly DatabaseContext _context;
 

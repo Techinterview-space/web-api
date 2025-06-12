@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.DeleteSalary;
 
-public class DeleteSalaryHandler : IRequestHandler<DeleteSalaryCommand, Unit>
+public class DeleteSalaryHandler : Infrastructure.Services.Mediator.IRequestHandler<DeleteSalaryCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -17,7 +17,7 @@ public class DeleteSalaryHandler : IRequestHandler<DeleteSalaryCommand, Unit>
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         DeleteSalaryCommand request,
         CancellationToken cancellationToken)
     {
@@ -28,6 +28,6 @@ public class DeleteSalaryHandler : IRequestHandler<DeleteSalaryCommand, Unit>
         _context.Salaries.Remove(salary);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

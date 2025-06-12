@@ -5,12 +5,11 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Companies.SoftDeleteCompany;
 
-public class SoftDeleteCompanyHandler : IRequestHandler<SoftDeleteCompanyCommand, bool>
+public class SoftDeleteCompanyHandler : Infrastructure.Services.Mediator.IRequestHandler<SoftDeleteCompanyCommand, bool>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

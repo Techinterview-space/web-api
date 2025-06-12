@@ -3,14 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.CompanyReviews.GetRecentReviews;
 
 public class GetRecentCompanyReviewsHandler
-    : IRequestHandler<GetRecentCompanyReviewsQuery, Pageable<CompanyReviewDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetRecentCompanyReviewsQuery, Pageable<CompanyReviewDto>>
 {
     private const int MaxPageSize = 100;
 

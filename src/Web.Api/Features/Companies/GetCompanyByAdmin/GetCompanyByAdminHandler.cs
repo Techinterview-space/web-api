@@ -6,13 +6,12 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.GetCompanyByAdmin;
 
-public class GetCompanyByAdminHandler : IRequestHandler<string, CompanyDto>
+public class GetCompanyByAdminHandler : Infrastructure.Services.Mediator.IRequestHandler<string, CompanyDto>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

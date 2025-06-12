@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.ApproveSalary;
 
-public class ApproveSalaryHandler : IRequestHandler<ApproveSalaryCommand, Unit>
+public class ApproveSalaryHandler : Infrastructure.Services.Mediator.IRequestHandler<ApproveSalaryCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -17,7 +17,7 @@ public class ApproveSalaryHandler : IRequestHandler<ApproveSalaryCommand, Unit>
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         ApproveSalaryCommand request,
         CancellationToken cancellationToken)
     {
@@ -28,6 +28,6 @@ public class ApproveSalaryHandler : IRequestHandler<ApproveSalaryCommand, Unit>
         salary.Approve();
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

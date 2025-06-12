@@ -6,12 +6,12 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Emails.Contracts;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviews.DeleteCompanyReview;
 
-public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCommand, Unit>
+public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -27,7 +27,7 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
         _emailService = emailService;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         DeleteCompanyReviewCommand request,
         CancellationToken cancellationToken)
     {
@@ -62,6 +62,6 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
                 cancellationToken);
         }
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

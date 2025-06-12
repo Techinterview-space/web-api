@@ -1,6 +1,7 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.SalariesChartShare.GetChartSharePage;
 
@@ -10,12 +11,12 @@ namespace Web.Api.Features.SalariesChartShare;
 [Route("chart-share")]
 public class ChartShareController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public ChartShareController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("")]
@@ -23,7 +24,7 @@ public class ChartShareController : ControllerBase
         [FromQuery] GetChartSharePageQuery request,
         CancellationToken cancellationToken)
     {
-        var contentHtml = await _mediator.Send(
+        var contentHtml = await _serviceProvider.HandleBy<GetChartSharePageHandler, GetChartSharePageQuery, string>(
             request,
             cancellationToken);
 

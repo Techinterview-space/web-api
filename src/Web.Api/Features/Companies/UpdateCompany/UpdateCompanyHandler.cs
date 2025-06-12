@@ -4,12 +4,12 @@ using Domain.Entities.Companies;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Companies.UpdateCompany;
 
-public record UpdateCompanyHandler : Infrastructure.Services.Mediator.IRequestHandler<UpdateCompanyCommand, Unit>
+public record UpdateCompanyHandler : Infrastructure.Services.Mediator.IRequestHandler<UpdateCompanyCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -19,7 +19,7 @@ public record UpdateCompanyHandler : Infrastructure.Services.Mediator.IRequestHa
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         UpdateCompanyCommand request,
         CancellationToken cancellationToken)
     {
@@ -38,6 +38,6 @@ public record UpdateCompanyHandler : Infrastructure.Services.Mediator.IRequestHa
             request.Body.Slug);
 
         await _context.TrySaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

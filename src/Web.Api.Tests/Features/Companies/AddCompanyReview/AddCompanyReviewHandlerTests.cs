@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using TestUtils.Auth;
 using TestUtils.Db;
@@ -51,7 +51,7 @@ public class AddCompanyReviewHandlerTests
 
         context.ChangeTracker.Clear();
         var result = await handler.Handle(command, CancellationToken.None);
-        Assert.Equal(Unit.Value, result);
+        Assert.Equal(Nothing.Value, result);
 
         var reviews = context.CompanyReviews
             .Where(x => x.CompanyId == company.Id)
@@ -121,7 +121,7 @@ public class AddCompanyReviewHandlerTests
 
         context.ChangeTracker.Clear();
         var result = await handler.Handle(command, CancellationToken.None);
-        Assert.Equal(Unit.Value, result);
+        Assert.Equal(Nothing.Value, result);
 
         var reviews = context.CompanyReviews
             .Where(x => x.CompanyId == company.Id)
@@ -190,7 +190,7 @@ public class AddCompanyReviewHandlerTests
 
         context.ChangeTracker.Clear();
         var result = await handler.Handle(command, CancellationToken.None);
-        Assert.Equal(Unit.Value, result);
+        Assert.Equal(Nothing.Value, result);
 
         var reviews = context.CompanyReviews
             .Where(x => x.CompanyId == company.Id)
@@ -358,7 +358,7 @@ public class AddCompanyReviewHandlerTests
 
         context.ChangeTracker.Clear();
         var result = await handler.Handle(command, CancellationToken.None);
-        Assert.Equal(Unit.Value, result);
+        Assert.Equal(Nothing.Value, result);
 
         var reviews = context.CompanyReviews
             .Where(x => x.CompanyId == company.Id)

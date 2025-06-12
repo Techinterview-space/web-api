@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.ExcludeFromStats;
 
-public class ExcludeFromStatsHandler : IRequestHandler<ExcludeFromStatsCommand, Unit>
+public class ExcludeFromStatsHandler : Infrastructure.Services.Mediator.IRequestHandler<ExcludeFromStatsCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -17,7 +17,7 @@ public class ExcludeFromStatsHandler : IRequestHandler<ExcludeFromStatsCommand, 
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         ExcludeFromStatsCommand request,
         CancellationToken cancellationToken)
     {
@@ -28,6 +28,6 @@ public class ExcludeFromStatsHandler : IRequestHandler<ExcludeFromStatsCommand, 
         salary.ExcludeFromStats();
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

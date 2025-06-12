@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 namespace Web.Api.Features.Subscribtions.EditSubscription;
 
-public class EditSubscriptionHandler : IRequestHandler<EditSubscriptionCommand, StatDataChangeSubscriptionDto>
+public class EditSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<EditSubscriptionCommand, StatDataChangeSubscriptionDto>
 {
     private readonly DatabaseContext _context;
 

@@ -2,7 +2,6 @@
 using Infrastructure.Configs;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
-using Infrastructure.Services.Mediator;
 using MaximGorbatyuk.DatabaseSqlEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -64,7 +63,6 @@ public class Startup
         });
 
         services
-            .AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Startup>())
             .SetupDatabase(_configuration, _environment)
             .SetupAppServices(_configuration)
             .SetupEmailIntegration(_environment, _configuration)
@@ -72,7 +70,7 @@ public class Startup
             .SetupAuthentication(_configuration)
             .SetupScheduler()
             .RegisterAllImplementations(
-                typeof(IRequestHandler<,>));
+                typeof(Infrastructure.Services.Mediator.IRequestHandler<,>));
 
         services
             .AddHostedService<AppInitializeService>();
