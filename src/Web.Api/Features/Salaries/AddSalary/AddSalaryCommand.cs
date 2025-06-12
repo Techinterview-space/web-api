@@ -5,7 +5,7 @@ using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.AddSalary;
 
-public record AddSalaryCommand : EditSalaryRequest, MediatR.IRequest<CreateOrEditSalaryRecordResponse>
+public record AddSalaryCommand : EditSalaryRequest
 {
     public double Value { get; init; }
 

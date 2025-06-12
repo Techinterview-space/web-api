@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Salaries.GetSalariesChart;
 
 namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
@@ -15,16 +17,16 @@ namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
     {
         private readonly IGlobal _global;
         private readonly DatabaseContext _context;
-        private readonly IMediator _mediator;
+        private readonly IServiceProvider _serviceProvider;
 
         public GetChartSharePageHandler(
             DatabaseContext context,
             IGlobal global,
-            IMediator mediator)
+            IServiceProvider serviceProvider)
         {
             _context = context;
             _global = global;
-            _mediator = mediator;
+            _serviceProvider = serviceProvider;
         }
 
         public static string SalaryFormat(
@@ -39,7 +41,7 @@ namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
             CancellationToken cancellationToken)
         {
             var professionsToInclude = new DeveloperProfessionsCollection(request.SelectedProfessionIds).ToList();
-            var chartResponse = await _mediator.Send(
+            var chartResponse = await _serviceProvider.HandleBy<GetSalariesChartHandler, GetSalariesChartQuery, SalariesChartResponse>(
                 new GetSalariesChartQuery
                 {
                     Grade = request.Grade,
