@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Web.Api.Features.Salaries.GetSalaries;
 
 public record GetSalariesPaginatedQuery
-    : PageModel, IRequest<Pageable<UserSalaryDto>>, ISalariesChartQueryParams
+    : PageModel>, ISalariesChartQueryParams
 {
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }

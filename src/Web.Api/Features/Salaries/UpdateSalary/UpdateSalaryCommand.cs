@@ -3,7 +3,7 @@ using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.UpdateSalary;
 
-public record UpdateSalaryCommand : EditSalaryRequest, IRequest<CreateOrEditSalaryRecordResponse>
+public record UpdateSalaryCommand : EditSalaryRequest
 {
     public UpdateSalaryCommand()
     {

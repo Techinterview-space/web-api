@@ -3,4 +3,4 @@ using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.Admin.GetSourcedSalaries;
 
-public record GetSourcedSalariesQuery : GetAllSalariesQueryParams, IRequest<Pageable<UserSalaryAdminDto>>;
+public record GetSourcedSalariesQuery : GetAllSalariesQueryParams>;

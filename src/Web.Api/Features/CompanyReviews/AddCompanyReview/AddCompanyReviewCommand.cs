@@ -2,7 +2,7 @@
 
 namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 
-public record AddCompanyReviewCommand : AddCompanyReviewBodyRequest, IRequest<Unit>
+public record AddCompanyReviewCommand : AddCompanyReviewBodyRequest
 {
     public AddCompanyReviewCommand(
         Guid companyId,

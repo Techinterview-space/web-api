@@ -64,7 +64,6 @@ public class Startup
         });
 
         services
-            .AddMediatR(x => x.RegisterServicesFromAssemblyContaining<Startup>())
             .SetupDatabase(_configuration, _environment)
             .SetupAppServices(_configuration)
             .SetupEmailIntegration(_environment, _configuration)
@@ -72,7 +71,7 @@ public class Startup
             .SetupAuthentication(_configuration)
             .SetupScheduler()
             .RegisterAllImplementations(
-                typeof(IRequestHandler<,>));
+                typeof(Infrastructure.Services.Mediator.IRequestHandler<,>));
 
         services
             .AddHostedService<AppInitializeService>();

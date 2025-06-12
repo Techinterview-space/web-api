@@ -2,4 +2,4 @@
 
 namespace Web.Api.Features.Telegram.GetTelegramUserSettings;
 
-public record GetTelegramUserSettingsQuery : PageModel, IRequest<Pageable<TelegramUserSettingsDto>>;
+public record GetTelegramUserSettingsQuery : PageModel>;

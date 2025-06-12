@@ -4,7 +4,7 @@ using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 namespace Web.Api.Features.Subscribtions.CreateSubscription;
 
 public record CreateSubscriptionCommand
-    : CreateSubscriptionBodyRequest, IRequest<StatDataChangeSubscriptionDto>
+    : CreateSubscriptionBodyRequest
 {
     public CreateSubscriptionCommand(
         CreateSubscriptionBodyRequest request)

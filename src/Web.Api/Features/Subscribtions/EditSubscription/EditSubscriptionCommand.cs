@@ -4,7 +4,7 @@ using Web.Api.Features.Subscribtions.Shared;
 
 namespace Web.Api.Features.Subscribtions.EditSubscription;
 
-public record EditSubscriptionCommand : EditSubscriptionBodyRequest, IRequest<StatDataChangeSubscriptionDto>
+public record EditSubscriptionCommand : EditSubscriptionBodyRequest
 {
     public Guid SubscriptionId { get; }
 

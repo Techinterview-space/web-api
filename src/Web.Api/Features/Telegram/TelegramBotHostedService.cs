@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Infrastructure.Services.Mediator;
 using Infrastructure.Services.Telegram;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -94,9 +94,8 @@ public class TelegramBotHostedService
         }
 
         using var scope = _serviceScopeFactory.CreateScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await mediator.Send(
+        await scope.ServiceProvider.HandleBy<ProcessTelegramMessageHandler, ProcessTelegramMessageCommand, string>(
             new ProcessTelegramMessageCommand(client, updateRequest),
             cancellationToken);
     }

@@ -3,4 +3,4 @@
 namespace Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 public record GetStatDataChangeSubscriptionsQuery
-    : PageModel, IRequest<Pageable<StatDataChangeSubscriptionDto>>;
+    : PageModel>;

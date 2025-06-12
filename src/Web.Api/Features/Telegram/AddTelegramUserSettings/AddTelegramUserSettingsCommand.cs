@@ -4,7 +4,7 @@ using Web.Api.Features.Telegram.GetTelegramUserSettings;
 namespace Web.Api.Features.Telegram.AddTelegramUserSettings;
 
 public record AddTelegramUserSettingsCommand
-    : AddTelegramUserSettingsRequest, IRequest<TelegramUserSettingsDto>
+    : AddTelegramUserSettingsRequest
 {
     public AddTelegramUserSettingsCommand(
         AddTelegramUserSettingsRequest request)
