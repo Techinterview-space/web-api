@@ -36,7 +36,7 @@ public class WebhooksController : ControllerBase
 
         if (spamReportEvents.Count > 0)
         {
-            _logger.LogInformation(
+            _logger.LogWarning(
                 "Received {Count} spam report events from Sendgrid. Signature: {Signature}. Emails: {Emails}",
                 spamReportEvents.Count,
                 signature,
