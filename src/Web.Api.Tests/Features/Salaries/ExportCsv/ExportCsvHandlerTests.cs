@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
+using Infrastructure.Services.Mediator;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -36,7 +37,7 @@ public class ExportCsvHandlerTests
                 new FakeAuth(user),
                 context,
                 new SalaryLabelsProviderFake(context))
-            .Handle(new ExportCsvQuery(), default);
+            .Handle(Nothing.Value, default);
 
         Assert.Equal(1, context.Salaries.Count());
         Assert.Equal(1, context.UserCsvDownloads.Count());
@@ -69,7 +70,7 @@ public class ExportCsvHandlerTests
                 new FakeAuth(user),
                 context,
                 new SalaryLabelsProviderFake(context))
-            .Handle(new ExportCsvQuery(), default);
+            .Handle(Nothing.Value, default);
 
         Assert.Equal(1, context.Salaries.Count());
         Assert.Equal(1, context.UserCsvDownloads.Count());
@@ -104,7 +105,7 @@ public class ExportCsvHandlerTests
                     new FakeAuth(user),
                     context,
                     new SalaryLabelsProviderFake(context))
-                .Handle(new ExportCsvQuery(), default));
+                .Handle(Nothing.Value, default));
 
         Assert.Equal(1, context.Salaries.Count());
         Assert.Equal(1, context.UserCsvDownloads.Count());

@@ -1,5 +1,4 @@
 ﻿using System;
-using Web.Api.Features.Telegram.GetTelegramUserSettings;
 
 namespace Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 

@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Web.Api.Features.Import.ImportKolesaCsv;
+﻿namespace Web.Api.Features.Import.ImportKolesaCsv;
 
 public record ImportKolesaDevelopersCsvCommand
-    : ImportKolesaDevelopersCsvRequestBody>
+    : ImportKolesaDevelopersCsvRequestBody
 {
     public ImportKolesaDevelopersCsvCommand(
         ImportKolesaDevelopersCsvRequestBody body)

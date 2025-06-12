@@ -13,7 +13,7 @@ using Web.Api.Features.Salaries.Providers;
 
 namespace Web.Api.Features.Salaries.ExportCsv;
 
-public class ExportCsvHandler : Infrastructure.Services.Mediator.IRequestHandler<ExportCsvQuery, SalariesCsvResponse>
+public class ExportCsvHandler : Infrastructure.Services.Mediator.IRequestHandler<Nothing, SalariesCsvResponse>
 {
     private const string NoValue = "";
 
@@ -32,7 +32,7 @@ public class ExportCsvHandler : Infrastructure.Services.Mediator.IRequestHandler
     }
 
     public async Task<SalariesCsvResponse> Handle(
-        ExportCsvQuery request,
+        Nothing request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);

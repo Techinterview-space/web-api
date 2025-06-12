@@ -1,5 +1,4 @@
 ﻿using System;
-using Infrastructure.Services.OpenAi.Models;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReport;
 

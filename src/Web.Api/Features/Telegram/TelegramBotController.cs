@@ -87,8 +87,8 @@ public class TelegramBotController : ControllerBase
     public async Task<TelegramInlineUsagesData> GetTelegramInlineReplyStats(
         CancellationToken cancellationToken)
     {
-        return await _serviceProvider.HandleBy<GetTelegramInlineUsageStatsHandler, GetTelegramInlineUsageStatsQuery, TelegramInlineUsagesData>(
-            new GetTelegramInlineUsageStatsQuery(),
+        return await _serviceProvider.HandleBy<GetTelegramInlineUsageStatsHandler, Nothing, TelegramInlineUsagesData>(
+            Nothing.Value,
             cancellationToken);
     }
 }

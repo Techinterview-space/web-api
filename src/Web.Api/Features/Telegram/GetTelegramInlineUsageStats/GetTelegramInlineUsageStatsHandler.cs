@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
 
 public class GetTelegramInlineUsageStatsHandler
-    : IRequestHandler<GetTelegramInlineUsageStatsQuery, TelegramInlineUsagesData>
+    : IRequestHandler<Nothing, TelegramInlineUsagesData>
 {
     private readonly DatabaseContext _context;
 
@@ -20,7 +20,7 @@ public class GetTelegramInlineUsageStatsHandler
     }
 
     public async Task<TelegramInlineUsagesData> Handle(
-        GetTelegramInlineUsageStatsQuery request,
+        Nothing request,
         CancellationToken cancellationToken)
     {
         var yearAgo = DateTimeOffset.UtcNow.AddYears(-1);

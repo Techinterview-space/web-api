@@ -4,7 +4,6 @@ using Domain.Entities.Questions;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Web.Api.Features.Surveys.Dtos;
 using Web.Api.Features.Surveys.Services;
 

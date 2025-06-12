@@ -8,8 +8,8 @@ using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Salaries.GetSalariesChart;
+using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
 {

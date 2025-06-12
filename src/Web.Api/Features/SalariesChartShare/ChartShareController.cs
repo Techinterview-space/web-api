@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.SalariesChartShare.GetChartSharePage;
 
 namespace Web.Api.Features.SalariesChartShare;

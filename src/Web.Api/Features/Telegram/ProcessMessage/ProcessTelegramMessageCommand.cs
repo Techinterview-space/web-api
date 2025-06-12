@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace Web.Api.Features.Telegram.ProcessMessage;
 
-public record ProcessTelegramMessageCommand : MediatR.IRequest<string>
+public record ProcessTelegramMessageCommand
 {
     public ProcessTelegramMessageCommand(
         ITelegramBotClient client,

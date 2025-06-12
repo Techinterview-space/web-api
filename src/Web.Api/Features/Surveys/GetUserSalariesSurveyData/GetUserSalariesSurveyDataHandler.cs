@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Web.Api.Features.Surveys.Services;
 
 namespace Web.Api.Features.Surveys.GetUserSalariesSurveyData;

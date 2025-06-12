@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.Admin.GetApprovedSalaries;

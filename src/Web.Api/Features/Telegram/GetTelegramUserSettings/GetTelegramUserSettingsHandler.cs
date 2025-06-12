@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 
 namespace Web.Api.Features.Telegram.GetTelegramUserSettings;
 

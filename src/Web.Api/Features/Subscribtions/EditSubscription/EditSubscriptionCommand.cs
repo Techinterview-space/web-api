@@ -1,5 +1,4 @@
 ﻿using System;
-using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 using Web.Api.Features.Subscribtions.Shared;
 
 namespace Web.Api.Features.Subscribtions.EditSubscription;

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Import.ImportKolesaCsv;
 using Web.Api.Setup.Attributes;
 

@@ -12,7 +12,6 @@ using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Import.ImportKolesaCsv;

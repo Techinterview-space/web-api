@@ -2,4 +2,4 @@
 
 namespace Web.Api.Features.Telegram.GetTelegramBotUsages;
 
-public record GetTelegramBotUsagesQuery : PageModel>;
+public record GetTelegramBotUsagesQuery : PageModel;

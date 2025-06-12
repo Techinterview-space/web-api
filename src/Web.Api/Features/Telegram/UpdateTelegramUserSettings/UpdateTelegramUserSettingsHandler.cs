@@ -5,7 +5,6 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 

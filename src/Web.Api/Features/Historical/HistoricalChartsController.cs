@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Historical.GetSalariesHistoricalChart;
 using Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
@@ -28,8 +27,8 @@ public class HistoricalChartsController : ControllerBase
         [FromQuery] GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        return _serviceProvider.HandleBy<GetSalariesHistoricalChartHandler, GetSalariesHistoricalChartQuery, GetSalariesHistoricalChartResponse>(
-            new GetSalariesHistoricalChartQuery
+        return _serviceProvider.HandleBy<GetSalariesHistoricalChartHandler, GetSalariesHistoricalChartQueryParams, GetSalariesHistoricalChartResponse>(
+            new GetSalariesHistoricalChartQueryParams
             {
                 From = request.From,
                 To = request.To,

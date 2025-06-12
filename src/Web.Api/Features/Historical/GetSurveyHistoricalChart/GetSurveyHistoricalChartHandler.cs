@@ -8,7 +8,6 @@ using Domain.Extensions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Web.Api.Features.Surveys.Services;

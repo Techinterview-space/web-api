@@ -2,7 +2,6 @@
 using Infrastructure.Configs;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
-using Infrastructure.Services.Mediator;
 using MaximGorbatyuk.DatabaseSqlEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;

@@ -4,7 +4,6 @@ using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 

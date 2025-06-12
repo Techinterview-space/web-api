@@ -1,6 +1,4 @@
-using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
-
-namespace Web.Api.Features.Subscribtions.CreateSubscription;
+﻿namespace Web.Api.Features.Subscribtions.CreateSubscription;
 
 public record CreateSubscriptionCommand
     : CreateSubscriptionBodyRequest

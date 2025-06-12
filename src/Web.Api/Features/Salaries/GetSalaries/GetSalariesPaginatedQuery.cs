@@ -4,13 +4,12 @@ using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Pagination;
-using Infrastructure.Salaries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Features.Salaries.GetSalaries;
 
 public record GetSalariesPaginatedQuery
-    : PageModel>, ISalariesChartQueryParams
+    : PageModel, ISalariesChartQueryParams
 {
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }

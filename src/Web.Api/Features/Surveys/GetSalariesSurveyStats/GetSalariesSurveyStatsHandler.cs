@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Infrastructure.Database;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;

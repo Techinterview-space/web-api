@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Surveys.Dtos;
 using Web.Api.Features.Surveys.GetSalariesSurveyStats;
 using Web.Api.Features.Surveys.GetUserSalariesSurveyData;

@@ -1,5 +1,4 @@
 ﻿using Domain.ValueObjects.Pagination;
-using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.CompanyReviews.GetRecentReviews;
 

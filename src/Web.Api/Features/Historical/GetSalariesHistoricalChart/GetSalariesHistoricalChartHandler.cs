@@ -6,13 +6,12 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
 using Infrastructure.Salaries;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
 public class GetSalariesHistoricalChartHandler
-    : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesHistoricalChartQuery, GetSalariesHistoricalChartResponse>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesHistoricalChartQueryParams, GetSalariesHistoricalChartResponse>
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
@@ -26,7 +25,7 @@ public class GetSalariesHistoricalChartHandler
     }
 
     public async Task<GetSalariesHistoricalChartResponse> Handle(
-        GetSalariesHistoricalChartQuery request,
+        GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
         var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);

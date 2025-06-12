@@ -9,7 +9,6 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 using Web.Api.Features.Salaries.Models;

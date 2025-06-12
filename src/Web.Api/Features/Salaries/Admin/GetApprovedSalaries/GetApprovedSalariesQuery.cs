@@ -1,6 +1,3 @@
-﻿using Domain.ValueObjects.Pagination;
-using Web.Api.Features.Salaries.Models;
+﻿namespace Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
 
-namespace Web.Api.Features.Salaries.Admin.GetApprovedSalaries;
-
-public record GetApprovedSalariesQuery : GetAllSalariesQueryParams>;
+public record GetApprovedSalariesQuery : GetAllSalariesQueryParams;

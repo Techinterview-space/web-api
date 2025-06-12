@@ -15,7 +15,6 @@ using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.UserCommands;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;

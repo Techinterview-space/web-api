@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using Infrastructure.Services.Mediator;
 using Web.Api.Features.Salaries.Admin;
 
 namespace Web.Api.Features.Salaries.GetSalaries;

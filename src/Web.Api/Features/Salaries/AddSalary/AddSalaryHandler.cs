@@ -5,7 +5,6 @@ using Domain.Entities.Salaries;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Salaries.Models;
 

@@ -7,7 +7,6 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 

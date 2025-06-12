@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Services.Mediator;
+using Infrastructure.Services.OpenAi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Subscribtions.ActivateSubscription;
 using Web.Api.Features.Subscribtions.CreateSubscription;

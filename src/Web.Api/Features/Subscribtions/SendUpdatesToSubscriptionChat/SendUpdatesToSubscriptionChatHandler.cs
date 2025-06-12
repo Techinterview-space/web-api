@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Services.Correlation;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Services.Salaries;
 

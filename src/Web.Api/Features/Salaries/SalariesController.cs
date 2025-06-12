@@ -104,8 +104,8 @@ public class SalariesController : ControllerBase
     public async Task<IActionResult> Export(
         CancellationToken cancellationToken)
     {
-        var response = await _serviceProvider.HandleBy<ExportCsvHandler, ExportCsvQuery, SalariesCsvResponse>(
-            new ExportCsvQuery(),
+        var response = await _serviceProvider.HandleBy<ExportCsvHandler, Nothing, SalariesCsvResponse>(
+            Nothing.Value,
             cancellationToken);
 
         return File(response.GetAsByteArray(), response.FileContentType, response.Filename);

@@ -7,7 +7,6 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.OpenAi.Models;
 using Infrastructure.Services.Professions;
-using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReport;

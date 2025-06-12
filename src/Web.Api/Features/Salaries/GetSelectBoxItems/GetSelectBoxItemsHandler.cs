@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Infrastructure.Services.Mediator;
 using Web.Api.Features.Salaries.Models;
 using Web.Api.Features.Salaries.Providers;
 
