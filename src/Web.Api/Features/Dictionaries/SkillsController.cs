@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Labels.Models;
 using Web.Api.Setup.Attributes;
 
-namespace Web.Api.Features.Skills;
+namespace Web.Api.Features.Dictionaries;
 
 [ApiController]
 [Route("api/skills")]

@@ -14,7 +14,7 @@ using Web.Api.Features.Labels.Models;
 using Web.Api.Features.Salaries.Providers;
 using Web.Api.Setup.Attributes;
 
-namespace Web.Api.Features.Professions;
+namespace Web.Api.Features.Dictionaries;
 
 [ApiController]
 [Route("api/professions")]

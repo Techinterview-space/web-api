@@ -1,9 +1,15 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Web.Api.Features.Webhooks.Models;
 
 namespace Web.Api.Features.Webhooks;
 
@@ -20,25 +26,64 @@ public class WebhooksController : ControllerBase
     }
 
     [HttpPost("sendgrid")]
-    public async Task<IActionResult> SendgridWebhook()
+    public async Task<IActionResult> SendgridWebhook(
+        CancellationToken cancellationToken)
+    {
+        var signature = Request.Headers["X-Twilio-Email-Event-Webhook-Signature"].ToString();
+        var spamReportEvents = (await TryParseBodyAsync(cancellationToken))
+            .Where(x => x.Event == "spamreport")
+            .ToList();
+
+        if (spamReportEvents.Count > 0)
+        {
+            _logger.LogInformation(
+                "Received {Count} spam report events from Sendgrid. Signature: {Signature}. Emails: {Emails}",
+                spamReportEvents.Count,
+                signature,
+                string.Join(", ", spamReportEvents.Select(x => x.Email)));
+        }
+        else
+        {
+            _logger.LogInformation(
+                "No spam report events found in Sendgrid webhook. Signature: {Signature}",
+                signature);
+        }
+
+        return Ok();
+    }
+
+    private async Task<List<SendgridEventItem>> TryParseBodyAsync(
+        CancellationToken cancellationToken)
     {
         // Enable seeking on the stream
         Request.EnableBuffering();
 
-        // Read the body as a string
         using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
-        var rawBody = await reader.ReadToEndAsync();
+        var rawBody = await reader.ReadToEndAsync(cancellationToken);
 
-        // Reset the stream position for further processing if needed
         Request.Body.Position = 0;
+        try
+        {
+            var items = JsonSerializer.Deserialize<List<SendgridEventItem>>(rawBody);
+            if (items == null)
+            {
+                _logger.LogWarning(
+                    "Sendgrid webhook body deserialization returned null. Body {Body}",
+                    rawBody);
 
-        var signature = Request.Headers["X-Twilio-Email-Event-Webhook-Signature"].ToString();
+                return new List<SendgridEventItem>(0);
+            }
 
-        _logger.LogInformation(
-            "Sendgrid webhook. Body: {Body}. Signature: {Signature}",
-            rawBody,
-            signature);
+            return items;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(
+                e,
+                "Failed to parse Sendgrid webhook body. Raw body: {RawBody}",
+                rawBody);
 
-        return Ok();
+            return new List<SendgridEventItem>(0);
+        }
     }
 }
