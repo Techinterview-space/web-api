@@ -23,9 +23,12 @@ public class WebhooksController : ControllerBase
         bodyStream.BaseStream.Seek(0, SeekOrigin.Begin);
         var bodyText = bodyStream.ReadToEnd();
 
+        var signature = Request.Headers["X-Twilio-Email-Event-Webhook-Signature"].ToString();
+
         _logger.LogInformation(
-            "Sendgrid webhook. Body: {Body}",
-            bodyText);
+            "Sendgrid webhook. Body: {Body}. Signature: {Signature}",
+            bodyText,
+            signature);
 
         return Ok();
     }
