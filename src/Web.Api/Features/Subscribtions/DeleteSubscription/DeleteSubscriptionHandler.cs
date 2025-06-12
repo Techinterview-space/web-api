@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Web.Api.Features.Subscribtions.DeleteSubscription;
 
 public class DeleteSubscriptionHandler
-    : Infrastructure.Services.Mediator.IRequestHandler<DeleteSubscriptionCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<DeleteSubscriptionCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -19,7 +19,7 @@ public class DeleteSubscriptionHandler
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         DeleteSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
@@ -30,6 +30,6 @@ public class DeleteSubscriptionHandler
         _context.StatDataChangeSubscriptions.Remove(cacheRecord);
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

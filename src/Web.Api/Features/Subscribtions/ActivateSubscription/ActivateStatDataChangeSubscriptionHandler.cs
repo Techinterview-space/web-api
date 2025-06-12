@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.ActivateSubscription;
 
-public class ActivateStatDataChangeSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
+public class ActivateStatDataChangeSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -23,7 +23,7 @@ public class ActivateStatDataChangeSubscriptionHandler : Infrastructure.Services
         _authorization = authorization;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         ActivateStatDataChangeSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
@@ -40,6 +40,6 @@ public class ActivateStatDataChangeSubscriptionHandler : Infrastructure.Services
         cacheRecord.Activate();
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

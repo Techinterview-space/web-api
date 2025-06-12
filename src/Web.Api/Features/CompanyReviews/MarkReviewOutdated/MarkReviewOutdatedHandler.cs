@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviews.MarkReviewOutdated;
 
-public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedCommand, Unit>
+public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -23,7 +23,7 @@ public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedComma
         _authorization = authorization;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         MarkReviewOutdatedCommand request,
         CancellationToken cancellationToken)
     {
@@ -41,6 +41,6 @@ public class MarkReviewOutdatedHandler : IRequestHandler<MarkReviewOutdatedComma
         company.MarkReviewAsOutdated(request.ReviewId);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

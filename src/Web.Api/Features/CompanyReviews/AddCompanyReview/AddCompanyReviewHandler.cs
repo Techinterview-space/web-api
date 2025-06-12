@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 
 public class AddCompanyReviewHandler
-    : Infrastructure.Services.Mediator.IRequestHandler<AddCompanyReviewCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<AddCompanyReviewCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -28,7 +28,7 @@ public class AddCompanyReviewHandler
         _notificationService = notificationService;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         AddCompanyReviewCommand request,
         CancellationToken cancellationToken)
     {
@@ -77,6 +77,6 @@ public class AddCompanyReviewHandler
             company,
             cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

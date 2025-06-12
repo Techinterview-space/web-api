@@ -3,33 +3,33 @@ namespace Infrastructure.Services.Mediator;
 /// <summary>
 /// Represents a void type, since Void is not a valid return type in C#.
 /// </summary>
-public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>
+public readonly struct Nothing : IEquatable<Nothing>, IComparable<Nothing>
 {
     /// <summary>
-    /// Default and only value of the <see cref="Unit"/> type.
+    /// Default and only value of the <see cref="Nothing"/> type.
     /// </summary>
-    public static readonly Unit Value = new();
+    public static readonly Nothing Value = new();
 
     /// <summary>
     /// Compares the current object with another object of the same type.
     /// </summary>
     /// <param name="other">An object to compare with this object.</param>
     /// <returns>Always returns 0 as all units are equal.</returns>
-    public int CompareTo(Unit other) => 0;
+    public int CompareTo(Nothing other) => 0;
 
     /// <summary>
-    /// Determines whether the specified <see cref="Unit"/> is equal to this instance.
+    /// Determines whether the specified <see cref="Nothing"/> is equal to this instance.
     /// </summary>
-    /// <param name="other">The <see cref="Unit"/> to compare with this instance.</param>
+    /// <param name="other">The <see cref="Nothing"/> to compare with this instance.</param>
     /// <returns>Always returns <c>true</c> as all units are equal.</returns>
-    public bool Equals(Unit other) => true;
+    public bool Equals(Nothing other) => true;
 
     /// <summary>
     /// Determines whether the specified <see cref="object"/> is equal to this instance.
     /// </summary>
     /// <param name="obj">The <see cref="object"/> to compare with this instance.</param>
-    /// <returns><c>true</c> if the specified <see cref="object"/> is a <see cref="Unit"/>; otherwise, <c>false</c>.</returns>
-    public override bool Equals(object? obj) => obj is Unit;
+    /// <returns><c>true</c> if the specified <see cref="object"/> is a <see cref="Nothing"/>; otherwise, <c>false</c>.</returns>
+    public override bool Equals(object? obj) => obj is Nothing;
 
     /// <summary>
     /// Returns a hash code for this instance.
@@ -49,7 +49,7 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>
     /// <param name="first">The first value.</param>
     /// <param name="second">The second value.</param>
     /// <returns>Always returns <c>true</c> as all units are equal.</returns>
-    public static bool operator ==(Unit first, Unit second) => true;
+    public static bool operator ==(Nothing first, Nothing second) => true;
 
     /// <summary>
     /// Inequality operator.
@@ -57,5 +57,5 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>
     /// <param name="first">The first value.</param>
     /// <param name="second">The second value.</param>
     /// <returns>Always returns <c>false</c> as all units are equal.</returns>
-    public static bool operator !=(Unit first, Unit second) => false;
+    public static bool operator !=(Nothing first, Nothing second) => false;
 }

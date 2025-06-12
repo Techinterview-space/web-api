@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.ExcludeFromStats;
 
-public class ExcludeFromStatsHandler : Infrastructure.Services.Mediator.IRequestHandler<ExcludeFromStatsCommand, Unit>
+public class ExcludeFromStatsHandler : Infrastructure.Services.Mediator.IRequestHandler<ExcludeFromStatsCommand, Nothing>
 {
     private readonly DatabaseContext _context;
 
@@ -17,7 +17,7 @@ public class ExcludeFromStatsHandler : Infrastructure.Services.Mediator.IRequest
         _context = context;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         ExcludeFromStatsCommand request,
         CancellationToken cancellationToken)
     {
@@ -28,6 +28,6 @@ public class ExcludeFromStatsHandler : Infrastructure.Services.Mediator.IRequest
         salary.ExcludeFromStats();
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

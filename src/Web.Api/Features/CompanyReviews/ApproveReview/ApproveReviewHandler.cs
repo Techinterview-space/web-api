@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviews.ApproveReview;
 
-public class ApproveReviewHandler : Infrastructure.Services.Mediator.IRequestHandler<ApproveReviewCommand, Unit>
+public class ApproveReviewHandler : Infrastructure.Services.Mediator.IRequestHandler<ApproveReviewCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -28,7 +28,7 @@ public class ApproveReviewHandler : Infrastructure.Services.Mediator.IRequestHan
         _emailService = emailService;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         ApproveReviewCommand request,
         CancellationToken cancellationToken)
     {
@@ -65,6 +65,6 @@ public class ApproveReviewHandler : Infrastructure.Services.Mediator.IRequestHan
                 cancellationToken);
         }
 
-        return Unit.Value;
+        return Nothing.Value;
     }
 }

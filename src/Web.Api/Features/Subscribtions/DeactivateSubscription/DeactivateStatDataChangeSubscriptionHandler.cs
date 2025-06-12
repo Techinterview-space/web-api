@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.DeactivateSubscription;
 
-public class DeactivateStatDataChangeSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<DeactivateStatDataChangeSubscriptionCommand, Unit>
+public class DeactivateStatDataChangeSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<DeactivateStatDataChangeSubscriptionCommand, Nothing>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;
@@ -23,7 +23,7 @@ public class DeactivateStatDataChangeSubscriptionHandler : Infrastructure.Servic
         _authorization = authorization;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<Nothing> Handle(
         DeactivateStatDataChangeSubscriptionCommand request,
         CancellationToken cancellationToken)
     {
@@ -40,6 +40,6 @@ public class DeactivateStatDataChangeSubscriptionHandler : Infrastructure.Servic
         cacheRecord.Deactivate();
 
         await _context.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return Nothing.Value;
     }
 }
