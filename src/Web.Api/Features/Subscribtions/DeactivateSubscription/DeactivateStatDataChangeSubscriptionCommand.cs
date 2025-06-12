@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Subscribtions.DeactivateSubscription;
 
-public record DeactivateStatDataChangeSubscriptionCommand : IRequest<Unit>
+public record DeactivateStatDataChangeSubscriptionCommand
 {
     public DeactivateStatDataChangeSubscriptionCommand(
         Guid id)

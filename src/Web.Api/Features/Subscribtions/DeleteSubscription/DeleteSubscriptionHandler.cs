@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using Domain.Entities.StatData;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.DeleteSubscription;
 
 public class DeleteSubscriptionHandler
-    : IRequestHandler<DeleteSubscriptionCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<DeleteSubscriptionCommand, Unit>
 {
     private readonly DatabaseContext _context;
 

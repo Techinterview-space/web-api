@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.DeleteSalary;
 
-public class DeleteSalaryHandler : IRequestHandler<DeleteSalaryCommand, Unit>
+public class DeleteSalaryHandler : Infrastructure.Services.Mediator.IRequestHandler<DeleteSalaryCommand, Unit>
 {
     private readonly DatabaseContext _context;
 

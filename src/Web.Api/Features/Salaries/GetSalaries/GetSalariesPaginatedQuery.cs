@@ -5,7 +5,6 @@ using Domain.Enums;
 using Domain.ValueObjects;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Salaries;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Features.Salaries.GetSalaries;

@@ -6,13 +6,13 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
 public class GetSalariesHistoricalChartHandler
-    : IRequestHandler<GetSalariesHistoricalChartQuery, GetSalariesHistoricalChartResponse>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesHistoricalChartQuery, GetSalariesHistoricalChartResponse>
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;

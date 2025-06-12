@@ -11,7 +11,7 @@ using Web.Api.Features.Companies.Dtos;
 namespace Web.Api.Features.Companies.SearchCompaniesForAdmin;
 
 public class SearchCompaniesForAdminHandler
-    : IRequestHandler<SearchCompaniesForAdminQueryParams, Pageable<CompanyDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<SearchCompaniesForAdminQueryParams, Pageable<CompanyDto>>
 {
     private const int MaxPageSize = 100;
 

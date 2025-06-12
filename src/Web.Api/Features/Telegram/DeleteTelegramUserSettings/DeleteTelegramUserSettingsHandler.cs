@@ -5,13 +5,13 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Telegram.DeleteTelegramUserSettings;
 
 public class DeleteTelegramUserSettingsHandler
-    : IRequestHandler<DeleteTelegramUserSettingsCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<DeleteTelegramUserSettingsCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

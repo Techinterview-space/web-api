@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Surveys.Dtos;
 using Web.Api.Features.Surveys.GetSalariesSurveyStats;
 using Web.Api.Features.Surveys.GetUserSalariesSurveyData;
@@ -15,23 +17,21 @@ namespace Web.Api.Features.Surveys;
 [Route("api/survey")]
 public class SurveyController : Controller
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _serviceProvider;
 
     public SurveyController(
-        IMediator mediator)
+        IServiceProvider serviceProvider)
     {
-        _mediator = mediator;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("salaries-user-stat-data")]
     public async Task<GetUserSalariesSurveyDataResponse> GetUserSurveyStatData(
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetUserSalariesSurveyDataHandler, GetUserSalariesSurveyDataQuery, GetUserSalariesSurveyDataResponse>(
             new GetUserSalariesSurveyDataQuery(),
             cancellationToken);
-
-        return result;
     }
 
     [HttpPost("salaries-stat-page-reply")]
@@ -39,24 +39,20 @@ public class SurveyController : Controller
         [FromBody] ReplyOnSalariesSurveyRequestBody requestBody,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(
+        return await _serviceProvider.HandleBy<ReplyOnSalariesSurveyHandler, ReplyOnSalariesSurveyCommand, SalariesSurveyReplyDto>(
             new ReplyOnSalariesSurveyCommand
             {
                 UsefulnessRating = requestBody.UsefulnessRating,
             },
             cancellationToken);
-
-        return result;
     }
 
     [HttpGet("salaries-stats")]
     public async Task<SalariesSurveyStatsData> GetSalariesSurveyStats(
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(
+        return await _serviceProvider.HandleBy<GetSalariesSurveyStatsHandler, GetSalariesSurveyStatsQuery, SalariesSurveyStatsData>(
             new GetSalariesSurveyStatsQuery(),
             cancellationToken);
-
-        return result;
     }
 }

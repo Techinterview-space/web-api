@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Subscribtions.ActivateSubscription;
 
-public record ActivateStatDataChangeSubscriptionCommand : IRequest<Unit>
+public record ActivateStatDataChangeSubscriptionCommand
 {
     public ActivateStatDataChangeSubscriptionCommand(
         Guid id)

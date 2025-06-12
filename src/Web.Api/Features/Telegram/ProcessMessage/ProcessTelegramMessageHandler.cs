@@ -15,7 +15,7 @@ using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.UserCommands;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -27,7 +27,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Web.Api.Features.Telegram.ProcessMessage;
 
-public class ProcessTelegramMessageHandler : IRequestHandler<ProcessTelegramMessageCommand, string>
+public class ProcessTelegramMessageHandler : Infrastructure.Services.Mediator.IRequestHandler<ProcessTelegramMessageCommand, string>
 {
     public const string SalariesPageUrl = "techinterview.space/salaries";
 

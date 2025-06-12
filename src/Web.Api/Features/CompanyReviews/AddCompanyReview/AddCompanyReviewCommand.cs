@@ -1,5 +1,4 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 

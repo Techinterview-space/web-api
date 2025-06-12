@@ -3,14 +3,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.CompanyReviews.SearchReviewsToBeApproved;
 
 public class SearchReviewsToBeApprovedHandler
-    : IRequestHandler<SearchReviewsToBeApprovedQuery, List<CompanyReviewDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<SearchReviewsToBeApprovedQuery, List<CompanyReviewDto>>
 {
     private readonly DatabaseContext _context;
 

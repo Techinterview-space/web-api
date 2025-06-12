@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Web.Api.Features.Salaries.Admin;
 
 namespace Web.Api.Features.Salaries.GetSalaries;
 
-public class GetSalariesPaginatedQueryHandler : IRequestHandler<GetSalariesPaginatedQuery, Pageable<UserSalaryDto>>
+public class GetSalariesPaginatedQueryHandler : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesPaginatedQuery, Pageable<UserSalaryDto>>
 {
     private readonly DatabaseContext _context;
 

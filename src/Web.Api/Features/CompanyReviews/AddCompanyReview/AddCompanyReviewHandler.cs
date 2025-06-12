@@ -6,13 +6,13 @@ using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
 using Infrastructure.Services.Telegram;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviews.AddCompanyReview;
 
 public class AddCompanyReviewHandler
-    : IRequestHandler<AddCompanyReviewCommand, Unit>
+    : Infrastructure.Services.Mediator.IRequestHandler<AddCompanyReviewCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

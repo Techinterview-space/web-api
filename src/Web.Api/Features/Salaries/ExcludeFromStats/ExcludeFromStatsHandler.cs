@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.ExcludeFromStats;
 
-public class ExcludeFromStatsHandler : IRequestHandler<ExcludeFromStatsCommand, Unit>
+public class ExcludeFromStatsHandler : Infrastructure.Services.Mediator.IRequestHandler<ExcludeFromStatsCommand, Unit>
 {
     private readonly DatabaseContext _context;
 

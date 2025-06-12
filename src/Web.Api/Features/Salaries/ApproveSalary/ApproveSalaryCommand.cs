@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Salaries.ApproveSalary;
 
-public record ApproveSalaryCommand : IRequest<Unit>
+public record ApproveSalaryCommand
 {
     public ApproveSalaryCommand(
         Guid id)

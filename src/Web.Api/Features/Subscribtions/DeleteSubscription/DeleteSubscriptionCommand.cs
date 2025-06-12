@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Subscribtions.DeleteSubscription;
 
-public record DeleteSubscriptionCommand : IRequest<Unit>
+public record DeleteSubscriptionCommand
 {
     public DeleteSubscriptionCommand(
         Guid id)

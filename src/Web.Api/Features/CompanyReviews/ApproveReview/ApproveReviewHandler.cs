@@ -7,12 +7,12 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Emails.Contracts;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviews.ApproveReview;
 
-public class ApproveReviewHandler : IRequestHandler<ApproveReviewCommand, Unit>
+public class ApproveReviewHandler : Infrastructure.Services.Mediator.IRequestHandler<ApproveReviewCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

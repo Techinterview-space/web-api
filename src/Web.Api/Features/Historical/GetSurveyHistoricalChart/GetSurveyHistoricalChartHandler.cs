@@ -8,7 +8,7 @@ using Domain.Extensions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Web.Api.Features.Surveys.Services;
@@ -16,7 +16,7 @@ using Web.Api.Features.Surveys.Services;
 namespace Web.Api.Features.Historical.GetSurveyHistoricalChart;
 
 public class GetSurveyHistoricalChartHandler
-    : IRequestHandler<GetSurveyHistoricalChartQuery, GetSurveyHistoricalChartResponse>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetSurveyHistoricalChartQuery, GetSurveyHistoricalChartResponse>
 {
     private const string CacheKey = $"{nameof(GetSurveyHistoricalChartHandler)}_SurveyData";
 

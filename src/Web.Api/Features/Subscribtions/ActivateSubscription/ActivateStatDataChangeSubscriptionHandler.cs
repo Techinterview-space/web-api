@@ -5,12 +5,12 @@ using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.ActivateSubscription;
 
-public class ActivateStatDataChangeSubscriptionHandler : IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
+public class ActivateStatDataChangeSubscriptionHandler : Infrastructure.Services.Mediator.IRequestHandler<ActivateStatDataChangeSubscriptionCommand, Unit>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

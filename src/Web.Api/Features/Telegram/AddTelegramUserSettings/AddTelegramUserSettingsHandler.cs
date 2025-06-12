@@ -4,14 +4,14 @@ using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 
 namespace Web.Api.Features.Telegram.AddTelegramUserSettings;
 
 public class AddTelegramUserSettingsHandler
-    : IRequestHandler<AddTelegramUserSettingsCommand, TelegramUserSettingsDto>
+    : Infrastructure.Services.Mediator.IRequestHandler<AddTelegramUserSettingsCommand, TelegramUserSettingsDto>
 {
     private readonly DatabaseContext _context;
 

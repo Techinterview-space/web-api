@@ -12,13 +12,13 @@ using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Import.ImportKolesaCsv;
 
 public class ImportKolesaDevelopersCsvHandler
-    : IRequestHandler<ImportKolesaDevelopersCsvCommand, List<ImportCsvResponseItem>>
+    : Infrastructure.Services.Mediator.IRequestHandler<ImportKolesaDevelopersCsvCommand, List<ImportCsvResponseItem>>
 {
     private readonly DatabaseContext _context;
 

@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.ApproveSalary;
 
-public class ApproveSalaryHandler : IRequestHandler<ApproveSalaryCommand, Unit>
+public class ApproveSalaryHandler : Infrastructure.Services.Mediator.IRequestHandler<ApproveSalaryCommand, Unit>
 {
     private readonly DatabaseContext _context;
 

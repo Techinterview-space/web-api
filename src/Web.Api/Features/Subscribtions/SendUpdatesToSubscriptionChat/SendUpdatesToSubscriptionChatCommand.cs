@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.Subscribtions.SendUpdatesToSubscriptionChat;
 
-public record SendUpdatesToSubscriptionChatCommand : IRequest<int>
+public record SendUpdatesToSubscriptionChatCommand
 {
     public SendUpdatesToSubscriptionChatCommand(
         Guid subscriptionId)

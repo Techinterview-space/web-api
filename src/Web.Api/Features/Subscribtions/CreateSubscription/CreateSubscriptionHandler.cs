@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Domain.Entities.StatData;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 
 namespace Web.Api.Features.Subscribtions.CreateSubscription;
 
 public class CreateSubscriptionHandler
-    : IRequestHandler<CreateSubscriptionCommand, StatDataChangeSubscriptionDto>
+    : Infrastructure.Services.Mediator.IRequestHandler<CreateSubscriptionCommand, StatDataChangeSubscriptionDto>
 {
     private readonly DatabaseContext _context;
 

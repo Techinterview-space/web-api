@@ -13,7 +13,7 @@ using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.GetCompany;
 
-public class GetCompanyHandler : IRequestHandler<string, GetCompanyResponse>
+public class GetCompanyHandler : Infrastructure.Services.Mediator.IRequestHandler<string, GetCompanyResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _authorization;

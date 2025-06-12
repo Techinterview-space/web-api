@@ -5,7 +5,7 @@ using Domain.Enums;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Errors.Model;
 using Web.Api.Features.Salaries.Models;
@@ -13,7 +13,7 @@ using NotFoundException = Domain.Validation.Exceptions.NotFoundException;
 
 namespace Web.Api.Features.Salaries.UpdateSalary;
 
-public class UpdateSalaryHandler : IRequestHandler<UpdateSalaryCommand, CreateOrEditSalaryRecordResponse>
+public class UpdateSalaryHandler : Infrastructure.Services.Mediator.IRequestHandler<UpdateSalaryCommand, CreateOrEditSalaryRecordResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IAuthorization _auth;

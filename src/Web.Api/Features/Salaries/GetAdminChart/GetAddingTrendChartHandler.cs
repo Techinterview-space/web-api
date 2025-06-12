@@ -4,13 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Salaries.GetAdminChart;
 
 public class GetAddingTrendChartHandler
-    : IRequestHandler<GetAddingTrendChartQuery, GetAddingTrendChartResponse>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetAddingTrendChartQuery, GetAddingTrendChartResponse>
 {
     private readonly DatabaseContext _context;
 

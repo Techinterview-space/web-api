@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace Web.Api.Features.CompanyReviews.MarkReviewOutdated;
 
-public record MarkReviewOutdatedCommand : IRequest<Unit>
+public record MarkReviewOutdatedCommand
 {
     public MarkReviewOutdatedCommand(
         Guid companyId,

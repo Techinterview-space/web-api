@@ -1,5 +1,4 @@
 ﻿using System;
-using MediatR;
 using Web.Api.Features.Subscribtions.GetStatDataChangeSubscriptions;
 using Web.Api.Features.Subscribtions.Shared;
 

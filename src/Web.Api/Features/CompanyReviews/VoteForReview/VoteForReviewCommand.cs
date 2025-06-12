@@ -1,11 +1,10 @@
 ﻿using System;
 using Domain.Attributes;
 using Domain.Entities.Companies;
-using MediatR;
 
 namespace Web.Api.Features.CompanyReviews.VoteForReview;
 
-public record VoteForReviewCommand : IRequest<VoteForReviewResponse>
+public record VoteForReviewCommand
 {
     public VoteForReviewCommand(
         Guid companyId,

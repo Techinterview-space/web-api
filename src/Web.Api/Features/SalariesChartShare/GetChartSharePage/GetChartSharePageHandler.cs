@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Salaries.GetSalariesChart;
 
 namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
 {
-    public class GetChartSharePageHandler : IRequestHandler<GetChartSharePageQuery, string>
+    public class GetChartSharePageHandler : Infrastructure.Services.Mediator.IRequestHandler<GetChartSharePageQuery, string>
     {
         private readonly IGlobal _global;
         private readonly DatabaseContext _context;

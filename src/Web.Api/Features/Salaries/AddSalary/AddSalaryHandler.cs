@@ -5,13 +5,13 @@ using Domain.Entities.Salaries;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.AddSalary;
 
-public class AddSalaryHandler : IRequestHandler<AddSalaryCommand, CreateOrEditSalaryRecordResponse>
+public class AddSalaryHandler : Infrastructure.Services.Mediator.IRequestHandler<AddSalaryCommand, CreateOrEditSalaryRecordResponse>
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;

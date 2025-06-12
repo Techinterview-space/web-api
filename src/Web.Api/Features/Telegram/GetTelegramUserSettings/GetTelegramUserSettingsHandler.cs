@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 
 namespace Web.Api.Features.Telegram.GetTelegramUserSettings;
 
 public class GetTelegramUserSettingsHandler
-    : IRequestHandler<GetTelegramUserSettingsQuery, Pageable<TelegramUserSettingsDto>>
+    : Infrastructure.Services.Mediator.IRequestHandler<GetTelegramUserSettingsQuery, Pageable<TelegramUserSettingsDto>>
 {
     private readonly DatabaseContext _context;
 

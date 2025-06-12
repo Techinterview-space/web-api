@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using MediatR;
+using Infrastructure.Services.Mediator;
 using Web.Api.Features.Surveys.Services;
 
 namespace Web.Api.Features.Surveys.GetUserSalariesSurveyData;
 
-public class GetUserSalariesSurveyDataHandler : IRequestHandler<GetUserSalariesSurveyDataQuery, GetUserSalariesSurveyDataResponse>
+public class GetUserSalariesSurveyDataHandler : Infrastructure.Services.Mediator.IRequestHandler<GetUserSalariesSurveyDataQuery, GetUserSalariesSurveyDataResponse>
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
