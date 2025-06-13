@@ -46,7 +46,8 @@ public class WebhooksController : ControllerBase
             return Ok();
         }
 
-        var allItems = await TryParseBodyAsync(cancellationToken);
+        var (allItems, rawBody) = await TryParseBodyAsync(cancellationToken);
+
         var spamReportEvents = allItems
             .Where(x => x.Event == "spamreport")
             .ToList();
@@ -70,7 +71,7 @@ public class WebhooksController : ControllerBase
         return Ok();
     }
 
-    private async Task<List<SendgridEventItem>> TryParseBodyAsync(
+    private async Task<(List<SendgridEventItem> Items, string RawBody)> TryParseBodyAsync(
         CancellationToken cancellationToken)
     {
         using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
@@ -85,10 +86,10 @@ public class WebhooksController : ControllerBase
                     "Sendgrid webhook body deserialization returned null. Body {Body}",
                     rawBody);
 
-                return new List<SendgridEventItem>(0);
+                return (new List<SendgridEventItem>(0), rawBody);
             }
 
-            return items;
+            return (items, rawBody);
         }
         catch (Exception e)
         {
@@ -97,7 +98,7 @@ public class WebhooksController : ControllerBase
                 "Failed to parse Sendgrid webhook body. Raw body: {RawBody}",
                 rawBody);
 
-            return new List<SendgridEventItem>(0);
+            return (new List<SendgridEventItem>(0), rawBody);
         }
     }
 
