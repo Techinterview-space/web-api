@@ -6,8 +6,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Web.Api.Features.Webhooks.Models;
 
@@ -17,19 +17,35 @@ namespace Web.Api.Features.Webhooks;
 [Route("api/webhooks")]
 public class WebhooksController : ControllerBase
 {
+    public const string HeadersSignatureKey = "X-Twilio-Email-Event-Webhook-Signature";
+
     private readonly ILogger<WebhooksController> _logger;
+    private readonly IConfiguration _configuration;
 
     public WebhooksController(
-        ILogger<WebhooksController> logger)
+        ILogger<WebhooksController> logger,
+        IConfiguration configuration)
     {
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpPost("sendgrid")]
     public async Task<IActionResult> SendgridWebhook(
         CancellationToken cancellationToken)
     {
-        var signature = Request.Headers["X-Twilio-Email-Event-Webhook-Signature"].ToString();
+        var signature = Request.Headers[HeadersSignatureKey].ToString();
+
+        // Verify signature
+        if (!VerifySignature(signature))
+        {
+            _logger.LogWarning(
+                "SendGrid webhook signature verification failed. Signature: {Signature}",
+                signature);
+
+            return Ok();
+        }
+
         var allItems = await TryParseBodyAsync(cancellationToken);
         var spamReportEvents = allItems
             .Where(x => x.Event == "spamreport")
@@ -57,13 +73,9 @@ public class WebhooksController : ControllerBase
     private async Task<List<SendgridEventItem>> TryParseBodyAsync(
         CancellationToken cancellationToken)
     {
-        // Enable seeking on the stream
-        Request.EnableBuffering();
-
         using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
         var rawBody = await reader.ReadToEndAsync(cancellationToken);
 
-        Request.Body.Position = 0;
         try
         {
             var items = JsonSerializer.Deserialize<List<SendgridEventItem>>(rawBody);
@@ -87,5 +99,24 @@ public class WebhooksController : ControllerBase
 
             return new List<SendgridEventItem>(0);
         }
+    }
+
+    private bool VerifySignature(
+        string signatureFromHeaders)
+    {
+        var signatureFromConfigs = _configuration["SendGridWebhookSignature"];
+        if (string.IsNullOrEmpty(signatureFromConfigs))
+        {
+            _logger.LogWarning("SendGridWebhookSignature is not configured");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(signatureFromHeaders) ||
+            string.IsNullOrEmpty(signatureFromConfigs))
+        {
+            return false;
+        }
+
+        return signatureFromHeaders.Equals(signatureFromConfigs, StringComparison.InvariantCultureIgnoreCase);
     }
 }
