@@ -27,7 +27,7 @@ jobs:
           sed -i 's/"__S3_BUCKET_NAME",/"${{ vars.S3_BUCKET_NAME }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__TELEGRAM_BOT_KEY",/"${{ secrets.TELEGRAM_BOT_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__SENDGRID_API_KEY",/"${{ secrets.SENDGRID_API_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
-          sed -i 's/"__SENDGRID_WEBHOOK_SIGNATURE_KEY",/"${{ secrets.SENDGRID_WEBHOOK_SIGNATURE_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__SENDGRID_WEBHOOK_SIGNATURE",/"${{ secrets.SENDGRID_WEBHOOK_SIGNATURE }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__OPEN_AI_SECRET",/"${{ secrets.OPEN_AI_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           cd src
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview

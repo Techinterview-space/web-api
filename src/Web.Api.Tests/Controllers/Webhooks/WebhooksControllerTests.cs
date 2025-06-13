@@ -22,22 +22,19 @@ public class WebhooksControllerTests
         // Arrange
         var logger = new Mock<ILogger<WebhooksController>>();
         var configuration = new Mock<IConfiguration>();
-        var testSignatureKey = "test-signature-key";
+        var testSignature = Guid.NewGuid().ToString();
         var testBody = "[{\"email\":\"test@example.com\",\"event\":\"delivered\"}]";
 
-        configuration.Setup(x => x["SendGridWebhookSignatureKey"]).Returns(testSignatureKey);
+        configuration.Setup(x => x["SendGridWebhookSignature"]).Returns(testSignature);
 
         var controller = new WebhooksController(logger.Object, configuration.Object);
-
-        // Generate valid signature
-        var signature = GenerateValidSignature(testSignatureKey, testBody);
 
         // Mock HttpContext and Request
         var httpContext = new Mock<HttpContext>();
         var request = new Mock<HttpRequest>();
         var headers = new HeaderDictionary
         {
-            ["X-Twilio-Email-Event-Webhook-Signature"] = signature
+            ["X-Twilio-Email-Event-Webhook-Signature"] = testSignature
         };
 
         var bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(testBody));
@@ -72,11 +69,10 @@ public class WebhooksControllerTests
         // Arrange
         var logger = new Mock<ILogger<WebhooksController>>();
         var configuration = new Mock<IConfiguration>();
-        var testSignatureKey = "test-signature-key";
+        var testSignature = Guid.NewGuid().ToString();
         var testBody = "[{\"email\":\"test@example.com\",\"event\":\"delivered\"}]";
-        var invalidSignature = "invalid-signature";
 
-        configuration.Setup(x => x["SendGridWebhookSignatureKey"]).Returns(testSignatureKey);
+        configuration.Setup(x => x["SendGridWebhookSignature"]).Returns(testSignature);
 
         var controller = new WebhooksController(logger.Object, configuration.Object);
 
@@ -85,7 +81,7 @@ public class WebhooksControllerTests
         var request = new Mock<HttpRequest>();
         var headers = new HeaderDictionary
         {
-            ["X-Twilio-Email-Event-Webhook-Signature"] = invalidSignature
+            ["X-Twilio-Email-Event-Webhook-Signature"] = Guid.NewGuid().ToString()
         };
 
         var bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(testBody));
@@ -122,7 +118,7 @@ public class WebhooksControllerTests
         var configuration = new Mock<IConfiguration>();
         var testBody = "[{\"email\":\"test@example.com\",\"event\":\"delivered\"}]";
 
-        configuration.Setup(x => x["SendGridWebhookSignatureKey"]).Returns((string)null);
+        configuration.Setup(x => x["SendGridWebhookSignature"]).Returns((string)null);
 
         var controller = new WebhooksController(logger.Object, configuration.Object);
 
@@ -131,7 +127,7 @@ public class WebhooksControllerTests
         var request = new Mock<HttpRequest>();
         var headers = new HeaderDictionary
         {
-            ["X-Twilio-Email-Event-Webhook-Signature"] = "some-signature"
+            ["X-Twilio-Email-Event-Webhook-Signature"] = Guid.NewGuid().ToString()
         };
 
         var bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(testBody));
@@ -154,19 +150,9 @@ public class WebhooksControllerTests
             x => x.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("SendGridWebhookSignatureKey is not configured")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("SendGridWebhookSignature is not configured")),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);
-    }
-
-    private static string GenerateValidSignature(string signatureKey, string requestBody)
-    {
-        var keyBytes = Encoding.UTF8.GetBytes(signatureKey);
-        var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
-
-        using var hmac = new HMACSHA256(keyBytes);
-        var computedHash = hmac.ComputeHash(bodyBytes);
-        return Convert.ToBase64String(computedHash);
     }
 }

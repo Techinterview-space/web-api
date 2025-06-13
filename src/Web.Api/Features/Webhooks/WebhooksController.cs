@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -19,6 +17,8 @@ namespace Web.Api.Features.Webhooks;
 [Route("api/webhooks")]
 public class WebhooksController : ControllerBase
 {
+    public const string HeadersSignatureKey = "X-Twilio-Email-Event-Webhook-Signature";
+
     private readonly ILogger<WebhooksController> _logger;
     private readonly IConfiguration _configuration;
 
@@ -34,27 +34,15 @@ public class WebhooksController : ControllerBase
     public async Task<IActionResult> SendgridWebhook(
         CancellationToken cancellationToken)
     {
-        var signature = Request.Headers["X-Twilio-Email-Event-Webhook-Signature"].ToString();
-
-        // Enable buffering to allow multiple reads of the request body
-        Request.EnableBuffering();
-
-        // Read the request body for signature verification
-        string requestBody;
-        using (var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true))
-        {
-            requestBody = await reader.ReadToEndAsync(cancellationToken);
-        }
-
-        // Reset stream position for subsequent reading
-        Request.Body.Position = 0;
+        var signature = Request.Headers[HeadersSignatureKey].ToString();
 
         // Verify signature
-        if (!VerifySignature(signature, requestBody))
+        if (!VerifySignature(signature))
         {
             _logger.LogWarning(
                 "SendGrid webhook signature verification failed. Signature: {Signature}",
                 signature);
+
             return Ok();
         }
 
@@ -113,35 +101,22 @@ public class WebhooksController : ControllerBase
         }
     }
 
-    private bool VerifySignature(string signature, string requestBody)
+    private bool VerifySignature(
+        string signatureFromHeaders)
     {
-        var signatureKey = _configuration["SendGridWebhookSignatureKey"];
-        if (string.IsNullOrEmpty(signatureKey))
+        var signatureFromConfigs = _configuration["SendGridWebhookSignature"];
+        if (string.IsNullOrEmpty(signatureFromConfigs))
         {
-            _logger.LogWarning("SendGridWebhookSignatureKey is not configured");
+            _logger.LogWarning("SendGridWebhookSignature is not configured");
             return false;
         }
 
-        if (string.IsNullOrEmpty(signature))
+        if (string.IsNullOrEmpty(signatureFromHeaders) ||
+            string.IsNullOrEmpty(signatureFromConfigs))
         {
             return false;
         }
 
-        try
-        {
-            var keyBytes = Encoding.UTF8.GetBytes(signatureKey);
-            var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
-
-            using var hmac = new HMACSHA256(keyBytes);
-            var computedHash = hmac.ComputeHash(bodyBytes);
-            var computedSignature = Convert.ToBase64String(computedHash);
-
-            return string.Equals(signature, computedSignature, StringComparison.Ordinal);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error verifying SendGrid webhook signature");
-            return false;
-        }
+        return signatureFromHeaders.Equals(signatureFromConfigs, StringComparison.InvariantCultureIgnoreCase);
     }
 }
