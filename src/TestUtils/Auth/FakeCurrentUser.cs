@@ -12,7 +12,7 @@ public record FakeCurrentUser : CurrentUser
     public FakeCurrentUser(
         User user)
     {
-        Id = $"google-oauth2|{Guid.NewGuid():N}";
+        UserId = user.IdentityId ?? $"google-oauth2|{Guid.NewGuid():N}";
         FirstName = user.FirstName;
         LastName = user.LastName;
         Email = user.Email;
@@ -20,14 +20,14 @@ public record FakeCurrentUser : CurrentUser
     }
 
     public FakeCurrentUser(
-        string id = "1",
+        string userId = "1",
         Role role = Role.Interviewer,
         string firstName = null,
         string lastName = null,
         string email = null,
         bool isEmailVerified = true)
     {
-        Id = id;
+        UserId = userId;
         FirstName = firstName ?? Faker.Name.First();
         LastName = lastName ?? Faker.Name.Last();
 
@@ -43,7 +43,14 @@ public record FakeCurrentUser : CurrentUser
     public FakeCurrentUser WithUserId(
         string userId)
     {
-        Id = userId;
+        UserId = userId;
+        return this;
+    }
+
+    public FakeCurrentUser WithEmail(
+        string email)
+    {
+        Email = email;
         return this;
     }
 }

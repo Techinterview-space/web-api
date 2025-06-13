@@ -75,7 +75,10 @@ public record AuthorizationService : IAuthorization
         var user = await _context.Users
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
-            .ByEmailOrNullAsync(_http.CurrentUser.Email);
+            .ByEmailOrIdentityIdOrNullAsync(
+                _http.CurrentUser.Email,
+                _http.CurrentUser.UserId,
+                cancellationToken);
 
         if (user == null)
         {
@@ -95,7 +98,7 @@ public record AuthorizationService : IAuthorization
                 user.Email,
                 user.Id,
                 user.IdentityId,
-                _http.CurrentUser.Id);
+                _http.CurrentUser.UserId);
 
             throw new AuthenticationException("User tries to use incorrect account to login");
         }

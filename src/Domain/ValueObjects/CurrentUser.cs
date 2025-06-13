@@ -29,7 +29,7 @@ public record CurrentUser
             throw new ArgumentException("Principal does not have any claim");
         }
 
-        Id = principal.GetClaimValue(ClaimTypes.NameIdentifier);
+        UserId = principal.GetClaimValue(ClaimTypes.NameIdentifier);
         Email = principal.GetClaimValue(ClaimTypes.Email, false) ?? principal.GetClaimValue("email");
         IsEmailVerified = principal.GetClaimValue("email_verified", false) == "true";
         FirstName = principal.GetClaimValue(ClaimTypes.GivenName, false);
@@ -59,9 +59,9 @@ public record CurrentUser
     }
 
     /// <summary>
-    /// Auth0 will store there smth like 'google-oauth2|12345'.
+    /// Auth0 will store there smth like 'google-oauth2|12345' or 'github'.
     /// </summary>
-    public string Id { get; protected set; }
+    public string UserId { get; protected set; }
 
     public string Email { get; protected set; }
 
@@ -103,19 +103,19 @@ public record CurrentUser
 
     public bool IsGoogleAuth()
     {
-        return Id != null &&
-               Id.StartsWith(GoogleOAuth2Prefix);
+        return UserId != null &&
+               UserId.StartsWith(GoogleOAuth2Prefix);
     }
 
     public bool IsGithubAuth()
     {
-        return Id != null &&
-               Id.StartsWith(GithubPrefix);
+        return UserId != null &&
+               UserId.StartsWith(GithubPrefix);
     }
 
     public bool IsAuth0Auth()
     {
-        return Id != null &&
-               Id.StartsWith(Auth0Prefix);
+        return UserId != null &&
+               UserId.StartsWith(Auth0Prefix);
     }
 }

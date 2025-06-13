@@ -24,7 +24,7 @@ public class AuthorizationServiceTests
         var target = new AuthorizationService(
             new FakeHttpContext(
                 new FakeCurrentUser(
-                    id: "42",
+                    userId: "42",
                     role: Role.Interviewer,
                     firstName: "John",
                     lastName: "Smith")),
@@ -233,5 +233,47 @@ public class AuthorizationServiceTests
         await Assert.ThrowsAsync<AuthenticationException>(() => target.GetCurrentUserOrNullAsync());
 
         Assert.Equal(1, await context.Users.CountAsync());
+    }
+
+    [Fact]
+    public async Task CurrentUserAsync_ExistingUser_UserChangedEmailInSocial_ChangedEmail()
+    {
+        await using var context = new SqliteContext();
+        var oldUser = await new UserFake(
+                role: Role.Interviewer,
+                firstName: "John",
+                lastName: "Smith")
+            .WithIdentity($"github|{Guid.NewGuid():N}")
+            .PleaseAsync(context);
+
+        Assert.NotNull(oldUser.IdentityId);
+        Assert.False(oldUser.EmailConfirmed);
+
+        var fakeUser = new FakeCurrentUser(oldUser)
+            .WithUserId(oldUser.IdentityId)
+            .WithEmail($"{Guid.NewGuid():N}@github.com");
+
+        Assert.NotEqual(oldUser.Email, fakeUser.Email);
+
+        var target = new AuthorizationService(
+            new FakeHttpContext(fakeUser),
+            context,
+            new Mock<ILogger<AuthorizationService>>().Object);
+
+        Assert.Equal(1, await context.Users.CountAsync());
+        var currentUser = await target.GetCurrentUserOrNullAsync();
+        Assert.Equal(1, await context.Users.CountAsync());
+
+        Assert.Equal(oldUser.Id, currentUser.Id);
+
+        Assert.NotNull(currentUser.IdentityId);
+        Assert.Equal(fakeUser.UserId, currentUser.IdentityId);
+
+        Assert.True(currentUser.EmailConfirmed);
+        Assert.Equal("John", currentUser.FirstName);
+        Assert.Equal("Smith", currentUser.LastName);
+        Assert.Single(currentUser.UserRoles);
+        Assert.Equal(Role.Interviewer, currentUser.UserRoles.Single().RoleId);
+        Assert.Equal(fakeUser.Email, currentUser.Email);
     }
 }

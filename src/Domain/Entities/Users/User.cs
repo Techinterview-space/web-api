@@ -54,7 +54,7 @@ public class User : BaseModel, IHasDeletedAt
             !string.IsNullOrEmpty(currentUser.LastName) ? currentUser.LastName : "-",
             currentUser.Roles.ToArray())
     {
-        IdentityId = currentUser.Id;
+        IdentityId = currentUser.UserId;
         EmailConfirmed = currentUser.IsGoogleAuth() || currentUser.IsGithubAuth();
     }
 
@@ -131,7 +131,7 @@ public class User : BaseModel, IHasDeletedAt
             return true;
         }
 
-        var userId = currentUser.Id?.Trim();
+        var userId = currentUser.UserId?.Trim();
         if (string.IsNullOrWhiteSpace(userId))
         {
             return false;
@@ -167,8 +167,15 @@ public class User : BaseModel, IHasDeletedAt
         var needUpdates = false;
         if (IdentityId == null)
         {
-            IdentityId = currentUser.Id;
+            IdentityId = currentUser.UserId;
             needUpdates = true;
+        }
+        else if (
+            IdentityId == currentUser.UserId &&
+            Email != currentUser.Email &&
+            (currentUser.IsGoogleAuth() || currentUser.IsGithubAuth()))
+        {
+            Email = currentUser.Email;
         }
 
         if (ProfilePicture == null ||
