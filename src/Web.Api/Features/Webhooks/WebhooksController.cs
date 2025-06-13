@@ -30,7 +30,8 @@ public class WebhooksController : ControllerBase
         CancellationToken cancellationToken)
     {
         var signature = Request.Headers["X-Twilio-Email-Event-Webhook-Signature"].ToString();
-        var spamReportEvents = (await TryParseBodyAsync(cancellationToken))
+        var allItems = await TryParseBodyAsync(cancellationToken);
+        var spamReportEvents = allItems
             .Where(x => x.Event == "spamreport")
             .ToList();
 
@@ -45,8 +46,9 @@ public class WebhooksController : ControllerBase
         else
         {
             _logger.LogInformation(
-                "No spam report events found in Sendgrid webhook. Signature: {Signature}",
-                signature);
+                "No spam report events found in Sendgrid webhook. Signature: {Signature}. Items: {Items}",
+                signature,
+                JsonSerializer.Serialize(allItems));
         }
 
         return Ok();
