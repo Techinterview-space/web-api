@@ -45,8 +45,15 @@ public class WebhooksController : ControllerBase
         if (!VerifySignature(signature, rawBody, timestamp))
         {
             _logger.LogWarning(
-                "SendGrid webhook signature verification failed. Signature: {Signature}",
-                signature);
+                "SendGrid webhook signature verification failed. " +
+                "Signature: {Signature}. " +
+                "Raw body: {RawBody}. " +
+                "Items: {Items}. " +
+                "Timestamp: {Timestamp}",
+                signature,
+                rawBody,
+                JsonSerializer.Serialize(allItems),
+                timestamp);
 
             return Ok();
         }
