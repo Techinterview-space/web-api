@@ -5,12 +5,15 @@ using System.Security;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Infrastructure.Services.Correlation;
+using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StrongGrid;
 using StrongGrid.Models;
 using StrongGrid.Models.Webhooks;
+using Web.Api.Features.Users.UnsubscribeUserFromEmails;
 
 namespace Web.Api.Features.Webhooks;
 
@@ -23,13 +26,19 @@ public class WebhooksController : ControllerBase
 
     private readonly ILogger<WebhooksController> _logger;
     private readonly IConfiguration _configuration;
+    private readonly ICorrelationIdAccessor _correlationIdAccessor;
+    private readonly IServiceProvider _serviceProvider;
 
     public WebhooksController(
         ILogger<WebhooksController> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ICorrelationIdAccessor correlationIdAccessor,
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _configuration = configuration;
+        _correlationIdAccessor = correlationIdAccessor;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpPost("sendgrid")]
@@ -41,7 +50,10 @@ public class WebhooksController : ControllerBase
         // Verify signature using the raw body
         if (allItems.Count == 0)
         {
-            _logger.LogWarning("No items found in Sendgrid webhook");
+            _logger.LogWarning(
+                "No items found in Sendgrid webhook. CorrelationId: {CorrelationId}",
+                _correlationIdAccessor.GetValue());
+
             return Ok();
         }
 
@@ -51,16 +63,23 @@ public class WebhooksController : ControllerBase
 
         if (spamReportEvents.Count > 0)
         {
-            _logger.LogWarning(
-                "Received {Count} spam report events from Sendgrid. Emails: {Emails}",
+            var result = await _serviceProvider.HandleBy<UnsubscribeUserFromEmailsHandler, List<string>, bool>(
+                spamReportEvents.Select(x => x.Email).ToList(),
+                cancellationToken);
+
+            _logger.LogInformation(
+                "Received {Count} spam report events from Sendgrid. Emails: {Emails}. Processed: {Processed}. CorrelationId: {CorrelationId}",
                 spamReportEvents.Count,
-                string.Join(", ", spamReportEvents.Select(x => x.Email)));
+                string.Join(", ", spamReportEvents.Select(x => x.Email)),
+                result,
+                _correlationIdAccessor.GetValue());
         }
         else
         {
             _logger.LogInformation(
-                "No spam report events found in Sendgrid webhook. Items: {Items}",
-                JsonSerializer.Serialize(allItems));
+                "No spam report events found in Sendgrid webhook. Items: {Items}. CorrelationId: {CorrelationId}",
+                JsonSerializer.Serialize(allItems),
+                _correlationIdAccessor.GetValue());
         }
 
         return Ok();
@@ -75,7 +94,10 @@ public class WebhooksController : ControllerBase
         var signatureFromConfigs = _configuration["SendGridWebhookSignature"];
         if (string.IsNullOrEmpty(signatureFromConfigs))
         {
-            _logger.LogWarning("SendGridWebhookSignature is not configured");
+            _logger.LogWarning(
+                "SendGridWebhookSignature is not configured. CorrelationId: {CorrelationId}",
+                _correlationIdAccessor.GetValue());
+
             return new List<Event>(0);
         }
 
@@ -96,7 +118,8 @@ public class WebhooksController : ControllerBase
         {
             _logger.LogError(
                 e,
-                "Security error during signed body verification");
+                "Security error during signed body verification. CorrelationId: {CorrelationId}",
+                _correlationIdAccessor.GetValue());
 
             return new List<Event>(0);
         }
@@ -104,7 +127,8 @@ public class WebhooksController : ControllerBase
         {
             _logger.LogError(
                 ex,
-                "General error during signed body verification");
+                "General error during signed body verification. CorrelationId: {CorrelationId}",
+                _correlationIdAccessor.GetValue());
 
             return new List<Event>(0);
         }

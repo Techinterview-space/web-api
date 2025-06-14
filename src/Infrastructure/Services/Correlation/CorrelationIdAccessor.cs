@@ -11,6 +11,8 @@ public class CorrelationIdAccessor : ICorrelationIdAccessor
 
     private readonly HttpContext _httpContextOrNull;
 
+    private string _value;
+
     public CorrelationIdAccessor(
         IHttpContextAccessor contextAccessor)
         : this(contextAccessor.HttpContext)
@@ -25,9 +27,21 @@ public class CorrelationIdAccessor : ICorrelationIdAccessor
 
     public string GetValue()
     {
-        return _httpContextOrNull?.Items.TryGetValue(CorrelationIdHeaderName, out var value) == true
-            ? value?.ToString()
-            : null;
+        if (_httpContextOrNull == null)
+        {
+            _value ??= Guid.NewGuid().ToString();
+            return _value;
+        }
+
+        if (_httpContextOrNull.Items.TryGetValue(CorrelationIdHeaderName, out var valueObject))
+        {
+            return valueObject?.ToString();
+        }
+
+        _value ??= Guid.NewGuid().ToString();
+        _httpContextOrNull.Items[CorrelationIdHeaderName] = _value;
+
+        return _value;
     }
 
     public void PutCorrelationIdToHeaders(
