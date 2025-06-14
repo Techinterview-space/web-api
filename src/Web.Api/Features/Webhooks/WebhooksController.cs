@@ -131,12 +131,16 @@ public class WebhooksController : ControllerBase
             var computedHashBytes = hmac.ComputeHash(bodyBytes);
             var computedSignature = Convert.ToBase64String(computedHashBytes);
 
-            // Compare computed signature with the one from headers
+            // Compare the computed signature with the one from headers
             return signatureFromHeaders.Equals(computedSignature, StringComparison.Ordinal);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error computing HMAC signature for webhook verification");
+            _logger.LogError(
+                ex,
+                "Error computing HMAC signature for webhook verification. Raw body: {RawBody}",
+                requestBody);
+
             return false;
         }
     }
