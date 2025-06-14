@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Security;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Web.Api.Features.Webhooks.Models;
+using StrongGrid;
+using StrongGrid.Models;
+using StrongGrid.Models.Webhooks;
 
 namespace Web.Api.Features.Webhooks;
 
@@ -19,6 +19,7 @@ namespace Web.Api.Features.Webhooks;
 public class WebhooksController : ControllerBase
 {
     public const string HeadersSignatureKey = "X-Twilio-Email-Event-Webhook-Signature";
+    public const string HeadersTimestampKey = "X-Twilio-Email-Event-Webhook-Timestamp";
 
     private readonly ILogger<WebhooksController> _logger;
     private readonly IConfiguration _configuration;
@@ -35,122 +36,77 @@ public class WebhooksController : ControllerBase
     public async Task<IActionResult> SendgridWebhook(
         CancellationToken cancellationToken)
     {
-        var signature = Request.Headers[HeadersSignatureKey].ToString();
-        var timestamp = Request.Headers["X-Twilio-Email-Event-Webhook-Timestamp"].ToString();
-
-        // Read body first for signature verification
-        var (allItems, rawBody) = await TryParseBodyAsync(cancellationToken);
+        var allItems = await TryParseBodyAsync(cancellationToken);
 
         // Verify signature using the raw body
-        if (!VerifySignature(signature, rawBody, timestamp))
+        if (allItems.Count == 0)
         {
-            _logger.LogWarning(
-                "SendGrid webhook signature verification failed. " +
-                "Signature: {Signature}. " +
-                "Raw body: {RawBody}. " +
-                "Items: {Items}. " +
-                "Timestamp: {Timestamp}",
-                signature,
-                rawBody,
-                JsonSerializer.Serialize(allItems),
-                timestamp);
-
+            _logger.LogWarning("No items found in Sendgrid webhook");
             return Ok();
         }
 
         var spamReportEvents = allItems
-            .Where(x => x.Event == "spamreport")
+            .Where(x => x.EventType is EventType.SpamReport)
             .ToList();
 
         if (spamReportEvents.Count > 0)
         {
             _logger.LogWarning(
-                "Received {Count} spam report events from Sendgrid. Signature: {Signature}. Emails: {Emails}",
+                "Received {Count} spam report events from Sendgrid. Emails: {Emails}",
                 spamReportEvents.Count,
-                signature,
                 string.Join(", ", spamReportEvents.Select(x => x.Email)));
         }
         else
         {
             _logger.LogInformation(
-                "No spam report events found in Sendgrid webhook. Signature: {Signature}. Items: {Items}",
-                signature,
+                "No spam report events found in Sendgrid webhook. Items: {Items}",
                 JsonSerializer.Serialize(allItems));
         }
 
         return Ok();
     }
 
-    private async Task<(List<SendgridEventItem> Items, string RawBody)> TryParseBodyAsync(
+    private async Task<List<Event>> TryParseBodyAsync(
         CancellationToken cancellationToken)
     {
-        using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
-        var rawBody = await reader.ReadToEndAsync(cancellationToken);
+        var signatureFromHeaders = Request.Headers[HeadersSignatureKey].ToString();
+        var timestamp = Request.Headers[HeadersTimestampKey].ToString();
 
-        try
-        {
-            var items = JsonSerializer.Deserialize<List<SendgridEventItem>>(rawBody);
-            if (items == null)
-            {
-                _logger.LogWarning(
-                    "Sendgrid webhook body deserialization returned null. Body {Body}",
-                    rawBody);
-
-                return (new List<SendgridEventItem>(0), rawBody);
-            }
-
-            return (items, rawBody);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(
-                e,
-                "Failed to parse Sendgrid webhook body. Raw body: {RawBody}",
-                rawBody);
-
-            return (new List<SendgridEventItem>(0), rawBody);
-        }
-    }
-
-    private bool VerifySignature(
-        string signatureFromHeaders,
-        string requestBody,
-        string timestamp)
-    {
         var signatureFromConfigs = _configuration["SendGridWebhookSignature"];
         if (string.IsNullOrEmpty(signatureFromConfigs))
         {
             _logger.LogWarning("SendGridWebhookSignature is not configured");
-            return false;
-        }
-
-        if (string.IsNullOrEmpty(signatureFromHeaders) ||
-            string.IsNullOrEmpty(requestBody))
-        {
-            return false;
+            return new List<Event>(0);
         }
 
         try
         {
-            // Compute HMAC-SHA256 of the request body using the secret key
-            var keyBytes = Encoding.UTF8.GetBytes(signatureFromConfigs);
-            var bodyBytes = Encoding.UTF8.GetBytes(timestamp + requestBody);
+            var parser = new WebhookParser();
+            var events = await parser.ParseSignedEventsWebhookAsync(
+                Request.Body,
+                signatureFromConfigs,
+                signatureFromHeaders,
+                timestamp,
+                cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
-            using var hmac = new HMACSHA256(keyBytes);
-            var computedHashBytes = hmac.ComputeHash(bodyBytes);
-            var computedSignature = Convert.ToBase64String(computedHashBytes);
+            return events.ToList();
+        }
+        catch (SecurityException e)
+        {
+            _logger.LogError(
+                e,
+                "Security error during signed body verification");
 
-            // Compare the computed signature with the one from headers
-            return signatureFromHeaders.Equals(computedSignature, StringComparison.Ordinal);
+            return new List<Event>(0);
         }
         catch (Exception ex)
         {
             _logger.LogError(
                 ex,
-                "Error computing HMAC signature for webhook verification. Raw body: {RawBody}",
-                requestBody);
+                "General error during signed body verification");
 
-            return false;
+            return new List<Event>(0);
         }
     }
 }
