@@ -36,12 +36,13 @@ public class WebhooksController : ControllerBase
         CancellationToken cancellationToken)
     {
         var signature = Request.Headers[HeadersSignatureKey].ToString();
+        var timestamp = Request.Headers["X-Twilio-Email-Event-Webhook-Timestamp"].ToString();
 
         // Read body first for signature verification
         var (allItems, rawBody) = await TryParseBodyAsync(cancellationToken);
 
         // Verify signature using the raw body
-        if (!VerifySignature(signature, rawBody))
+        if (!VerifySignature(signature, rawBody, timestamp))
         {
             _logger.LogWarning(
                 "SendGrid webhook signature verification failed. Signature: {Signature}",
@@ -106,7 +107,8 @@ public class WebhooksController : ControllerBase
 
     private bool VerifySignature(
         string signatureFromHeaders,
-        string requestBody)
+        string requestBody,
+        string timestamp)
     {
         var signatureFromConfigs = _configuration["SendGridWebhookSignature"];
         if (string.IsNullOrEmpty(signatureFromConfigs))
@@ -125,7 +127,7 @@ public class WebhooksController : ControllerBase
         {
             // Compute HMAC-SHA256 of the request body using the secret key
             var keyBytes = Encoding.UTF8.GetBytes(signatureFromConfigs);
-            var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
+            var bodyBytes = Encoding.UTF8.GetBytes(timestamp + requestBody);
 
             using var hmac = new HMACSHA256(keyBytes);
             var computedHashBytes = hmac.ComputeHash(bodyBytes);
