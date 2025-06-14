@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -36,8 +37,11 @@ public class WebhooksController : ControllerBase
     {
         var signature = Request.Headers[HeadersSignatureKey].ToString();
 
-        // Verify signature
-        if (!VerifySignature(signature))
+        // Read body first for signature verification
+        var (allItems, rawBody) = await TryParseBodyAsync(cancellationToken);
+
+        // Verify signature using the raw body
+        if (!VerifySignature(signature, rawBody))
         {
             _logger.LogWarning(
                 "SendGrid webhook signature verification failed. Signature: {Signature}",
@@ -45,8 +49,6 @@ public class WebhooksController : ControllerBase
 
             return Ok();
         }
-
-        var (allItems, rawBody) = await TryParseBodyAsync(cancellationToken);
 
         var spamReportEvents = allItems
             .Where(x => x.Event == "spamreport")
@@ -103,7 +105,8 @@ public class WebhooksController : ControllerBase
     }
 
     private bool VerifySignature(
-        string signatureFromHeaders)
+        string signatureFromHeaders,
+        string requestBody)
     {
         var signatureFromConfigs = _configuration["SendGridWebhookSignature"];
         if (string.IsNullOrEmpty(signatureFromConfigs))
@@ -113,11 +116,28 @@ public class WebhooksController : ControllerBase
         }
 
         if (string.IsNullOrEmpty(signatureFromHeaders) ||
-            string.IsNullOrEmpty(signatureFromConfigs))
+            string.IsNullOrEmpty(requestBody))
         {
             return false;
         }
 
-        return signatureFromHeaders.Equals(signatureFromConfigs, StringComparison.InvariantCultureIgnoreCase);
+        try
+        {
+            // Compute HMAC-SHA256 of the request body using the secret key
+            var keyBytes = Encoding.UTF8.GetBytes(signatureFromConfigs);
+            var bodyBytes = Encoding.UTF8.GetBytes(requestBody);
+
+            using var hmac = new HMACSHA256(keyBytes);
+            var computedHashBytes = hmac.ComputeHash(bodyBytes);
+            var computedSignature = Convert.ToBase64String(computedHashBytes);
+
+            // Compare computed signature with the one from headers
+            return signatureFromHeaders.Equals(computedSignature, StringComparison.Ordinal);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error computing HMAC signature for webhook verification");
+            return false;
+        }
     }
 }
