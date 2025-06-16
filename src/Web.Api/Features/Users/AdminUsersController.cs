@@ -13,6 +13,7 @@ using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Users.Models;
+using Web.Api.Features.Users.SearchUsersForAdmin;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Users;
@@ -35,19 +36,24 @@ public class AdminUsersController : ControllerBase
 
     [HttpGet("")]
     public async Task<Pageable<UserDto>> All(
-        [FromQuery] PageModel pageParams = null)
+        [FromQuery] SearchUsersForAdminQueryParams queryParams = null)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin);
 
-        pageParams ??= PageModel.Default;
+        queryParams ??= new SearchUsersForAdminQueryParams();
+        
+        var emailFilter = queryParams.Email?.Trim().ToLowerInvariant();
+        
         return await _context.Users
             .AsNoTracking()
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
+            .When(queryParams.HasEmailFilter(), x => x.Email.ToLower().Contains(emailFilter))
+            .When(queryParams.HasUnsubscribeFilter(), x => x.UnsubscribeMeFromAll == queryParams.UnsubscribeMeFromAll.Value)
             .OrderBy(x => x.CreatedAt)
             .Select(UserDto.Transformation)
-            .AsPaginatedAsync(pageParams);
+            .AsPaginatedAsync(queryParams);
     }
 
     [HttpGet("{id:long}")]
