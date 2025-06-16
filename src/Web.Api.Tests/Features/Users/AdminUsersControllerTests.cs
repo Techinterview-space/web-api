@@ -105,4 +105,27 @@ public class AdminUsersControllerTests
         // Should return all 3 users (admin + 2 test users)
         Assert.Equal(3, result.Results.Count);
     }
+
+    [Fact]
+    public async Task All_WithEmptyEmailFilter_ReturnsAllActiveUsers()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var admin = await new UserFake(Role.Admin).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+        var controller = new AdminUsersController(
+            new FakeAuth(admin),
+            context);
+
+        var queryParams = new SearchUsersForAdminQueryParams
+        {
+            Email = ""  // Empty string should not filter
+        };
+
+        context.ChangeTracker.Clear();
+        var result = await controller.All(queryParams);
+        
+        // Should return all users since empty email filter is ignored
+        Assert.Equal(2, result.Results.Count);
+    }
 }

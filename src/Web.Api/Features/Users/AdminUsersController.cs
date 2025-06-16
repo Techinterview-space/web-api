@@ -49,7 +49,7 @@ public class AdminUsersController : ControllerBase
             .Include(x => x.UserRoles)
             .Include(x => x.Salaries)
             .Where(x => x.DeletedAt == null)
-            .When(queryParams.HasEmailFilter(), x => x.Email.ToLower().Contains(emailFilter))
+            .When(queryParams.HasEmailFilter(), x => x.Email != null && x.Email.ToLower().Contains(emailFilter))
             .When(queryParams.HasUnsubscribeFilter(), x => x.UnsubscribeMeFromAll == queryParams.UnsubscribeMeFromAll.Value)
             .OrderBy(x => x.CreatedAt)
             .Select(UserDto.Transformation)
