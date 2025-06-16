@@ -1,3 +1,4 @@
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
 using TestUtils.Auth;
@@ -30,9 +31,9 @@ public class AdminUsersControllerTests
 
         context.ChangeTracker.Clear();
         var result = await controller.All(queryParams);
-        
+
         Assert.Single(result.Results);
-        Assert.Equal(user1.Id, result.Results[0].Id);
+        Assert.Equal(user1.Id, result.Results.First().Id);
     }
 
     [Fact]
@@ -54,9 +55,9 @@ public class AdminUsersControllerTests
 
         context.ChangeTracker.Clear();
         var result = await controller.All(queryParams);
-        
+
         Assert.Single(result.Results);
-        Assert.Equal(user1.Id, result.Results[0].Id);
+        Assert.Equal(user1.Id, result.Results.First().Id);
     }
 
     [Fact]
@@ -80,9 +81,9 @@ public class AdminUsersControllerTests
 
         context.ChangeTracker.Clear();
         var result = await controller.All(queryParams);
-        
+
         Assert.Single(result.Results);
-        Assert.Equal(user1.Id, result.Results[0].Id);
+        Assert.Equal(user1.Id, result.Results.First().Id);
     }
 
     [Fact]
@@ -101,7 +102,7 @@ public class AdminUsersControllerTests
 
         context.ChangeTracker.Clear();
         var result = await controller.All(queryParams);
-        
+
         // Should return all 3 users (admin + 2 test users)
         Assert.Equal(3, result.Results.Count);
     }
@@ -119,12 +120,12 @@ public class AdminUsersControllerTests
 
         var queryParams = new SearchUsersForAdminQueryParams
         {
-            Email = ""  // Empty string should not filter
+            Email = string.Empty // Empty string should not filter
         };
 
         context.ChangeTracker.Clear();
         var result = await controller.All(queryParams);
-        
+
         // Should return all users since empty email filter is ignored
         Assert.Equal(2, result.Results.Count);
     }

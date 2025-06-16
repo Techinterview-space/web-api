@@ -41,9 +41,8 @@ public class AdminUsersController : ControllerBase
         await _auth.HasRoleOrFailAsync(Role.Admin);
 
         queryParams ??= new SearchUsersForAdminQueryParams();
-        
+
         var emailFilter = queryParams.Email?.Trim().ToLowerInvariant();
-        
         return await _context.Users
             .AsNoTracking()
             .Include(x => x.UserRoles)
