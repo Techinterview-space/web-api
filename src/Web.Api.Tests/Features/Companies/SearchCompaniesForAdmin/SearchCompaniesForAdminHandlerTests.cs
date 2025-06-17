@@ -42,58 +42,6 @@ public class SearchCompaniesForAdminHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithSearchQuery_ReturnsMatchingCompanies()
-    {
-        await using var context = new InMemoryDatabaseContext();
-        
-        var company1 = CreateAndSaveCompany(context, "Microsoft Corporation");
-        var company2 = CreateAndSaveCompany(context, "Google LLC");
-        var company3 = CreateAndSaveCompany(context, "Apple Inc");
-
-        var target = new SearchCompaniesForAdminHandler(context);
-
-        var queryParams = new SearchCompaniesForAdminQueryParams
-        {
-            Page = 1,
-            PageSize = 10,
-            SearchQuery = "Google"
-        };
-
-        var result = await target.Handle(queryParams, CancellationToken.None);
-
-        Assert.Single(result.Results);
-        Assert.Equal(1, result.TotalItems);
-        Assert.Equal(company2.Id, result.Results.First().Id);
-    }
-
-    [Fact]
-    public async Task Handle_WithBothFilters_ReturnsCompaniesMatchingBoth()
-    {
-        await using var context = new InMemoryDatabaseContext();
-        
-        var company1 = CreateAndSaveCompany(context, "Microsoft Corporation");
-        var company2 = CreateAndSaveCompany(context, "Microsoft Azure");
-        var company3 = CreateAndSaveCompany(context, "Google Microsoft");
-
-        var target = new SearchCompaniesForAdminHandler(context);
-
-        var queryParams = new SearchCompaniesForAdminQueryParams
-        {
-            Page = 1,
-            PageSize = 10,
-            SearchQuery = "Corporation",
-            CompanyName = "Microsoft"
-        };
-
-        var result = await target.Handle(queryParams, CancellationToken.None);
-
-        // Should match companies that contain both "Corporation" (SearchQuery) and "Microsoft" (CompanyName)
-        Assert.Single(result.Results);
-        Assert.Equal(1, result.TotalItems);
-        Assert.Equal(company1.Id, result.Results.First().Id);
-    }
-
-    [Fact]
     public async Task Handle_WithNoFilters_ReturnsAllCompanies()
     {
         await using var context = new InMemoryDatabaseContext();

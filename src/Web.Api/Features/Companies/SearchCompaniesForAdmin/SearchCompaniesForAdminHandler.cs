@@ -33,11 +33,9 @@ public class SearchCompaniesForAdminHandler
             ? MaxPageSize
             : request.PageSize;
 
-        var searchQuery = request.SearchQuery?.Trim().ToLowerInvariant();
         var companyNameFilter = request.CompanyName?.Trim().ToLowerInvariant();
         var companies = await _context.Companies
             .AsNoTracking()
-            .When(searchQuery?.Length >= 2, x => x.Name.ToLower().Contains(searchQuery))
             .When(request.HasCompanyNameFilter(), x => x.Name.ToLower().Contains(companyNameFilter))
             .OrderBy(x => x.Name)
             .AsPaginatedAsync(
