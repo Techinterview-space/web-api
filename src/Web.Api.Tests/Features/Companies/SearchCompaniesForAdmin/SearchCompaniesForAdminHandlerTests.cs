@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ public class SearchCompaniesForAdminHandlerTests
     public async Task Handle_WithCompanyNameFilter_ReturnsMatchingCompanies()
     {
         await using var context = new InMemoryDatabaseContext();
-        
+
         var company1 = CreateAndSaveCompany(context, "Microsoft Corporation");
         var company2 = CreateAndSaveCompany(context, "Google LLC");
         var company3 = CreateAndSaveCompany(context, "Microsoft Azure");
@@ -45,7 +45,7 @@ public class SearchCompaniesForAdminHandlerTests
     public async Task Handle_WithNoFilters_ReturnsAllCompanies()
     {
         await using var context = new InMemoryDatabaseContext();
-        
+
         var company1 = CreateAndSaveCompany(context, "Microsoft Corporation");
         var company2 = CreateAndSaveCompany(context, "Google LLC");
         var company3 = CreateAndSaveCompany(context, "Apple Inc");
@@ -68,7 +68,7 @@ public class SearchCompaniesForAdminHandlerTests
     public async Task Handle_WithEmptyCompanyNameFilter_IgnoresFilter()
     {
         await using var context = new InMemoryDatabaseContext();
-        
+
         var company1 = CreateAndSaveCompany(context, "Microsoft Corporation");
         var company2 = CreateAndSaveCompany(context, "Google LLC");
 
@@ -78,7 +78,7 @@ public class SearchCompaniesForAdminHandlerTests
         {
             Page = 1,
             PageSize = 10,
-            CompanyName = ""
+            CompanyName = string.Empty
         };
 
         var result = await target.Handle(queryParams, CancellationToken.None);
@@ -91,7 +91,7 @@ public class SearchCompaniesForAdminHandlerTests
     public async Task Handle_CompanyNameFilter_IsCaseInsensitive()
     {
         await using var context = new InMemoryDatabaseContext();
-        
+
         var company1 = CreateAndSaveCompany(context, "Microsoft Corporation");
         var company2 = CreateAndSaveCompany(context, "Google LLC");
 
@@ -113,7 +113,7 @@ public class SearchCompaniesForAdminHandlerTests
 
     private static Company CreateAndSaveCompany(InMemoryDatabaseContext context, string name)
     {
-        var company = new Company(name, "Test description", new List<string>(), "");
+        var company = new Company(name, "Test description", new List<string>(), string.Empty);
         var entry = context.Companies.Add(company);
         context.SaveChanges();
         return entry.Entity;
