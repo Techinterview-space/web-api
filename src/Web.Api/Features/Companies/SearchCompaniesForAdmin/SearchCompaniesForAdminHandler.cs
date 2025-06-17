@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Domain.Validation;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Database;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Companies.Dtos;
 
