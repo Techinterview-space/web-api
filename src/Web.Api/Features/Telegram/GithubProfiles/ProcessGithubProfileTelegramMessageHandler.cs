@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Mediator;
@@ -48,52 +47,11 @@ public class ProcessGithubProfileTelegramMessageHandler
         var username = messageText.TrimStart('@');
         if (!string.IsNullOrEmpty(username))
         {
-            try
-            {
-                var githubClient = new GitHubClient(new ProductHeaderValue("techinterview.space"));
-                var user = await githubClient.User.Get(username);
-                
-                // Get extended profile data
-                var extendedData = await GetExtendedGitHubProfileDataAsync(githubClient, username, cancellationToken);
-                
-                textToSend = $"Hello, {user.Name}!\n\n" +
-                             $"Your GitHub profile: {user.HtmlUrl}\n" +
-                             $"Followers: {user.Followers}\n" +
-                             $"Following: {user.Following}\n" +
-                             $"Public Repos: {user.PublicRepos}\n" +
-                             $"Private repos: {user.TotalPrivateRepos}\n" +
-                             extendedData;
-            }
-            catch (NotFoundException notFoundEx)
-            {
-                _logger.LogWarning(
-                    notFoundEx,
-                    "GitHub user not found: {Username}. Exception: {Exception}",
-                    username,
-                    notFoundEx.Message);
+            var (userData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
+                username,
+                cancellationToken);
 
-                textToSend = "GitHub user not found. Please provide a valid GitHub username in the format: @username or username";
-            }
-            catch (RateLimitExceededException rateLimitEx)
-            {
-                _logger.LogWarning(
-                    rateLimitEx,
-                    "GitHub API rate limit exceeded for user: {Username}. Exception: {Exception}",
-                    username,
-                    rateLimitEx.Message);
-
-                textToSend = "GitHub API rate limit exceeded. Please try again later.";
-            }
-            catch (Exception e)
-            {
-                _logger.LogWarning(
-                    e,
-                    "An error occurred while processing GitHub profile for user: {Username}. Exception: {Exception}",
-                    username,
-                    e.Message);
-
-                textToSend = "An error occurred while processing your request. Please try again later.";
-            }
+            textToSend = userData?.GetTelegramFormattedText() ?? errorReplyTextOrNull;
         }
         else
         {
@@ -141,8 +99,8 @@ public class ProcessGithubProfileTelegramMessageHandler
         {
             textToSend =
                 "Welcome to the GitHub Profile Bot! " +
-                 "You can get information about a GitHub user by sending their username in the format: @username or username. " +
-                 "For example, send @octocat to get information about the user 'octocat'. \n\n" +
+                 "You can get information about a GitHub user by sending their username in the format: @@username or username. " +
+                 "For example, send @@octocat to get information about the user 'octocat'. \n\n" +
                  "If you have any question, feel free to drop a message to @maximgorbatyuk";
 
             await request.BotClient.SendMessage(
@@ -159,62 +117,69 @@ public class ProcessGithubProfileTelegramMessageHandler
         return textToSend;
     }
 
-    private async Task<string> GetExtendedGitHubProfileDataAsync(
-        GitHubClient githubClient, 
-        string username, 
+    private async Task<(GithubProfileData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
+        string username,
         CancellationToken cancellationToken)
     {
         try
         {
-            string issuesCount = "N/A", prsCount = "N/A", totalStars = "N/A", forksCount = "N/A";
+            var githubClient = new GitHubClient(new ProductHeaderValue("techinterview.space"));
+            var user = await githubClient.User.Get(username);
 
             // Start all tasks concurrently to minimize API calls
-            var reposTask = githubClient.Repository.GetAllForUser(username);
-            
-            var issueSearchRequest = new SearchIssuesRequest
-            {
-                Author = username,
-                Type = IssueTypeQualifier.Issue
-            };
-            var issuesTask = githubClient.Search.SearchIssues(issueSearchRequest);
+            var repos = await githubClient.Repository.GetAllForUser(username);
 
-            var prSearchRequest = new SearchIssuesRequest
-            {
-                Author = username,
-                Type = IssueTypeQualifier.PullRequest
-            };
-            var prsTask = githubClient.Search.SearchIssues(prSearchRequest);
+            var issuesResult = await githubClient.Search.SearchIssues(
+                new SearchIssuesRequest
+                {
+                    Author = username,
+                    Type = IssueTypeQualifier.Issue
+                });
 
-            // Wait for all tasks to complete
-            await Task.WhenAll(reposTask, issuesTask, prsTask);
+            var prsResult = await githubClient.Search.SearchIssues(
+                new SearchIssuesRequest
+                {
+                    Author = username,
+                    Type = IssueTypeQualifier.PullRequest
+                });
 
-            // Process repositories data
-            var repos = await reposTask;
-            totalStars = repos.Sum(r => r.StargazersCount).ToString();
-            forksCount = repos.Count(r => r.Fork).ToString();
+            var userData = new GithubProfileData(
+                user,
+                repos,
+                issuesResult,
+                prsResult);
 
-            // Process search results
-            var issuesResult = await issuesTask;
-            issuesCount = issuesResult.TotalCount.ToString();
-
-            var prsResult = await prsTask;
-            prsCount = prsResult.TotalCount.ToString();
-
-            return $"\n\n<b>Additional Stats:</b>\n" +
-                   $"Issues created: {issuesCount}\n" +
-                   $"Pull requests: {prsCount}\n" +
-                   $"Total stars received: {totalStars}\n" +
-                   $"Repositories forked: {forksCount}\n";
+            return (userData, null);
         }
-        catch (RateLimitExceededException)
+        catch (NotFoundException notFoundEx)
         {
-            // Re-throw rate limit exceptions to be handled by the main handler
-            throw;
+            _logger.LogWarning(
+                notFoundEx,
+                "GitHub user not found: {Username}. Exception: {Exception}",
+                username,
+                notFoundEx.Message);
+
+            return (null, "GitHub user not found. Please provide a valid GitHub username in the format: @@username or username");
         }
-        catch (Exception ex)
+        catch (RateLimitExceededException rateLimitEx)
         {
-            _logger.LogWarning(ex, "Failed to get extended GitHub profile data for user: {Username}", username);
-            return "\n\n<i>Extended stats temporarily unavailable</i>\n";
+            _logger.LogWarning(
+                rateLimitEx,
+                "GitHub API rate limit exceeded for user: {Username}. Exception: {Exception}",
+                username,
+                rateLimitEx.Message);
+
+            return (null, "GitHub API rate limit exceeded. Please try again later.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(
+                e,
+                "An error occurred while processing GitHub profile for user: {Username}. Exception: {Exception}",
+                username,
+                e.Message);
+
+            return (null, "An error occurred while processing your request. Please try again later.");
         }
     }
 }
