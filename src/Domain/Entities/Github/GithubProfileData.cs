@@ -1,14 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Octokit;
-
-namespace Web.Api.Features.Telegram.GithubProfiles;
+﻿namespace Domain.Entities.Github;
 
 public record GithubProfileData
 {
     public string Name { get; init; }
 
-    public string Username => HtmlUrl.Split('/').LastOrDefault() ?? string.Empty;
+    public string Username { get; init; }
 
     public string HtmlUrl { get; init; }
 
@@ -42,39 +38,6 @@ public record GithubProfileData
     {
     }
 
-    public GithubProfileData(
-        Octokit.User user,
-        IReadOnlyList<Octokit.Repository> repositories,
-        SearchIssuesResult issuesResult,
-        SearchIssuesResult prsResult,
-        int commitsCount,
-        int filesAdjusted,
-        int changesInFilesCount,
-        int additionsInFilesCount,
-        int deletionsInFilesCount)
-    {
-        Name = user.Name;
-        HtmlUrl = user.HtmlUrl;
-        Followers = user.Followers;
-        Following = user.Following;
-        PublicRepos = user.PublicRepos;
-        TotalPrivateRepos = user.TotalPrivateRepos;
-
-        CountOfStarredRepos = repositories.Count > 0
-            ? repositories
-                .Sum(r => r.StargazersCount)
-            : 0;
-
-        CountOfForkedRepos = repositories.Count(r => r.Fork);
-
-        IssuesOpenedByUser = issuesResult.TotalCount;
-        PullRequestsCreatedByUser = prsResult.TotalCount;
-        CommitsCount = commitsCount;
-        ChangesInFilesCount = changesInFilesCount;
-        AdditionsInFilesCount = additionsInFilesCount;
-        DeletionsInFilesCount = deletionsInFilesCount;
-    }
-
     public string GetTelegramFormattedText()
     {
         return $"Github stats for <b>{Username}</b> ({Name}):\n" +
@@ -95,5 +58,4 @@ public record GithubProfileData
                $"Lines removed: <b>{DeletionsInFilesCount}</b>\n\n" +
                $"<em>Stats sent by @github_profile_bot</em>";
     }
-
 }

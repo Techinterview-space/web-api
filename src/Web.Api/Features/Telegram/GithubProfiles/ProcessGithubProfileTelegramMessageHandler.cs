@@ -118,7 +118,7 @@ public class ProcessGithubProfileTelegramMessageHandler
         return textToSend;
     }
 
-    private async Task<(GithubProfileData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
+    private async Task<(GithubProfileDataBasedOnOctokitData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
         string username,
         CancellationToken cancellationToken)
     {
@@ -139,7 +139,7 @@ public class ProcessGithubProfileTelegramMessageHandler
             {
                 var commitsResult = await githubClient.Repository.Commit.GetAll(
                     username,
-                    repo.FullName,
+                    repo.Name,
                     new CommitRequest
                     {
                         Author = username,
@@ -173,7 +173,7 @@ public class ProcessGithubProfileTelegramMessageHandler
                     Type = IssueTypeQualifier.PullRequest
                 });
 
-            var userData = new GithubProfileData(
+            var userData = new GithubProfileDataBasedOnOctokitData(
                 user,
                 repos,
                 issuesResult,
