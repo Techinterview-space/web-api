@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Mediator;
@@ -51,12 +53,17 @@ public class ProcessGithubProfileTelegramMessageHandler
             {
                 var githubClient = new GitHubClient(new ProductHeaderValue("techinterview.space"));
                 var user = await githubClient.User.Get(username);
+                
+                // Get extended profile data
+                var extendedData = await GetExtendedGitHubProfileDataAsync(githubClient, username, cancellationToken);
+                
                 textToSend = $"Hello, {user.Name}!\n\n" +
                              $"Your GitHub profile: {user.HtmlUrl}\n" +
                              $"Followers: {user.Followers}\n" +
                              $"Following: {user.Following}\n" +
                              $"Public Repos: {user.PublicRepos}\n" +
-                             $"Private repos: {user.TotalPrivateRepos}\n";
+                             $"Private repos: {user.TotalPrivateRepos}\n" +
+                             extendedData;
             }
             catch (NotFoundException notFoundEx)
             {
@@ -151,5 +158,70 @@ public class ProcessGithubProfileTelegramMessageHandler
         }
 
         return textToSend;
+    }
+
+    private async Task<string> GetExtendedGitHubProfileDataAsync(
+        GitHubClient githubClient, 
+        string username, 
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var extendedDataTasks = new List<Task>();
+            string issuesCount = "N/A", prsCount = "N/A", totalStars = "N/A", forksCount = "N/A";
+
+            // Get user's repositories to calculate total stars and forks
+            var reposTask = githubClient.Repository.GetAllForUser(username);
+            extendedDataTasks.Add(reposTask);
+
+            // Search for issues created by user
+            var issueSearchRequest = new SearchIssuesRequest
+            {
+                Author = username,
+                Type = IssueTypeQualifier.Issue
+            };
+            var issuesTask = githubClient.Search.SearchIssues(issueSearchRequest);
+            extendedDataTasks.Add(issuesTask);
+
+            // Search for pull requests created by user  
+            var prSearchRequest = new SearchIssuesRequest
+            {
+                Author = username,
+                Type = IssueTypeQualifier.PullRequest
+            };
+            var prsTask = githubClient.Search.SearchIssues(prSearchRequest);
+            extendedDataTasks.Add(prsTask);
+
+            // Wait for all tasks to complete with timeout protection
+            await Task.WhenAll(extendedDataTasks);
+
+            // Process repositories data
+            var repos = await reposTask;
+            totalStars = repos.Sum(r => r.StargazersCount).ToString();
+            forksCount = repos.Count(r => r.Fork).ToString();
+
+            // Process search results
+            var issuesResult = await issuesTask;
+            issuesCount = issuesResult.TotalCount.ToString();
+
+            var prsResult = await prsTask;
+            prsCount = prsResult.TotalCount.ToString();
+
+            return $"\n\n<b>Additional Stats:</b>\n" +
+                   $"Issues created: {issuesCount}\n" +
+                   $"Pull requests: {prsCount}\n" +
+                   $"Total stars received: {totalStars}\n" +
+                   $"Repositories forked: {forksCount}\n";
+        }
+        catch (RateLimitExceededException)
+        {
+            // Re-throw rate limit exceptions to be handled by the main handler
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to get extended GitHub profile data for user: {Username}", username);
+            return "\n\n<i>Extended stats temporarily unavailable</i>\n";
+        }
     }
 }
