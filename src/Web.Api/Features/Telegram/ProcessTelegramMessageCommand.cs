@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace Web.Api.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram;
 
 public record ProcessTelegramMessageCommand
 {

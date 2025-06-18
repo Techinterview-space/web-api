@@ -49,6 +49,7 @@ public static class ServiceRegistration
             .AddTransient<ISalariesTelegramBotClientProvider, SalariesTelegramBotClientProvider>()
             .AddTransient<IGithubProfileBotProvider, GithubProfileBotProvider>()
             .AddTransient<SalariesTelegramBotHostedService>()
+            .AddTransient<GithubProfileBotHostedService>()
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
             .AddTransient<StatDataChangeSubscriptionService>()

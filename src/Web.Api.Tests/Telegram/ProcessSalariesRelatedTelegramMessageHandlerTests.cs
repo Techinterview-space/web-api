@@ -15,13 +15,14 @@ using Telegram.Bot.Types.Enums;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using TestUtils.Mocks;
-using Web.Api.Features.Telegram.ProcessMessage;
+using Web.Api.Features.Telegram;
+using Web.Api.Features.Telegram.ProcessSalariesRelatedMessage;
 using Web.Api.Tests.Mocks;
 using Xunit;
 
 namespace Web.Api.Tests.Telegram
 {
-    public class ProcessTelegramMessageCommandTests
+    public class ProcessSalariesRelatedTelegramMessageHandlerTests
     {
         public const string ProcessMessage1 = "Зарплаты специалистов IT в Казахстане по грейдам:\n\n" +
                                               "Джуны: <b>2,222</b> тг. (~5$)\n" +
@@ -61,13 +62,13 @@ namespace Web.Api.Tests.Telegram
                 DeveloperGrade.Lead,
                 [10111.10, 11111.11, 12222.12]);
 
-            var logger = new Mock<ILogger<ProcessTelegramMessageHandler>>();
+            var logger = new Mock<ILogger<ProcessSalariesRelatedTelegramMessageHandler>>();
             var currencyService = new CurrenciesServiceFake();
 
             using var mockedCache = Create.MockedMemoryCache();
             var telegramBotClient = new Mock<ITelegramBotClient>();
 
-            var processTelegramMessageHandler = new ProcessTelegramMessageHandler(
+            var processTelegramMessageHandler = new ProcessSalariesRelatedTelegramMessageHandler(
                 logger.Object,
                 currencyService,
                 context,
@@ -105,13 +106,13 @@ namespace Web.Api.Tests.Telegram
             await using var context = new InMemoryDatabaseContext();
             var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
 
-            var logger = new Mock<ILogger<ProcessTelegramMessageHandler>>();
+            var logger = new Mock<ILogger<ProcessSalariesRelatedTelegramMessageHandler>>();
             var currencyService = new CurrenciesServiceFake();
 
             using var mockedCache = Create.MockedMemoryCache();
             var telegramBotClient = new Mock<ITelegramBotClient>();
 
-            var processTelegramMessageHandler = new ProcessTelegramMessageHandler(
+            var processTelegramMessageHandler = new ProcessSalariesRelatedTelegramMessageHandler(
                 logger.Object,
                 currencyService,
                 context,

@@ -47,6 +47,9 @@ public class AppInitializeService : IHostedService
 
         var telegramService = scope.ServiceProvider.GetRequiredService<SalariesTelegramBotHostedService>();
         telegramService.StartReceiving(cancellationToken);
+
+        var githubProfileService = scope.ServiceProvider.GetRequiredService<GithubProfileBotHostedService>();
+        githubProfileService.StartReceiving(cancellationToken);
     }
 
     private static async Task MigrateAsync(
