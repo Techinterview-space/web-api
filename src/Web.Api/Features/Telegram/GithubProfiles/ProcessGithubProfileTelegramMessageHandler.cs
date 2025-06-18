@@ -31,10 +31,21 @@ public class ProcessGithubProfileTelegramMessageHandler
             return string.Empty;
         }
 
-        string textToSend;
+        var messageText = message.Text?.Trim();
+        var textToSend = await ProcessSimpleTextAsync(
+            message,
+            messageText,
+            request,
+            cancellationToken);
 
-        var username = message.Text?.Trim().TrimStart('@');
-        if (string.IsNullOrEmpty(username))
+        if (textToSend is not null ||
+            messageText is null)
+        {
+            return textToSend;
+        }
+
+        var username = messageText.TrimStart('@');
+        if (!string.IsNullOrEmpty(username))
         {
             try
             {
@@ -92,6 +103,52 @@ public class ProcessGithubProfileTelegramMessageHandler
                 MessageId = message.MessageId,
             },
             cancellationToken: cancellationToken);
+
+        return textToSend;
+    }
+
+    private async Task<string> ProcessSimpleTextAsync(
+        Message message,
+        string messageText,
+        ProcessTelegramMessageCommand request,
+        CancellationToken cancellationToken)
+    {
+        string textToSend = null;
+        if (string.IsNullOrWhiteSpace(messageText))
+        {
+            textToSend = "Please provide a valid GitHub username in the format: @username or username";
+
+            await request.BotClient.SendMessage(
+                message.Chat.Id,
+                textToSend,
+                parseMode: ParseMode.Html,
+                replyParameters: new ReplyParameters
+                {
+                    MessageId = message.MessageId,
+                },
+                cancellationToken: cancellationToken);
+
+            return textToSend;
+        }
+
+        if (messageText is "/start" or "/help")
+        {
+            textToSend =
+                "Welcome to the GitHub Profile Bot! " +
+                 "You can get information about a GitHub user by sending their username in the format: @username or username. " +
+                 "For example, send @octocat to get information about the user 'octocat'. \n\n" +
+                 "If you have any question, feel free to drop a message to @maximgorbatyuk";
+
+            await request.BotClient.SendMessage(
+                message.Chat.Id,
+                textToSend,
+                parseMode: ParseMode.Html,
+                replyParameters: new ReplyParameters
+                {
+                    MessageId = message.MessageId,
+                },
+                cancellationToken: cancellationToken);
+        }
 
         return textToSend;
     }
