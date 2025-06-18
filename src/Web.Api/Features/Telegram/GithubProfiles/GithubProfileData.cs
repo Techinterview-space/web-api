@@ -28,6 +28,16 @@ public record GithubProfileData
 
     public int CountOfForkedRepos { get; init; }
 
+    public int CommitsCount { get; init; }
+
+    public int FilesAdjusted { get; init; }
+
+    public int ChangesInFilesCount { get; init; }
+
+    public int AdditionsInFilesCount { get; init; }
+
+    public int DeletionsInFilesCount { get; init; }
+
     public GithubProfileData()
     {
     }
@@ -36,7 +46,12 @@ public record GithubProfileData
         Octokit.User user,
         IReadOnlyList<Octokit.Repository> repositories,
         SearchIssuesResult issuesResult,
-        SearchIssuesResult prsResult)
+        SearchIssuesResult prsResult,
+        int commitsCount,
+        int filesAdjusted,
+        int changesInFilesCount,
+        int additionsInFilesCount,
+        int deletionsInFilesCount)
     {
         Name = user.Name;
         HtmlUrl = user.HtmlUrl;
@@ -54,6 +69,10 @@ public record GithubProfileData
 
         IssuesOpenedByUser = issuesResult.TotalCount;
         PullRequestsCreatedByUser = prsResult.TotalCount;
+        CommitsCount = commitsCount;
+        ChangesInFilesCount = changesInFilesCount;
+        AdditionsInFilesCount = additionsInFilesCount;
+        DeletionsInFilesCount = deletionsInFilesCount;
     }
 
     public string GetTelegramFormattedText()
@@ -66,7 +85,14 @@ public record GithubProfileData
                $"Issues created: <b>{IssuesOpenedByUser}</b>\n" +
                $"Pull requests: <b>{PullRequestsCreatedByUser}</b>\n" +
                $"Total stars received: <b>{CountOfStarredRepos}</b>\n" +
-               $"Repositories forked: <b>{CountOfForkedRepos}</b>\n\n" +
+               $"Repositories forked: <b>{CountOfForkedRepos}</b>\n" +
+               $"----\n" +
+               $"Stats for last 6 month:\n" +
+               $"Commits made: <b>{CommitsCount}</b>\n" +
+               $"Files adjusted: <b>{FilesAdjusted}</b>\n" +
+               $"Lines changed: <b>{ChangesInFilesCount}</b>\n" +
+               $"Lines added: <b>{AdditionsInFilesCount}</b>\n" +
+               $"Lines removed: <b>{DeletionsInFilesCount}</b>\n\n" +
                $"<em>Stats sent by @github_profile_bot</em>";
     }
 

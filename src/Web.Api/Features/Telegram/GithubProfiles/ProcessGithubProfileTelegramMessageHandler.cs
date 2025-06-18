@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Mediator;
@@ -128,6 +129,35 @@ public class ProcessGithubProfileTelegramMessageHandler
 
             // Start all tasks concurrently to minimize API calls
             var repos = await githubClient.Repository.GetAllForUser(username);
+            var commitsCount = 0;
+            var filesAdjusted = 0;
+            var changesInFilesCount = 0;
+            var additionsInFilesCount = 0;
+            var deletionsInFilesCount = 0;
+
+            foreach (var repo in repos)
+            {
+                var commitsResult = await githubClient.Repository.Commit.GetAll(
+                    username,
+                    repo.FullName,
+                    new CommitRequest
+                    {
+                        Author = username,
+                        Since = DateTimeOffset.UtcNow.AddMonths(-6),
+                    });
+
+                commitsCount += commitsResult.Count;
+                foreach (var commit in commitsResult)
+                {
+                    filesAdjusted += commit.Files.Count;
+                    foreach (var commitFile in commit.Files)
+                    {
+                        changesInFilesCount += commitFile.Changes;
+                        additionsInFilesCount += commitFile.Additions;
+                        deletionsInFilesCount += commitFile.Deletions;
+                    }
+                }
+            }
 
             var issuesResult = await githubClient.Search.SearchIssues(
                 new SearchIssuesRequest
@@ -147,7 +177,12 @@ public class ProcessGithubProfileTelegramMessageHandler
                 user,
                 repos,
                 issuesResult,
-                prsResult);
+                prsResult,
+                commitsCount,
+                filesAdjusted,
+                changesInFilesCount,
+                additionsInFilesCount,
+                deletionsInFilesCount);
 
             return (userData, null);
         }
