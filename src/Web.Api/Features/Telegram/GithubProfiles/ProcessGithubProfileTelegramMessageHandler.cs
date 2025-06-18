@@ -99,8 +99,8 @@ public class ProcessGithubProfileTelegramMessageHandler
         {
             textToSend =
                 "Welcome to the GitHub Profile Bot! " +
-                 "You can get information about a GitHub user by sending their username in the format: @@username or username. " +
-                 "For example, send @@octocat to get information about the user 'octocat'. \n\n" +
+                 "You can get information about a GitHub user by sending their username in the format: <pre>@username</pre> or <pre>username</pre>. " +
+                 "For example, send <pre>@octocat</pre> to get information about the user 'octocat'. \n\n" +
                  "If you have any question, feel free to drop a message to @maximgorbatyuk";
 
             await request.BotClient.SendMessage(
@@ -133,7 +133,7 @@ public class ProcessGithubProfileTelegramMessageHandler
                 new SearchIssuesRequest
                 {
                     Author = username,
-                    Type = IssueTypeQualifier.Issue
+                    Type = IssueTypeQualifier.Issue,
                 });
 
             var prsResult = await githubClient.Search.SearchIssues(

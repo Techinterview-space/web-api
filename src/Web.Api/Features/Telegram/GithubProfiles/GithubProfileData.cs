@@ -28,6 +28,10 @@ public record GithubProfileData
 
     public int CountOfForkedRepos { get; init; }
 
+    public GithubProfileData()
+    {
+    }
+
     public GithubProfileData(
         Octokit.User user,
         IReadOnlyList<Octokit.Repository> repositories,
@@ -54,7 +58,7 @@ public record GithubProfileData
 
     public string GetTelegramFormattedText()
     {
-        return $"{Name} (@{Username})\n\n" +
+        return $"Github stats for <b>{Username}</b> ({Name}):\n" +
                $"<em><a href=\"{HtmlUrl}\">Profile URL</a></em>\n\n" +
                $"Followers: <b>{Followers}</b>\n" +
                $"Following: <b>{Following}</b>\n" +
@@ -62,7 +66,8 @@ public record GithubProfileData
                $"Issues created: <b>{IssuesOpenedByUser}</b>\n" +
                $"Pull requests: <b>{PullRequestsCreatedByUser}</b>\n" +
                $"Total stars received: <b>{CountOfStarredRepos}</b>\n" +
-               $"Repositories forked: <b>{CountOfForkedRepos}</b>";
+               $"Repositories forked: <b>{CountOfForkedRepos}</b>\n\n" +
+               $"<em>Stats sent by @github_profile_bot</em>";
     }
 
 }
