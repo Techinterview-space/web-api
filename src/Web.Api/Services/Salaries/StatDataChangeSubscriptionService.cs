@@ -29,6 +29,7 @@ public class StatDataChangeSubscriptionService
 {
     public const string SalariesPageUrl = "techinterview.space/salaries";
     public const int CountOfDaysToSendMonthlyNotification = 24;
+    public const int PercentToShowDifference = 1;
 
     private readonly DatabaseContext _context;
     private readonly ICurrencyService _currencyService;
@@ -148,7 +149,7 @@ public class StatDataChangeSubscriptionService
                 {
                     var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
 
-                    if (diffInPercent is > 0 or < 0)
+                    if (diffInPercent is >= PercentToShowDifference or <= -PercentToShowDifference)
                     {
                         hasAnyDifference = true;
 
@@ -175,24 +176,26 @@ public class StatDataChangeSubscriptionService
                 calculatedBasedOnLine += $" (+{subscriptionData.TotalSalaryCount - lastCacheItemOrNull.Data.TotalSalaryCount})";
             }
 
-            if (subscription.Regularity is SubscriptionRegularityType.Weekly &&
-                !hasAnyDifference &&
-                subscription.PreventNotificationIfNoDifference &&
+            if (subscription.Regularity is SubscriptionRegularityType.Monthly &&
                 !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification))
             {
                 _logger.LogInformation(
-                    "No difference in salaries for subscription weekly {SubscriptionId} ({Name}). Skipping notification.",
+                    "Monthly subscription {SubscriptionId} ({Name}) will be skipped due to dates",
                     subscription.Id,
                     subscription.Name);
 
                 continue;
             }
 
-            if (subscription.Regularity is SubscriptionRegularityType.Monthly &&
-                !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification))
+            var skipWeeklyNotification = subscription.Regularity is SubscriptionRegularityType.Weekly &&
+                                         !hasAnyDifference &&
+                                         subscription.PreventNotificationIfNoDifference &&
+                                         !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification);
+
+            if (skipWeeklyNotification)
             {
                 _logger.LogInformation(
-                    "Monthly subscription {SubscriptionId} ({Name}) will be skipped due to dates",
+                    "No difference in salaries for subscription weekly {SubscriptionId} ({Name}). Skipping notification.",
                     subscription.Id,
                     subscription.Name);
 
