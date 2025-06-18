@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -127,40 +128,43 @@ public class ProcessGithubProfileTelegramMessageHandler
             var githubClient = new GitHubClient(new ProductHeaderValue("techinterview.space"));
             var user = await githubClient.User.Get(username);
 
-            // Start all tasks concurrently to minimize API calls
-            var repos = await githubClient.Repository.GetAllForUser(username);
             var commitsCount = 0;
             var filesAdjusted = 0;
             var changesInFilesCount = 0;
             var additionsInFilesCount = 0;
             var deletionsInFilesCount = 0;
 
-            foreach (var repo in repos)
+            var userOrganizations = await githubClient.Organization.GetAllForUser(username);
+            foreach (var userOrganization in userOrganizations)
             {
-                var commitsResult = await githubClient.Repository.Commit.GetAll(
+                var userOrganizationRepositories = await githubClient.Repository.GetAllForOrg(userOrganization.Name);
+                var orgRepoStats = await CalculateRepositoriesStatsAsync(
+                    userOrganizationRepositories,
                     username,
-                    repo.Name,
-                    new CommitRequest
-                    {
-                        Author = username,
-                        Since = DateTimeOffset.UtcNow.AddMonths(-6),
-                    });
+                    githubClient,
+                    cancellationToken);
 
-                commitsCount += commitsResult.Count;
-                foreach (var commit in commitsResult)
-                {
-                    filesAdjusted += commit.Files?.Count ?? 0;
-                    if (commit.Files != null && commit.Files.Count > 0)
-                    {
-                        foreach (var commitFile in commit.Files)
-                        {
-                            changesInFilesCount += commitFile.Changes;
-                            additionsInFilesCount += commitFile.Additions;
-                            deletionsInFilesCount += commitFile.Deletions;
-                        }
-                    }
-                }
+                commitsCount += orgRepoStats.CommitsCount;
+                filesAdjusted += orgRepoStats.FilesAdjusted;
+                changesInFilesCount += orgRepoStats.ChangesInFilesCount;
+                additionsInFilesCount += orgRepoStats.AdditionsInFilesCount;
+                deletionsInFilesCount += orgRepoStats.DeletionsInFilesCount;
             }
+
+            // Start all tasks concurrently to minimize API calls
+            var userRepositories = await githubClient.Repository.GetAllForUser(username);
+
+            var userRepositoriesStats = await CalculateRepositoriesStatsAsync(
+                userRepositories,
+                username,
+                githubClient,
+                cancellationToken);
+
+            commitsCount += userRepositoriesStats.CommitsCount;
+            filesAdjusted += userRepositoriesStats.FilesAdjusted;
+            changesInFilesCount += userRepositoriesStats.ChangesInFilesCount;
+            additionsInFilesCount += userRepositoriesStats.AdditionsInFilesCount;
+            deletionsInFilesCount += userRepositoriesStats.DeletionsInFilesCount;
 
             var issuesResult = await githubClient.Search.SearchIssues(
                 new SearchIssuesRequest
@@ -178,7 +182,7 @@ public class ProcessGithubProfileTelegramMessageHandler
 
             var userData = new GithubProfileDataBasedOnOctokitData(
                 user,
-                repos,
+                userRepositories,
                 issuesResult,
                 prsResult,
                 commitsCount,
@@ -219,5 +223,52 @@ public class ProcessGithubProfileTelegramMessageHandler
 
             return (null, "An error occurred while processing your request. Please try again later.");
         }
+    }
+
+    private async Task<RepositoryChangesStats> CalculateRepositoriesStatsAsync(
+        IReadOnlyList<Repository> repositories,
+        string username,
+        GitHubClient gitHubClient,
+        CancellationToken cancellationToken)
+    {
+        var commitsCount = 0;
+        var filesAdjusted = 0;
+        var changesInFilesCount = 0;
+        var additionsInFilesCount = 0;
+        var deletionsInFilesCount = 0;
+
+        foreach (var repo in repositories)
+        {
+            var commitsResult = await gitHubClient.Repository.Commit.GetAll(
+                username,
+                repo.Name,
+                new CommitRequest
+                {
+                    Author = username,
+                    Since = DateTimeOffset.UtcNow.AddMonths(-6),
+                });
+
+            commitsCount += commitsResult.Count;
+            foreach (var commit in commitsResult)
+            {
+                filesAdjusted += commit.Files?.Count ?? 0;
+                if (commit.Files != null && commit.Files.Count > 0)
+                {
+                    foreach (var commitFile in commit.Files)
+                    {
+                        changesInFilesCount += commitFile.Changes;
+                        additionsInFilesCount += commitFile.Additions;
+                        deletionsInFilesCount += commitFile.Deletions;
+                    }
+                }
+            }
+        }
+
+        return new RepositoryChangesStats(
+            commitsCount,
+            filesAdjusted,
+            changesInFilesCount,
+            additionsInFilesCount,
+            deletionsInFilesCount);
     }
 }
