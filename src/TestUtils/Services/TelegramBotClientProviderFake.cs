@@ -1,12 +1,13 @@
 ﻿using System.Threading;
 using Infrastructure.Services.Telegram;
+using Infrastructure.Services.Telegram.Salaries;
 using Moq;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
 namespace TestUtils.Services;
 
-public class TelegramBotClientProviderFake : ITelegramBotClientProvider
+public class TelegramBotClientProviderFake : ISalariesTelegramBotClientProvider
 {
     private readonly Mock<ITelegramBotClient> _telegramBotClient;
 

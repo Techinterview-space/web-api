@@ -14,6 +14,7 @@ using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.ReplyMessages;
+using Infrastructure.Services.Telegram.Salaries;
 using Infrastructure.Services.Telegram.UserCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -33,7 +34,7 @@ public class StatDataChangeSubscriptionService
     private readonly ICurrencyService _currencyService;
     private readonly IProfessionsCacheService _professionsCacheService;
     private readonly IGlobal _global;
-    private readonly ITelegramBotClientProvider _botClientProvider;
+    private readonly ISalariesTelegramBotClientProvider _botClientProvider;
     private readonly ILogger<StatDataChangeSubscriptionService> _logger;
 
     public StatDataChangeSubscriptionService(
@@ -41,7 +42,7 @@ public class StatDataChangeSubscriptionService
         ICurrencyService currencyService,
         IProfessionsCacheService professionsCacheService,
         IGlobal global,
-        ITelegramBotClientProvider botClientProvider,
+        ISalariesTelegramBotClientProvider botClientProvider,
         ILogger<StatDataChangeSubscriptionService> logger)
     {
         _context = context;

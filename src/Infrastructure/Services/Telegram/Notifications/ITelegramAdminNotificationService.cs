@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Companies;
 
-namespace Infrastructure.Services.Telegram;
+namespace Infrastructure.Services.Telegram.Notifications;
 
 public interface ITelegramAdminNotificationService
 {

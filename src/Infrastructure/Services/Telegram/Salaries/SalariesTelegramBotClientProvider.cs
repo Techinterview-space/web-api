@@ -2,16 +2,16 @@
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
-namespace Infrastructure.Services.Telegram;
+namespace Infrastructure.Services.Telegram.Salaries;
 
-public class TelegramBotClientProvider : ITelegramBotClientProvider
+public class SalariesTelegramBotClientProvider : ISalariesTelegramBotClientProvider
 {
     private readonly IConfiguration _configuration;
-    private readonly ILogger<TelegramBotClientProvider> _logger;
+    private readonly ILogger<SalariesTelegramBotClientProvider> _logger;
 
-    public TelegramBotClientProvider(
+    public SalariesTelegramBotClientProvider(
         IConfiguration configuration,
-        ILogger<TelegramBotClientProvider> logger)
+        ILogger<SalariesTelegramBotClientProvider> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -19,13 +19,13 @@ public class TelegramBotClientProvider : ITelegramBotClientProvider
 
     public ITelegramBotClient CreateClient()
     {
-        var enabled = _configuration["Telegram:Enable"]?.ToLowerInvariant();
+        var enabled = _configuration["Telegram:SalariesBotEnable"]?.ToLowerInvariant();
         var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
 
-        var token = Environment.GetEnvironmentVariable("Telegram__BotToken");
+        var token = Environment.GetEnvironmentVariable("Telegram__SalariesBotToken");
         if (string.IsNullOrEmpty(token))
         {
-            token = _configuration["Telegram:BotToken"];
+            token = _configuration["Telegram:SalariesBotToken"];
         }
 
         if (!parsedEnabled ||
@@ -33,7 +33,7 @@ public class TelegramBotClientProvider : ITelegramBotClientProvider
             string.IsNullOrEmpty(token))
         {
             _logger.LogWarning(
-                "Telegram bot is disabled. Value {Value}. Parsed: {Parsed}",
+                "Salaries Telegram bot is disabled. Value {Value}. Parsed: {Parsed}",
                 enabled,
                 parsedEnabled);
 

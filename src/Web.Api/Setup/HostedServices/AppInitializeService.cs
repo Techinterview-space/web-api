@@ -45,7 +45,7 @@ public class AppInitializeService : IHostedService
         var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
         await MigrateAsync(database, cancellationToken);
 
-        var telegramService = scope.ServiceProvider.GetRequiredService<TelegramBotHostedService>();
+        var telegramService = scope.ServiceProvider.GetRequiredService<SalariesTelegramBotHostedService>();
         telegramService.StartReceiving(cancellationToken);
     }
 
