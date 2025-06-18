@@ -7,6 +7,7 @@ using Domain.Entities.Telegram;
 using Infrastructure.Database;
 using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.ReplyMessages;
+using Infrastructure.Services.Telegram.Salaries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -17,12 +18,12 @@ public class TelegramSalariesRegularStatsUpdateJob
     : InvocableJobBase<TelegramSalariesRegularStatsUpdateJob>
 {
     private readonly DatabaseContext _context;
-    private readonly ITelegramBotClientProvider _botClientProvider;
+    private readonly ISalariesTelegramBotClientProvider _botClientProvider;
 
     public TelegramSalariesRegularStatsUpdateJob(
         ILogger<TelegramSalariesRegularStatsUpdateJob> logger,
         DatabaseContext context,
-        ITelegramBotClientProvider botClientProvider)
+        ISalariesTelegramBotClientProvider botClientProvider)
         : base(logger)
     {
         _context = context;

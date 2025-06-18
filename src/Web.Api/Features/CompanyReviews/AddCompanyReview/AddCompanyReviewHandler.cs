@@ -7,6 +7,7 @@ using Infrastructure.Database;
 using Infrastructure.Extensions;
 using Infrastructure.Services.Mediator;
 using Infrastructure.Services.Telegram;
+using Infrastructure.Services.Telegram.Notifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviews.AddCompanyReview;

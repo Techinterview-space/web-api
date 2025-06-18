@@ -1,7 +1,7 @@
 ﻿using Infrastructure.Salaries;
 using Infrastructure.Services.Telegram.ReplyMessages;
 
-namespace Web.Api.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram.ProcessSalariesRelatedMessage;
 
 public record TelegramBotStartCommandReplyData : TelegramBotReplyData
 {
@@ -17,7 +17,7 @@ public record TelegramBotStartCommandReplyData : TelegramBotReplyData
     {
         return $@"Привет!
 
-Я - бот-ассистент проекта по сбору статистики по зарплатам в IT в Казахстане <a href=""{frontendLink}"">{ProcessTelegramMessageHandler.SalariesPageUrl}</a>.
+Я - бот-ассистент проекта по сбору статистики по зарплатам в IT в Казахстане <a href=""{frontendLink}"">{ProcessSalariesRelatedTelegramMessageHandler.SalariesPageUrl}</a>.
 Я могу подсказать в чате, какие зарплаты у разных специалистов по грейдам.
 Попробуй тегнуть меня в груповом чате и ввести ""frontend"" и выбери вариант в выпадающем меню - в итоге в чат будет отправлена статистика по зарплатам фронтенд-разработчиков.
 

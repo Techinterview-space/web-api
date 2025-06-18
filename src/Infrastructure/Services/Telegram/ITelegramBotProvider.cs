@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Services.Telegram;
 
-public interface ITelegramBotClientProvider
+public interface ITelegramBotProvider
 {
     ITelegramBotClient CreateClient();
 }

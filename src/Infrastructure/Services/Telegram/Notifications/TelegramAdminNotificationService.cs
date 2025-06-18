@@ -2,23 +2,24 @@
 using Domain.Enums;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
+using Infrastructure.Services.Telegram.Salaries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace Infrastructure.Services.Telegram;
+namespace Infrastructure.Services.Telegram.Notifications;
 
-public class TelegramNotificationService : ITelegramAdminNotificationService
+public class TelegramAdminNotificationService : ITelegramAdminNotificationService
 {
-    private readonly ITelegramBotClientProvider _botClientProvider;
-    private readonly ILogger<TelegramNotificationService> _logger;
+    private readonly ISalariesTelegramBotClientProvider _botClientProvider;
+    private readonly ILogger<TelegramAdminNotificationService> _logger;
     private readonly DatabaseContext _context;
     private readonly IGlobal _globalSettings;
 
-    public TelegramNotificationService(
-        ITelegramBotClientProvider botClientProvider,
-        ILogger<TelegramNotificationService> logger,
+    public TelegramAdminNotificationService(
+        ISalariesTelegramBotClientProvider botClientProvider,
+        ILogger<TelegramAdminNotificationService> logger,
         DatabaseContext context,
         IGlobal globalSettings)
     {

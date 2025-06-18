@@ -17,6 +17,9 @@ using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram;
+using Infrastructure.Services.Telegram.GithubProfile;
+using Infrastructure.Services.Telegram.Notifications;
+using Infrastructure.Services.Telegram.Salaries;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,12 +46,14 @@ public static class ServiceRegistration
             .AddScoped<IPdf, QuestPdfBasedRender>()
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
             .AddScoped<IOpenAiService, OpenAiService>()
-            .AddTransient<ITelegramBotClientProvider, TelegramBotClientProvider>()
-            .AddTransient<TelegramBotHostedService>()
+            .AddTransient<ISalariesTelegramBotClientProvider, SalariesTelegramBotClientProvider>()
+            .AddTransient<IGithubProfileBotProvider, GithubProfileBotProvider>()
+            .AddTransient<SalariesTelegramBotHostedService>()
+            .AddTransient<GithubProfileBotHostedService>()
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
             .AddTransient<StatDataChangeSubscriptionService>()
-            .AddScoped<ITelegramAdminNotificationService, TelegramNotificationService>()
+            .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
             .AddScoped<IViewRenderer, ViewRenderer>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection

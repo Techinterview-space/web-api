@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Infrastructure.Services.Mediator;
 using Infrastructure.Services.Telegram;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,27 +8,20 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Web.Api.Features.Telegram.ProcessMessage;
 
 namespace Web.Api.Features.Telegram;
 
-public class TelegramBotHostedService
+public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
+    where TBotProvider : ITelegramBotProvider
 {
-    private static readonly UpdateType[] _updateTypes = new List<UpdateType>
-    {
-        UpdateType.InlineQuery,
-        UpdateType.Message,
-        UpdateType.ChosenInlineResult,
-    }.ToArray();
-
-    private readonly ITelegramBotClientProvider _botClientProvider;
-    private readonly ILogger<TelegramBotHostedService> _logger;
+    private readonly TBotProvider _botClientProvider;
+    private readonly ILogger<TChild> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DateTime _startedToListenTo;
 
-    public TelegramBotHostedService(
-        ITelegramBotClientProvider botClientProvider,
-        ILogger<TelegramBotHostedService> logger,
+    protected TelegramBotHostedServiceBase(
+        TBotProvider botClientProvider,
+        ILogger<TChild> logger,
         IServiceScopeFactory serviceScopeFactory)
     {
         _botClientProvider = botClientProvider;
@@ -53,10 +44,18 @@ public class TelegramBotHostedService
             errorHandler: HandlePollingErrorAsync,
             receiverOptions: new ReceiverOptions
             {
-                AllowedUpdates = _updateTypes
+                AllowedUpdates = GetUpdateTypes()
             },
             cancellationToken: cancellationToken);
     }
+
+    protected abstract UpdateType[] GetUpdateTypes();
+
+    protected abstract Task HandleUpdateAsync(
+        IServiceScope scope,
+        ITelegramBotClient client,
+        Update updateRequest,
+        CancellationToken cancellationToken);
 
     private Task HandlePollingErrorAsync(
         ITelegramBotClient client,
@@ -77,10 +76,6 @@ public class TelegramBotHostedService
         CancellationToken cancellationToken)
     {
         _logger.LogDebug("Received update of type {UpdateType}", updateRequest.Type);
-        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
-        {
-            return;
-        }
 
         var messageSent = updateRequest.Message?.Date;
         if (messageSent < _startedToListenTo)
@@ -93,10 +88,17 @@ public class TelegramBotHostedService
             return;
         }
 
+        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
+        {
+            return;
+        }
+
         using var scope = _serviceScopeFactory.CreateScope();
 
-        await scope.ServiceProvider.HandleBy<ProcessTelegramMessageHandler, ProcessTelegramMessageCommand, string>(
-            new ProcessTelegramMessageCommand(client, updateRequest),
+        await HandleUpdateAsync(
+            scope,
+            client,
+            updateRequest,
             cancellationToken);
     }
 }

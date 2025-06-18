@@ -12,6 +12,7 @@ using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
+using Infrastructure.Services.Mediator;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.UserCommands;
@@ -24,25 +25,25 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Web.Api.Features.Telegram.ProcessMessage;
+namespace Web.Api.Features.Telegram.ProcessSalariesRelatedMessage;
 
-public class ProcessTelegramMessageHandler : Infrastructure.Services.Mediator.IRequestHandler<ProcessTelegramMessageCommand, string>
+public class ProcessSalariesRelatedTelegramMessageHandler
+    : IRequestHandler<ProcessTelegramMessageCommand, string>
 {
     public const string SalariesPageUrl = "techinterview.space/salaries";
-
     private const string CacheKey = "TelegramBotService_ReplyData";
 
     private const int CachingMinutes = 20;
 
-    private readonly ILogger<ProcessTelegramMessageHandler> _logger;
+    private readonly ILogger<ProcessSalariesRelatedTelegramMessageHandler> _logger;
     private readonly ICurrencyService _currencyService;
     private readonly IProfessionsCacheService _professionsCacheService;
     private readonly DatabaseContext _context;
     private readonly IMemoryCache _cache;
     private readonly IGlobal _global;
 
-    public ProcessTelegramMessageHandler(
-        ILogger<ProcessTelegramMessageHandler> logger,
+    public ProcessSalariesRelatedTelegramMessageHandler(
+        ILogger<ProcessSalariesRelatedTelegramMessageHandler> logger,
         ICurrencyService currencyService,
         DatabaseContext context,
         IMemoryCache cache,
