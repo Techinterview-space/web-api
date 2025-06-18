@@ -149,12 +149,15 @@ public class ProcessGithubProfileTelegramMessageHandler
                 commitsCount += commitsResult.Count;
                 foreach (var commit in commitsResult)
                 {
-                    filesAdjusted += commit.Files.Count;
-                    foreach (var commitFile in commit.Files)
+                    filesAdjusted += commit.Files?.Count ?? 0;
+                    if (commit.Files != null && commit.Files.Count > 0)
                     {
-                        changesInFilesCount += commitFile.Changes;
-                        additionsInFilesCount += commitFile.Additions;
-                        deletionsInFilesCount += commitFile.Deletions;
+                        foreach (var commitFile in commit.Files)
+                        {
+                            changesInFilesCount += commitFile.Changes;
+                            additionsInFilesCount += commitFile.Additions;
+                            deletionsInFilesCount += commitFile.Deletions;
+                        }
                     }
                 }
             }
