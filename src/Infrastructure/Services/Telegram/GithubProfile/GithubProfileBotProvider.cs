@@ -8,11 +8,11 @@ namespace Infrastructure.Services.Telegram.GithubProfile;
 public class GithubProfileBotProvider : IGithubProfileBotProvider
 {
     private readonly IConfiguration _configuration;
-    private readonly ILogger<SalariesTelegramBotClientProvider> _logger;
+    private readonly ILogger<GithubProfileBotProvider> _logger;
 
     public GithubProfileBotProvider(
         IConfiguration configuration,
-        ILogger<SalariesTelegramBotClientProvider> logger)
+        ILogger<GithubProfileBotProvider> logger)
     {
         _configuration = configuration;
         _logger = logger;

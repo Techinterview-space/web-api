@@ -1,6 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Mediator;
+using Microsoft.Extensions.Logging;
 using Octokit;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -11,6 +13,14 @@ namespace Web.Api.Features.Telegram.GithubProfiles;
 public class ProcessGithubProfileTelegramMessageHandler
     : IRequestHandler<ProcessTelegramMessageCommand, string>
 {
+    private readonly ILogger<ProcessGithubProfileTelegramMessageHandler> _logger;
+
+    public ProcessGithubProfileTelegramMessageHandler(
+        ILogger<ProcessGithubProfileTelegramMessageHandler> logger)
+    {
+        _logger = logger;
+    }
+
     public async Task<string> Handle(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
@@ -26,14 +36,47 @@ public class ProcessGithubProfileTelegramMessageHandler
         var username = message.Text?.Trim().TrimStart('@');
         if (string.IsNullOrEmpty(username))
         {
-            var githubClient = new GitHubClient(new ProductHeaderValue("techinterview.space"));
-            var user = await githubClient.User.Get(username);
-            textToSend = $"Hello, {user.Name}!\n\n" +
-                         $"Your GitHub profile: {user.HtmlUrl}\n" +
-                         $"Followers: {user.Followers}\n" +
-                         $"Following: {user.Following}\n" +
-                         $"Public Repos: {user.PublicRepos}\n" +
-                         $"Private repos: {user.TotalPrivateRepos}\n";
+            try
+            {
+                var githubClient = new GitHubClient(new ProductHeaderValue("techinterview.space"));
+                var user = await githubClient.User.Get(username);
+                textToSend = $"Hello, {user.Name}!\n\n" +
+                             $"Your GitHub profile: {user.HtmlUrl}\n" +
+                             $"Followers: {user.Followers}\n" +
+                             $"Following: {user.Following}\n" +
+                             $"Public Repos: {user.PublicRepos}\n" +
+                             $"Private repos: {user.TotalPrivateRepos}\n";
+            }
+            catch (NotFoundException notFoundEx)
+            {
+                _logger.LogWarning(
+                    notFoundEx,
+                    "GitHub user not found: {Username}. Exception: {Exception}",
+                    username,
+                    notFoundEx.Message);
+
+                textToSend = "GitHub user not found. Please provide a valid GitHub username in the format: @username or username";
+            }
+            catch (RateLimitExceededException rateLimitEx)
+            {
+                _logger.LogWarning(
+                    rateLimitEx,
+                    "GitHub API rate limit exceeded for user: {Username}. Exception: {Exception}",
+                    username,
+                    rateLimitEx.Message);
+
+                textToSend = "GitHub API rate limit exceeded. Please try again later.";
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning(
+                    e,
+                    "An error occurred while processing GitHub profile for user: {Username}. Exception: {Exception}",
+                    username,
+                    e.Message);
+
+                textToSend = "An error occurred while processing your request. Please try again later.";
+            }
         }
         else
         {
