@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -167,33 +166,27 @@ public class ProcessGithubProfileTelegramMessageHandler
     {
         try
         {
-            var extendedDataTasks = new List<Task>();
             string issuesCount = "N/A", prsCount = "N/A", totalStars = "N/A", forksCount = "N/A";
 
-            // Get user's repositories to calculate total stars and forks
+            // Start all tasks concurrently to minimize API calls
             var reposTask = githubClient.Repository.GetAllForUser(username);
-            extendedDataTasks.Add(reposTask);
-
-            // Search for issues created by user
+            
             var issueSearchRequest = new SearchIssuesRequest
             {
                 Author = username,
                 Type = IssueTypeQualifier.Issue
             };
             var issuesTask = githubClient.Search.SearchIssues(issueSearchRequest);
-            extendedDataTasks.Add(issuesTask);
 
-            // Search for pull requests created by user  
             var prSearchRequest = new SearchIssuesRequest
             {
                 Author = username,
                 Type = IssueTypeQualifier.PullRequest
             };
             var prsTask = githubClient.Search.SearchIssues(prSearchRequest);
-            extendedDataTasks.Add(prsTask);
 
-            // Wait for all tasks to complete with timeout protection
-            await Task.WhenAll(extendedDataTasks);
+            // Wait for all tasks to complete
+            await Task.WhenAll(reposTask, issuesTask, prsTask);
 
             // Process repositories data
             var repos = await reposTask;
