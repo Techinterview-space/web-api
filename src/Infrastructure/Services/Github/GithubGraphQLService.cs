@@ -31,7 +31,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         try
         {
             var client = await GetClientAsync(cancellationToken);
-            var since = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits).ToString("yyyy-MM-ddTHH:mm:ss");
+            var since = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits).ToString("yyyy-MM-dd");
 
             _logger.LogInformation(
                 "Fetching GitHub profile data for user {Username} using GraphQL API",
@@ -43,6 +43,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 Query = @"
                 query GetUserProfile($username: String!) {
                   user(login: $username) {
+                    id
                     name
                     login
                     url
@@ -154,6 +155,183 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
     }
 
     private async Task<CommitStatistics> GetCommitStatisticsAsync(
+        GraphQLHttpClient client,
+        string username,
+        UserProfile user,
+        string since,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Get the user's commit activity using contribution information
+            // This is a more reliable approach than search
+            var contributionQuery = new GraphQLRequest
+            {
+                Query = @"
+                query GetUserContributions($username: String!, $from: DateTime!, $to: DateTime!) {
+                  user(login: $username) {
+                    contributionsCollection(from: $from, to: $to) {
+                      totalCommitContributions
+                      commitContributionsByRepository {
+                        repository {
+                          owner {
+                            login
+                          }
+                          name
+                        }
+                        contributions(first: 100) {
+                          nodes {
+                            commitCount
+                            occurredAt
+                          }
+                        }
+                      }
+                    }
+                  }
+                }",
+                Variables = new
+                {
+                    username = username,
+                    from = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits),
+                    to = DateTimeOffset.UtcNow
+                }
+            };
+
+            _logger.LogInformation(
+                "Fetching contribution data for user {Username} from {From} to {To}",
+                username,
+                DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits),
+                DateTimeOffset.UtcNow);
+
+            var response = await client.SendQueryAsync<ContributionResponse>(contributionQuery, cancellationToken);
+
+            if (response.Errors?.Any() == true)
+            {
+                _logger.LogWarning(
+                    "GraphQL errors in contribution query: {Errors}",
+                    string.Join(", ", response.Errors.Select(e => e.Message)));
+            }
+
+            if (response.Data?.User?.ContributionsCollection == null)
+            {
+                _logger.LogWarning("No contribution data returned for user {Username}", username);
+                return await GetCommitStatisticsUsingBatchedApproach(client, username, user, since, cancellationToken);
+            }
+
+            var contributionData = response.Data.User.ContributionsCollection;
+            var stats = new CommitStatistics
+            {
+                CommitsCount = contributionData.TotalCommitContributions
+            };
+
+            _logger.LogInformation(
+                "Found {TotalCommits} total commit contributions for user {Username}",
+                stats.CommitsCount,
+                username);
+
+            // Get detailed commit information from repositories to calculate file changes
+            if (contributionData.CommitContributionsByRepository != null)
+            {
+                await EnrichStatsWithFileChanges(client, username, contributionData.CommitContributionsByRepository, stats, since, cancellationToken);
+            }
+
+            _logger.LogInformation(
+                "Successfully processed contribution data for user {Username}: {CommitsCount} commits, {FilesAdjusted} files",
+                username,
+                stats.CommitsCount,
+                stats.FilesAdjusted);
+
+            return stats;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get commit statistics using contribution API for user {Username}", username);
+            
+            // Fallback to the original batched approach if contribution API fails
+            return await GetCommitStatisticsUsingBatchedApproach(client, username, user, since, cancellationToken);
+        }
+    }
+
+    private async Task EnrichStatsWithFileChanges(
+        GraphQLHttpClient client,
+        string username,
+        List<RepositoryContribution> repositoryContributions,
+        CommitStatistics stats,
+        string since,
+        CancellationToken cancellationToken)
+    {
+        // For a subset of repositories with the most contributions, get detailed commit information
+        var topRepos = repositoryContributions
+            .OrderByDescending(rc => rc.Contributions?.Nodes?.Sum(n => n.CommitCount) ?? 0)
+            .Take(10) // Limit to top 10 repositories to avoid rate limits
+            .ToList();
+
+        foreach (var repoContribution in topRepos)
+        {
+            try
+            {
+                var repoQuery = new GraphQLRequest
+                {
+                    Query = @"
+                    query GetRepositoryCommitDetails($owner: String!, $name: String!, $since: GitTimestamp!, $first: Int!) {
+                      repository(owner: $owner, name: $name) {
+                        defaultBranchRef {
+                          target {
+                            ... on Commit {
+                              history(first: $first, since: $since) {
+                                nodes {
+                                  author {
+                                    user {
+                                      login
+                                    }
+                                  }
+                                  additions
+                                  deletions
+                                  changedFiles
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }",
+                    Variables = new
+                    {
+                        owner = repoContribution.Repository.Owner.Login,
+                        name = repoContribution.Repository.Name,
+                        since = since,
+                        first = 100
+                    }
+                };
+
+                var response = await client.SendQueryAsync<RepositoryCommitResponse>(repoQuery, cancellationToken);
+
+                if (response.Data?.Repository?.DefaultBranchRef?.Target?.History?.Nodes != null)
+                {
+                    foreach (var commit in response.Data.Repository.DefaultBranchRef.Target.History.Nodes)
+                    {
+                        // Only count commits by the target user
+                        if (commit.Author?.User?.Login?.Equals(username, StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            stats.FilesAdjusted += commit.ChangedFiles;
+                            stats.AdditionsInFilesCount += commit.Additions;
+                            stats.DeletionsInFilesCount += commit.Deletions;
+                            stats.ChangesInFilesCount += commit.Additions + commit.Deletions;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to get detailed commit data for repository {Owner}/{Name}", 
+                    repoContribution.Repository.Owner.Login, 
+                    repoContribution.Repository.Name);
+            }
+        }
+    }
+    }
+
+    private async Task<CommitStatistics> GetCommitStatisticsUsingBatchedApproach(
         GraphQLHttpClient client,
         string username,
         UserProfile user,
@@ -516,8 +694,89 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         public UserProfile User { get; set; }
     }
 
+    public record ContributionResponse
+    {
+        public ContributionUser User { get; set; }
+    }
+
+    public record ContributionUser
+    {
+        public ContributionsCollection ContributionsCollection { get; set; }
+    }
+
+    public record ContributionsCollection
+    {
+        public int TotalCommitContributions { get; set; }
+        public List<RepositoryContribution> CommitContributionsByRepository { get; set; }
+    }
+
+    public record RepositoryContribution
+    {
+        public ContributionRepository Repository { get; set; }
+        public ContributionConnection Contributions { get; set; }
+    }
+
+    public record ContributionRepository
+    {
+        public Owner Owner { get; set; }
+        public string Name { get; set; }
+    }
+
+    public record ContributionConnection
+    {
+        public List<ContributionNode> Nodes { get; set; }
+    }
+
+    public record ContributionNode
+    {
+        public int CommitCount { get; set; }
+        public DateTime OccurredAt { get; set; }
+    }
+
+    public record RepositoryCommitResponse
+    {
+        public RepositoryCommitData Repository { get; set; }
+    }
+
+    public record RepositoryCommitData
+    {
+        public DefaultBranchRef DefaultBranchRef { get; set; }
+    }
+
+    public record CommitTarget
+    {
+        public CommitHistory History { get; set; }
+    }
+
+    public record CommitHistory
+    {
+        public List<CommitNode> Nodes { get; set; }
+    }
+
+    public record CommitNode
+    {
+        public CommitAuthor Author { get; set; }
+        public int Additions { get; set; }
+        public int Deletions { get; set; }
+        public int ChangedFiles { get; set; }
+    }
+
+    public record CommitAuthor
+    {
+        public CommitUser User { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
+
+    public record CommitUser
+    {
+        public string Login { get; set; }
+    }
+
     public record UserProfile
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
 
         public string Login { get; set; }
@@ -586,5 +845,6 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
     public record DefaultBranchRef
     {
         public string Name { get; set; }
+        public CommitTarget Target { get; set; }
     }
 }
