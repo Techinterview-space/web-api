@@ -24,18 +24,18 @@ public class ProcessGithubProfileTelegramMessageHandler
     private const int MonthsToFetchCommits = 3;
 
     private readonly ILogger<ProcessGithubProfileTelegramMessageHandler> _logger;
-    private readonly IGithubPersonalUserTokenService _githubPersonalUserTokenService;
+    private readonly GithubClientService _githubClientService;
     private readonly DatabaseContext _context;
     private readonly IConfiguration _configuration;
 
     public ProcessGithubProfileTelegramMessageHandler(
         ILogger<ProcessGithubProfileTelegramMessageHandler> logger,
-        IGithubPersonalUserTokenService githubPersonalUserTokenService,
+        GithubClientService githubClientService,
         DatabaseContext context,
         IConfiguration configuration)
     {
         _logger = logger;
-        _githubPersonalUserTokenService = githubPersonalUserTokenService;
+        _githubClientService = githubClientService;
         _context = context;
         _configuration = configuration;
     }
@@ -265,16 +265,9 @@ public class ProcessGithubProfileTelegramMessageHandler
         string username,
         CancellationToken cancellationToken)
     {
-        var patToken = await _githubPersonalUserTokenService.GetTokenAsync(cancellationToken);
-
         try
         {
-            var githubClient = new GitHubClient(
-                new ProductHeaderValue("techinterview.space"),
-                new InMemoryCredentialStore(
-                    new Credentials(patToken)));
-
-            var user = await githubClient.User.Get(username);
+            var user = await _githubClientService.GetUserAsync(username, cancellationToken);
 
             var commitsCount = 0;
             var filesAdjusted = 0;
@@ -282,15 +275,15 @@ public class ProcessGithubProfileTelegramMessageHandler
             var additionsInFilesCount = 0;
             var deletionsInFilesCount = 0;
 
-            var userOrganizations = await githubClient.Organization.GetAllForUser(username);
+            var userOrganizations = await _githubClientService.GetOrganizationsAsync(username);
             foreach (var userOrganization in userOrganizations)
             {
-                var userOrganizationRepositories = await githubClient.Repository.GetAllForOrg(userOrganization.Login);
+                var userOrganizationRepositories = await _githubClientService.GetOrganizationRepositoriesAsync(userOrganization.Login);
                 var orgRepoStats = await CalculateRepositoriesStatsAsync(
                     userOrganizationRepositories,
                     userOrganization.Login,
                     username,
-                    githubClient,
+                    _githubClientService,
                     cancellationToken);
 
                 commitsCount += orgRepoStats.CommitsCount;
@@ -301,13 +294,13 @@ public class ProcessGithubProfileTelegramMessageHandler
             }
 
             // Start all tasks concurrently to minimize API calls
-            var userRepositories = await githubClient.Repository.GetAllForUser(username);
+            var userRepositories = await _githubClientService.GetUserRepositoriesAsync(username, cancellationToken);
 
             var userRepositoriesStats = await CalculateRepositoriesStatsAsync(
                 userRepositories,
                 username,
                 username,
-                githubClient,
+                _githubClientService,
                 cancellationToken);
 
             commitsCount += userRepositoriesStats.CommitsCount;
@@ -316,19 +309,8 @@ public class ProcessGithubProfileTelegramMessageHandler
             additionsInFilesCount += userRepositoriesStats.AdditionsInFilesCount;
             deletionsInFilesCount += userRepositoriesStats.DeletionsInFilesCount;
 
-            var issuesResult = await githubClient.Search.SearchIssues(
-                new SearchIssuesRequest
-                {
-                    Author = username,
-                    Type = IssueTypeQualifier.Issue,
-                });
-
-            var prsResult = await githubClient.Search.SearchIssues(
-                new SearchIssuesRequest
-                {
-                    Author = username,
-                    Type = IssueTypeQualifier.PullRequest
-                });
+            var issuesResult = await _githubClientService.SearchUserIssuesAsync(username, cancellationToken);
+            var prsResult = await _githubClientService.SearchUserPullRequestsAsync(username, cancellationToken);
 
             var userData = new GithubProfileDataBasedOnOctokitData(
                 user,
@@ -379,7 +361,7 @@ public class ProcessGithubProfileTelegramMessageHandler
         IReadOnlyList<Repository> repositories,
         string repoOwner,
         string username,
-        GitHubClient gitHubClient,
+        GithubClientService gitHubClient,
         CancellationToken cancellationToken)
     {
         var commitsCount = 0;
@@ -390,22 +372,21 @@ public class ProcessGithubProfileTelegramMessageHandler
 
         foreach (var repo in repositories)
         {
-            var commitsResult = await gitHubClient.Repository.Commit.GetAll(
+            var commitsResult = await gitHubClient.GetRepositoryCommitsAsync(
                 repoOwner,
                 repo.Name,
-                new CommitRequest
-                {
-                    Author = username,
-                    Since = DateTimeOffset.UtcNow.AddMonths(-MonthsToFetchCommits),
-                });
+                username,
+                MonthsToFetchCommits,
+                cancellationToken);
 
             commitsCount += commitsResult.Count;
             foreach (var commit in commitsResult)
             {
-                var commitFiles = await gitHubClient.Repository.Commit.Get(
+                var commitFiles = await gitHubClient.GetCommitAsync(
                     repoOwner,
                     repo.Name,
-                    commit.Sha);
+                    commit.Sha,
+                    cancellationToken);
 
                 filesAdjusted += commitFiles.Files?.Count ?? 0;
                 if (commitFiles.Files is { Count: > 0 })
