@@ -9,6 +9,7 @@ namespace Infrastructure.Services.Github;
 
 public class GithubGraphQLService : IGithubGraphQLService, IDisposable
 {
+    private const int DefaultBatchSize = 10;
     private readonly IGithubPersonalUserTokenService _githubPersonalUserTokenService;
     private readonly ILogger<GithubGraphQLService> _logger;
     private GraphQLHttpClient? _client;
@@ -30,6 +31,8 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         {
             var client = await GetClientAsync(cancellationToken);
             var since = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits).ToString("yyyy-MM-ddTHH:mm:ssZ");
+
+            _logger.LogInformation("Fetching GitHub profile data for user {Username} using GraphQL API", username);
 
             // Single GraphQL query to get user data and repositories first
             var userQuery = new GraphQLRequest
@@ -109,8 +112,13 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
                 throw new InvalidOperationException($"User {username} not found");
             }
 
+            _logger.LogInformation("Successfully fetched basic profile data for user {Username}", username);
+
             // Now get commit statistics efficiently using a batched approach
             var commitStats = await GetCommitStatisticsAsync(client, username, response.Data.User, since, cancellationToken);
+
+            _logger.LogInformation("Successfully fetched commit statistics for user {Username}: {CommitsCount} commits, {FilesAdjusted} files", 
+                username, commitStats.CommitsCount, commitStats.FilesAdjusted);
 
             return MapToGithubProfileData(response.Data.User, commitStats, monthsToFetchCommits);
         }
@@ -149,7 +157,10 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
 
         // Process repositories in batches to get commit stats
         var stats = new CommitStatistics();
-        var batchSize = 10; // Process 10 repos at a time
+        var batchSize = DefaultBatchSize; // Process repositories in configurable batches to avoid hitting rate limits
+        
+        _logger.LogInformation("Processing {TotalRepos} repositories in batches of {BatchSize} for user {Username}", 
+            allRepos.Count, batchSize, username);
         
         for (int i = 0; i < allRepos.Count; i += batchSize)
         {
@@ -161,6 +172,9 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
             stats.ChangesInFilesCount += batchStats.ChangesInFilesCount;
             stats.AdditionsInFilesCount += batchStats.AdditionsInFilesCount;
             stats.DeletionsInFilesCount += batchStats.DeletionsInFilesCount;
+            
+            _logger.LogDebug("Processed batch {BatchNumber}/{TotalBatches} for user {Username}", 
+                (i / batchSize) + 1, (allRepos.Count + batchSize - 1) / batchSize, username);
         }
 
         return stats;
