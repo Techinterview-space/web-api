@@ -85,7 +85,7 @@ public class ProcessGithubProfileTelegramMessageHandler
 
         if (await _context.GithubProfileProcessingJobs.AnyAsync(x => x.Username == username, cancellationToken))
         {
-            textToSend = "Profile {username} is already in progress. Please wait until the previous request is completed or send it again later.";
+            textToSend = $"Profile {username} is already in progress. Please wait until the previous request is completed or send it again later.";
             await request.BotClient.ReplyToWithHtmlAsync(
                 message.Chat.Id,
                 message.MessageId,
