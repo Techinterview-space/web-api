@@ -9,6 +9,7 @@ using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Services.Correlation;
 using Infrastructure.Services.Files;
+using Infrastructure.Services.Github;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
@@ -54,7 +55,8 @@ public static class ServiceRegistration
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
             .AddTransient<StatDataChangeSubscriptionService>()
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
-            .AddScoped<IViewRenderer, ViewRenderer>();
+            .AddScoped<IViewRenderer, ViewRenderer>()
+            .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

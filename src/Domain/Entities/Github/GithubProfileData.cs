@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities.Github;
+﻿using System;
+
+namespace Domain.Entities.Github;
 
 public record GithubProfileData
 {
@@ -34,28 +36,31 @@ public record GithubProfileData
 
     public int DeletionsInFilesCount { get; init; }
 
+    public DateTime CreatedAt { get; init; }
+
     public GithubProfileData()
     {
     }
 
-    public string GetTelegramFormattedText()
+    public string GetTelegramFormattedText(
+        int month = 3)
     {
         return $"Github stats for <b>{Username}</b> ({Name}):\n" +
                $"<em><a href=\"{HtmlUrl}\">Profile URL</a></em>\n\n" +
-               $"Followers: <b>{Followers}</b>\n" +
-               $"Following: <b>{Following}</b>\n" +
-               $"Public Repos: <b>{PublicRepos}</b>\n\n" +
-               $"Issues created: <b>{IssuesOpenedByUser}</b>\n" +
-               $"Pull requests: <b>{PullRequestsCreatedByUser}</b>\n" +
-               $"Total stars received: <b>{CountOfStarredRepos}</b>\n" +
-               $"Repositories forked: <b>{CountOfForkedRepos}</b>\n" +
-               $"----\n" +
-               $"Stats for last 6 month:\n" +
-               $"Commits made: <b>{CommitsCount}</b>\n" +
-               $"Files adjusted: <b>{FilesAdjusted}</b>\n" +
-               $"Lines changed: <b>{ChangesInFilesCount}</b>\n" +
-               $"Lines added: <b>{AdditionsInFilesCount}</b>\n" +
-               $"Lines removed: <b>{DeletionsInFilesCount}</b>\n\n" +
-               $"<em>Stats sent by @github_profile_bot</em>";
+               $"Followers: <b>{Followers:N0}</b>\n" +
+               $"Following: <b>{Following:N0}</b>\n" +
+               $"Public Repos: <b>{PublicRepos:N0}</b>\n\n" +
+               $"Issues created: <b>{IssuesOpenedByUser:N0}</b>\n" +
+               $"Pull requests: <b>{PullRequestsCreatedByUser:N0}</b>\n" +
+               $"Total stars received: <b>{CountOfStarredRepos:N0}</b>\n" +
+               $"Repositories forked: <b>{CountOfForkedRepos:N0}</b>\n\n" +
+               $"<em>Stats for last {month} month in public repositories (own and organization ones):</em>\n\n" +
+               $"Commits made: <b>{CommitsCount:N0}</b>\n" +
+               $"Files adjusted: <b>{FilesAdjusted:N0}</b>\n" +
+               $"Lines changed: <b>{ChangesInFilesCount:N0}</b>\n" +
+               $"Lines added: <b>{AdditionsInFilesCount:N0}</b>\n" +
+               $"Lines removed: <b>{DeletionsInFilesCount:N0}</b>\n\n" +
+               $"<em>Data were taken at {CreatedAt:yyyy-MM-dd HH:mm:ss} UTC</em>\n" +
+               $"<em>Stats prepared by @github_profile_bot</em>";
     }
 }

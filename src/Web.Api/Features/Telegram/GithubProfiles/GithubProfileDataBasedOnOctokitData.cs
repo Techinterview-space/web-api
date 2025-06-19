@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Github;
 using Octokit;
@@ -33,11 +34,13 @@ public record GithubProfileDataBasedOnOctokitData : GithubProfileData
 
         CountOfForkedRepos = repositories.Count(r => r.Fork);
 
+        FilesAdjusted = filesAdjusted;
         IssuesOpenedByUser = issuesResult.TotalCount;
         PullRequestsCreatedByUser = prsResult.TotalCount;
         CommitsCount = commitsCount;
         ChangesInFilesCount = changesInFilesCount;
         AdditionsInFilesCount = additionsInFilesCount;
         DeletionsInFilesCount = deletionsInFilesCount;
+        CreatedAt = DateTime.UtcNow;
     }
 }

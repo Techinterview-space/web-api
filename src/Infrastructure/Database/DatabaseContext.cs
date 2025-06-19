@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Entities.Companies;
 using Domain.Entities.CSV;
+using Domain.Entities.Github;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Questions;
@@ -68,6 +69,16 @@ public class DatabaseContext : DbContext
     public DbSet<StatDataChangeSubscriptionTgMessage> StatDataChangeSubscriptionTgMessages { get; set; }
 
     public DbSet<UserEmail> UserEmails { get; set; }
+
+    public DbSet<GithubProfile> GithubProfiles { get; set; }
+
+    public DbSet<GithubProfileBotChat> GithubProfileBotChats { get; set; }
+
+    public DbSet<GithubProfileBotMessage> GithubProfileBotMessages { get; set; }
+
+    public DbSet<GithubPersonalUserToken> GithubPersonalUserTokens { get; set; }
+
+    public DbSet<GithubProfileProcessingJob> GithubProfileProcessingJobs { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
