@@ -243,6 +243,11 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                         history(first: 100, since: $since) {{
                           totalCount
                           nodes {{
+                            author {{
+                              user {{
+                                login
+                              }}
+                            }}
                             committedDate
                             additions
                             deletions
@@ -275,7 +280,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     string.Join(", ", response.Errors.Select(e => e.Message)));
             }
 
-            return ProcessBatchCommitResponse(response.Data);
+            return ProcessBatchCommitResponse(response.Data, username);
         }
         catch (Exception ex)
         {
@@ -288,7 +293,8 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
     }
 
     private CommitStatistics ProcessBatchCommitResponse(
-        Dictionary<string, object> data)
+        Dictionary<string, object> data,
+        string username)
     {
         var stats = new CommitStatistics();
 
@@ -316,8 +322,21 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     {
                         foreach (var commit in nodes.EnumerateArray())
                         {
-                            // For now, count all commits since filtering by author in GraphQL is complex
-                            // In a future iteration; we could add better author filtering
+                            // Filter commits by author username
+                            string authorLogin = null;
+                            if (commit.TryGetProperty("author", out var author) &&
+                                author.TryGetProperty("user", out var user) &&
+                                user.TryGetProperty("login", out var login))
+                            {
+                                authorLogin = login.GetString();
+                            }
+
+                            // Only count commits authored by the specified username
+                            if (!string.Equals(authorLogin, username, StringComparison.OrdinalIgnoreCase))
+                            {
+                                continue;
+                            }
+
                             stats.CommitsCount++;
 
                             if (commit.TryGetProperty("changedFiles", out var changedFiles))
