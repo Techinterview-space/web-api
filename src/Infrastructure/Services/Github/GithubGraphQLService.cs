@@ -31,7 +31,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         try
         {
             var client = await GetClientAsync(cancellationToken);
-            var since = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits).ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var since = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits).ToString("yyyy-MM-ddTHH:mm:ss");
 
             _logger.LogInformation(
                 "Fetching GitHub profile data for user {Username} using GraphQL API",
