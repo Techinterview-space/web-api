@@ -1,6 +1,4 @@
-using System.Threading;
-using System.Threading.Tasks;
-using Domain.Entities.Github;
+﻿using Domain.Entities.Github;
 
 namespace Infrastructure.Services.Github;
 

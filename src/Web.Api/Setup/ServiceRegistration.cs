@@ -58,7 +58,7 @@ public static class ServiceRegistration
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()
             .AddScoped<GithubClientService>()
-            .AddScoped<IGithubGraphQLService, GithubGraphQLService>();
+            .AddScoped<IGithubGraphQLService, GithubGraphQlService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

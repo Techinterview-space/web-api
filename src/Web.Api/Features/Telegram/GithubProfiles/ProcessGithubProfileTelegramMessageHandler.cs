@@ -264,7 +264,7 @@ public class ProcessGithubProfileTelegramMessageHandler
         return chatTobeReturned;
     }
 
-    private async Task<(GithubProfileDataBasedOnOctokitData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
+    private async Task<(GithubProfileData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
         string username,
         CancellationToken cancellationToken)
     {
@@ -274,7 +274,7 @@ public class ProcessGithubProfileTelegramMessageHandler
             try
             {
                 var profileData = await _githubGraphQLService.GetUserProfileDataAsync(username, MonthsToFetchCommits, cancellationToken);
-                
+
                 // Convert to the expected return type
                 var convertedData = new GithubProfileDataFromGraphQL(
                     profileData.Name ?? profileData.Username,
@@ -293,14 +293,17 @@ public class ProcessGithubProfileTelegramMessageHandler
                     profileData.ChangesInFilesCount,
                     profileData.AdditionsInFilesCount,
                     profileData.DeletionsInFilesCount);
-                
+
                 return (convertedData, null);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "GraphQL service failed for user {Username}, falling back to REST API", username);
-                
-                // Fall back to original REST implementation
+                _logger.LogWarning(
+                    ex,
+                    "GraphQL service failed for user {Username}, falling back to REST API",
+                    username);
+
+                // Fall back to the original REST implementation
                 return await GetExtendedGitHubProfileDataUsingRestAsync(username, cancellationToken);
             }
         }
@@ -330,10 +333,10 @@ public class ProcessGithubProfileTelegramMessageHandler
             var additionsInFilesCount = 0;
             var deletionsInFilesCount = 0;
 
-            var userOrganizations = await _githubClientService.GetOrganizationsAsync(username);
+            var userOrganizations = await _githubClientService.GetOrganizationsAsync(username, cancellationToken);
             foreach (var userOrganization in userOrganizations)
             {
-                var userOrganizationRepositories = await _githubClientService.GetOrganizationRepositoriesAsync(userOrganization.Login);
+                var userOrganizationRepositories = await _githubClientService.GetOrganizationRepositoriesAsync(userOrganization.Login, cancellationToken);
                 var orgRepoStats = await CalculateRepositoriesStatsAsync(
                     userOrganizationRepositories,
                     userOrganization.Login,

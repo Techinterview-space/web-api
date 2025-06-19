@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Domain.Entities.Github;
 using GraphQL;
 using GraphQL.Client.Http;
@@ -12,16 +7,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services.Github;
 
-public class GithubGraphQLService : IGithubGraphQLService, IDisposable
+public class GithubGraphQlService : IGithubGraphQLService, IDisposable
 {
     private const int DefaultBatchSize = 10;
     private readonly IGithubPersonalUserTokenService _githubPersonalUserTokenService;
-    private readonly ILogger<GithubGraphQLService> _logger;
-    private GraphQLHttpClient? _client;
+    private readonly ILogger<GithubGraphQlService> _logger;
 
-    public GithubGraphQLService(
+    private GraphQLHttpClient _client;
+
+    public GithubGraphQlService(
         IGithubPersonalUserTokenService githubPersonalUserTokenService,
-        ILogger<GithubGraphQLService> logger)
+        ILogger<GithubGraphQlService> logger)
     {
         _githubPersonalUserTokenService = githubPersonalUserTokenService;
         _logger = logger;
@@ -37,7 +33,9 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
             var client = await GetClientAsync(cancellationToken);
             var since = DateTimeOffset.UtcNow.AddMonths(-monthsToFetchCommits).ToString("yyyy-MM-ddTHH:mm:ssZ");
 
-            _logger.LogInformation("Fetching GitHub profile data for user {Username} using GraphQL API", username);
+            _logger.LogInformation(
+                "Fetching GitHub profile data for user {Username} using GraphQL API",
+                username);
 
             // Single GraphQL query to get user data and repositories first
             var userQuery = new GraphQLRequest
@@ -106,10 +104,12 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
 
             var response = await client.SendQueryAsync<UserProfileResponse>(userQuery, cancellationToken);
 
-            if (response.Errors?.Any() == true)
+            if (response.Errors?.Length > 0)
             {
-                _logger.LogWarning("GraphQL errors for user {Username}: {Errors}", 
-                    username, string.Join(", ", response.Errors.Select(e => e.Message)));
+                _logger.LogWarning(
+                    "GraphQL errors for user {Username}: {Errors}",
+                    username,
+                    string.Join(", ", response.Errors.Select(e => e.Message)));
             }
 
             if (response.Data?.User == null)
@@ -122,8 +122,11 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
             // Now get commit statistics efficiently using a batched approach
             var commitStats = await GetCommitStatisticsAsync(client, username, response.Data.User, since, cancellationToken);
 
-            _logger.LogInformation("Successfully fetched commit statistics for user {Username}: {CommitsCount} commits, {FilesAdjusted} files", 
-                username, commitStats.CommitsCount, commitStats.FilesAdjusted);
+            _logger.LogInformation(
+                "Successfully fetched commit statistics for user {Username}: {CommitsCount} commits, {FilesAdjusted} files",
+                username,
+                commitStats.CommitsCount,
+                commitStats.FilesAdjusted);
 
             return MapToGithubProfileData(response.Data.User, commitStats, monthsToFetchCommits);
         }
@@ -134,15 +137,31 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         }
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(
+        bool disposing)
+    {
+        if (disposing)
+        {
+            _client?.Dispose();
+            _client = null;
+        }
+    }
+
     private async Task<CommitStatistics> GetCommitStatisticsAsync(
-        GraphQLHttpClient client, 
-        string username, 
-        UserProfile user, 
-        string since, 
+        GraphQLHttpClient client,
+        string username,
+        UserProfile user,
+        string since,
         CancellationToken cancellationToken)
     {
         var allRepos = new List<Repository>();
-        
+
         // Collect all repositories (user owned + organization)
         if (user.Repositories?.Nodes != null)
         {
@@ -162,24 +181,29 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
 
         // Process repositories in batches to get commit stats
         var stats = new CommitStatistics();
-        var batchSize = DefaultBatchSize; // Process repositories in configurable batches to avoid hitting rate limits
-        
-        _logger.LogInformation("Processing {TotalRepos} repositories in batches of {BatchSize} for user {Username}", 
-            allRepos.Count, batchSize, username);
-        
-        for (int i = 0; i < allRepos.Count; i += batchSize)
+
+        _logger.LogInformation(
+            "Processing {TotalRepos} repositories in batches of {BatchSize} for user {Username}",
+            allRepos.Count,
+            DefaultBatchSize,
+            username);
+
+        for (var i = 0; i < allRepos.Count; i += DefaultBatchSize)
         {
-            var batch = allRepos.Skip(i).Take(batchSize).ToList();
+            var batch = allRepos.Skip(i).Take(DefaultBatchSize).ToList();
             var batchStats = await GetCommitStatisticsForBatch(client, username, batch, since, cancellationToken);
-            
+
             stats.CommitsCount += batchStats.CommitsCount;
             stats.FilesAdjusted += batchStats.FilesAdjusted;
             stats.ChangesInFilesCount += batchStats.ChangesInFilesCount;
             stats.AdditionsInFilesCount += batchStats.AdditionsInFilesCount;
             stats.DeletionsInFilesCount += batchStats.DeletionsInFilesCount;
-            
-            _logger.LogDebug("Processed batch {BatchNumber}/{TotalBatches} for user {Username}", 
-                (i / batchSize) + 1, (allRepos.Count + batchSize - 1) / batchSize, username);
+
+            _logger.LogDebug(
+                "Processed batch {BatchNumber}/{TotalBatches} for user {Username}",
+                (i / DefaultBatchSize) + 1,
+                (allRepos.Count + DefaultBatchSize - 1) / DefaultBatchSize,
+                username);
         }
 
         return stats;
@@ -192,12 +216,12 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         string since,
         CancellationToken cancellationToken)
     {
-        if (!repositories.Any())
+        if (repositories.Count == 0)
         {
             return new CommitStatistics();
         }
 
-        // Build dynamic GraphQL query for the batch
+        // Build a dynamic GraphQL query for the batch
         var repoQueries = new List<string>();
         var variables = new Dictionary<string, object>
         {
@@ -205,7 +229,7 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
             ["since"] = since
         };
 
-        for (int i = 0; i < repositories.Count; i++)
+        for (var i = 0; i < repositories.Count; i++)
         {
             var repo = repositories[i];
             var alias = $"repo{i}";
@@ -243,11 +267,12 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
 
         try
         {
-            var response = await client.SendQueryAsync<dynamic>(batchQuery, cancellationToken);
-            
+            var response = await client.SendQueryAsync<Dictionary<string, object>>(batchQuery, cancellationToken);
+
             if (response.Errors?.Any() == true)
             {
-                _logger.LogWarning("GraphQL errors in batch: {Errors}", 
+                _logger.LogWarning(
+                    "GraphQL errors in batch: {Errors}",
                     string.Join(", ", response.Errors.Select(e => e.Message)));
             }
 
@@ -255,16 +280,23 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to get commit statistics for batch, skipping");
+            _logger.LogWarning(
+                ex,
+                "Failed to get commit statistics for batch, skipping");
+
             return new CommitStatistics();
         }
     }
 
-    private CommitStatistics ProcessBatchCommitResponse(dynamic data)
+    private CommitStatistics ProcessBatchCommitResponse(
+        Dictionary<string, object> data)
     {
         var stats = new CommitStatistics();
-        
-        if (data == null) return stats;
+
+        if (data == null)
+        {
+            return stats;
+        }
 
         try
         {
@@ -277,7 +309,7 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
                 try
                 {
                     var repoData = property.Value;
-                    
+
                     if (repoData.TryGetProperty("defaultBranchRef", out var branchRef) &&
                         branchRef.TryGetProperty("target", out var target) &&
                         target.TryGetProperty("history", out var history) &&
@@ -286,21 +318,21 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
                         foreach (var commit in nodes.EnumerateArray())
                         {
                             // For now, count all commits since filtering by author in GraphQL is complex
-                            // In a future iteration, we could add better author filtering
+                            // In a future iteration; we could add better author filtering
                             stats.CommitsCount++;
-                            
+
                             if (commit.TryGetProperty("changedFiles", out var changedFiles))
                             {
                                 stats.FilesAdjusted += changedFiles.GetInt32();
                             }
-                            
+
                             if (commit.TryGetProperty("additions", out var additions))
                             {
                                 var additionsCount = additions.GetInt32();
                                 stats.AdditionsInFilesCount += additionsCount;
                                 stats.ChangesInFilesCount += additionsCount;
                             }
-                            
+
                             if (commit.TryGetProperty("deletions", out var deletions))
                             {
                                 var deletionsCount = deletions.GetInt32();
@@ -312,7 +344,10 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to process commit data for repository {RepoKey}", property.Name);
+                    _logger.LogWarning(
+                        ex,
+                        "Failed to process commit data for repository {RepoKey}",
+                        property.Name);
                 }
             }
         }
@@ -364,7 +399,8 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         };
     }
 
-    private async Task<GraphQLHttpClient> GetClientAsync(CancellationToken cancellationToken = default)
+    private async Task<GraphQLHttpClient> GetClientAsync(
+        CancellationToken cancellationToken = default)
     {
         if (_client != null)
         {
@@ -372,46 +408,55 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         }
 
         var token = await _githubPersonalUserTokenService.GetTokenAsync(cancellationToken);
-        
+
         _client = new GraphQLHttpClient("https://api.github.com/graphql", new NewtonsoftJsonSerializer());
-        _client.HttpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        _client.HttpClient.DefaultRequestHeaders.Add("Authorization", $"bearer {token}");
         _client.HttpClient.DefaultRequestHeaders.Add("User-Agent", "techinterview.space");
 
         return _client;
     }
 
-    public void Dispose()
-    {
-        _client?.Dispose();
-    }
-
     // Response DTOs for GraphQL
-    public class CommitStatistics
+    public record CommitStatistics
     {
         public int CommitsCount { get; set; }
+
         public int FilesAdjusted { get; set; }
+
         public int ChangesInFilesCount { get; set; }
+
         public int AdditionsInFilesCount { get; set; }
+
         public int DeletionsInFilesCount { get; set; }
     }
 
-    public class UserProfileResponse
+    public record UserProfileResponse
     {
         public UserProfile User { get; set; }
     }
 
-    public class UserProfile
+    public record UserProfile
     {
         public string Name { get; set; }
+
         public string Login { get; set; }
+
         public string Url { get; set; }
+
         public CountInfo Followers { get; set; }
+
         public CountInfo Following { get; set; }
+
         public CountInfo PublicRepos { get; set; }
+
         public RepositoryConnection Repositories { get; set; }
+
         public OrganizationConnection Organizations { get; set; }
+
         public CountInfo Issues { get; set; }
+
         public CountInfo PullRequests { get; set; }
+
         public DateTime CreatedAt { get; set; }
     }
 
@@ -420,38 +465,44 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         public int TotalCount { get; set; }
     }
 
-    public class RepositoryConnection
+    public record RepositoryConnection
     {
         public int TotalCount { get; set; }
+
         public List<Repository> Nodes { get; set; }
     }
 
-    public class OrganizationConnection
+    public record OrganizationConnection
     {
         public List<Organization> Nodes { get; set; }
     }
 
-    public class Organization
+    public record Organization
     {
         public string Login { get; set; }
+
         public RepositoryConnection Repositories { get; set; }
     }
 
     public class Repository
     {
         public string Name { get; set; }
+
         public Owner Owner { get; set; }
+
         public int StargazerCount { get; set; }
+
         public bool IsFork { get; set; }
+
         public DefaultBranchRef DefaultBranchRef { get; set; }
     }
 
-    public class Owner
+    public record Owner
     {
         public string Login { get; set; }
     }
 
-    public class DefaultBranchRef
+    public record DefaultBranchRef
     {
         public string Name { get; set; }
     }
