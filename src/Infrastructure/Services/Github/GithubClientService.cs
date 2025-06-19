@@ -4,6 +4,7 @@ using Octokit.Internal;
 
 namespace Infrastructure.Services.Github;
 
+// TODO mgorbatyuk: create interface for this service
 public class GithubClientService
 {
     private readonly IGithubPersonalUserTokenService _githubPersonalUserTokenService;

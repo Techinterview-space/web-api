@@ -56,7 +56,8 @@ public static class ServiceRegistration
             .AddTransient<StatDataChangeSubscriptionService>()
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
             .AddScoped<IViewRenderer, ViewRenderer>()
-            .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>();
+            .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()
+            .AddScoped<GithubClientService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
