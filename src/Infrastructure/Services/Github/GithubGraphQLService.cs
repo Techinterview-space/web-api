@@ -237,21 +237,23 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
 
             repoQueries.Add($@"
                 {alias}: repository(owner: $owner{i}, name: $name{i}) {{
-                  defaultBranchRef {{
-                    target {{
-                      ... on Commit {{
-                        history(first: 100, since: $since) {{
-                          totalCount
-                          nodes {{
-                            author {{
-                              user {{
-                                login
+                  ... on Repository {{
+                    defaultBranchRef {{
+                      target {{
+                        ... on Commit {{
+                          history(first: 100, since: $since) {{
+                            totalCount
+                            nodes {{
+                              author {{
+                                user {{
+                                  login
+                                }}
                               }}
+                              committedDate
+                              additions
+                              deletions
+                              changedFiles
                             }}
-                            committedDate
-                            additions
-                            deletions
-                            changedFiles
                           }}
                         }}
                       }}
@@ -280,7 +282,21 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     string.Join(", ", response.Errors.Select(e => e.Message)));
             }
 
+            if (response.Data == null)
+            {
+                _logger.LogWarning("No data returned from GraphQL batch query");
+                return new CommitStatistics();
+            }
+
             return ProcessBatchCommitResponse(response.Data, username);
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogWarning(
+                jsonEx,
+                "JSON parsing error in batch commit query: {ErrorMessage}",
+                jsonEx.Message);
+            return new CommitStatistics();
         }
         catch (Exception ex)
         {
@@ -309,69 +325,116 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             var json = JsonSerializer.Serialize(data);
             var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
 
+            _logger.LogDebug("Processing batch commit response for user {Username}", username);
+
             foreach (var property in jsonElement.EnumerateObject())
             {
                 try
                 {
                     var repoData = property.Value;
 
-                    if (repoData.TryGetProperty("defaultBranchRef", out var branchRef) &&
-                        branchRef.TryGetProperty("target", out var target) &&
-                        target.TryGetProperty("history", out var history) &&
-                        history.TryGetProperty("nodes", out var nodes))
+                    _logger.LogDebug("Processing repository data for {RepoKey}", property.Name);
+
+                    // Check if repository exists (GraphQL returns null for non-existent repos)
+                    if (repoData.ValueKind == JsonValueKind.Null)
                     {
-                        foreach (var commit in nodes.EnumerateArray())
+                        _logger.LogDebug("Repository {RepoKey} not found or inaccessible", property.Name);
+                        continue;
+                    }
+
+                    // Check if repository data exists and has the expected structure
+                    if (!repoData.TryGetProperty("defaultBranchRef", out var branchRef) || 
+                        branchRef.ValueKind == JsonValueKind.Null)
+                    {
+                        _logger.LogDebug("Repository {RepoKey} has no default branch", property.Name);
+                        continue; // Repository has no default branch
+                    }
+
+                    if (!branchRef.TryGetProperty("target", out var target) || 
+                        target.ValueKind == JsonValueKind.Null)
+                    {
+                        _logger.LogDebug("Repository {RepoKey} has no target (empty repository)", property.Name);
+                        continue; // Target is null (empty repository)
+                    }
+
+                    if (!target.TryGetProperty("history", out var history) || 
+                        history.ValueKind == JsonValueKind.Null)
+                    {
+                        _logger.LogDebug("Repository {RepoKey} has no commit history", property.Name);
+                        continue; // No commit history
+                    }
+
+                    if (!history.TryGetProperty("nodes", out var nodes) || 
+                        nodes.ValueKind == JsonValueKind.Null || 
+                        nodes.ValueKind != JsonValueKind.Array)
+                    {
+                        _logger.LogDebug("Repository {RepoKey} has invalid nodes structure. ValueKind: {ValueKind}", 
+                            property.Name, nodes.ValueKind);
+                        continue; // No commit nodes or nodes is not an array
+                    }
+
+                    var commitsProcessed = 0;
+                    foreach (var commit in nodes.EnumerateArray())
+                    {
+                        // Filter commits by author username
+                        string authorLogin = null;
+                        if (commit.TryGetProperty("author", out var author) &&
+                            author.ValueKind != JsonValueKind.Null &&
+                            author.TryGetProperty("user", out var user) &&
+                            user.ValueKind != JsonValueKind.Null &&
+                            user.TryGetProperty("login", out var login))
                         {
-                            // Filter commits by author username
-                            string authorLogin = null;
-                            if (commit.TryGetProperty("author", out var author) &&
-                                author.TryGetProperty("user", out var user) &&
-                                user.TryGetProperty("login", out var login))
-                            {
-                                authorLogin = login.GetString();
-                            }
+                            authorLogin = login.GetString();
+                        }
 
-                            // Only count commits authored by the specified username
-                            if (!string.Equals(authorLogin, username, StringComparison.OrdinalIgnoreCase))
-                            {
-                                continue;
-                            }
+                        // Only count commits authored by the specified username
+                        if (!string.Equals(authorLogin, username, StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
 
-                            stats.CommitsCount++;
+                        stats.CommitsCount++;
+                        commitsProcessed++;
 
-                            if (commit.TryGetProperty("changedFiles", out var changedFiles))
-                            {
-                                stats.FilesAdjusted += changedFiles.GetInt32();
-                            }
+                        if (commit.TryGetProperty("changedFiles", out var changedFiles) && 
+                            changedFiles.ValueKind == JsonValueKind.Number)
+                        {
+                            stats.FilesAdjusted += changedFiles.GetInt32();
+                        }
 
-                            if (commit.TryGetProperty("additions", out var additions))
-                            {
-                                var additionsCount = additions.GetInt32();
-                                stats.AdditionsInFilesCount += additionsCount;
-                                stats.ChangesInFilesCount += additionsCount;
-                            }
+                        if (commit.TryGetProperty("additions", out var additions) && 
+                            additions.ValueKind == JsonValueKind.Number)
+                        {
+                            var additionsCount = additions.GetInt32();
+                            stats.AdditionsInFilesCount += additionsCount;
+                            stats.ChangesInFilesCount += additionsCount;
+                        }
 
-                            if (commit.TryGetProperty("deletions", out var deletions))
-                            {
-                                var deletionsCount = deletions.GetInt32();
-                                stats.DeletionsInFilesCount += deletionsCount;
-                                stats.ChangesInFilesCount += deletionsCount;
-                            }
+                        if (commit.TryGetProperty("deletions", out var deletions) && 
+                            deletions.ValueKind == JsonValueKind.Number)
+                        {
+                            var deletionsCount = deletions.GetInt32();
+                            stats.DeletionsInFilesCount += deletionsCount;
+                            stats.ChangesInFilesCount += deletionsCount;
                         }
                     }
+
+                    _logger.LogDebug("Processed {CommitsCount} commits for repository {RepoKey}", 
+                        commitsProcessed, property.Name);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(
                         ex,
-                        "Failed to process commit data for repository {RepoKey}",
-                        property.Name);
+                        "Failed to process commit data for repository {RepoKey}. Error: {ErrorMessage}",
+                        property.Name,
+                        ex.Message);
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to process batch commit response");
+            _logger.LogWarning(ex, "Failed to process batch commit response. Error: {ErrorMessage}", ex.Message);
         }
 
         return stats;
