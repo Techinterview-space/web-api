@@ -225,7 +225,6 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         var repoQueries = new List<string>();
         var variables = new Dictionary<string, object>
         {
-            ["username"] = username,
             ["since"] = since
         };
 
@@ -259,7 +258,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         var batchQuery = new GraphQLRequest
         {
             Query = $@"
-                query GetCommitsBatch($username: String!, $since: GitTimestamp!, {string.Join(", ", repositories.Select((r, i) => $"$owner{i}: String!, $name{i}: String!"))}) {{
+                query GetCommitsBatch($since: GitTimestamp!, {string.Join(", ", repositories.Select((r, i) => $"$owner{i}: String!, $name{i}: String!"))}) {{
                   {string.Join("\n", repoQueries)}
                 }}",
             Variables = variables
