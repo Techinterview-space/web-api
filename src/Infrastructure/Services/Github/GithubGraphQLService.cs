@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Domain.Entities.Github;
 using GraphQL;
 using GraphQL.Client.Http;
@@ -238,7 +243,7 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
 
         try
         {
-            var response = await client.SendQueryAsync<Dictionary<string, object>>(batchQuery, cancellationToken);
+            var response = await client.SendQueryAsync<dynamic>(batchQuery, cancellationToken);
             
             if (response.Errors?.Any() == true)
             {
@@ -255,54 +260,65 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
         }
     }
 
-    private CommitStatistics ProcessBatchCommitResponse(Dictionary<string, object> data)
+    private CommitStatistics ProcessBatchCommitResponse(dynamic data)
     {
         var stats = new CommitStatistics();
         
         if (data == null) return stats;
 
-        foreach (var kvp in data)
+        try
         {
-            try
+            // Convert dynamic data to JSON and parse it properly
+            var json = JsonSerializer.Serialize(data);
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
+
+            foreach (var property in jsonElement.EnumerateObject())
             {
-                var repoData = JsonSerializer.Deserialize<JsonElement>(kvp.Value.ToString());
-                
-                if (repoData.TryGetProperty("defaultBranchRef", out var branchRef) &&
-                    branchRef.TryGetProperty("target", out var target) &&
-                    target.TryGetProperty("history", out var history) &&
-                    history.TryGetProperty("nodes", out var nodes))
+                try
                 {
-                    foreach (var commit in nodes.EnumerateArray())
+                    var repoData = property.Value;
+                    
+                    if (repoData.TryGetProperty("defaultBranchRef", out var branchRef) &&
+                        branchRef.TryGetProperty("target", out var target) &&
+                        target.TryGetProperty("history", out var history) &&
+                        history.TryGetProperty("nodes", out var nodes))
                     {
-                        // For now, count all commits since filtering by author in GraphQL is complex
-                        // In a future iteration, we could add better author filtering
-                        stats.CommitsCount++;
-                        
-                        if (commit.TryGetProperty("changedFiles", out var changedFiles))
+                        foreach (var commit in nodes.EnumerateArray())
                         {
-                            stats.FilesAdjusted += changedFiles.GetInt32();
-                        }
-                        
-                        if (commit.TryGetProperty("additions", out var additions))
-                        {
-                            var additionsCount = additions.GetInt32();
-                            stats.AdditionsInFilesCount += additionsCount;
-                            stats.ChangesInFilesCount += additionsCount;
-                        }
-                        
-                        if (commit.TryGetProperty("deletions", out var deletions))
-                        {
-                            var deletionsCount = deletions.GetInt32();
-                            stats.DeletionsInFilesCount += deletionsCount;
-                            stats.ChangesInFilesCount += deletionsCount;
+                            // For now, count all commits since filtering by author in GraphQL is complex
+                            // In a future iteration, we could add better author filtering
+                            stats.CommitsCount++;
+                            
+                            if (commit.TryGetProperty("changedFiles", out var changedFiles))
+                            {
+                                stats.FilesAdjusted += changedFiles.GetInt32();
+                            }
+                            
+                            if (commit.TryGetProperty("additions", out var additions))
+                            {
+                                var additionsCount = additions.GetInt32();
+                                stats.AdditionsInFilesCount += additionsCount;
+                                stats.ChangesInFilesCount += additionsCount;
+                            }
+                            
+                            if (commit.TryGetProperty("deletions", out var deletions))
+                            {
+                                var deletionsCount = deletions.GetInt32();
+                                stats.DeletionsInFilesCount += deletionsCount;
+                                stats.ChangesInFilesCount += deletionsCount;
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to process commit data for repository {RepoKey}", property.Name);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to process commit data for repository {RepoKey}", kvp.Key);
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to process batch commit response");
         }
 
         return stats;
@@ -344,7 +360,7 @@ public class GithubGraphQLService : IGithubGraphQLService, IDisposable
             ChangesInFilesCount = commitStats.ChangesInFilesCount,
             AdditionsInFilesCount = commitStats.AdditionsInFilesCount,
             DeletionsInFilesCount = commitStats.DeletionsInFilesCount,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = user.CreatedAt
         };
     }
 

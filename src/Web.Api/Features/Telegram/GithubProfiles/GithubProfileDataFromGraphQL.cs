@@ -1,3 +1,4 @@
+using System;
 using Domain.Entities.Github;
 
 namespace Web.Api.Features.Telegram.GithubProfiles;
