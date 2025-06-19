@@ -259,7 +259,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         var batchQuery = new GraphQLRequest
         {
             Query = $@"
-                query GetCommitsBatch($username: String!, $since: DateTime!, {string.Join(", ", repositories.Select((r, i) => $"$owner{i}: String!, $name{i}: String!"))}) {{
+                query GetCommitsBatch($username: String!, $since: GitTimestamp!, {string.Join(", ", repositories.Select((r, i) => $"$owner{i}: String!, $name{i}: String!"))}) {{
                   {string.Join("\n", repoQueries)}
                 }}",
             Variables = variables
