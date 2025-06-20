@@ -121,7 +121,13 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             _logger.LogInformation("Successfully fetched basic profile data for user {Username}", username);
 
             // Now get commit statistics efficiently using a batched approach
-            var commitStats = await GetCommitStatisticsAsync(client, username, response.Data.User, since, cancellationToken);
+            var commitStats = await GetCommitStatisticsAsync(
+                client,
+                username,
+                response.Data.User,
+                since,
+                monthsToFetchCommits,
+                cancellationToken);
 
             _logger.LogInformation(
                 "Successfully fetched commit statistics for user {Username}: {CommitsCount} commits, {FilesAdjusted} files",
@@ -159,6 +165,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         string username,
         UserProfile user,
         string since,
+        int monthsToFetchCommits,
         CancellationToken cancellationToken)
     {
         try
@@ -246,7 +253,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to get commit statistics using contribution API for user {Username}", username);
-            
+
             // Fallback to the original batched approach if contribution API fails
             return await GetCommitStatisticsUsingBatchedApproach(client, username, user, since, cancellationToken);
         }
@@ -323,12 +330,13 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to get detailed commit data for repository {Owner}/{Name}", 
-                    repoContribution.Repository.Owner.Login, 
+                _logger.LogWarning(
+                    ex,
+                    "Failed to get detailed commit data for repository {Owner}/{Name}",
+                    repoContribution.Repository.Owner.Login,
                     repoContribution.Repository.Name);
             }
         }
-    }
     }
 
     private async Task<CommitStatistics> GetCommitStatisticsUsingBatchedApproach(
@@ -521,33 +529,35 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     }
 
                     // Check if repository data exists and has the expected structure
-                    if (!repoData.TryGetProperty("defaultBranchRef", out var branchRef) || 
+                    if (!repoData.TryGetProperty("defaultBranchRef", out var branchRef) ||
                         branchRef.ValueKind == JsonValueKind.Null)
                     {
                         _logger.LogDebug("Repository {RepoKey} has no default branch", property.Name);
                         continue; // Repository has no default branch
                     }
 
-                    if (!branchRef.TryGetProperty("target", out var target) || 
+                    if (!branchRef.TryGetProperty("target", out var target) ||
                         target.ValueKind == JsonValueKind.Null)
                     {
                         _logger.LogDebug("Repository {RepoKey} has no target (empty repository)", property.Name);
                         continue; // Target is null (empty repository)
                     }
 
-                    if (!target.TryGetProperty("history", out var history) || 
+                    if (!target.TryGetProperty("history", out var history) ||
                         history.ValueKind == JsonValueKind.Null)
                     {
                         _logger.LogDebug("Repository {RepoKey} has no commit history", property.Name);
                         continue; // No commit history
                     }
 
-                    if (!history.TryGetProperty("nodes", out var nodes) || 
-                        nodes.ValueKind == JsonValueKind.Null || 
+                    if (!history.TryGetProperty("nodes", out var nodes) ||
+                        nodes.ValueKind == JsonValueKind.Null ||
                         nodes.ValueKind != JsonValueKind.Array)
                     {
-                        _logger.LogDebug("Repository {RepoKey} has invalid nodes structure. ValueKind: {ValueKind}", 
-                            property.Name, nodes.ValueKind);
+                        _logger.LogDebug(
+                            "Repository {RepoKey} has invalid nodes structure. ValueKind: {ValueKind}",
+                            property.Name,
+                            nodes.ValueKind);
                         continue; // No commit nodes or nodes is not an array
                     }
 
@@ -574,13 +584,13 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                         stats.CommitsCount++;
                         commitsProcessed++;
 
-                        if (commit.TryGetProperty("changedFiles", out var changedFiles) && 
+                        if (commit.TryGetProperty("changedFiles", out var changedFiles) &&
                             changedFiles.ValueKind == JsonValueKind.Number)
                         {
                             stats.FilesAdjusted += changedFiles.GetInt32();
                         }
 
-                        if (commit.TryGetProperty("additions", out var additions) && 
+                        if (commit.TryGetProperty("additions", out var additions) &&
                             additions.ValueKind == JsonValueKind.Number)
                         {
                             var additionsCount = additions.GetInt32();
@@ -588,7 +598,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                             stats.ChangesInFilesCount += additionsCount;
                         }
 
-                        if (commit.TryGetProperty("deletions", out var deletions) && 
+                        if (commit.TryGetProperty("deletions", out var deletions) &&
                             deletions.ValueKind == JsonValueKind.Number)
                         {
                             var deletionsCount = deletions.GetInt32();
@@ -597,8 +607,10 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                         }
                     }
 
-                    _logger.LogDebug("Processed {CommitsCount} commits for repository {RepoKey}", 
-                        commitsProcessed, property.Name);
+                    _logger.LogDebug(
+                        "Processed {CommitsCount} commits for repository {RepoKey}",
+                        commitsProcessed,
+                        property.Name);
                 }
                 catch (Exception ex)
                 {
