@@ -218,7 +218,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         var repoCommitsQuery = @"
         query($owner: String!, $repo: String!, $user_id: ID!, $since: GitTimestamp!, $until: GitTimestamp!, $cursor: String) {
           repository(owner: $owner, name: $repo) {
-            object(expression: "HEAD") {
+            object(expression: ""HEAD"") {
               ... on Commit {
                 history(first: 100, since: $since, until: $until, author: {id: $user_id}, after: $cursor) {
                   pageInfo {
@@ -299,19 +299,28 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 {
                     break;
                 }
-                cursor = history.PageInfo.EndCursor;
 
-            } while (true);
+                cursor = history.PageInfo.EndCursor;
+            }
+            while (true);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error fetching commits from {Owner}/{Repo}: {Message}", owner, repo, ex.Message);
+            _logger.LogWarning(
+                ex,
+                "Error fetching commits from {Owner}/{Repo}: {Message}",
+                owner,
+                repo,
+                ex.Message);
         }
 
         return stats;
     }
 
-    private GithubProfileData MapToGithubProfileData(UserProfile user, CommitStatistics commitStats, int monthsToFetchCommits)
+    private GithubProfileData MapToGithubProfileData(
+        UserProfile user,
+        CommitStatistics commitStats,
+        int monthsToFetchCommits)
     {
         return new GithubProfileData
         {
