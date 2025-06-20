@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -121,14 +121,14 @@ public class GithubClientService
             });
     }
 
-    public async Task<SearchIssuesResult> SearchUserDiscussionsAsync(
+    public Task<SearchIssuesResult> SearchUserDiscussionsAsync(
         string username,
         CancellationToken cancellationToken = default)
     {
         // Note: GitHub REST API doesn't have direct discussion search capability.
-        // This is a placeholder that returns zero results as discussions are better 
+        // This is a placeholder that returns zero results as discussions are better
         // handled through GraphQL API. For REST API fallback, we return empty result.
-        return new SearchIssuesResult(0, false, new List<Issue>());
+        return Task.FromResult(new SearchIssuesResult(0, false, new List<Issue>()));
     }
 
     public async Task<int> GetUserCodeReviewsCountAsync(
@@ -138,14 +138,12 @@ public class GithubClientService
     {
         try
         {
-            // Search for pull requests reviewed by the user
+            // Search for pull requests reviewed by the user using GitHub search syntax
+            var searchQuery = $"type:pr reviewed-by:{username} updated:>{DateTimeOffset.UtcNow.AddMonths(-monthsToFetch):yyyy-MM-dd}";
             var reviewedPRs = await (await GetClientAsync(cancellationToken)).Search.SearchIssues(
-                new SearchIssuesRequest
+                new SearchIssuesRequest(searchQuery)
                 {
                     Type = IssueTypeQualifier.PullRequest,
-                    State = ItemState.All,
-                    Reviewed = username,
-                    Updated = DateRange.GreaterThan(DateTimeOffset.UtcNow.AddMonths(-monthsToFetch)),
                 });
 
             return reviewedPRs.TotalCount;
@@ -169,7 +167,8 @@ public class GithubClientService
     {
         var languageCommitCounts = new Dictionary<string, int>();
 
-        foreach (var repo in repositories.Take(10)) // Limit to avoid too many API calls
+        // Limit to top 10 repositories to avoid too many API calls
+        foreach (var repo in repositories.Take(10))
         {
             try
             {
@@ -184,7 +183,7 @@ public class GithubClientService
 
                     if (commits.Count > 0)
                     {
-                        languageCommitCounts[repo.Language] = 
+                        languageCommitCounts[repo.Language] =
                             languageCommitCounts.GetValueOrDefault(repo.Language, 0) + commits.Count;
                     }
                 }

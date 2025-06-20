@@ -68,7 +68,7 @@ public record GithubProfileData
                $"Lines removed: <b>{DeletionsInFilesCount:N0}</b>\n" +
                $"Discussions opened: <b>{DiscussionsOpened:N0}</b>\n" +
                $"Code reviews made: <b>{CodeReviewsMade:N0}</b>\n" +
-               (string.IsNullOrEmpty(TopLanguagesByCommits) ? "" : $"Top languages: <b>{TopLanguagesByCommits}</b>\n") +
+               (string.IsNullOrEmpty(TopLanguagesByCommits) ? string.Empty : $"Top languages: <b>{TopLanguagesByCommits}</b>\n") +
                "\n" +
                $"<em>Data were taken at {CreatedAt:yyyy-MM-dd HH:mm:ss} UTC</em>\n" +
                $"<em>Stats prepared by @github_profile_bot</em>";
