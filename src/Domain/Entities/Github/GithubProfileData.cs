@@ -36,6 +36,12 @@ public record GithubProfileData
 
     public int DeletionsInFilesCount { get; init; }
 
+    public int DiscussionsOpened { get; init; }
+
+    public int CodeReviewsMade { get; init; }
+
+    public string TopLanguagesByCommits { get; init; }
+
     public DateTime CreatedAt { get; init; }
 
     public GithubProfileData()
@@ -59,7 +65,11 @@ public record GithubProfileData
                $"Files adjusted: <b>{FilesAdjusted:N0}</b>\n" +
                $"Lines changed: <b>{ChangesInFilesCount:N0}</b>\n" +
                $"Lines added: <b>{AdditionsInFilesCount:N0}</b>\n" +
-               $"Lines removed: <b>{DeletionsInFilesCount:N0}</b>\n\n" +
+               $"Lines removed: <b>{DeletionsInFilesCount:N0}</b>\n" +
+               $"Discussions opened: <b>{DiscussionsOpened:N0}</b>\n" +
+               $"Code reviews made: <b>{CodeReviewsMade:N0}</b>\n" +
+               (string.IsNullOrEmpty(TopLanguagesByCommits) ? "" : $"Top languages: <b>{TopLanguagesByCommits}</b>\n") +
+               "\n" +
                $"<em>Data were taken at {CreatedAt:yyyy-MM-dd HH:mm:ss} UTC</em>\n" +
                $"<em>Stats prepared by @github_profile_bot</em>";
     }

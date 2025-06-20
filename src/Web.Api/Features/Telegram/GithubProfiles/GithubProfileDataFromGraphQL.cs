@@ -21,7 +21,10 @@ public record GithubProfileDataFromGraphQL : GithubProfileData
         int filesAdjusted,
         int changesInFilesCount,
         int additionsInFilesCount,
-        int deletionsInFilesCount)
+        int deletionsInFilesCount,
+        int discussionsOpened,
+        int codeReviewsMade,
+        string topLanguagesByCommits)
     {
         Name = name;
         Username = username;
@@ -39,6 +42,9 @@ public record GithubProfileDataFromGraphQL : GithubProfileData
         ChangesInFilesCount = changesInFilesCount;
         AdditionsInFilesCount = additionsInFilesCount;
         DeletionsInFilesCount = deletionsInFilesCount;
+        DiscussionsOpened = discussionsOpened;
+        CodeReviewsMade = codeReviewsMade;
+        TopLanguagesByCommits = topLanguagesByCommits ?? string.Empty;
         CreatedAt = DateTime.UtcNow;
     }
 }

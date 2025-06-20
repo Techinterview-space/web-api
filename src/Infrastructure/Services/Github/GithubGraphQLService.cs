@@ -1,4 +1,9 @@
-﻿using System.Text.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Domain.Entities.Github;
 using GraphQL;
 using GraphQL.Client.Http;
@@ -60,12 +65,19 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                       totalCount
                     }
                     contributionsCollection(from: $from, to: $to) {
+                      totalPullRequestReviewContributions
                       commitContributionsByRepository {
                         repository {
                           name
                           owner { 
                             login 
                           }
+                          primaryLanguage {
+                            name
+                          }
+                        }
+                        contributions {
+                          totalCount
                         }
                       }
                     }
@@ -73,6 +85,9 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                       totalCount
                     }
                     pullRequests(first: 100, states: [OPEN, MERGED, CLOSED]) {
+                      totalCount
+                    }
+                    repositoryDiscussions {
                       totalCount
                     }
                     createdAt
@@ -340,8 +355,38 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             ChangesInFilesCount = commitStats.ChangesInFilesCount,
             AdditionsInFilesCount = commitStats.AdditionsInFilesCount,
             DeletionsInFilesCount = commitStats.DeletionsInFilesCount,
+            DiscussionsOpened = user.RepositoryDiscussions?.TotalCount ?? 0,
+            CodeReviewsMade = user.ContributionsCollection?.TotalPullRequestReviewContributions ?? 0,
+            TopLanguagesByCommits = CalculateTopLanguages(user.ContributionsCollection?.CommitContributionsByRepository),
             CreatedAt = user.CreatedAt
         };
+    }
+
+    private string CalculateTopLanguages(IEnumerable<RepositoryContribution> repositoryContributions)
+    {
+        if (repositoryContributions == null)
+            return string.Empty;
+
+        var languageCommitCounts = new Dictionary<string, int>();
+
+        foreach (var repoContrib in repositoryContributions)
+        {
+            if (repoContrib.Repository?.PrimaryLanguage?.Name != null)
+            {
+                var language = repoContrib.Repository.PrimaryLanguage.Name;
+                var commitCount = repoContrib.Contributions?.TotalCount ?? 0;
+                languageCommitCounts[language] = languageCommitCounts.GetValueOrDefault(language, 0) + commitCount;
+            }
+        }
+
+        // Get top 3 languages
+        var topLanguages = languageCommitCounts
+            .OrderByDescending(x => x.Value)
+            .Take(3)
+            .Select(x => $"{x.Key} ({x.Value})")
+            .ToArray();
+
+        return topLanguages.Length > 0 ? string.Join(", ", topLanguages) : string.Empty;
     }
 
     private async Task<GraphQLHttpClient> GetClientAsync(
@@ -439,6 +484,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         public CountInfo StarredRepositories { get; set; }
         public CountInfo Issues { get; set; }
         public CountInfo PullRequests { get; set; }
+        public CountInfo RepositoryDiscussions { get; set; }
         public ContributionsCollection ContributionsCollection { get; set; }
         public DateTime CreatedAt { get; set; }
     }
@@ -450,18 +496,26 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
 
     public record ContributionsCollection
     {
+        public int TotalPullRequestReviewContributions { get; set; }
         public List<RepositoryContribution> CommitContributionsByRepository { get; set; }
     }
 
     public record RepositoryContribution
     {
         public ContributionRepository Repository { get; set; }
+        public CountInfo Contributions { get; set; }
     }
 
     public record ContributionRepository
     {
         public string Name { get; set; }
         public Owner Owner { get; set; }
+        public PrimaryLanguage PrimaryLanguage { get; set; }
+    }
+
+    public record PrimaryLanguage
+    {
+        public string Name { get; set; }
     }
 
     public record Owner

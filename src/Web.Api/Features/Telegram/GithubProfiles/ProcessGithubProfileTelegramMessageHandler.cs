@@ -292,7 +292,10 @@ public class ProcessGithubProfileTelegramMessageHandler
                     profileData.FilesAdjusted,
                     profileData.ChangesInFilesCount,
                     profileData.AdditionsInFilesCount,
-                    profileData.DeletionsInFilesCount);
+                    profileData.DeletionsInFilesCount,
+                    profileData.DiscussionsOpened,
+                    profileData.CodeReviewsMade,
+                    profileData.TopLanguagesByCommits);
 
                 return (convertedData, null);
             }
@@ -370,6 +373,11 @@ public class ProcessGithubProfileTelegramMessageHandler
             var issuesResult = await _githubClientService.SearchUserIssuesAsync(username, cancellationToken);
             var prsResult = await _githubClientService.SearchUserPullRequestsAsync(username, cancellationToken);
 
+            // Fetch new data
+            var discussionsResult = await _githubClientService.SearchUserDiscussionsAsync(username, cancellationToken);
+            var codeReviewsCount = await _githubClientService.GetUserCodeReviewsCountAsync(username, MonthsToFetchCommits, cancellationToken);
+            var topLanguages = await _githubClientService.GetTopLanguagesByCommitsAsync(userRepositories, username, MonthsToFetchCommits, cancellationToken);
+
             var userData = new GithubProfileDataBasedOnOctokitData(
                 user,
                 userRepositories,
@@ -379,7 +387,10 @@ public class ProcessGithubProfileTelegramMessageHandler
                 filesAdjusted,
                 changesInFilesCount,
                 additionsInFilesCount,
-                deletionsInFilesCount);
+                deletionsInFilesCount,
+                discussionsResult.TotalCount,
+                codeReviewsCount,
+                topLanguages);
 
             return (userData, null);
         }

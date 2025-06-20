@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Octokit;
 using Octokit.Internal;
 
@@ -114,6 +119,98 @@ public class GithubClientService
                 Author = username,
                 Type = IssueTypeQualifier.PullRequest,
             });
+    }
+
+    public async Task<SearchIssuesResult> SearchUserDiscussionsAsync(
+        string username,
+        CancellationToken cancellationToken = default)
+    {
+        return await (await GetClientAsync(cancellationToken)).Search.SearchIssues(
+            new SearchIssuesRequest
+            {
+                Author = username,
+                In = new[] { IssueInQualifier.Title, IssueInQualifier.Body },
+                // Note: GitHub REST API doesn't have a direct discussion search, 
+                // this searches for issues which may include discussions in some repos
+            });
+    }
+
+    public async Task<int> GetUserCodeReviewsCountAsync(
+        string username,
+        int monthsToFetch = 6,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Search for pull requests reviewed by the user
+            var reviewedPRs = await (await GetClientAsync(cancellationToken)).Search.SearchIssues(
+                new SearchIssuesRequest
+                {
+                    Type = IssueTypeQualifier.PullRequest,
+                    State = ItemState.All,
+                    Reviewed = username,
+                    Updated = DateRange.GreaterThan(DateTimeOffset.UtcNow.AddMonths(-monthsToFetch)),
+                });
+
+            return reviewedPRs.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to fetch code reviews count for user {Username}",
+                username);
+
+            return 0;
+        }
+    }
+
+    public async Task<string> GetTopLanguagesByCommitsAsync(
+        IReadOnlyList<Repository> repositories,
+        string username,
+        int monthsToFetch = 6,
+        CancellationToken cancellationToken = default)
+    {
+        var languageCommitCounts = new Dictionary<string, int>();
+
+        foreach (var repo in repositories.Take(10)) // Limit to avoid too many API calls
+        {
+            try
+            {
+                if (repo.Language != null)
+                {
+                    var commits = await GetRepositoryCommitsAsync(
+                        repo.Owner.Login,
+                        repo.Name,
+                        username,
+                        monthsToFetch,
+                        cancellationToken);
+
+                    if (commits.Count > 0)
+                    {
+                        languageCommitCounts[repo.Language] = 
+                            languageCommitCounts.GetValueOrDefault(repo.Language, 0) + commits.Count;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Failed to fetch commits for repository {RepoOwner}/{RepoName}",
+                    repo.Owner.Login,
+                    repo.Name);
+            }
+        }
+
+        // Get top 3 languages
+        var topLanguages = languageCommitCounts
+            .OrderByDescending(x => x.Value)
+            .Take(3)
+            .Select(x => $"{x.Key} ({x.Value})")
+            .ToArray();
+
+        return topLanguages.Length > 0 ? string.Join(", ", topLanguages) : string.Empty;
     }
 
     private async Task<GitHubClient> GetClientAsync(
