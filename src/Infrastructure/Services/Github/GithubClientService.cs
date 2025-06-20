@@ -125,14 +125,10 @@ public class GithubClientService
         string username,
         CancellationToken cancellationToken = default)
     {
-        return await (await GetClientAsync(cancellationToken)).Search.SearchIssues(
-            new SearchIssuesRequest
-            {
-                Author = username,
-                In = new[] { IssueInQualifier.Title, IssueInQualifier.Body },
-                // Note: GitHub REST API doesn't have a direct discussion search, 
-                // this searches for issues which may include discussions in some repos
-            });
+        // Note: GitHub REST API doesn't have direct discussion search capability.
+        // This is a placeholder that returns zero results as discussions are better 
+        // handled through GraphQL API. For REST API fallback, we return empty result.
+        return new SearchIssuesResult(0, false, new List<Issue>());
     }
 
     public async Task<int> GetUserCodeReviewsCountAsync(
