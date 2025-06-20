@@ -21,7 +21,7 @@ namespace Web.Api.Features.Telegram.GithubProfiles;
 public class ProcessGithubProfileTelegramMessageHandler
     : IRequestHandler<ProcessTelegramMessageCommand, string>
 {
-    private const int MonthsToFetchCommits = 3;
+    private const int MonthsToFetchCommits = 12;
 
     private readonly ILogger<ProcessGithubProfileTelegramMessageHandler> _logger;
     private readonly GithubClientService _githubClientService;
