@@ -1,14 +1,15 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.Github;
 using Domain.Enums;
-using Domain.ValueObjects.Pagination;
-using Infrastructure.Database;
+using Infrastructure.Services.Mediator;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Github.Dtos;
+using Microsoft.Extensions.DependencyInjection;
+using Web.Api.Features.Github.DeleteGithubProcessingJob;
+using Web.Api.Features.Github.GetGithubProfileChats;
+using Web.Api.Features.Github.GetGithubProfiles;
+using Web.Api.Features.Github.GetGithubProcessingJobs;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Github;
@@ -18,63 +19,40 @@ namespace Web.Api.Features.Github;
 [HasAnyRole(Role.Admin)]
 public class GithubController : ControllerBase
 {
-    private readonly DatabaseContext _context;
+    private readonly IServiceProvider _serviceProvider;
 
-    public GithubController(DatabaseContext context)
+    public GithubController(IServiceProvider serviceProvider)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
     }
 
     [HttpGet("profiles")]
     public async Task<IActionResult> GetGithubProfiles(
-        [FromQuery] PageModel queryParams,
+        [FromQuery] GetGithubProfilesQueryParams queryParams,
         CancellationToken cancellationToken)
     {
-        var profiles = await _context.GithubProfiles
-            .OrderByDescending(x => x.CreatedAt)
-            .AsPaginatedAsync(
-                queryParams,
-                cancellationToken);
-
-        return Ok(new Pageable<GithubProfileDto>(
-            profiles.CurrentPage,
-            profiles.PageSize,
-            profiles.TotalItems,
-            profiles.Results
-                .Select(x => new GithubProfileDto(x))
-                .ToList()));
+        return Ok(
+            await _serviceProvider.GetRequiredService<GetGithubProfilesHandler>()
+                .Handle(queryParams, cancellationToken));
     }
 
     [HttpGet("chats")]
     public async Task<IActionResult> GetGithubProfileChats(
-        [FromQuery] PageModel queryParams,
+        [FromQuery] GetGithubProfileChatsQueryParams queryParams,
         CancellationToken cancellationToken)
     {
-        var chats = await _context.GithubProfileBotChats
-            .OrderByDescending(x => x.MessagesCount)
-            .ThenByDescending(x => x.CreatedAt)
-            .AsPaginatedAsync(
-                queryParams,
-                cancellationToken);
-
-        return Ok(new Pageable<GithubProfileBotChatDto>(
-            chats.CurrentPage,
-            chats.PageSize,
-            chats.TotalItems,
-            chats.Results
-                .Select(x => new GithubProfileBotChatDto(x))
-                .ToList()));
+        return Ok(
+            await _serviceProvider.GetRequiredService<GetGithubProfileChatsHandler>()
+                .Handle(queryParams, cancellationToken));
     }
 
     [HttpGet("processing-jobs")]
     public async Task<IActionResult> GetGithubProcessingJobs(
         CancellationToken cancellationToken)
     {
-        var jobs = await _context.GithubProfileProcessingJobs
-            .OrderByDescending(x => x.CreatedAt)
-            .AllAsync(cancellationToken);
-
-        return Ok(jobs.Select(x => new GithubProfileProcessingJobDto(x)).ToList());
+        return Ok(
+            await _serviceProvider.GetRequiredService<GetGithubProcessingJobsHandler>()
+                .Handle(Nothing.Value, cancellationToken));
     }
 
     [HttpDelete("processing-jobs/{username}")]
@@ -82,17 +60,16 @@ public class GithubController : ControllerBase
         string username,
         CancellationToken cancellationToken)
     {
-        var job = await _context.GithubProfileProcessingJobs
-            .FirstOrDefaultAsync(x => x.Username == username, cancellationToken);
-
-        if (job == null)
+        try
         {
-            return NotFound($"Github processing job with username '{username}' not found");
+            await _serviceProvider.GetRequiredService<DeleteGithubProcessingJobHandler>()
+                .Handle(new DeleteGithubProcessingJobCommand(username), cancellationToken);
+
+            return Ok();
         }
-
-        _context.GithubProfileProcessingJobs.Remove(job);
-        await _context.TrySaveChangesAsync(cancellationToken);
-
-        return Ok();
+        catch (BadHttpRequestException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
