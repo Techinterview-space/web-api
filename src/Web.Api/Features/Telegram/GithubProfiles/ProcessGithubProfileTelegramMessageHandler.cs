@@ -21,21 +21,24 @@ namespace Web.Api.Features.Telegram.GithubProfiles;
 public class ProcessGithubProfileTelegramMessageHandler
     : IRequestHandler<ProcessTelegramMessageCommand, string>
 {
-    private const int MonthsToFetchCommits = 3;
+    private const int MonthsToFetchCommits = 12;
 
     private readonly ILogger<ProcessGithubProfileTelegramMessageHandler> _logger;
     private readonly GithubClientService _githubClientService;
+    private readonly IGithubGraphQLService _githubGraphQLService;
     private readonly DatabaseContext _context;
     private readonly IConfiguration _configuration;
 
     public ProcessGithubProfileTelegramMessageHandler(
         ILogger<ProcessGithubProfileTelegramMessageHandler> logger,
         GithubClientService githubClientService,
+        IGithubGraphQLService githubGraphQLService,
         DatabaseContext context,
         IConfiguration configuration)
     {
         _logger = logger;
         _githubClientService = githubClientService;
+        _githubGraphQLService = githubGraphQLService;
         _context = context;
         _configuration = configuration;
     }
@@ -261,7 +264,62 @@ public class ProcessGithubProfileTelegramMessageHandler
         return chatTobeReturned;
     }
 
-    private async Task<(GithubProfileDataBasedOnOctokitData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
+    private async Task<(GithubProfileData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
+        string username,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Try GraphQL service first for better performance
+            try
+            {
+                var profileData = await _githubGraphQLService.GetUserProfileDataAsync(username, MonthsToFetchCommits, cancellationToken);
+
+                // Convert to the expected return type
+                var convertedData = new GithubProfileDataFromGraphQL(
+                    profileData.Name ?? profileData.Username,
+                    profileData.Username,
+                    profileData.HtmlUrl,
+                    profileData.Followers,
+                    profileData.Following,
+                    profileData.PublicRepos,
+                    profileData.TotalPrivateRepos,
+                    profileData.PullRequestsCreatedByUser,
+                    profileData.IssuesOpenedByUser,
+                    profileData.CountOfStarredRepos,
+                    profileData.CountOfForkedRepos,
+                    profileData.CommitsCount,
+                    profileData.FilesAdjusted,
+                    profileData.ChangesInFilesCount,
+                    profileData.AdditionsInFilesCount,
+                    profileData.DeletionsInFilesCount);
+
+                return (convertedData, null);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "GraphQL service failed for user {Username}, falling back to REST API",
+                    username);
+
+                // Fall back to the original REST implementation
+                return await GetExtendedGitHubProfileDataUsingRestAsync(username, cancellationToken);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(
+                e,
+                "An error occurred while processing GitHub profile for user: {Username}. Exception: {Exception}",
+                username,
+                e.Message);
+
+            return (null, "An error occurred while processing your request. Please try again later.");
+        }
+    }
+
+    private async Task<(GithubProfileDataBasedOnOctokitData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataUsingRestAsync(
         string username,
         CancellationToken cancellationToken)
     {
@@ -275,10 +333,10 @@ public class ProcessGithubProfileTelegramMessageHandler
             var additionsInFilesCount = 0;
             var deletionsInFilesCount = 0;
 
-            var userOrganizations = await _githubClientService.GetOrganizationsAsync(username);
+            var userOrganizations = await _githubClientService.GetOrganizationsAsync(username, cancellationToken);
             foreach (var userOrganization in userOrganizations)
             {
-                var userOrganizationRepositories = await _githubClientService.GetOrganizationRepositoriesAsync(userOrganization.Login);
+                var userOrganizationRepositories = await _githubClientService.GetOrganizationRepositoriesAsync(userOrganization.Login, cancellationToken);
                 var orgRepoStats = await CalculateRepositoriesStatsAsync(
                     userOrganizationRepositories,
                     userOrganization.Login,
