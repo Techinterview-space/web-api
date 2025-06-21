@@ -79,16 +79,9 @@ public class GithubController : ControllerBase
         string username,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            await _serviceProvider.GetRequiredService<DeleteGithubProfileHandler>()
-                .Handle(new DeleteGithubProfileCommand(username), cancellationToken);
+        await _serviceProvider.GetRequiredService<DeleteGithubProfileHandler>()
+            .Handle(new DeleteGithubProfileCommand(username), cancellationToken);
 
-            return Ok();
-        }
-        catch (BadHttpRequestException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        return Ok();
     }
 }
