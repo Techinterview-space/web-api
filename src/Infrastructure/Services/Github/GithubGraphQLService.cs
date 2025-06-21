@@ -366,7 +366,8 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 user.ContributionsCollection?.CommitContributionsByRepository,
                 topLanguagesCount),
             MonthsToFetchCommits = monthsToFetchCommits,
-            CreatedAt = user.CreatedAt
+            UserCreatedAt = user.CreatedAt,
+            CreatedAt = DateTime.UtcNow,
         };
     }
 
@@ -487,10 +488,15 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         public string Id { get; set; }
         public string Name { get; set; }
         public string Login { get; set; }
+
         public string Url { get; set; }
+
         public CountInfo Followers { get; set; }
+
         public CountInfo Following { get; set; }
+
         public CountInfo Repositories { get; set; }
+
         public CountInfo StarredRepositories { get; set; }
         public CountInfo Issues { get; set; }
         public CountInfo PullRequests { get; set; }
