@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Database;
@@ -8,7 +8,8 @@ using Web.Api.Features.Github.Dtos;
 
 namespace Web.Api.Features.Github.GetGithubProfileChats;
 
-public class GetGithubProfileChatsHandler : IRequestHandler<GetGithubProfileChatsQueryParams, GetGithubProfileChatsResponse>
+public class GetGithubProfileChatsHandler
+    : IRequestHandler<GetGithubProfileChatsQueryParams, GetGithubProfileChatsResponse>
 {
     private readonly DatabaseContext _context;
 

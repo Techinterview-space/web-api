@@ -1,3 +1,5 @@
-namespace Web.Api.Features.Github.DeleteGithubProcessingJob;
+﻿namespace Web.Api.Features.Github.DeleteGithubProcessingJob;
 
-public record DeleteGithubProcessingJobCommand(string Username);
+#pragma warning disable SA1313
+public record DeleteGithubProcessingJobCommand(
+    string Username);

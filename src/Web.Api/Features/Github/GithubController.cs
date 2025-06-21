@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Github.DeleteGithubProcessingJob;
+using Web.Api.Features.Github.GetGithubProcessingJobs;
 using Web.Api.Features.Github.GetGithubProfileChats;
 using Web.Api.Features.Github.GetGithubProfiles;
-using Web.Api.Features.Github.GetGithubProcessingJobs;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.Github;
