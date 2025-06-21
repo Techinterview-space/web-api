@@ -54,10 +54,10 @@ public class DeleteGithubProfileHandlerTests
         await using var context = new InMemoryDatabaseContext();
 
         var handler = new DeleteGithubProfileHandler(context);
-        
+
         var exception = await Assert.ThrowsAsync<NotFoundException>(
             () => handler.Handle(new DeleteGithubProfileCommand("nonexistent"), default));
-        
+
         Assert.Contains("Github profile with username 'nonexistent' not found", exception.Message);
     }
 }
