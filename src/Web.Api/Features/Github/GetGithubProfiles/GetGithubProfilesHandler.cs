@@ -21,7 +21,11 @@ public class GetGithubProfilesHandler : IRequestHandler<GetGithubProfilesQueryPa
         GetGithubProfilesQueryParams request,
         CancellationToken cancellationToken)
     {
+        var search = request.Search?.Trim().ToLowerInvariant();
         var profiles = await _context.GithubProfiles
+            .When(
+                !string.IsNullOrEmpty(search),
+                x => x.Username.ToLower().Contains(search))
             .OrderByDescending(x => x.CreatedAt)
             .AsPaginatedAsync(
                 request,

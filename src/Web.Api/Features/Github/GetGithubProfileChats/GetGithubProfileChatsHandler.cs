@@ -22,7 +22,11 @@ public class GetGithubProfileChatsHandler
         GetGithubProfileChatsQueryParams request,
         CancellationToken cancellationToken)
     {
+        var search = request.Search?.Trim().ToLowerInvariant();
         var chats = await _context.GithubProfileBotChats
+            .When(
+                !string.IsNullOrEmpty(search),
+                x => x.Username.ToLower().Contains(search))
             .OrderByDescending(x => x.MessagesCount)
             .ThenByDescending(x => x.CreatedAt)
             .AsPaginatedAsync(
