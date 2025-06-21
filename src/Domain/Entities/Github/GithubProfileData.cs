@@ -46,6 +46,8 @@ public record GithubProfileData
 
     public int MonthsToFetchCommits { get; init; }
 
+    public DateTime UserCreatedAt { get; init; }
+
     public DateTime CreatedAt { get; init; }
 
     public GithubProfileData()
@@ -105,6 +107,7 @@ public record GithubProfileData
 
         var result = $"Github stats for <b>{Username}</b>\n" +
                      $"Name: {Name}\n" +
+                     $"Profile created: <em>{UserCreatedAt:yyyy-MM-dd}</em>\n" +
                      $"<em><a href=\"{HtmlUrl}\">Profile URL</a></em>\n\n" +
                      $"🌟 Social stats:\n" +
                      $"- Followers: <b>{Followers:N0}</b>\n" +
