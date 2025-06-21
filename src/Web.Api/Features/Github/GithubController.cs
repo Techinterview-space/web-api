@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Github.DeleteGithubProcessingJob;
+using Web.Api.Features.Github.DeleteGithubProfile;
 using Web.Api.Features.Github.GetGithubProcessingJobs;
 using Web.Api.Features.Github.GetGithubProfileChats;
 using Web.Api.Features.Github.GetGithubProfiles;
@@ -71,5 +72,16 @@ public class GithubController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+    }
+
+    [HttpDelete("profiles/{username}")]
+    public async Task<IActionResult> DeleteGithubProfile(
+        string username,
+        CancellationToken cancellationToken)
+    {
+        await _serviceProvider.GetRequiredService<DeleteGithubProfileHandler>()
+            .Handle(new DeleteGithubProfileCommand(username), cancellationToken);
+
+        return Ok();
     }
 }
