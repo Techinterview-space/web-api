@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Services.Mediator;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Github.DeleteGithubProfile;
@@ -25,7 +25,7 @@ public class DeleteGithubProfileHandler : IRequestHandler<DeleteGithubProfileCom
 
         if (profile == null)
         {
-            throw new BadHttpRequestException($"Github profile with username '{request.Username}' not found");
+            throw new NotFoundException($"Github profile with username '{request.Username}' not found");
         }
 
         _context.GithubProfiles.Remove(profile);

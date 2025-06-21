@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities.Github;
 using Domain.Enums;
+using Domain.Validation.Exceptions;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using Web.Api.Features.Github.DeleteGithubProfile;
@@ -48,13 +49,13 @@ public class DeleteGithubProfileHandlerTests
     }
 
     [Fact]
-    public async Task Delete_GithubProfileDoesNotExist_ThrowsBadHttpRequestException()
+    public async Task Delete_GithubProfileDoesNotExist_ThrowsNotFoundException()
     {
         await using var context = new InMemoryDatabaseContext();
 
         var handler = new DeleteGithubProfileHandler(context);
         
-        var exception = await Assert.ThrowsAsync<Microsoft.AspNetCore.Http.BadHttpRequestException>(
+        var exception = await Assert.ThrowsAsync<NotFoundException>(
             () => handler.Handle(new DeleteGithubProfileCommand("nonexistent"), default));
         
         Assert.Contains("Github profile with username 'nonexistent' not found", exception.Message);
