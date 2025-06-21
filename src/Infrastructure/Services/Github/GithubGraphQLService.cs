@@ -60,6 +60,11 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     }
                     repositories(first: 100, ownerAffiliations: OWNER) {
                       totalCount
+                      nodes {
+                        stargazerCount
+                        forkCount
+                        isFork
+                      }
                     }
                     starredRepositories {
                       totalCount
@@ -353,8 +358,8 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             TotalPrivateRepos = 0, // GraphQL doesn't expose private repo count for other users
             PullRequestsCreatedByUser = user.PullRequests?.TotalCount ?? 0,
             IssuesOpenedByUser = user.Issues?.TotalCount ?? 0,
-            CountOfStarredRepos = user.StarredRepositories?.TotalCount ?? 0,
-            CountOfForkedRepos = 0, // Will calculate this if needed from individual repositories
+            CountOfStarredRepos = user.Repositories?.Nodes?.Sum(r => r.StargazerCount) ?? 0,
+            CountOfForkedRepos = user.Repositories?.Nodes?.Count(r => r.IsFork) ?? 0,
             CommitsCount = commitStats.CommitsCount,
             FilesAdjusted = commitStats.FilesAdjusted,
             ChangesInFilesCount = commitStats.ChangesInFilesCount,
@@ -495,7 +500,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
 
         public CountInfo Following { get; set; }
 
-        public CountInfo Repositories { get; set; }
+        public RepositoriesInfo Repositories { get; set; }
 
         public CountInfo StarredRepositories { get; set; }
         public CountInfo Issues { get; set; }
@@ -508,6 +513,19 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
     public record CountInfo
     {
         public int TotalCount { get; set; }
+    }
+
+    public record RepositoriesInfo
+    {
+        public int TotalCount { get; set; }
+        public List<RepositoryNode> Nodes { get; set; }
+    }
+
+    public record RepositoryNode
+    {
+        public int StargazerCount { get; set; }
+        public int ForkCount { get; set; }
+        public bool IsFork { get; set; }
     }
 
     public record ContributionsCollection
