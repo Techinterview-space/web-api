@@ -134,7 +134,11 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 commitStats.CommitsCount,
                 commitStats.FilesAdjusted);
 
-            return MapToGithubProfileData(response.Data.User, commitStats, monthsToFetchCommits);
+            return MapToGithubProfileData(
+                user: response.Data.User,
+                commitStats: commitStats,
+                monthsToFetchCommits: monthsToFetchCommits,
+                topLanguagesCount: 3);
         }
         catch (Exception ex)
         {
@@ -335,7 +339,8 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
     private GithubProfileData MapToGithubProfileData(
         UserProfile user,
         CommitStatistics commitStats,
-        int monthsToFetchCommits)
+        int monthsToFetchCommits,
+        int topLanguagesCount)
     {
         return new GithubProfileData
         {
@@ -357,16 +362,21 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             DeletionsInFilesCount = commitStats.DeletionsInFilesCount,
             DiscussionsOpened = user.RepositoryDiscussions?.TotalCount ?? 0,
             CodeReviewsMade = user.ContributionsCollection?.TotalPullRequestReviewContributions ?? 0,
-            TopLanguagesByCommits = CalculateTopLanguages(user.ContributionsCollection?.CommitContributionsByRepository),
+            TopLanguagesByCommits = CalculateTopLanguages(
+                user.ContributionsCollection?.CommitContributionsByRepository,
+                topLanguagesCount),
+            MonthsToFetchCommits = monthsToFetchCommits,
             CreatedAt = user.CreatedAt
         };
     }
 
-    private string CalculateTopLanguages(IEnumerable<RepositoryContribution> repositoryContributions)
+    private Dictionary<string, int> CalculateTopLanguages(
+        List<RepositoryContribution> repositoryContributions,
+        int topLanguagesCount = 3)
     {
-        if (repositoryContributions == null)
+        if (repositoryContributions == null || repositoryContributions.Count == 0)
         {
-            return string.Empty;
+            return new Dictionary<string, int>();
         }
 
         var languageCommitCounts = new Dictionary<string, int>();
@@ -382,13 +392,11 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         }
 
         // Get top 3 languages
-        var topLanguages = languageCommitCounts
-            .OrderByDescending(x => x.Value)
-            .Take(3)
-            .Select(x => $"{x.Key} ({x.Value})")
-            .ToArray();
-
-        return topLanguages.Length > 0 ? string.Join(", ", topLanguages) : string.Empty;
+        return new Dictionary<string, int>(
+            languageCommitCounts
+                .OrderByDescending(x => x.Value)
+                .Take(topLanguagesCount)
+                .ToList());
     }
 
     private async Task<GraphQLHttpClient> GetClientAsync(

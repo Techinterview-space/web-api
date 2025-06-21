@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Domain.Entities.Github;
 
 namespace Web.Api.Features.Telegram.GithubProfiles;
 
-public record GithubProfileDataFromGraphQL : GithubProfileData
+public record GithubProfileDataFromGraphQl : GithubProfileData
 {
-    public GithubProfileDataFromGraphQL(
+    public GithubProfileDataFromGraphQl(
         string name,
         string username,
         string htmlUrl,
@@ -24,7 +25,7 @@ public record GithubProfileDataFromGraphQL : GithubProfileData
         int deletionsInFilesCount,
         int discussionsOpened,
         int codeReviewsMade,
-        string topLanguagesByCommits)
+        Dictionary<string, int> topLanguagesByCommits)
     {
         Name = name;
         Username = username;
@@ -44,7 +45,7 @@ public record GithubProfileDataFromGraphQL : GithubProfileData
         DeletionsInFilesCount = deletionsInFilesCount;
         DiscussionsOpened = discussionsOpened;
         CodeReviewsMade = codeReviewsMade;
-        TopLanguagesByCommits = topLanguagesByCommits ?? string.Empty;
+        TopLanguagesByCommits = topLanguagesByCommits ?? new Dictionary<string, int>();
         CreatedAt = DateTime.UtcNow;
     }
 }

@@ -159,15 +159,16 @@ public class GithubClientService
         }
     }
 
-    public async Task<string> GetTopLanguagesByCommitsAsync(
+    public async Task<Dictionary<string, int>> GetTopLanguagesByCommitsAsync(
         IReadOnlyList<Repository> repositories,
         string username,
-        int monthsToFetch = 6,
+        int monthsToFetch,
+        int topLanguagesCount = 3,
         CancellationToken cancellationToken = default)
     {
         var languageCommitCounts = new Dictionary<string, int>();
 
-        // Limit to top 10 repositories to avoid too many API calls
+        // Limit to the top 10 repositories to avoid too many API calls
         foreach (var repo in repositories.Take(10))
         {
             try
@@ -199,13 +200,11 @@ public class GithubClientService
         }
 
         // Get top 3 languages
-        var topLanguages = languageCommitCounts
-            .OrderByDescending(x => x.Value)
-            .Take(3)
-            .Select(x => $"{x.Key} ({x.Value})")
-            .ToArray();
-
-        return topLanguages.Length > 0 ? string.Join(", ", topLanguages) : string.Empty;
+        return new Dictionary<string, int>(
+            languageCommitCounts
+                .OrderByDescending(x => x.Value)
+                .Take(topLanguagesCount)
+                .ToList());
     }
 
     private async Task<GitHubClient> GetClientAsync(

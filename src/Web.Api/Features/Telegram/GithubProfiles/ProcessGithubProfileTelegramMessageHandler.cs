@@ -157,7 +157,7 @@ public class ProcessGithubProfileTelegramMessageHandler
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
-            textToSend = profileData?.GetTelegramFormattedText(MonthsToFetchCommits)
+            textToSend = profileData?.GetTelegramFormattedText()
                          ?? errorReplyTextOrNull
                          ?? "An error occurred while fetching GitHub profile data. Please try again later.";
 
@@ -273,31 +273,12 @@ public class ProcessGithubProfileTelegramMessageHandler
             // Try GraphQL service first for better performance
             try
             {
-                var profileData = await _githubGraphQLService.GetUserProfileDataAsync(username, MonthsToFetchCommits, cancellationToken);
+                var profileData = await _githubGraphQLService.GetUserProfileDataAsync(
+                    username,
+                    MonthsToFetchCommits,
+                    cancellationToken);
 
-                // Convert to the expected return type
-                var convertedData = new GithubProfileDataFromGraphQL(
-                    profileData.Name ?? profileData.Username,
-                    profileData.Username,
-                    profileData.HtmlUrl,
-                    profileData.Followers,
-                    profileData.Following,
-                    profileData.PublicRepos,
-                    profileData.TotalPrivateRepos,
-                    profileData.PullRequestsCreatedByUser,
-                    profileData.IssuesOpenedByUser,
-                    profileData.CountOfStarredRepos,
-                    profileData.CountOfForkedRepos,
-                    profileData.CommitsCount,
-                    profileData.FilesAdjusted,
-                    profileData.ChangesInFilesCount,
-                    profileData.AdditionsInFilesCount,
-                    profileData.DeletionsInFilesCount,
-                    profileData.DiscussionsOpened,
-                    profileData.CodeReviewsMade,
-                    profileData.TopLanguagesByCommits);
-
-                return (convertedData, null);
+                return (profileData, null);
             }
             catch (Exception ex)
             {
@@ -376,7 +357,12 @@ public class ProcessGithubProfileTelegramMessageHandler
             // Fetch new data
             var discussionsResult = await _githubClientService.SearchUserDiscussionsAsync(username, cancellationToken);
             var codeReviewsCount = await _githubClientService.GetUserCodeReviewsCountAsync(username, MonthsToFetchCommits, cancellationToken);
-            var topLanguages = await _githubClientService.GetTopLanguagesByCommitsAsync(userRepositories, username, MonthsToFetchCommits, cancellationToken);
+            var topLanguages = await _githubClientService.GetTopLanguagesByCommitsAsync(
+                userRepositories,
+                username,
+                MonthsToFetchCommits,
+                3,
+                cancellationToken);
 
             var userData = new GithubProfileDataBasedOnOctokitData(
                 user,
@@ -390,7 +376,8 @@ public class ProcessGithubProfileTelegramMessageHandler
                 deletionsInFilesCount,
                 discussionsResult.TotalCount,
                 codeReviewsCount,
-                topLanguages);
+                topLanguages,
+                MonthsToFetchCommits);
 
             return (userData, null);
         }

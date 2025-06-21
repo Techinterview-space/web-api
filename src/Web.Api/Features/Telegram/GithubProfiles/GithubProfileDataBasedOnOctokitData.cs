@@ -20,7 +20,8 @@ public record GithubProfileDataBasedOnOctokitData : GithubProfileData
         int deletionsInFilesCount,
         int discussionsOpened,
         int codeReviewsMade,
-        string topLanguagesByCommits)
+        Dictionary<string, int> topLanguagesByCommits,
+        int monthsToFetchCommits = 6)
     {
         Name = user.Name;
         Username = user.HtmlUrl.Split('/').LastOrDefault() ?? string.Empty;
@@ -46,7 +47,8 @@ public record GithubProfileDataBasedOnOctokitData : GithubProfileData
         DeletionsInFilesCount = deletionsInFilesCount;
         DiscussionsOpened = discussionsOpened;
         CodeReviewsMade = codeReviewsMade;
-        TopLanguagesByCommits = topLanguagesByCommits ?? string.Empty;
+        TopLanguagesByCommits = topLanguagesByCommits ?? new Dictionary<string, int>();
+        MonthsToFetchCommits = monthsToFetchCommits;
         CreatedAt = DateTime.UtcNow;
     }
 }
