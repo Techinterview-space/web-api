@@ -249,7 +249,7 @@ public class ProcessGithubProfileTelegramMessageHandler
             var adminUsername = _configuration["Telegram:AdminUsername"];
             chatTobeReturned = new GithubProfileBotChat(
                 chatId: message.Chat.Id,
-                username: message.From?.Username,
+                username: message.From?.Username ?? message.Chat.Id.ToString(),
                 isAdmin: !string.IsNullOrEmpty(adminUsername) && message.From?.Username == adminUsername);
 
             _context.Add(chatTobeReturned);
