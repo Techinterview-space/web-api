@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Github;
+using Domain.Entities.Telegram;
 using Infrastructure.Database;
 using Infrastructure.Services.Github;
 using Infrastructure.Services.Mediator;
@@ -15,6 +17,7 @@ using Octokit.Internal;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineQueryResults;
 
 namespace Web.Api.Features.Telegram.GithubProfiles;
 
@@ -47,11 +50,38 @@ public class ProcessGithubProfileTelegramMessageHandler
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
+        // Handle inline queries
+        if (request.UpdateRequest.Type == UpdateType.InlineQuery &&
+            request.UpdateRequest.InlineQuery != null)
+        {
+            await ProcessInlineQueryAsync(
+                request.BotClient,
+                request.UpdateRequest,
+                cancellationToken);
+
+            return null;
+        }
+
         var message = request.UpdateRequest.Message;
         if (message is null ||
             message.From?.IsBot == true)
         {
             return string.Empty;
+        }
+
+        // Handle inline query click logging
+        var botUser = await GetBotUserAsync(request.BotClient, cancellationToken);
+        var messageSentByBot =
+            message.ViaBot is not null &&
+            message.ViaBot.Username == botUser.Username;
+
+        if (messageSentByBot)
+        {
+            await AddInlineQueryClickAsync(
+                message,
+                cancellationToken);
+
+            return null;
         }
 
         var messageText = message.Text?.Trim();
@@ -463,5 +493,115 @@ public class ProcessGithubProfileTelegramMessageHandler
             changesInFilesCount,
             additionsInFilesCount,
             deletionsInFilesCount);
+    }
+
+    private async Task ProcessInlineQueryAsync(
+        ITelegramBotClient client,
+        Update updateRequest,
+        CancellationToken cancellationToken)
+    {
+        var results = new List<InlineQueryResult>();
+        var query = updateRequest.InlineQuery?.Query?.Trim() ?? string.Empty;
+
+        // Add a general help result
+        results.Add(new InlineQueryResultArticle(
+            "help",
+            "How to use GitHub Profile Bot",
+            new InputTextMessageContent(
+                "Send a GitHub username to get profile information.\n\n" +
+                "Examples:\n" +
+                "• @octocat\n" +
+                "• octocat\n\n" +
+                "The bot will provide detailed information about the user's GitHub profile, repositories, and activity.")
+            {
+                ParseMode = ParseMode.Html,
+            }));
+
+        if (!string.IsNullOrEmpty(query) && query.Length >= 2)
+        {
+            // Clean the username (remove @ if present)
+            var username = query.TrimStart('@');
+            
+            if (!string.IsNullOrEmpty(username) && IsValidGitHubUsername(username))
+            {
+                results.Add(new InlineQueryResultArticle(
+                    $"profile_{username}",
+                    $"Get GitHub profile for @{username}",
+                    new InputTextMessageContent($"@{username}")
+                    {
+                        ParseMode = ParseMode.Html,
+                    }));
+            }
+        }
+
+        try
+        {
+            await client.AnswerInlineQuery(
+                updateRequest.InlineQuery!.Id,
+                results,
+                cacheTime: 300,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(
+                e,
+                "An error occurred while answering inline query: {Message}",
+                e.Message);
+        }
+    }
+
+    private async Task AddInlineQueryClickAsync(
+        Message message,
+        CancellationToken cancellationToken)
+    {
+        if (message.From == null)
+        {
+            return;
+        }
+
+        var username = message.From.Username?.Trim() ?? message.From.Id.ToString();
+        var chatId = message.Chat.Id;
+        var chatName = message.Chat.Title?.Trim();
+
+        _context.Add(
+            new TelegramInlineReply(
+                username,
+                message.From.Id,
+                chatId,
+                chatName));
+
+        await _context.TrySaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<User> GetBotUserAsync(ITelegramBotClient client, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await client.GetMe(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get bot user information");
+            throw;
+        }
+    }
+
+    private static bool IsValidGitHubUsername(string username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return false;
+
+        // GitHub username validation rules
+        // - May only contain alphanumeric characters or single hyphens
+        // - Cannot begin or end with a hyphen
+        // - Maximum is 39 characters
+        if (username.Length > 39)
+            return false;
+
+        if (username.StartsWith("-") || username.EndsWith("-"))
+            return false;
+
+        return username.All(c => char.IsLetterOrDigit(c) || c == '-');
     }
 }

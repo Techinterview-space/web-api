@@ -25,7 +25,9 @@ public class GithubProfileBotHostedService
     {
         return
         [
+            UpdateType.InlineQuery,
             UpdateType.Message,
+            UpdateType.ChosenInlineResult
         ];
     }
 
@@ -35,7 +37,7 @@ public class GithubProfileBotHostedService
         Update updateRequest,
         CancellationToken cancellationToken)
     {
-        if (updateRequest.Message is null)
+        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
         {
             return Task.CompletedTask;
         }
