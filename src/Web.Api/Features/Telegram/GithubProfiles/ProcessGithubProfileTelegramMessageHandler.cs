@@ -70,10 +70,9 @@ public class ProcessGithubProfileTelegramMessageHandler
         }
 
         // Handle inline query click logging
-        var botUser = await GetBotUserAsync(request.BotClient, cancellationToken);
         var messageSentByBot =
             message.ViaBot is not null &&
-            message.ViaBot.Username == botUser.Username;
+            message.ViaBot.Username == "github_profile_bot";
 
         if (messageSentByBot)
         {
@@ -521,7 +520,7 @@ public class ProcessGithubProfileTelegramMessageHandler
         {
             // Clean the username (remove @ if present)
             var username = query.TrimStart('@');
-            
+
             if (!string.IsNullOrEmpty(username) && IsValidGitHubUsername(username))
             {
                 results.Add(new InlineQueryResultArticle(
@@ -574,33 +573,27 @@ public class ProcessGithubProfileTelegramMessageHandler
         await _context.TrySaveChangesAsync(cancellationToken);
     }
 
-    private async Task<User> GetBotUserAsync(ITelegramBotClient client, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await client.GetMe(cancellationToken);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to get bot user information");
-            throw;
-        }
-    }
-
-    private static bool IsValidGitHubUsername(string username)
+    private static bool IsValidGitHubUsername(
+        string username)
     {
         if (string.IsNullOrWhiteSpace(username))
+        {
             return false;
+        }
 
         // GitHub username validation rules
         // - May only contain alphanumeric characters or single hyphens
         // - Cannot begin or end with a hyphen
         // - Maximum is 39 characters
         if (username.Length > 39)
+        {
             return false;
+        }
 
-        if (username.StartsWith("-") || username.EndsWith("-"))
+        if (username.StartsWith('-') || username.EndsWith('-'))
+        {
             return false;
+        }
 
         return username.All(c => char.IsLetterOrDigit(c) || c == '-');
     }
