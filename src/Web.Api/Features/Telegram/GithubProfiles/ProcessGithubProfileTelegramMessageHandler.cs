@@ -69,10 +69,12 @@ public class ProcessGithubProfileTelegramMessageHandler
             return string.Empty;
         }
 
+        var telegramBotUsername = _configuration["Telegram:GithubTelegramBotName"];
+
         // Handle inline query click logging
         var messageSentByBot =
             message.ViaBot is not null &&
-            message.ViaBot.Username == "github_profile_bot";
+            message.ViaBot.Username == telegramBotUsername;
 
         if (messageSentByBot)
         {
@@ -538,7 +540,7 @@ public class ProcessGithubProfileTelegramMessageHandler
             await client.AnswerInlineQuery(
                 updateRequest.InlineQuery!.Id,
                 results,
-                cacheTime: 300,
+                cacheTime: 15 * 60,
                 cancellationToken: cancellationToken);
         }
         catch (Exception e)
