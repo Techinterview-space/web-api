@@ -421,6 +421,7 @@ Chat ID: {message.Chat.Id}
             await client.AnswerInlineQuery(
                 updateRequest.InlineQuery!.Id,
                 results,
+                cacheTime: 10 * 60,
                 cancellationToken: cancellationToken);
         }
         catch (Exception e)

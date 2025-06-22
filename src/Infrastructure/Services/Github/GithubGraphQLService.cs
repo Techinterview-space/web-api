@@ -27,7 +27,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         _logger = logger;
     }
 
-    public async Task<GithubProfileData> GetUserProfileDataAsync(
+    public async Task<GithubProfileDataResult> GetUserProfileDataAsync(
         string username,
         int monthsToFetchCommits = 6,
         CancellationToken cancellationToken = default)
@@ -118,10 +118,12 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
 
             if (response.Data?.User == null)
             {
-                throw new InvalidOperationException($"User {username} not found");
+                return GithubProfileDataResult.NotFound();
             }
 
-            _logger.LogInformation("Successfully fetched basic profile data for user {Username}", username);
+            _logger.LogInformation(
+                "Successfully fetched basic profile data for user {Username}",
+                username);
 
             // Step 2: Get detailed commit statistics using user ID filtering (Python pattern)
             var commitStats = await GetCommitStatisticsAsync(
@@ -139,16 +141,22 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 commitStats.CommitsCount,
                 commitStats.FilesAdjusted);
 
-            return MapToGithubProfileData(
-                user: response.Data.User,
-                commitStats: commitStats,
-                monthsToFetchCommits: monthsToFetchCommits,
-                topLanguagesCount: 3);
+            return GithubProfileDataResult.Success(
+                MapToGithubProfileData(
+                    user: response.Data.User,
+                    commitStats: commitStats,
+                    monthsToFetchCommits: monthsToFetchCommits,
+                    topLanguagesCount: 3));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to fetch GitHub profile data for user {Username}", username);
-            throw;
+            _logger.LogError(
+                ex,
+                "Failed to fetch GitHub profile data for user {Username}",
+                username);
+
+            return GithubProfileDataResult.Failure(
+                $"Error fetching GitHub profile data for {username}");
         }
     }
 

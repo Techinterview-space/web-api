@@ -1,10 +1,8 @@
-﻿using Domain.Entities.Github;
-
-namespace Infrastructure.Services.Github;
+﻿namespace Infrastructure.Services.Github;
 
 public interface IGithubGraphQLService
 {
-    Task<GithubProfileData> GetUserProfileDataAsync(
+    Task<GithubProfileDataResult> GetUserProfileDataAsync(
         string username,
         int monthsToFetchCommits = 6,
         CancellationToken cancellationToken = default);

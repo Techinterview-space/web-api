@@ -17,7 +17,6 @@ using Infrastructure.Services.OpenAi;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
-using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.GithubProfile;
 using Infrastructure.Services.Telegram.Notifications;
 using Infrastructure.Services.Telegram.Salaries;
@@ -57,7 +56,6 @@ public static class ServiceRegistration
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()
-            .AddScoped<GithubClientService>()
             .AddScoped<IGithubGraphQLService, GithubGraphQlService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
