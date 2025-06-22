@@ -12,8 +12,6 @@ using Infrastructure.Services.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Octokit;
-using Octokit.Internal;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -27,20 +25,17 @@ public class ProcessGithubProfileTelegramMessageHandler
     private const int MonthsToFetchCommits = 12;
 
     private readonly ILogger<ProcessGithubProfileTelegramMessageHandler> _logger;
-    private readonly GithubClientService _githubClientService;
     private readonly IGithubGraphQLService _githubGraphQLService;
     private readonly DatabaseContext _context;
     private readonly IConfiguration _configuration;
 
     public ProcessGithubProfileTelegramMessageHandler(
         ILogger<ProcessGithubProfileTelegramMessageHandler> logger,
-        GithubClientService githubClientService,
         IGithubGraphQLService githubGraphQLService,
         DatabaseContext context,
         IConfiguration configuration)
     {
         _logger = logger;
-        _githubClientService = githubClientService;
         _githubGraphQLService = githubGraphQLService;
         _context = context;
         _configuration = configuration;
@@ -81,6 +76,16 @@ public class ProcessGithubProfileTelegramMessageHandler
             await AddInlineQueryClickAsync(
                 message,
                 cancellationToken);
+
+            return null;
+        }
+
+        if (message.Chat.Type is not ChatType.Private)
+        {
+            _logger.LogDebug(
+                "Received message in non-private chat: {ChatId} from user: {Username}. Skipping",
+                message.Chat.Id,
+                message.From?.Username ?? message.From?.Id.ToString());
 
             return null;
         }
@@ -183,6 +188,11 @@ public class ProcessGithubProfileTelegramMessageHandler
         CancellationToken cancellationToken)
     {
         string textToSend = null;
+        if (message.Chat.Type != ChatType.Private)
+        {
+            return null;
+        }
+
         if (string.IsNullOrWhiteSpace(messageText) ||
             messageText.Contains(' '))
         {
@@ -244,207 +254,6 @@ public class ProcessGithubProfileTelegramMessageHandler
 
         await _context.SaveChangesAsync(cancellationToken);
         return chatTobeReturned;
-    }
-
-    private async Task<(GithubProfileData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataAsync(
-        string username,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            // Try GraphQL service first for better performance
-            try
-            {
-                var profileData = await _githubGraphQLService.GetUserProfileDataAsync(
-                    username,
-                    MonthsToFetchCommits,
-                    cancellationToken);
-
-                return (profileData, null);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(
-                    ex,
-                    "GraphQL service failed for user {Username}, falling back to REST API",
-                    username);
-
-                // Fall back to the original REST implementation
-                return await GetExtendedGitHubProfileDataUsingRestAsync(username, cancellationToken);
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning(
-                e,
-                "An error occurred while processing GitHub profile for user: {Username}. Exception: {Exception}",
-                username,
-                e.Message);
-
-            return (null, "An error occurred while processing your request. Please try again later.");
-        }
-    }
-
-    private async Task<(GithubProfileDataBasedOnOctokitData User, string ErrorReplyTextOrNull)> GetExtendedGitHubProfileDataUsingRestAsync(
-        string username,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var user = await _githubClientService.GetUserAsync(username, cancellationToken);
-
-            var commitsCount = 0;
-            var filesAdjusted = 0;
-            var changesInFilesCount = 0;
-            var additionsInFilesCount = 0;
-            var deletionsInFilesCount = 0;
-
-            var userOrganizations = await _githubClientService.GetOrganizationsAsync(username, cancellationToken);
-            foreach (var userOrganization in userOrganizations)
-            {
-                var userOrganizationRepositories = await _githubClientService.GetOrganizationRepositoriesAsync(userOrganization.Login, cancellationToken);
-                var orgRepoStats = await CalculateRepositoriesStatsAsync(
-                    userOrganizationRepositories,
-                    userOrganization.Login,
-                    username,
-                    _githubClientService,
-                    cancellationToken);
-
-                commitsCount += orgRepoStats.CommitsCount;
-                filesAdjusted += orgRepoStats.FilesAdjusted;
-                changesInFilesCount += orgRepoStats.ChangesInFilesCount;
-                additionsInFilesCount += orgRepoStats.AdditionsInFilesCount;
-                deletionsInFilesCount += orgRepoStats.DeletionsInFilesCount;
-            }
-
-            // Start all tasks concurrently to minimize API calls
-            var userRepositories = await _githubClientService.GetUserRepositoriesAsync(username, cancellationToken);
-
-            var userRepositoriesStats = await CalculateRepositoriesStatsAsync(
-                userRepositories,
-                username,
-                username,
-                _githubClientService,
-                cancellationToken);
-
-            commitsCount += userRepositoriesStats.CommitsCount;
-            filesAdjusted += userRepositoriesStats.FilesAdjusted;
-            changesInFilesCount += userRepositoriesStats.ChangesInFilesCount;
-            additionsInFilesCount += userRepositoriesStats.AdditionsInFilesCount;
-            deletionsInFilesCount += userRepositoriesStats.DeletionsInFilesCount;
-
-            var issuesResult = await _githubClientService.SearchUserIssuesAsync(username, cancellationToken);
-            var prsResult = await _githubClientService.SearchUserPullRequestsAsync(username, cancellationToken);
-
-            // Fetch new data
-            var discussionsResult = await _githubClientService.SearchUserDiscussionsAsync(username, cancellationToken);
-            var codeReviewsCount = await _githubClientService.GetUserCodeReviewsCountAsync(username, MonthsToFetchCommits, cancellationToken);
-            var topLanguages = await _githubClientService.GetTopLanguagesByCommitsAsync(
-                userRepositories,
-                username,
-                MonthsToFetchCommits,
-                3,
-                cancellationToken);
-
-            var userData = new GithubProfileDataBasedOnOctokitData(
-                user,
-                userRepositories,
-                issuesResult,
-                prsResult,
-                commitsCount,
-                filesAdjusted,
-                changesInFilesCount,
-                additionsInFilesCount,
-                deletionsInFilesCount,
-                discussionsResult.TotalCount,
-                codeReviewsCount,
-                topLanguages,
-                MonthsToFetchCommits);
-
-            return (userData, null);
-        }
-        catch (NotFoundException notFoundEx)
-        {
-            _logger.LogWarning(
-                notFoundEx,
-                "GitHub user not found: {Username}. Exception: {Exception}",
-                username,
-                notFoundEx.Message);
-
-            return (null, "GitHub user not found. Please provide a valid GitHub username in the format: @@username or username");
-        }
-        catch (RateLimitExceededException rateLimitEx)
-        {
-            _logger.LogWarning(
-                rateLimitEx,
-                "GitHub API rate limit exceeded for user: {Username}. Exception: {Exception}",
-                username,
-                rateLimitEx.Message);
-
-            return (null, "GitHub API rate limit exceeded. Please try again later.");
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning(
-                e,
-                "An error occurred while processing GitHub profile for user: {Username}. Exception: {Exception}",
-                username,
-                e.Message);
-
-            return (null, "An error occurred while processing your request. Please try again later.");
-        }
-    }
-
-    private async Task<RepositoryChangesStats> CalculateRepositoriesStatsAsync(
-        IReadOnlyList<Repository> repositories,
-        string repoOwner,
-        string username,
-        GithubClientService gitHubClient,
-        CancellationToken cancellationToken)
-    {
-        var commitsCount = 0;
-        var filesAdjusted = 0;
-        var changesInFilesCount = 0;
-        var additionsInFilesCount = 0;
-        var deletionsInFilesCount = 0;
-
-        foreach (var repo in repositories)
-        {
-            var commitsResult = await gitHubClient.GetRepositoryCommitsAsync(
-                repoOwner,
-                repo.Name,
-                username,
-                MonthsToFetchCommits,
-                cancellationToken);
-
-            commitsCount += commitsResult.Count;
-            foreach (var commit in commitsResult)
-            {
-                var commitFiles = await gitHubClient.GetCommitAsync(
-                    repoOwner,
-                    repo.Name,
-                    commit.Sha,
-                    cancellationToken);
-
-                filesAdjusted += commitFiles.Files?.Count ?? 0;
-                if (commitFiles.Files is { Count: > 0 })
-                {
-                    foreach (var commitFile in commitFiles.Files)
-                    {
-                        changesInFilesCount += commitFile.Changes;
-                        additionsInFilesCount += commitFile.Additions;
-                        deletionsInFilesCount += commitFile.Deletions;
-                    }
-                }
-            }
-        }
-
-        return new RepositoryChangesStats(
-            commitsCount,
-            filesAdjusted,
-            changesInFilesCount,
-            additionsInFilesCount,
-            deletionsInFilesCount);
     }
 
     private async Task ProcessInlineQueryAsync(
@@ -538,21 +347,24 @@ public class ProcessGithubProfileTelegramMessageHandler
             var existingGithubProfile = await _context.GithubProfiles
                 .FirstOrDefaultAsync(x => x.Username == username, cancellationToken);
 
-            GithubProfileData profileData = null;
-            string errorReplyTextOrNull = null;
+            GithubProfileDataResult profileDataResult = null;
+            GithubProfileData profileData;
 
-            var saveDaatabaseChanges = false;
+            var saveDatabaseChanges = false;
             if (existingGithubProfile is not null)
             {
                 existingGithubProfile.IncrementRequestsCount();
                 profileData = existingGithubProfile.GetProfileDataIfRelevant();
-                saveDaatabaseChanges = true;
+                saveDatabaseChanges = true;
 
                 if (profileData is null)
                 {
-                    (profileData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
+                    profileDataResult = await _githubGraphQLService.GetUserProfileDataAsync(
                         username,
+                        MonthsToFetchCommits,
                         cancellationToken);
+
+                    profileData = profileDataResult.Data;
 
                     if (profileData is not null)
                     {
@@ -562,9 +374,12 @@ public class ProcessGithubProfileTelegramMessageHandler
             }
             else
             {
-                (profileData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
+                profileDataResult = await _githubGraphQLService.GetUserProfileDataAsync(
                     username,
+                    MonthsToFetchCommits,
                     cancellationToken);
+
+                profileData = profileDataResult.Data;
 
                 if (profileData is not null)
                 {
@@ -573,17 +388,35 @@ public class ProcessGithubProfileTelegramMessageHandler
                             username,
                             profileData));
 
-                    saveDaatabaseChanges = true;
+                    saveDatabaseChanges = true;
                 }
             }
 
-            if (saveDaatabaseChanges)
+            if (saveDatabaseChanges)
             {
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
+            if (profileDataResult != null)
+            {
+                switch (profileDataResult.Result)
+                {
+                    case GithubProfileDataResultType.Success:
+                        return profileDataResult.Data.GetTelegramFormattedText();
+
+                    case GithubProfileDataResultType.NotFound:
+                        return $"Github user {username} was not found";
+
+                    case GithubProfileDataResultType.RateLimitExceeded:
+                    case GithubProfileDataResultType.Failure:
+                        return profileDataResult.ErrorMessage;
+
+                    default:
+                        throw new InvalidOperationException("Unexpected result type from GitHub profile data service: " + profileDataResult.Result);
+                }
+            }
+
             return profileData?.GetTelegramFormattedText()
-                   ?? errorReplyTextOrNull
                    ?? "An error occurred while fetching GitHub profile data. Please try again later.";
         }
         catch (Exception ex)
