@@ -141,56 +141,7 @@ public class ProcessGithubProfileTelegramMessageHandler
                 $"Starting to fetch GitHub profile data for <b>{username}</b>. It might take 2-3 mins, please be patient...",
                 cancellationToken);
 
-            var existingGithubProfile = await _context.GithubProfiles
-                .FirstOrDefaultAsync(x => x.Username == username, cancellationToken);
-
-            GithubProfileData profileData = null;
-            string errorReplyTextOrNull = null;
-
-            var saveDaatabaseChanges = false;
-            if (existingGithubProfile is not null)
-            {
-                existingGithubProfile.IncrementRequestsCount();
-                profileData = existingGithubProfile.GetProfileDataIfRelevant();
-                saveDaatabaseChanges = true;
-
-                if (profileData is null)
-                {
-                    (profileData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
-                        username,
-                        cancellationToken);
-
-                    if (profileData is not null)
-                    {
-                        existingGithubProfile.SyncData(profileData);
-                    }
-                }
-            }
-            else
-            {
-                (profileData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
-                    username,
-                    cancellationToken);
-
-                if (profileData is not null)
-                {
-                    _context.Add(
-                        new GithubProfile(
-                            username,
-                            profileData));
-
-                    saveDaatabaseChanges = true;
-                }
-            }
-
-            if (saveDaatabaseChanges)
-            {
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-
-            textToSend = profileData?.GetTelegramFormattedText()
-                         ?? errorReplyTextOrNull
-                         ?? "An error occurred while fetching GitHub profile data. Please try again later.";
+            textToSend = await GetGithubProfileDataAsync(username, cancellationToken);
 
             await request.BotClient.ReplyToWithHtmlAsync(
                 message.Chat.Id,
@@ -525,10 +476,13 @@ public class ProcessGithubProfileTelegramMessageHandler
 
             if (!string.IsNullOrEmpty(username) && IsValidGitHubUsername(username))
             {
+                // Fetch the actual GitHub profile data for inline query
+                var profileText = await GetGithubProfileDataAsync(username, cancellationToken);
+
                 results.Add(new InlineQueryResultArticle(
                     $"profile_{username}",
                     $"Get GitHub profile for @{username}",
-                    new InputTextMessageContent($"@{username}")
+                    new InputTextMessageContent(profileText)
                     {
                         ParseMode = ParseMode.Html,
                     }));
@@ -573,6 +527,75 @@ public class ProcessGithubProfileTelegramMessageHandler
                 chatName));
 
         await _context.TrySaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<string> GetGithubProfileDataAsync(
+        string username,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var existingGithubProfile = await _context.GithubProfiles
+                .FirstOrDefaultAsync(x => x.Username == username, cancellationToken);
+
+            GithubProfileData profileData = null;
+            string errorReplyTextOrNull = null;
+
+            var saveDaatabaseChanges = false;
+            if (existingGithubProfile is not null)
+            {
+                existingGithubProfile.IncrementRequestsCount();
+                profileData = existingGithubProfile.GetProfileDataIfRelevant();
+                saveDaatabaseChanges = true;
+
+                if (profileData is null)
+                {
+                    (profileData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
+                        username,
+                        cancellationToken);
+
+                    if (profileData is not null)
+                    {
+                        existingGithubProfile.SyncData(profileData);
+                    }
+                }
+            }
+            else
+            {
+                (profileData, errorReplyTextOrNull) = await GetExtendedGitHubProfileDataAsync(
+                    username,
+                    cancellationToken);
+
+                if (profileData is not null)
+                {
+                    _context.Add(
+                        new GithubProfile(
+                            username,
+                            profileData));
+
+                    saveDaatabaseChanges = true;
+                }
+            }
+
+            if (saveDaatabaseChanges)
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+
+            return profileData?.GetTelegramFormattedText()
+                   ?? errorReplyTextOrNull
+                   ?? "An error occurred while fetching GitHub profile data. Please try again later.";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error while fetching GitHub profile data for user: {Username}. Exception: {Exception}",
+                username,
+                ex.Message);
+
+            return "An error occurred while processing your request. Please try again later.";
+        }
     }
 
     private static bool IsValidGitHubUsername(
