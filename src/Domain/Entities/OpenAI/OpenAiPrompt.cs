@@ -22,22 +22,28 @@ public class OpenAiPrompt : HasDatesBase
 
     public string Prompt { get; protected set; }
 
+    public string Model { get; protected set; }
+
     public OpenAiPrompt(
         OpenAiPromptType id,
-        string prompt)
+        string prompt,
+        string model)
     {
         Id = id;
         Prompt = prompt;
+        Model = model;
     }
 
     // for migrations
     public OpenAiPrompt(
         OpenAiPromptType id,
         string prompt,
+        string model,
         DateTimeOffset createdAt)
     {
         Id = id;
         Prompt = prompt;
+        Model = model;
         CreatedAt = UpdatedAt = createdAt;
     }
 

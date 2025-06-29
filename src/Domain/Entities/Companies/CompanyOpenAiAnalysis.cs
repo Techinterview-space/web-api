@@ -12,23 +12,20 @@ public class CompanyOpenAiAnalysis : HasDatesBase, IHasIdBase<Guid>
 
     public string AnalysisText { get; protected set; }
 
+    public string Model { get; protected set; }
+
     public Guid CompanyId { get; protected set; }
 
     public virtual Company Company { get; protected set; }
 
     public CompanyOpenAiAnalysis(
         Company company,
-        string analysisText)
-        : this(company.Id, analysisText)
-    {
-    }
-
-    public CompanyOpenAiAnalysis(
-        Guid companyId,
-        string analysisText)
+        string analysisText,
+        string model)
     {
         Id = Guid.NewGuid();
-        CompanyId = companyId;
+        CompanyId = company.Id;
+        Model = model;
         AnalysisText = analysisText ?? throw new ArgumentNullException(nameof(analysisText));
     }
 

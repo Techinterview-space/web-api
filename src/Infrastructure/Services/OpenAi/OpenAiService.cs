@@ -41,17 +41,17 @@ public class OpenAiService : IOpenAiService
             throw new InvalidOperationException("Company does not have relevant reviews.");
         }
 
-        var prompt = (await _context
-                         .OpenAiPrompts
-                         .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken))?.Prompt
-                     ?? OpenAiPrompt.DefaultCompanyAnalyzePrompt;
+        var promptData = await _context
+            .OpenAiPrompts
+            .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken);
 
         var input = JsonSerializer.Serialize(
             new CompanyAnalyzeRequest(company));
 
         return await AnalyzeChatAsync(
             input,
-            prompt,
+            promptData?.Prompt ?? OpenAiPrompt.DefaultCompanyAnalyzePrompt,
+            promptData?.Model,
             correlationId,
             cancellationToken);
     }
@@ -61,14 +61,14 @@ public class OpenAiService : IOpenAiService
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        var prompt = (await _context
+        var prompt = await _context
                          .OpenAiPrompts
-                         .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Chat, cancellationToken))?.Prompt
-                     ?? OpenAiPrompt.DefaultChatAnalyzePrompt;
+                         .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Chat, cancellationToken);
 
         return await AnalyzeChatAsync(
             input,
-            prompt,
+            prompt?.Prompt ?? OpenAiPrompt.DefaultChatAnalyzePrompt,
+            prompt?.Model,
             correlationId,
             cancellationToken);
     }
@@ -76,15 +76,15 @@ public class OpenAiService : IOpenAiService
     private async Task<OpenAiChatResult> AnalyzeChatAsync(
         string input,
         string systemPrompt,
+        string model = null,
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
         var apiKey = _configuration["OpenAI:ApiKey"];
-        var model = _configuration["OpenAI:Model"];
         var baseUrl = _configuration["OpenAI:BaseUrl"];
+        model ??= _configuration["OpenAI:DefaultModel"];
 
         if (string.IsNullOrEmpty(apiKey) ||
-            string.IsNullOrEmpty(model) ||
             string.IsNullOrEmpty(baseUrl))
         {
             _logger.LogError(
@@ -165,10 +165,10 @@ public class OpenAiService : IOpenAiService
                     correlationId,
                     responseJson);
 
-                return OpenAiChatResult.Failure();
+                return OpenAiChatResult.Failure(model);
             }
 
-            return OpenAiChatResult.Success(responseDeserialized.Choices);
+            return OpenAiChatResult.Success(responseDeserialized.Choices, model);
         }
         catch (Exception e)
         {
@@ -180,7 +180,7 @@ public class OpenAiService : IOpenAiService
                 correlationId,
                 input);
 
-            return OpenAiChatResult.Failure();
+            return OpenAiChatResult.Failure(model);
         }
     }
 }

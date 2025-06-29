@@ -59,7 +59,8 @@ public class GetCompanyAiAnalysisHandler
             var aiRecord = _context.Add(
                 new CompanyOpenAiAnalysis(
                     company,
-                    response.GetResponseTextOrNull())).Entity;
+                    response.GetResponseTextOrNull(),
+                    response.Model)).Entity;
 
             await _context.SaveChangesAsync(cancellationToken);
         }

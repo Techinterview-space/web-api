@@ -9,6 +9,8 @@ public record AiHtmlAnalysis
 
     public string Text { get; }
 
+    public string Model { get; }
+
     public DateTimeOffset CreatedAt { get; }
 
     public AiHtmlAnalysis(
@@ -26,5 +28,6 @@ public record AiHtmlAnalysis
         Text = latestAnalysis.AnalysisText;
         Html = new MarkdownToHtml(latestAnalysis.AnalysisText).ToString();
         CreatedAt = latestAnalysis.CreatedAt;
+        Model = latestAnalysis.Model;
     }
 }

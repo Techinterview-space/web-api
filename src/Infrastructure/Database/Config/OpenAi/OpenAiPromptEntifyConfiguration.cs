@@ -32,10 +32,12 @@ public class OpenAiPromptEntifyConfiguration : IEntityTypeConfiguration<OpenAiPr
             new OpenAiPrompt(
                 OpenAiPromptType.Company,
                 OpenAiPrompt.DefaultCompanyAnalyzePrompt,
+                "gpt-4o",
                 createdAt),
             new OpenAiPrompt(
                 OpenAiPromptType.Chat,
                 OpenAiPrompt.DefaultChatAnalyzePrompt,
+                "gpt-4o",
                 createdAt));
     }
 }
