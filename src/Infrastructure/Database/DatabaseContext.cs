@@ -4,6 +4,7 @@ using Domain.Entities.CSV;
 using Domain.Entities.Github;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
+using Domain.Entities.OpenAI;
 using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
@@ -79,6 +80,10 @@ public class DatabaseContext : DbContext
     public DbSet<GithubPersonalUserToken> GithubPersonalUserTokens { get; set; }
 
     public DbSet<GithubProfileProcessingJob> GithubProfileProcessingJobs { get; set; }
+
+    public DbSet<OpenAiPrompt> OpenAiPrompts { get; set; }
+
+    public DbSet<CompanyOpenAiAnalysis> CompanyOpenAiAnalysisRecords { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

@@ -2,7 +2,10 @@
 using System.Text;
 using System.Text.Json;
 using Domain.Entities.Companies;
+using Domain.Entities.OpenAI;
+using Infrastructure.Database;
 using Infrastructure.Services.OpenAi.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -13,18 +16,21 @@ public class OpenAiService : IOpenAiService
     private readonly ILogger<OpenAiService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
+    private readonly DatabaseContext _context;
 
     public OpenAiService(
         ILogger<OpenAiService> logger,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        DatabaseContext context)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
+        _context = context;
     }
 
-    public Task<OpenAiChatResult> AnalyzeCompanyAsync(
+    public async Task<OpenAiChatResult> AnalyzeCompanyAsync(
         Company company,
         string correlationId = null,
         CancellationToken cancellationToken = default)
@@ -35,30 +41,34 @@ public class OpenAiService : IOpenAiService
             throw new InvalidOperationException("Company does not have relevant reviews.");
         }
 
-        const string systemPrompt =
-            "You are a helpful career assistant. " +
-            "Analyze the company's reviews and provide " +
-            "a summary with advice what should user pay more attention on. " +
-            "In the request there will be a company total rating, rating history and reviews presented in JSON format. Your reply should be in Russian language, markdown formatted.";
+        var prompt = (await _context
+                         .OpenAiPrompts
+                         .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken))?.Prompt
+                     ?? OpenAiPrompt.DefaultCompanyAnalyzePrompt;
 
         var input = JsonSerializer.Serialize(
             new CompanyAnalyzeRequest(company));
 
-        return AnalyzeChatAsync(
+        return await AnalyzeChatAsync(
             input,
-            systemPrompt,
+            prompt,
             correlationId,
             cancellationToken);
     }
 
-    public Task<OpenAiChatResult> AnalyzeChatAsync(
+    public async Task<OpenAiChatResult> AnalyzeChatAsync(
         string input,
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        return AnalyzeChatAsync(
+        var prompt = (await _context
+                         .OpenAiPrompts
+                         .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Chat, cancellationToken))?.Prompt
+                     ?? OpenAiPrompt.DefaultChatAnalyzePrompt;
+
+        return await AnalyzeChatAsync(
             input,
-            "You are a helpful assistant. Analyze the user's input and provide a response.",
+            prompt,
             correlationId,
             cancellationToken);
     }

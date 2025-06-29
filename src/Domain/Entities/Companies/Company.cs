@@ -35,6 +35,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
 
     public virtual List<CompanyReview> Reviews { get; protected set; }
 
+    public virtual List<CompanyOpenAiAnalysis> OpenAiAnalysisRecords { get; protected set; }
+
     public Company(
         string name,
         string description,
