@@ -69,7 +69,7 @@ public class OpenAiService : IOpenAiService
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        var apiKey = _configuration["OpenAiApiKey"];
+        var apiKey = _configuration["OpenAI:ApiKey"];
         var model = _configuration["OpenAI:Model"];
         var baseUrl = _configuration["OpenAI:BaseUrl"];
 
