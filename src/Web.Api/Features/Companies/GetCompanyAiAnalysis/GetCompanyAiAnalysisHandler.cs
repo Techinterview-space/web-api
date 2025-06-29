@@ -55,6 +55,8 @@ public class GetCompanyAiAnalysisHandler
         if (response.IsSuccess)
         {
             company.ReplaceAiAnalysisRecord(response.GetResponseTextOrNull());
+
+            _context.Update(company);
             await _context.SaveChangesAsync(cancellationToken);
         }
 

@@ -268,8 +268,6 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
             new CompanyOpenAiAnalysis(
                 this,
                 content));
-
-        UpdatedAt = DateTime.UtcNow;
     }
 
     public bool HasAiAnalysis()
