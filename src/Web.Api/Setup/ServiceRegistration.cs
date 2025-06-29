@@ -14,6 +14,7 @@ using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.OpenAi;
+using Infrastructure.Services.OpenAi.Custom;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
@@ -45,7 +46,7 @@ public static class ServiceRegistration
             .AddScoped<IMarkdownToHtmlGenerator, MarkdownToHtmlGenerator>()
             .AddScoped<IPdf, QuestPdfBasedRender>()
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
-            .AddScoped<IOpenAiService, OpenAiService>()
+            .AddScoped<ICustomOpenAiService, CustomOpenAiService>()
             .AddTransient<ISalariesTelegramBotClientProvider, SalariesTelegramBotClientProvider>()
             .AddTransient<IGithubProfileBotProvider, GithubProfileBotProvider>()
             .AddTransient<SalariesTelegramBotHostedService>()
@@ -56,7 +57,8 @@ public static class ServiceRegistration
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()
-            .AddScoped<IGithubGraphQLService, GithubGraphQlService>();
+            .AddScoped<IGithubGraphQLService, GithubGraphQlService>()
+            .AddScoped<IOpenAiService, OpenAiService>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

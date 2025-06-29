@@ -69,6 +69,16 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
             .ToList();
     }
 
+    public bool HasRelevantReviews()
+    {
+        if (Reviews == null)
+        {
+            throw new InvalidOperationException("Reviews are not initialized.");
+        }
+
+        return Reviews.Any(x => x.IsRelevant());
+    }
+
     public bool IsUserAllowedToLeaveReview(
         long userId)
     {

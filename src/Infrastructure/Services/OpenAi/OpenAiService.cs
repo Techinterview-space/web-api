@@ -1,8 +1,7 @@
 ﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using Infrastructure.Jwt;
+using Domain.Entities.Companies;
 using Infrastructure.Services.OpenAi.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,75 +10,167 @@ namespace Infrastructure.Services.OpenAi;
 
 public class OpenAiService : IOpenAiService
 {
+    private readonly ILogger<OpenAiService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<OpenAiService> _logger;
 
     public OpenAiService(
+        ILogger<OpenAiService> logger,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
-        ILogger<OpenAiService> logger)
+        IConfiguration configuration)
     {
+        _logger = logger;
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
-        _logger = logger;
     }
 
-    public string GetBearer()
-    {
-        var secret = _configuration["OpenAiApiSecret"];
-        return new TechinterviewJwtTokenGenerator(secret).ToString();
-    }
-
-    public async Task<string> GetAnalysisAsync(
-        OpenAiBodyReport report,
+    public Task<OpenAiChatResult> AnalyzeCompanyAsync(
+        Company company,
+        string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        var apiUrl = _configuration["OpenAiApiUrl"];
-        if (string.IsNullOrEmpty(apiUrl))
+        if (company == null ||
+            !company.HasRelevantReviews())
         {
-            throw new InvalidOperationException("OpenAI API url is not set");
+            throw new InvalidOperationException("Company does not have relevant reviews.");
         }
 
-        var responseContent = string.Empty;
+        const string systemPrompt =
+            "You are a helpful career assistant. " +
+            "Analyze the company's reviews and provide " +
+            "a summary with advice what should user pay more attention on. " +
+            "In the request there will be a company total rating, rating history and reviews presented in JSON format.";
+
+        var input = JsonSerializer.Serialize(
+            new CompanyAnalyzeRequest(company));
+
+        return AnalyzeChatAsync(
+            input,
+            systemPrompt,
+            correlationId,
+            cancellationToken);
+    }
+
+    public Task<OpenAiChatResult> AnalyzeChatAsync(
+        string input,
+        string correlationId = null,
+        CancellationToken cancellationToken = default)
+    {
+        return AnalyzeChatAsync(
+            input,
+            "You are a helpful assistant. Analyze the user's input and provide a response.",
+            correlationId,
+            cancellationToken);
+    }
+
+    private async Task<OpenAiChatResult> AnalyzeChatAsync(
+        string input,
+        string systemPrompt,
+        string correlationId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var apiKey = _configuration["OpenAI:ApiKey"];
+        var model = _configuration["OpenAI:Model"];
+        var baseUrl = _configuration["OpenAI:BaseUrl"];
+
+        if (string.IsNullOrEmpty(apiKey) ||
+            string.IsNullOrEmpty(model) ||
+            string.IsNullOrEmpty(baseUrl))
+        {
+            _logger.LogError(
+                "OpenAI configuration is missing. " +
+                "CorrelationId: {CorrelationId}. " +
+                "ApiKey: {ApiKey}, " +
+                "Model: {Model}, " +
+                "BaseUrl: {BaseUrl}",
+                correlationId,
+                apiKey?.Length.ToString() ?? "-",
+                model,
+                baseUrl);
+
+            throw new InvalidOperationException("OpenAI configuration is not set.");
+        }
+
+        var request = new ChatRequest
+        {
+            Model = model,
+            Messages =
+            [
+                new ChatMessage
+                {
+                    Role = "system",
+                    Content = systemPrompt,
+                },
+
+                new ChatMessage
+                {
+                    Role = "user",
+                    Content = input
+                },
+            ]
+        };
+
+        var requestJson = JsonSerializer.Serialize(request);
+        var httpRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"{baseUrl}chat/completions");
+
+        httpRequest.Headers.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            apiKey);
+
+        httpRequest.Content = new StringContent(
+            requestJson,
+            Encoding.UTF8,
+            "application/json");
+
+        var client = _httpClientFactory.CreateClient("OpenAI");
+
         try
         {
-            using var client = _httpClientFactory.CreateClient();
+            var response = await client.SendAsync(httpRequest, cancellationToken);
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            client.BaseAddress = new Uri(apiUrl);
-            var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", GetBearer());
-            request.Content = new StringContent(
-                JsonSerializer.Serialize(report),
-                Encoding.UTF8,
-                "application/json");
-
-            var response = await client.SendAsync(request, cancellationToken);
-
-            responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                return responseContent;
+                _logger.LogError(
+                    "OpenAI API request failed. " +
+                    "CorrelationId: {CorrelationId}. " +
+                    "StatusCode: {StatusCode}, " +
+                    "ReasonPhrase: {ReasonPhrase}. " +
+                    "Response: {Response}",
+                    correlationId,
+                    response.StatusCode,
+                    response.ReasonPhrase,
+                    responseJson);
             }
 
-            _logger.LogError(
-                "Failed request to OpenAI {Url}. Status {Status}, Response {Response}",
-                apiUrl,
-                response.StatusCode,
-                responseContent);
+            var responseDeserialized = JsonSerializer.Deserialize<ChatResponse>(responseJson);
+            if (responseDeserialized?.Choices == null)
+            {
+                _logger.LogError(
+                    "OpenAI API response deserialization failed. " +
+                    "CorrelationId: {CorrelationId}. " +
+                    "Response: {Response}",
+                    correlationId,
+                    responseJson);
 
-            return string.Empty;
+                return OpenAiChatResult.Failure();
+            }
+
+            return OpenAiChatResult.Success(responseDeserialized.Choices);
         }
         catch (Exception e)
         {
             _logger.LogError(
                 e,
-                "Error while getting OpenAI response from {Url}. Message {Message}. Response {Response}",
-                apiUrl,
-                e.Message,
-                responseContent);
+                "An error occurred while calling OpenAI API. " +
+                "CorrelationId: {CorrelationId}. " +
+                "Input: {Input}",
+                correlationId,
+                input);
 
-            return string.Empty;
+            return OpenAiChatResult.Failure();
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Companies.CreateCompany;
 using Web.Api.Features.Companies.GetCompany;
+using Web.Api.Features.Companies.GetCompanyAiAnalysis;
 using Web.Api.Features.Companies.GetCompanyByAdmin;
 using Web.Api.Features.Companies.SearchCompanies;
 using Web.Api.Features.Companies.SearchCompaniesForAdmin;
@@ -96,6 +97,17 @@ public class CompaniesController : ControllerBase
     {
         return Ok(
             await _serviceProvider.GetRequiredService<GetCompanyByAdminHandler>()
+                .Handle(companyIdentifier, cancellationToken));
+    }
+
+    [HttpGet("{companyIdentifier}/open-ai-analysis")]
+    [HasAnyRole(Role.Admin)]
+    public async Task<IActionResult> GetCompanyAiAnalysis(
+        string companyIdentifier,
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _serviceProvider.GetRequiredService<GetCompanyAiAnalysisHandler>()
                 .Handle(companyIdentifier, cancellationToken));
     }
 

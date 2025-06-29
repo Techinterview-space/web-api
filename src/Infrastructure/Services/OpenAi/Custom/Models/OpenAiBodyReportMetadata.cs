@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Salaries;
 
-namespace Infrastructure.Services.OpenAi.Models;
+namespace Infrastructure.Services.OpenAi.Custom.Models;
 
 public record OpenAiBodyReportMetadata
 {
