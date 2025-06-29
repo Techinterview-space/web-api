@@ -255,8 +255,7 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         }
     }
 
-    public void ReplaceAiAnalysisRecord(
-        string content)
+    public void ClearAiAnalysisRecords()
     {
         if (OpenAiAnalysisRecords == null)
         {
@@ -264,10 +263,6 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         }
 
         OpenAiAnalysisRecords.Clear();
-        OpenAiAnalysisRecords.Add(
-            new CompanyOpenAiAnalysis(
-                this,
-                content));
     }
 
     public bool HasAiAnalysis()

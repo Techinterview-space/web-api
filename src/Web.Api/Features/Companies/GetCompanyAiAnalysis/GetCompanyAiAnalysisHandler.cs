@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Companies;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
@@ -54,9 +55,12 @@ public class GetCompanyAiAnalysisHandler
 
         if (response.IsSuccess)
         {
-            company.ReplaceAiAnalysisRecord(response.GetResponseTextOrNull());
+            company.ClearAiAnalysisRecords();
+            var aiRecord = _context.Add(
+                new CompanyOpenAiAnalysis(
+                    company,
+                    response.GetResponseTextOrNull())).Entity;
 
-            _context.Update(company);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
