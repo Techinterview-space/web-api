@@ -45,10 +45,18 @@ public class GetCompanyAiAnalysisHandler
                 cancellationToken)
             ?? throw new NotFoundException("Company not found.");
 
-        return await _openAiService
+        var response = await _openAiService
             .AnalyzeCompanyAsync(
                 company,
                 _correlationIdAccessor.GetValue(),
                 cancellationToken);
+
+        if (response.IsSuccess)
+        {
+            company.ReplaceAiAnalysisRecord(response.GetResponseTextOrNull());
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        return response;
     }
 }

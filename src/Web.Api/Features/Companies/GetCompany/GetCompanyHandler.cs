@@ -67,8 +67,11 @@ public class GetCompanyHandler : Infrastructure.Services.Mediator.IRequestHandle
         CancellationToken cancellationToken)
     {
         return await _context.Companies
+            .Include(x => x.OpenAiAnalysisRecords)
             .Include(x => x.Reviews
-                    .Where(r => r.ApprovedAt != null && r.OutdatedAt == null))
+                    .Where(r =>
+                        r.ApprovedAt != null &&
+                        r.OutdatedAt == null))
             .Where(x => x.DeletedAt == null)
             .GetCompanyByIdentifierOrNullAsync(
                 identifier,

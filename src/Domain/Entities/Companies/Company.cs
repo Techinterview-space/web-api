@@ -255,6 +255,29 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         }
     }
 
+    public void ReplaceAiAnalysisRecord(
+        string content)
+    {
+        if (OpenAiAnalysisRecords == null)
+        {
+            throw new InvalidOperationException("OpenAiAnalysisRecords are not initialized.");
+        }
+
+        OpenAiAnalysisRecords.Clear();
+        OpenAiAnalysisRecords.Add(
+            new CompanyOpenAiAnalysis(
+                this,
+                content));
+
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public bool HasAiAnalysis()
+    {
+        return OpenAiAnalysisRecords != null &&
+               OpenAiAnalysisRecords.Count > 0;
+    }
+
     protected Company()
     {
     }

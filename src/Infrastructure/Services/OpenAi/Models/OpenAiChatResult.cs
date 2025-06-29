@@ -4,7 +4,7 @@ public record OpenAiChatResult
 {
     public static OpenAiChatResult Success(List<Choice> choices)
     {
-        return new OpenAiChatResult(true, choices);
+        return new OpenAiChatResult(choices.Count > 0, choices);
     }
 
     public static OpenAiChatResult Failure()
@@ -23,4 +23,11 @@ public record OpenAiChatResult
     public bool IsSuccess { get; }
 
     public List<Choice> Choices { get; }
+
+    public string GetResponseTextOrNull()
+    {
+        return Choices.Count > 0
+            ? Choices[0].Message.Content
+            : null;
+    }
 }

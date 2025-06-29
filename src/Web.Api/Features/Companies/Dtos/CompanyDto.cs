@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Domain.Entities.Companies;
+using Infrastructure.Services.Companies;
 
 namespace Web.Api.Features.Companies.Dtos;
 
@@ -28,6 +29,8 @@ public record CompanyDto
 
     public List<CompanyRatingHistoryRecordDto> RatingHistory { get; init; }
 
+    public AiHtmlAnalysis AiAnalysis { get; init; }
+
     public DateTimeOffset CreatedAt { get; init; }
 
     public DateTimeOffset UpdatedAt { get; init; }
@@ -52,6 +55,11 @@ public record CompanyDto
         Slug = company.Slug;
         Reviews = company.Reviews?.ConvertAll(review => new CompanyReviewDto(review));
         RatingHistory = company.RatingHistory?.ConvertAll(record => new CompanyRatingHistoryRecordDto(record));
+        if (company.HasAiAnalysis())
+        {
+            AiAnalysis = new AiHtmlAnalysis(company);
+        }
+
         CreatedAt = company.CreatedAt;
         UpdatedAt = company.UpdatedAt;
         DeletedAt = company.DeletedAt;
