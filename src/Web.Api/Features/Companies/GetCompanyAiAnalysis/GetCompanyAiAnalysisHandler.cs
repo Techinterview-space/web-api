@@ -40,6 +40,7 @@ public class GetCompanyAiAnalysisHandler
         var company = await _context.Companies
             .Include(x => x.RatingHistory)
             .Include(x => x.Reviews)
+            .Include(x => x.OpenAiAnalysisRecords)
             .GetCompanyByIdentifierOrNullAsync(
                 companyId,
                 cancellationToken)
