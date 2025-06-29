@@ -9,7 +9,8 @@ using Domain.Entities.StatData;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.OpenAi;
-using Infrastructure.Services.OpenAi.Models;
+using Infrastructure.Services.OpenAi.Custom;
+using Infrastructure.Services.OpenAi.Custom.Models;
 using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -21,13 +22,13 @@ public class AiAnalysisSubscriptionJob
 {
     private readonly DatabaseContext _context;
     private readonly IProfessionsCacheService _professionsCacheService;
-    private readonly IOpenAiService _openAiService;
+    private readonly ICustomOpenAiService _openAiService;
 
     public AiAnalysisSubscriptionJob(
         ILogger<AiAnalysisSubscriptionJob> logger,
         DatabaseContext context,
         IProfessionsCacheService professionsCacheService,
-        IOpenAiService openAiService)
+        ICustomOpenAiService openAiService)
         : base(logger)
     {
         _context = context;

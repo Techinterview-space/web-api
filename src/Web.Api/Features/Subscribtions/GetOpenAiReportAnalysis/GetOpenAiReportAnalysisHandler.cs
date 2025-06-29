@@ -6,7 +6,8 @@ using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.OpenAi;
-using Infrastructure.Services.OpenAi.Models;
+using Infrastructure.Services.OpenAi.Custom;
+using Infrastructure.Services.OpenAi.Custom.Models;
 using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +17,12 @@ public class GetOpenAiReportAnalysisHandler : Infrastructure.Services.Mediator.I
 {
     private readonly DatabaseContext _context;
     private readonly IProfessionsCacheService _professionsCacheService;
-    private readonly IOpenAiService _openApiService;
+    private readonly ICustomOpenAiService _openApiService;
 
     public GetOpenAiReportAnalysisHandler(
         DatabaseContext context,
         IProfessionsCacheService professionsCacheService,
-        IOpenAiService openApiService)
+        ICustomOpenAiService openApiService)
     {
         _context = context;
         _professionsCacheService = professionsCacheService;
