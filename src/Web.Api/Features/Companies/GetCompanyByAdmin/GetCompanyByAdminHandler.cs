@@ -47,6 +47,7 @@ public class GetCompanyByAdminHandler : Infrastructure.Services.Mediator.IReques
         return await _context.Companies
             .Include(x => x.Reviews)
             .Include(x => x.RatingHistory)
+            .Include(x => x.OpenAiAnalysisRecords)
             .GetCompanyByIdentifierOrNullAsync(
                 identifier,
                 cancellationToken)
