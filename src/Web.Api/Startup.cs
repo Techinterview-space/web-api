@@ -21,6 +21,7 @@ namespace Web.Api;
 
 public class Startup
 {
+    // hello
     private const string CorsPolicyName = "CorsPolicy";
     private const string AppName = "TechInterview.API";
 
