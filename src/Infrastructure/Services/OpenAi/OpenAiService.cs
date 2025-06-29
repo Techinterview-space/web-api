@@ -39,7 +39,7 @@ public class OpenAiService : IOpenAiService
             "You are a helpful career assistant. " +
             "Analyze the company's reviews and provide " +
             "a summary with advice what should user pay more attention on. " +
-            "In the request there will be a company total rating, rating history and reviews presented in JSON format.";
+            "In the request there will be a company total rating, rating history and reviews presented in JSON format. Your reply should be in Russian language, markdown formatted.";
 
         var input = JsonSerializer.Serialize(
             new CompanyAnalyzeRequest(company));
