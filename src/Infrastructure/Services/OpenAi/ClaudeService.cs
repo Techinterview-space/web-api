@@ -12,6 +12,8 @@ namespace Infrastructure.Services.OpenAi;
 
 public class ClaudeService : IArtificialIntellectService
 {
+    private const string ApiKeyTemplate = "__CLAUDE_API_KEY";
+
     private readonly ILogger<ClaudeService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
@@ -75,7 +77,8 @@ public class ClaudeService : IArtificialIntellectService
         model ??= _configuration["Claude:DefaultModel"];
 
         if (string.IsNullOrEmpty(apiKey) ||
-            string.IsNullOrEmpty(baseUrl))
+            string.IsNullOrEmpty(baseUrl) ||
+            apiKey == ApiKeyTemplate)
         {
             _logger.LogError(
                 "Claude configuration is missing. " +
