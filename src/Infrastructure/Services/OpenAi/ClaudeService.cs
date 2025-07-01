@@ -70,9 +70,9 @@ public class ClaudeService : IArtificialIntellectService
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        var apiKey = _configuration["Anthropic:ApiKey"];
-        var baseUrl = _configuration["Anthropic:BaseUrl"];
-        model ??= _configuration["Anthropic:DefaultModel"];
+        var apiKey = _configuration["Claude:ApiKey"];
+        var baseUrl = _configuration["Claude:BaseUrl"];
+        model ??= _configuration["Claude:DefaultModel"];
 
         if (string.IsNullOrEmpty(apiKey) ||
             string.IsNullOrEmpty(baseUrl))
@@ -88,7 +88,7 @@ public class ClaudeService : IArtificialIntellectService
                 model,
                 baseUrl);
 
-            throw new InvalidOperationException("OpenAI configuration is not set.");
+            throw new InvalidOperationException("Claude configuration is not set.");
         }
 
         var requestJson = JsonSerializer.Serialize(
