@@ -28,6 +28,7 @@ jobs:
           sed -i 's/"__SENDGRID_WEBHOOK_SIGNATURE",/"${{ secrets.SENDGRID_WEBHOOK_SIGNATURE }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__OPEN_AI_SECRET",/"${{ secrets.OPEN_AI_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__OPENAI_API_KEY",/"${{ secrets.OPENAI_API_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__CLAUDE_API_KEY",/"${{ secrets.CLAUDE_API_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           cd src
           docker login -u ${{ env.DO_TOKEN }} -p ${{ env.DO_TOKEN }} registry.digitalocean.com/techinterview
           docker build -f Dockerfile -t ${{ secrets.CR }}/backend:${{ github.sha }} .

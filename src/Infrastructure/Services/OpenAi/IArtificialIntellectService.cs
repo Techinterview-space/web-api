@@ -3,14 +3,14 @@ using Infrastructure.Services.OpenAi.Models;
 
 namespace Infrastructure.Services.OpenAi;
 
-public interface IOpenAiService
+public interface IArtificialIntellectService
 {
-    Task<OpenAiChatResult> AnalyzeCompanyAsync(
+    Task<AiChatResult> AnalyzeCompanyAsync(
         Company company,
         string correlationId = null,
         CancellationToken cancellationToken = default);
 
-    Task<OpenAiChatResult> AnalyzeChatAsync(
+    Task<AiChatResult> AnalyzeChatAsync(
         string input,
         string correlationId = null,
         CancellationToken cancellationToken = default);

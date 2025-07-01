@@ -1,27 +1,27 @@
 ﻿namespace Infrastructure.Services.OpenAi.Models;
 
-public record OpenAiChatResult
+public record AiChatResult
 {
-    public static OpenAiChatResult Success(
+    public static AiChatResult Success(
         List<Choice> choices,
         string model)
     {
-        return new OpenAiChatResult(
+        return new AiChatResult(
             choices.Count > 0,
             choices,
             model);
     }
 
-    public static OpenAiChatResult Failure(
+    public static AiChatResult Failure(
         string model)
     {
-        return new OpenAiChatResult(
+        return new AiChatResult(
             false,
             new List<Choice>(),
             model);
     }
 
-    private OpenAiChatResult(
+    private AiChatResult(
         bool isSuccess,
         List<Choice> choices,
         string model)

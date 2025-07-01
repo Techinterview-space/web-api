@@ -15,15 +15,15 @@ using Microsoft.Extensions.Logging;
 namespace Web.Api.Features.Companies.GetCompanyAiAnalysis;
 
 public class GetCompanyAiAnalysisHandler
-    : IRequestHandler<string, OpenAiChatResult>
+    : IRequestHandler<string, AiChatResult>
 {
-    private readonly IOpenAiService _openAiService;
+    private readonly IArtificialIntellectService _openAiService;
     private readonly ILogger<GetCompanyAiAnalysisHandler> _logger;
     private readonly DatabaseContext _context;
     private readonly ICorrelationIdAccessor _correlationIdAccessor;
 
     public GetCompanyAiAnalysisHandler(
-        IOpenAiService openAiService,
+        IArtificialIntellectService openAiService,
         ILogger<GetCompanyAiAnalysisHandler> logger,
         DatabaseContext context,
         ICorrelationIdAccessor correlationIdAccessor)
@@ -34,7 +34,7 @@ public class GetCompanyAiAnalysisHandler
         _correlationIdAccessor = correlationIdAccessor;
     }
 
-    public async Task<OpenAiChatResult> Handle(
+    public async Task<AiChatResult> Handle(
         string companyId,
         CancellationToken cancellationToken)
     {

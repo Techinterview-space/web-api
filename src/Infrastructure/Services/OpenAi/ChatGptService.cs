@@ -11,15 +11,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services.OpenAi;
 
-public class OpenAiService : IOpenAiService
+public class ChatGptService : IArtificialIntellectService
 {
-    private readonly ILogger<OpenAiService> _logger;
+    private readonly ILogger<ChatGptService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
     private readonly DatabaseContext _context;
 
-    public OpenAiService(
-        ILogger<OpenAiService> logger,
+    public ChatGptService(
+        ILogger<ChatGptService> logger,
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
         DatabaseContext context)
@@ -30,7 +30,7 @@ public class OpenAiService : IOpenAiService
         _context = context;
     }
 
-    public async Task<OpenAiChatResult> AnalyzeCompanyAsync(
+    public async Task<AiChatResult> AnalyzeCompanyAsync(
         Company company,
         string correlationId = null,
         CancellationToken cancellationToken = default)
@@ -46,7 +46,7 @@ public class OpenAiService : IOpenAiService
             .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken);
 
         var input = JsonSerializer.Serialize(
-            new CompanyAnalyzeRequest(company));
+            new CompanyAnalyzeAiRequest(company));
 
         return await AnalyzeChatAsync(
             input,
@@ -56,7 +56,7 @@ public class OpenAiService : IOpenAiService
             cancellationToken);
     }
 
-    public async Task<OpenAiChatResult> AnalyzeChatAsync(
+    public async Task<AiChatResult> AnalyzeChatAsync(
         string input,
         string correlationId = null,
         CancellationToken cancellationToken = default)
@@ -73,7 +73,7 @@ public class OpenAiService : IOpenAiService
             cancellationToken);
     }
 
-    private async Task<OpenAiChatResult> AnalyzeChatAsync(
+    private async Task<AiChatResult> AnalyzeChatAsync(
         string input,
         string systemPrompt,
         string model = null,
@@ -101,7 +101,7 @@ public class OpenAiService : IOpenAiService
             throw new InvalidOperationException("OpenAI configuration is not set.");
         }
 
-        var request = new ChatRequest
+        var request = new ChatGptRequest
         {
             Model = model,
             Messages =
@@ -165,10 +165,10 @@ public class OpenAiService : IOpenAiService
                     correlationId,
                     responseJson);
 
-                return OpenAiChatResult.Failure(model);
+                return AiChatResult.Failure(model);
             }
 
-            return OpenAiChatResult.Success(responseDeserialized.Choices, model);
+            return AiChatResult.Success(responseDeserialized.Choices, model);
         }
         catch (Exception e)
         {
@@ -180,7 +180,7 @@ public class OpenAiService : IOpenAiService
                 correlationId,
                 input);
 
-            return OpenAiChatResult.Failure(model);
+            return AiChatResult.Failure(model);
         }
     }
 }

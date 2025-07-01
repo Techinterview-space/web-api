@@ -2,9 +2,9 @@
 
 namespace Infrastructure.Services.OpenAi.Models;
 
-internal record CompanyAnalyzeRequest
+internal record CompanyAnalyzeAiRequest
 {
-    public CompanyAnalyzeRequest(
+    public CompanyAnalyzeAiRequest(
         Company company)
     {
         Name = company.Name;

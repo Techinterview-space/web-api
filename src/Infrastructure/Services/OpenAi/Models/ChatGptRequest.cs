@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Services.OpenAi.Models;
 
-public record ChatRequest
+public record ChatGptRequest
 {
     [JsonPropertyName("model")]
     public string Model { get; set; }
