@@ -21,6 +21,7 @@ namespace Web.Api;
 
 public class Startup
 {
+    // comment to deploy
     private const string CorsPolicyName = "CorsPolicy";
     private const string AppName = "TechInterview.API";
 
