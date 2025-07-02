@@ -130,14 +130,6 @@ public static class ContextExtensions
                ?? throw NotFoundException.CreateFromEntity<T>(id);
     }
 
-    public static async Task<T> ByIdOrFailAsync<T, TKey>(this IQueryable<T> query, TKey id, CancellationToken cancellationToken = default(CancellationToken))
-        where T : class, IHasIdBase<TKey>
-        where TKey : struct
-    {
-        return await query.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken)
-               ?? throw NotFoundException.CreateFromEntity<T>(id);
-    }
-
     public static Task<T> ByIdOrNullAsync<T, TKey>(
         this IQueryable<T> query,
         TKey id,

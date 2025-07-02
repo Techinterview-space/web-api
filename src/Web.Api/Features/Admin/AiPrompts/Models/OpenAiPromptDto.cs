@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Domain.Entities.OpenAI;
 
 namespace Web.Api.Features.Admin.AiPrompts.Models;

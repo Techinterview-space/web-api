@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,14 +60,19 @@ public class AiPromptController : ControllerBase
 
         if (!createRequest.Id.HasValue)
         {
-            throw new BadRequestException("Id is required for OpenAI prompt creation");
+            throw new BadRequestException("Id is required for prompt creation");
+        }
+
+        if (createRequest.Engine is AiEngine.Undefined)
+        {
+            throw new BadRequestException("Engine is required for prompt creation");
         }
 
         if (await _context.OpenAiPrompts.AnyAsync(
                 x => x.Id == createRequest.Id.Value,
                 cancellationToken: cancellationToken))
         {
-            throw new BadRequestException("OpenAI prompt with this ID already exists");
+            throw new BadRequestException("Prompt with this ID already exists");
         }
 
         var item = await _context.SaveAsync(
@@ -77,6 +82,7 @@ public class AiPromptController : ControllerBase
                 createRequest.Model,
                 createRequest.Engine),
             cancellationToken);
+
         return Ok(item.Id);
     }
 
@@ -93,12 +99,12 @@ public class AiPromptController : ControllerBase
         }
 
         var entity = await _context.OpenAiPrompts
-            .ByIdOrFailAsync(updateRequest.Id.Value, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == updateRequest.Id.Value, cancellationToken);
 
-        // Update entity properties
-        entity.UpdatePrompt(updateRequest.Prompt);
-        entity.UpdateModel(updateRequest.Model);
-        entity.UpdateEngine(updateRequest.Engine);
+        entity.Update(
+            updateRequest.Prompt,
+            updateRequest.Model,
+            updateRequest.Engine);
 
         await _context.TrySaveChangesAsync(cancellationToken);
         return Ok();
@@ -112,10 +118,11 @@ public class AiPromptController : ControllerBase
         await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
 
         var entity = await _context.OpenAiPrompts
-            .ByIdOrFailAsync(id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         _context.Remove(entity);
         await _context.TrySaveChangesAsync(cancellationToken);
+
         return Ok();
     }
 }

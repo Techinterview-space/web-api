@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,6 +16,23 @@ public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
     public const string DefaultChatAnalyzePrompt =
         "You are a helpful assistant. Analyze the user's input and provide a response. " +
         "Your reply should be in question language, markdown formatted.";
+
+    private static readonly List<string> _chatGptAllowedModels = new List<string>
+    {
+        "gpt-3.5-turbo",
+        "gpt-4",
+        "gpt-4o",
+    };
+
+    private static readonly List<string> _claudeAllowedModels = new List<string>
+    {
+        "claude-3-5-haiku-20241022",
+        "claude-3-5-haiku-latest",
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-sonnet-latest",
+        "claude-sonnet-4-20250514",
+        "claude-sonnet-4-0",
+    };
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -33,9 +51,11 @@ public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
         AiEngine engine)
     {
         Id = id;
-        Prompt = prompt;
-        Model = model;
+        Prompt = prompt?.Trim();
+        Model = model?.Trim().ToLowerInvariant();
         Engine = engine;
+
+        ValidateModel();
     }
 
     // for migrations
@@ -57,18 +77,42 @@ public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
     {
     }
 
-    public void UpdatePrompt(string prompt)
+    public void Update(
+        string prompt,
+        string model,
+        AiEngine engine)
     {
+        prompt = prompt?.Trim();
+        if (string.IsNullOrEmpty(prompt))
+        {
+            throw new InvalidOperationException("Prompt cannot be null or empty.");
+        }
+
+        model = model?.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(model))
+        {
+            throw new InvalidOperationException("Model cannot be null or empty.");
+        }
+
         Prompt = prompt;
-    }
-
-    public void UpdateModel(string model)
-    {
         Model = model;
+        Engine = engine;
+
+        ValidateModel();
     }
 
-    public void UpdateEngine(AiEngine engine)
+    public void ValidateModel()
     {
-        Engine = engine;
+        if (Engine is AiEngine.OpenAi &&
+            !_chatGptAllowedModels.Contains(Model))
+        {
+            throw new InvalidOperationException($"Model '{Model}' is not allowed for OpenAI engine.");
+        }
+
+        if (Engine is AiEngine.Claude &&
+            !_claudeAllowedModels.Contains(Model))
+        {
+            throw new InvalidOperationException($"Model '{Model}' is not allowed for Claude engine.");
+        }
     }
 }
