@@ -1,10 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Infrastructure.Services.OpenAi.Models;
+namespace Infrastructure.Ai.Claude;
 
-public record ChatMessage
+public record ClaudeChatMessage
 {
-    public ChatMessage(
+    public ClaudeChatMessage(
         string role,
         string content)
     {
@@ -12,12 +12,12 @@ public record ChatMessage
         Content = content;
     }
 
-    public ChatMessage()
+    public ClaudeChatMessage()
     {
     }
 
     [JsonPropertyName("role")]
-    public string Role { get; set; } // "user", "assistant", or "system"
+    public string Role { get; set; }
 
     [JsonPropertyName("content")]
     public string Content { get; set; }

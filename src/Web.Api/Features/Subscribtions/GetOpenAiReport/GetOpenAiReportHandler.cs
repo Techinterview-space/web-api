@@ -5,7 +5,7 @@ using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
-using Infrastructure.Services.OpenAi.Custom.Models;
+using Infrastructure.Services.AiServices.Custom.Models;
 using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 

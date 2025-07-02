@@ -2,11 +2,11 @@
 using System.Text;
 using System.Text.Json;
 using Infrastructure.Jwt;
-using Infrastructure.Services.OpenAi.Custom.Models;
+using Infrastructure.Services.AiServices.Custom.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Services.OpenAi.Custom;
+namespace Infrastructure.Services.AiServices.Custom;
 
 public class CustomOpenAiService : ICustomOpenAiService
 {

@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Linq;
 using AspNetCore.Aws.S3.Simple.Settings;
+using Infrastructure.Ai;
+using Infrastructure.Ai.ChatGpt;
+using Infrastructure.Ai.Claude;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
+using Infrastructure.Services.AiServices;
+using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.Correlation;
 using Infrastructure.Services.Files;
 using Infrastructure.Services.Github;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Html;
 using Infrastructure.Services.Http;
-using Infrastructure.Services.OpenAi;
-using Infrastructure.Services.OpenAi.Custom;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
@@ -58,7 +61,10 @@ public static class ServiceRegistration
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()
             .AddScoped<IGithubGraphQLService, GithubGraphQlService>()
-            .AddScoped<IArtificialIntellectService, ClaudeService>();
+            .AddScoped<IArtificialIntellectService, AiService>()
+            .AddScoped<IAiProviderFactory, AiProviderFactory>()
+            .AddScoped<ChatGptProvider>()
+            .AddScoped<ClaudeAiProvider>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();

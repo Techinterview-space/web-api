@@ -1,7 +1,7 @@
 ﻿using Domain.Entities.Companies;
-using Infrastructure.Services.OpenAi.Models;
+using Infrastructure.Ai;
 
-namespace Infrastructure.Services.OpenAi;
+namespace Infrastructure.Services.AiServices;
 
 public interface IArtificialIntellectService
 {

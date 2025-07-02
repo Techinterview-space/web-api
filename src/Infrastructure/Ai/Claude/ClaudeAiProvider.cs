@@ -1,71 +1,29 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Domain.Entities.Companies;
-using Domain.Entities.OpenAI;
-using Infrastructure.Database;
-using Infrastructure.Services.OpenAi.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Services.OpenAi;
+namespace Infrastructure.Ai.Claude;
 
-public class ClaudeService : IArtificialIntellectService
+public class ClaudeAiProvider : IAiProvider
 {
     private const string ApiKeyTemplate = "__CLAUDE_API_KEY";
 
-    private readonly ILogger<ClaudeService> _logger;
+    private readonly ILogger<ClaudeAiProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
-    private readonly DatabaseContext _context;
 
-    public ClaudeService(
-        ILogger<ClaudeService> logger,
+    public ClaudeAiProvider(
+        ILogger<ClaudeAiProvider> logger,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
-        DatabaseContext context)
+        IConfiguration configuration)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
-        _context = context;
     }
 
-    public async Task<AiChatResult> AnalyzeCompanyAsync(
-        Company company,
-        string correlationId = null,
-        CancellationToken cancellationToken = default)
-    {
-        if (company == null ||
-            !company.HasRelevantReviews())
-        {
-            throw new InvalidOperationException("Company does not have relevant reviews.");
-        }
-
-        var promptData = await _context
-            .OpenAiPrompts
-            .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken);
-
-        var input = JsonSerializer.Serialize(
-            new CompanyAnalyzeAiRequest(company));
-
-        return await AnalyzeChatAsync(
-            input,
-            promptData?.Prompt ?? OpenAiPrompt.DefaultCompanyAnalyzePrompt,
-            "claude-3-5-sonnet-20241022",
-            correlationId,
-            cancellationToken);
-    }
-
-    public Task<AiChatResult> AnalyzeChatAsync(
-        string input,
-        string correlationId = null,
-        CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    private async Task<AiChatResult> AnalyzeChatAsync(
+    public async Task<AiChatResult> AnalyzeChatAsync(
         string input,
         string systemPrompt,
         string model = null,
@@ -102,7 +60,7 @@ public class ClaudeService : IArtificialIntellectService
                 MaxTokens = 2048,
                 Messages =
                 [
-                    new ChatMessage(
+                    new ClaudeChatMessage(
                         "user",
                         input),
                 ]

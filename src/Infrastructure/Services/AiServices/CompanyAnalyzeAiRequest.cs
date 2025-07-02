@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Companies;
 
-namespace Infrastructure.Services.OpenAi.Models;
+namespace Infrastructure.Services.AiServices;
 
 internal record CompanyAnalyzeAiRequest
 {
