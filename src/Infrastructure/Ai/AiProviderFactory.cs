@@ -7,10 +7,10 @@ namespace Infrastructure.Ai;
 
 public class AiProviderFactory : IAiProviderFactory
 {
-    private readonly IServiceScope _serviceScope;
+    private readonly IServiceProvider _serviceScope;
 
     public AiProviderFactory(
-        IServiceScope serviceScope)
+        IServiceProvider serviceScope)
     {
         _serviceScope = serviceScope;
     }
@@ -20,8 +20,8 @@ public class AiProviderFactory : IAiProviderFactory
     {
         return engine switch
         {
-            AiEngine.OpenAi => _serviceScope.ServiceProvider.GetRequiredService<ChatGptProvider>(),
-            AiEngine.Claude => _serviceScope.ServiceProvider.GetRequiredService<ClaudeAiProvider>(),
+            AiEngine.OpenAi => _serviceScope.GetRequiredService<ChatGptProvider>(),
+            AiEngine.Claude => _serviceScope.GetRequiredService<ClaudeAiProvider>(),
             _ => throw new NotSupportedException($"AI engine '{engine}' is not supported.")
         };
     }
