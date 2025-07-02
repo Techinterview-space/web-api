@@ -16,6 +16,15 @@ public class OpenAiPromptEntifyConfiguration : IEntityTypeConfiguration<OpenAiPr
             .Property(x => x.Prompt)
             .IsRequired();
 
+        builder
+            .Property(x => x.Model)
+            .IsRequired();
+
+        builder
+            .Property(x => x.Engine)
+            .IsRequired()
+            .HasDefaultValue(AiEngine.OpenAi);
+
         var createdAt = new DateTimeOffset(
             new DateTime(
                 2025,
@@ -33,11 +42,13 @@ public class OpenAiPromptEntifyConfiguration : IEntityTypeConfiguration<OpenAiPr
                 OpenAiPromptType.Company,
                 OpenAiPrompt.DefaultCompanyAnalyzePrompt,
                 "gpt-4o",
+                AiEngine.OpenAi,
                 createdAt),
             new OpenAiPrompt(
                 OpenAiPromptType.Chat,
                 OpenAiPrompt.DefaultChatAnalyzePrompt,
                 "gpt-4o",
+                AiEngine.OpenAi,
                 createdAt));
     }
 }

@@ -24,14 +24,18 @@ public class OpenAiPrompt : HasDatesBase
 
     public string Model { get; protected set; }
 
+    public AiEngine Engine { get; protected set; }
+
     public OpenAiPrompt(
         OpenAiPromptType id,
         string prompt,
-        string model)
+        string model,
+        AiEngine engine)
     {
         Id = id;
         Prompt = prompt;
         Model = model;
+        Engine = engine;
     }
 
     // for migrations
@@ -39,11 +43,13 @@ public class OpenAiPrompt : HasDatesBase
         OpenAiPromptType id,
         string prompt,
         string model,
+        AiEngine engine,
         DateTimeOffset createdAt)
     {
         Id = id;
         Prompt = prompt;
         Model = model;
+        Engine = engine;
         CreatedAt = UpdatedAt = createdAt;
     }
 
