@@ -16,14 +16,4 @@ public record OpenAiPromptDto
     public DateTimeOffset CreatedAt { get; init; }
 
     public DateTimeOffset UpdatedAt { get; init; }
-
-    public OpenAiPromptDto(OpenAiPrompt entity)
-    {
-        Id = entity.Id;
-        Prompt = entity.Prompt;
-        Model = entity.Model;
-        Engine = entity.Engine;
-        CreatedAt = entity.CreatedAt;
-        UpdatedAt = entity.UpdatedAt;
-    }
 }

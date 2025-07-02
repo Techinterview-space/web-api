@@ -38,7 +38,15 @@ public class AiPromptController : ControllerBase
 
         return await _context.OpenAiPrompts
             .OrderBy(x => x.Id)
-            .Select(x => new OpenAiPromptDto(x))
+            .Select(x => new OpenAiPromptDto
+            {
+                Id = x.Id,
+                Prompt = x.Prompt,
+                Model = x.Model,
+                Engine = x.Engine,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt
+            })
             .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
