@@ -130,6 +130,14 @@ public static class ContextExtensions
                ?? throw NotFoundException.CreateFromEntity<T>(id);
     }
 
+    public static Task<T> ByIdOrNullAsync<T, TKey>(
+        this IQueryable<T> query,
+        TKey id,
+        CancellationToken cancellationToken = default)
+        where T : class, IHasIdBase<TKey>
+        where TKey : struct =>
+        query.FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+
     public static async Task<Pageable<TEntity>> AsPaginatedAsync<TEntity>(
         this IQueryable<TEntity> query,
         PageModel pageModelOrNull = null,
