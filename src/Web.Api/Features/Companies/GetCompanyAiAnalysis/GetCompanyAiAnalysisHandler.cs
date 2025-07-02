@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Companies;
 using Domain.Validation.Exceptions;
+using Infrastructure.Ai;
 using Infrastructure.Database;
 using Infrastructure.Extensions;
+using Infrastructure.Services.AiServices;
 using Infrastructure.Services.Correlation;
 using Infrastructure.Services.Mediator;
-using Infrastructure.Services.OpenAi;
-using Infrastructure.Services.OpenAi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

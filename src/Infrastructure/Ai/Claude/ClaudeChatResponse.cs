@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Infrastructure.Services.OpenAi.Models;
+namespace Infrastructure.Ai.Claude;
 
 public record ClaudeChatResponse
 {

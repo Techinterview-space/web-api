@@ -1,7 +1,7 @@
 ﻿using Domain.Entities.Salaries;
 using Infrastructure.Salaries;
 
-namespace Infrastructure.Services.OpenAi.Custom.Models;
+namespace Infrastructure.Services.AiServices.Custom.Models;
 
 public record OpenAiBodyReport
 {

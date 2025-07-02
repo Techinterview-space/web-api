@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Infrastructure.Services.OpenAi.Models;
+namespace Infrastructure.Ai.Claude;
 
 public record ClaudeRequest
 {
@@ -14,5 +14,5 @@ public record ClaudeRequest
     public string SystemPrompt { get; set; }
 
     [JsonPropertyName("messages")]
-    public List<ChatMessage> Messages { get; set; }
+    public List<ClaudeChatMessage> Messages { get; set; }
 }

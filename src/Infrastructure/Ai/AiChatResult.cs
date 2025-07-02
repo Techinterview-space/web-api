@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.OpenAi.Models;
+﻿namespace Infrastructure.Ai;
 
 public record AiChatResult
 {
@@ -40,7 +40,7 @@ public record AiChatResult
     public string GetResponseTextOrNull()
     {
         return Choices.Count > 0
-            ? Choices[0].Message.Content
+            ? Choices[0].Content
             : null;
     }
 }

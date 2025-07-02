@@ -1,79 +1,28 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using Domain.Entities.Companies;
-using Domain.Entities.OpenAI;
-using Infrastructure.Database;
-using Infrastructure.Services.OpenAi.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.Services.OpenAi;
+namespace Infrastructure.Ai.ChatGpt;
 
-public class ChatGptService : IArtificialIntellectService
+public class ChatGptProvider : IAiProvider
 {
-    private readonly ILogger<ChatGptService> _logger;
+    private readonly ILogger<ChatGptProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
-    private readonly DatabaseContext _context;
 
-    public ChatGptService(
-        ILogger<ChatGptService> logger,
+    public ChatGptProvider(
+        ILogger<ChatGptProvider> logger,
         IHttpClientFactory httpClientFactory,
-        IConfiguration configuration,
-        DatabaseContext context)
+        IConfiguration configuration)
     {
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
-        _context = context;
-    }
-
-    public async Task<AiChatResult> AnalyzeCompanyAsync(
-        Company company,
-        string correlationId = null,
-        CancellationToken cancellationToken = default)
-    {
-        if (company == null ||
-            !company.HasRelevantReviews())
-        {
-            throw new InvalidOperationException("Company does not have relevant reviews.");
-        }
-
-        var promptData = await _context
-            .OpenAiPrompts
-            .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken);
-
-        var input = JsonSerializer.Serialize(
-            new CompanyAnalyzeAiRequest(company));
-
-        return await AnalyzeChatAsync(
-            input,
-            promptData?.Prompt ?? OpenAiPrompt.DefaultCompanyAnalyzePrompt,
-            promptData?.Model,
-            correlationId,
-            cancellationToken);
     }
 
     public async Task<AiChatResult> AnalyzeChatAsync(
-        string input,
-        string correlationId = null,
-        CancellationToken cancellationToken = default)
-    {
-        var prompt = await _context
-                         .OpenAiPrompts
-                         .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Chat, cancellationToken);
-
-        return await AnalyzeChatAsync(
-            input,
-            prompt?.Prompt ?? OpenAiPrompt.DefaultChatAnalyzePrompt,
-            prompt?.Model,
-            correlationId,
-            cancellationToken);
-    }
-
-    private async Task<AiChatResult> AnalyzeChatAsync(
         string input,
         string systemPrompt,
         string model = null,
@@ -106,17 +55,13 @@ public class ChatGptService : IArtificialIntellectService
             Model = model,
             Messages =
             [
-                new ChatMessage
-                {
-                    Role = "system",
-                    Content = systemPrompt,
-                },
+                new ChatGptMessage(
+                    "system",
+                    systemPrompt),
 
-                new ChatMessage
-                {
-                    Role = "user",
-                    Content = input
-                },
+                new ChatGptMessage(
+                    "user",
+                    input),
             ]
         };
 
@@ -168,7 +113,7 @@ public class ChatGptService : IArtificialIntellectService
                     responseJson);
             }
 
-            var responseDeserialized = JsonSerializer.Deserialize<ChatResponse>(responseJson);
+            var responseDeserialized = JsonSerializer.Deserialize<ChatGptResponse>(responseJson);
             if (responseDeserialized?.Choices == null)
             {
                 _logger.LogError(
@@ -181,7 +126,11 @@ public class ChatGptService : IArtificialIntellectService
                 return AiChatResult.Failure(model);
             }
 
-            return AiChatResult.Success(responseDeserialized.Choices, model);
+            return AiChatResult.Success(
+                responseDeserialized.Choices
+                    .Select(x => new AiChoice(x.Message))
+                    .ToList(),
+                model);
         }
         catch (Exception e)
         {

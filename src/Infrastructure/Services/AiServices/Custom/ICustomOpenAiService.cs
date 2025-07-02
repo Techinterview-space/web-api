@@ -1,6 +1,6 @@
-﻿using Infrastructure.Services.OpenAi.Custom.Models;
+﻿using Infrastructure.Services.AiServices.Custom.Models;
 
-namespace Infrastructure.Services.OpenAi.Custom;
+namespace Infrastructure.Services.AiServices.Custom;
 
 public interface ICustomOpenAiService
 {
