@@ -501,9 +501,11 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Entities.OpenAI.OpenAiPrompt", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -513,9 +515,6 @@ namespace Domain.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(1);
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("text");
@@ -524,17 +523,32 @@ namespace Domain.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Type", "IsActive");
-
                     b.ToTable("OpenAiPrompts", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Engine = 1,
+                            Model = "gpt-4o",
+                            Prompt = "You are a helpful career assistant. Analyze the company's reviews and provide a summary with advice what should user pay more attention on. In the request there will be a company total rating, rating history and reviews presented in JSON format. Your reply should be in Russian language, markdown formatted.",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Engine = 1,
+                            Model = "gpt-4o",
+                            Prompt = "You are a helpful assistant. Analyze the user's input and provide a response. Your reply should be in question language, markdown formatted.",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Questions.SalariesSurveyReply", b =>

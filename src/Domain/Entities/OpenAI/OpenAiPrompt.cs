@@ -34,8 +34,6 @@ public class OpenAiPrompt : HasDatesBase
         "claude-sonnet-4-0",
     };
 
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Key]
     public Guid Id { get; protected set; }
 
     public OpenAiPromptType Type { get; protected set; }
@@ -62,25 +60,6 @@ public class OpenAiPrompt : HasDatesBase
         IsActive = false;
 
         ValidateModel();
-    }
-
-    // for migrations
-    public OpenAiPrompt(
-        Guid id,
-        OpenAiPromptType type,
-        string prompt,
-        string model,
-        AiEngine engine,
-        bool isActive,
-        DateTimeOffset createdAt)
-    {
-        Id = id;
-        Type = type;
-        Prompt = prompt;
-        Model = model;
-        Engine = engine;
-        IsActive = isActive;
-        CreatedAt = UpdatedAt = createdAt;
     }
 
     protected OpenAiPrompt()

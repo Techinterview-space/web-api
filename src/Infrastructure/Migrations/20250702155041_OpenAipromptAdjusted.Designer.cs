@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Domain.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250702153712_OpenAipromptAdjusted")]
+    [Migration("20250702155041_OpenAipromptAdjusted")]
     partial class OpenAipromptAdjusted
     {
         /// <inheritdoc />
