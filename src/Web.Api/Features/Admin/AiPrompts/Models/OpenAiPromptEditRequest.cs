@@ -5,7 +5,7 @@ namespace Web.Api.Features.Admin.AiPrompts.Models;
 
 public record OpenAiPromptEditRequest
 {
-    public OpenAiPromptType? Id { get; init; }
+    public OpenAiPromptType Type { get; init; }
 
     [Required]
     public string Prompt { get; init; }

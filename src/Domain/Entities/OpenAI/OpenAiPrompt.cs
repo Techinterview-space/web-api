@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities.OpenAI;
 
-public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
+public class OpenAiPrompt : HasDatesBase
 {
     public const string DefaultCompanyAnalyzePrompt =
         "You are a helpful career assistant. " +
@@ -36,7 +36,9 @@ public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
-    public OpenAiPromptType Id { get; protected set; }
+    public Guid Id { get; protected set; }
+
+    public OpenAiPromptType Type { get; protected set; }
 
     public string Prompt { get; protected set; }
 
@@ -44,32 +46,40 @@ public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
 
     public AiEngine Engine { get; protected set; }
 
+    public bool IsActive { get; protected set; }
+
     public OpenAiPrompt(
         OpenAiPromptType id,
         string prompt,
         string model,
         AiEngine engine)
     {
-        Id = id;
+        Id = Guid.NewGuid();
+        Type = id;
         Prompt = prompt?.Trim();
         Model = model?.Trim().ToLowerInvariant();
         Engine = engine;
+        IsActive = false;
 
         ValidateModel();
     }
 
     // for migrations
     public OpenAiPrompt(
-        OpenAiPromptType id,
+        Guid id,
+        OpenAiPromptType type,
         string prompt,
         string model,
         AiEngine engine,
+        bool isActive,
         DateTimeOffset createdAt)
     {
         Id = id;
+        Type = type;
         Prompt = prompt;
         Model = model;
         Engine = engine;
+        IsActive = isActive;
         CreatedAt = UpdatedAt = createdAt;
     }
 
@@ -114,5 +124,25 @@ public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
         {
             throw new InvalidOperationException($"Model '{Model}' is not allowed for Claude engine.");
         }
+    }
+
+    public void Activate()
+    {
+        if (IsActive)
+        {
+            throw new InvalidOperationException("Already active.");
+        }
+
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        if (!IsActive)
+        {
+            throw new InvalidOperationException("Already inactive.");
+        }
+
+        IsActive = false;
     }
 }

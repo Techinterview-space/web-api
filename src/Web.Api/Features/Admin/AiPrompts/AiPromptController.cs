@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,8 +43,10 @@ public class AiPromptController : ControllerBase
             {
                 Id = x.Id,
                 Prompt = x.Prompt,
+                Type = x.Type,
                 Model = x.Model,
                 Engine = x.Engine,
+                IsActive = x.IsActive,
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt
             })
@@ -58,7 +61,7 @@ public class AiPromptController : ControllerBase
     {
         await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
 
-        if (!createRequest.Id.HasValue)
+        if (createRequest.Type is OpenAiPromptType.Undefined)
         {
             throw new BadRequestException("Id is required for prompt creation");
         }
@@ -68,16 +71,9 @@ public class AiPromptController : ControllerBase
             throw new BadRequestException("Engine is required for prompt creation");
         }
 
-        if (await _context.OpenAiPrompts.AnyAsync(
-                x => x.Id == createRequest.Id.Value,
-                cancellationToken: cancellationToken))
-        {
-            throw new BadRequestException("Prompt with this ID already exists");
-        }
-
         var item = await _context.SaveAsync(
             new OpenAiPrompt(
-                createRequest.Id.Value,
+                createRequest.Type,
                 createRequest.Prompt,
                 createRequest.Model,
                 createRequest.Engine),
@@ -86,20 +82,21 @@ public class AiPromptController : ControllerBase
         return Ok(item.Id);
     }
 
-    [HttpPut("")]
+    [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(
+        [FromRoute(Name = "id")] Guid id,
         [FromBody] OpenAiPromptEditRequest updateRequest,
         CancellationToken cancellationToken)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
 
-        if (!updateRequest.Id.HasValue)
+        if (updateRequest.Type is OpenAiPromptType.Undefined)
         {
             throw new BadRequestException("Id is required for OpenAI prompt update");
         }
 
         var entity = await _context.OpenAiPrompts
-            .FirstOrDefaultAsync(x => x.Id == updateRequest.Id.Value, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         entity.Update(
             updateRequest.Prompt,
@@ -110,9 +107,37 @@ public class AiPromptController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{id}")]
+    [HttpPut("{id:guid}/activate")]
+    public async Task<IActionResult> Activate(
+        [FromRoute(Name = "id")] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var entity = await _context.OpenAiPrompts
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        entity.Activate();
+
+        await _context.TrySaveChangesAsync(cancellationToken);
+        return Ok();
+    }
+
+    [HttpPut("{id:guid}/deactivate")]
+    public async Task<IActionResult> Deactivate(
+        [FromRoute(Name = "id")] Guid id,
+        CancellationToken cancellationToken)
+    {
+        var entity = await _context.OpenAiPrompts
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        entity.Deactivate();
+
+        await _context.TrySaveChangesAsync(cancellationToken);
+        return Ok();
+    }
+
+    [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(
-        [FromRoute] OpenAiPromptType id,
+        [FromRoute(Name = "id")] Guid id,
         CancellationToken cancellationToken)
     {
         await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);

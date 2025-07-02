@@ -13,6 +13,10 @@ public class OpenAiPromptEntifyConfiguration : IEntityTypeConfiguration<OpenAiPr
         builder.HasKey(x => x.Id);
 
         builder
+            .Property(x => x.Type)
+            .IsRequired();
+
+        builder
             .Property(x => x.Prompt)
             .IsRequired();
 
@@ -25,30 +29,10 @@ public class OpenAiPromptEntifyConfiguration : IEntityTypeConfiguration<OpenAiPr
             .IsRequired()
             .HasDefaultValue(AiEngine.OpenAi);
 
-        var createdAt = new DateTimeOffset(
-            new DateTime(
-                2025,
-                6,
-                29,
-                12,
-                4,
-                0,
-                0,
-                DateTimeKind.Utc),
-            TimeSpan.Zero);
-
-        builder.HasData(
-            new OpenAiPrompt(
-                OpenAiPromptType.Company,
-                OpenAiPrompt.DefaultCompanyAnalyzePrompt,
-                "gpt-4o",
-                AiEngine.OpenAi,
-                createdAt),
-            new OpenAiPrompt(
-                OpenAiPromptType.Chat,
-                OpenAiPrompt.DefaultChatAnalyzePrompt,
-                "gpt-4o",
-                AiEngine.OpenAi,
-                createdAt));
+        builder.HasIndex(x => new
+        {
+            x.Type,
+            x.IsActive
+        });
     }
 }

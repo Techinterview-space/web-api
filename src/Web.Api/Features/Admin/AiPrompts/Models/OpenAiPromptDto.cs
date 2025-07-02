@@ -5,13 +5,17 @@ namespace Web.Api.Features.Admin.AiPrompts.Models;
 
 public record OpenAiPromptDto
 {
-    public OpenAiPromptType Id { get; init; }
+    public Guid Id { get; init; }
+
+    public OpenAiPromptType Type { get; init; }
 
     public string Prompt { get; init; }
 
     public string Model { get; init; }
 
     public AiEngine Engine { get; init; }
+
+    public bool IsActive { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
 

@@ -33,7 +33,10 @@ public class AiService : IArtificialIntellectService
 
         var promptData = await _context
             .OpenAiPrompts
-            .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Company, cancellationToken)
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync(
+                x => x.Type == OpenAiPromptType.Company && x.IsActive,
+                cancellationToken)
             ?? throw new InvalidOperationException($"System does not have eny prompts for {OpenAiPromptType.Company}.");
 
         var input = JsonSerializer.Serialize(
@@ -56,7 +59,10 @@ public class AiService : IArtificialIntellectService
     {
         var promptData = await _context
             .OpenAiPrompts
-            .FirstOrDefaultAsync(x => x.Id == OpenAiPromptType.Chat, cancellationToken)
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync(
+                x => x.Type == OpenAiPromptType.Chat && x.IsActive,
+                cancellationToken)
                      ?? throw new InvalidOperationException($"System does not have eny prompts for {OpenAiPromptType.Chat}.");
 
         var aiProvider = _aiProviderFactory.GetProvider(promptData.Engine);

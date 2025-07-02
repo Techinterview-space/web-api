@@ -1,0 +1,90 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+
+#nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
+namespace Domain.Migrations
+{
+    /// <inheritdoc />
+    public partial class OpenAipromptAdjusted : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DeleteData(
+                table: "OpenAiPrompts",
+                keyColumn: "Id",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "OpenAiPrompts",
+                keyColumn: "Id",
+                keyValue: 2);
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "Id",
+                table: "OpenAiPrompts",
+                type: "uuid",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "integer")
+                .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            migrationBuilder.AddColumn<bool>(
+                name: "IsActive",
+                table: "OpenAiPrompts",
+                type: "boolean",
+                nullable: false,
+                defaultValue: false);
+
+            migrationBuilder.AddColumn<int>(
+                name: "Type",
+                table: "OpenAiPrompts",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OpenAiPrompts_Type_IsActive",
+                table: "OpenAiPrompts",
+                columns: new[] { "Type", "IsActive" });
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropIndex(
+                name: "IX_OpenAiPrompts_Type_IsActive",
+                table: "OpenAiPrompts");
+
+            migrationBuilder.DropColumn(
+                name: "IsActive",
+                table: "OpenAiPrompts");
+
+            migrationBuilder.DropColumn(
+                name: "Type",
+                table: "OpenAiPrompts");
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Id",
+                table: "OpenAiPrompts",
+                type: "integer",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uuid")
+                .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            migrationBuilder.InsertData(
+                table: "OpenAiPrompts",
+                columns: new[] { "Id", "CreatedAt", "Engine", "Model", "Prompt", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 1, "gpt-4o", "You are a helpful career assistant. Analyze the company's reviews and provide a summary with advice what should user pay more attention on. In the request there will be a company total rating, rating history and reviews presented in JSON format. Your reply should be in Russian language, markdown formatted.", new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) },
+                    { 2, new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), 1, "gpt-4o", "You are a helpful assistant. Analyze the user's input and provide a response. Your reply should be in question language, markdown formatted.", new DateTimeOffset(new DateTime(2025, 6, 29, 12, 4, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)) }
+                });
+        }
+    }
+}
