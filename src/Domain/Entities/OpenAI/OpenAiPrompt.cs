@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities.OpenAI;
 
-public class OpenAiPrompt : HasDatesBase
+public class OpenAiPrompt : HasDatesBase, IHasIdBase<OpenAiPromptType>
 {
     public const string DefaultCompanyAnalyzePrompt =
         "You are a helpful career assistant. " +
@@ -55,5 +55,20 @@ public class OpenAiPrompt : HasDatesBase
 
     protected OpenAiPrompt()
     {
+    }
+
+    public void UpdatePrompt(string prompt)
+    {
+        Prompt = prompt;
+    }
+
+    public void UpdateModel(string model)
+    {
+        Model = model;
+    }
+
+    public void UpdateEngine(AiEngine engine)
+    {
+        Engine = engine;
     }
 }
