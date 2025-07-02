@@ -154,6 +154,19 @@ public class ChatGptService : IArtificialIntellectService
                     response.ReasonPhrase,
                     responseJson);
             }
+            else
+            {
+                _logger.LogInformation(
+                    "OpenAI API request succeed. " +
+                    "CorrelationId: {CorrelationId}. " +
+                    "StatusCode: {StatusCode}, " +
+                    "ReasonPhrase: {ReasonPhrase}. " +
+                    "Response: {Response}",
+                    correlationId,
+                    response.StatusCode,
+                    response.ReasonPhrase,
+                    responseJson);
+            }
 
             var responseDeserialized = JsonSerializer.Deserialize<ChatResponse>(responseJson);
             if (responseDeserialized?.Choices == null)

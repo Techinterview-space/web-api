@@ -154,8 +154,8 @@ public class ClaudeService : IArtificialIntellectService
                     responseJson);
             }
 
-            var responseDeserialized = JsonSerializer.Deserialize<ChatResponse>(responseJson);
-            if (responseDeserialized?.Choices == null)
+            var responseDeserialized = JsonSerializer.Deserialize<ClaudeChatResponse>(responseJson);
+            if (responseDeserialized?.Content == null)
             {
                 _logger.LogError(
                     "Claude API response deserialization failed. " +
@@ -167,7 +167,13 @@ public class ClaudeService : IArtificialIntellectService
                 return AiChatResult.Failure(model);
             }
 
-            return AiChatResult.Success(responseDeserialized.Choices, model);
+            return AiChatResult.Success(
+                responseDeserialized.Content
+                    .Select(x => new AiChoice(
+                        responseDeserialized.Model,
+                        x))
+                    .ToList(),
+                model);
         }
         catch (Exception e)
         {

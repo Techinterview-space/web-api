@@ -3,7 +3,7 @@
 public record AiChatResult
 {
     public static AiChatResult Success(
-        List<Choice> choices,
+        List<AiChoice> choices,
         string model)
     {
         return new AiChatResult(
@@ -17,13 +17,13 @@ public record AiChatResult
     {
         return new AiChatResult(
             false,
-            new List<Choice>(),
+            new List<AiChoice>(),
             model);
     }
 
     private AiChatResult(
         bool isSuccess,
-        List<Choice> choices,
+        List<AiChoice> choices,
         string model)
     {
         IsSuccess = isSuccess;
@@ -33,7 +33,7 @@ public record AiChatResult
 
     public bool IsSuccess { get; }
 
-    public List<Choice> Choices { get; }
+    public List<AiChoice> Choices { get; }
 
     public string Model { get; }
 
