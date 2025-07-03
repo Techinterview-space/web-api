@@ -58,7 +58,9 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     following {
                       totalCount
                     }
-                    repositories(first: 100, ownerAffiliations: OWNER) {
+                    // Include both user-owned repositories and organization repositories 
+                    // to ensure all contribution statistics are captured correctly
+                    repositories(first: 100, ownerAffiliations: [OWNER, ORGANIZATION_MEMBER]) {
                       totalCount
                       nodes {
                         stargazerCount
@@ -193,6 +195,16 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             userId,
             repositoryContributions.Count);
 
+        // Log the repositories being processed for better debugging
+        foreach (var repo in repositoryContributions)
+        {
+            _logger.LogDebug(
+                "Processing repository: {Owner}/{Name} (contributions: {ContributionCount})",
+                repo.Repository.Owner.Login,
+                repo.Repository.Name,
+                repo.Contributions?.TotalCount ?? 0);
+        }
+
         // Process each repository to get detailed commit information (following Python pattern)
         foreach (var repoContribution in repositoryContributions)
         {
@@ -214,13 +226,14 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 stats.ChangesInFilesCount += repoStats.ChangesInFilesCount;
 
                 _logger.LogDebug(
-                    "Repository {Owner}/{Name}: {Commits} commits, {Files} files, {Additions} additions, {Deletions} deletions",
+                    "Repository {Owner}/{Name}: {Commits} commits, {Files} files, {Additions} additions, {Deletions} deletions (Owner type: {OwnerType})",
                     repoContribution.Repository.Owner.Login,
                     repoContribution.Repository.Name,
                     repoStats.CommitsCount,
                     repoStats.FilesAdjusted,
                     repoStats.AdditionsInFilesCount,
-                    repoStats.DeletionsInFilesCount);
+                    repoStats.DeletionsInFilesCount,
+                    repoContribution.Repository.Owner.Login == username ? "User" : "Organization");
             }
             catch (Exception ex)
             {
@@ -231,6 +244,16 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     repoContribution.Repository.Name);
             }
         }
+
+        var userRepoCount = repositoryContributions.Count(r => r.Repository.Owner.Login == username);
+        var orgRepoCount = repositoryContributions.Count(r => r.Repository.Owner.Login != username);
+
+        _logger.LogInformation(
+            "Completed commit statistics for user {Username}: {TotalCommits} commits from {UserRepoCount} user repos and {OrgRepoCount} organization repos",
+            username,
+            stats.CommitsCount,
+            userRepoCount,
+            orgRepoCount);
 
         return stats;
     }
@@ -366,7 +389,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             TotalPrivateRepos = 0, // GraphQL doesn't expose private repo count for other users
             PullRequestsCreatedByUser = user.PullRequests?.TotalCount ?? 0,
             IssuesOpenedByUser = user.Issues?.TotalCount ?? 0,
-            CountOfStarredRepos = user.Repositories?.Nodes?.Sum(r => r.StargazerCount) ?? 0,
+            CountOfStarredRepos = user.StarredRepositories?.TotalCount ?? 0,
             CountOfForkedRepos = user.Repositories?.Nodes?.Count(r => r.IsFork) ?? 0,
             CommitsCount = commitStats.CommitsCount,
             FilesAdjusted = commitStats.FilesAdjusted,
