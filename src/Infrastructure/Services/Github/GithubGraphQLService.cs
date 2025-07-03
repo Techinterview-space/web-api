@@ -42,7 +42,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 "Fetching GitHub profile data for user {Username} using GraphQL API",
                 username);
 
-            // Step 1: Get user ID and repository contributions (similar to Python implementation)
+            // Step 1: Get user ID and repository contributions
             var userQuery = new GraphQLRequest
             {
                 Query = @"
@@ -58,9 +58,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     following {
                       totalCount
                     }
-                    // Include both user-owned repositories and organization repositories 
-                    // to ensure all contribution statistics are captured correctly
-                    repositories(first: 100, ownerAffiliations: [OWNER, ORGANIZATION_MEMBER]) {
+                    repositories(first: 100, affiliations: [OWNER, ORGANIZATION_MEMBER,COLLABORATOR], ownerAffiliations:[OWNER, ORGANIZATION_MEMBER, COLLABORATOR]) {
                       totalCount
                       nodes {
                         stargazerCount
