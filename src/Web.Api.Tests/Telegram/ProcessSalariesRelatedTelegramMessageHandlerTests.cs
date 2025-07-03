@@ -7,6 +7,7 @@ using Domain.Enums;
 using Infrastructure.Database;
 using MemoryCache.Testing.Moq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Telegram.Bot;
@@ -67,6 +68,13 @@ namespace Web.Api.Tests.Telegram
 
             using var mockedCache = Create.MockedMemoryCache();
             var telegramBotClient = new Mock<ITelegramBotClient>();
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string>
+                    {
+                        { "Telegram:AdminUsername", "maximgorbatyuk" },
+                    })
+                .Build();
 
             var processTelegramMessageHandler = new ProcessSalariesRelatedTelegramMessageHandler(
                 logger.Object,
@@ -74,7 +82,8 @@ namespace Web.Api.Tests.Telegram
                 context,
                 mockedCache,
                 new GlobalFake(),
-                new ProfessionsCacheServiceFake(context));
+                new ProfessionsCacheServiceFake(context),
+                configuration);
 
             var mockUpdate = new Mock<Update>();
 
@@ -112,13 +121,22 @@ namespace Web.Api.Tests.Telegram
             using var mockedCache = Create.MockedMemoryCache();
             var telegramBotClient = new Mock<ITelegramBotClient>();
 
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string>
+                    {
+                        { "Telegram:AdminUsername", "maximgorbatyuk" },
+                    })
+                .Build();
+
             var processTelegramMessageHandler = new ProcessSalariesRelatedTelegramMessageHandler(
                 logger.Object,
                 currencyService,
                 context,
                 mockedCache,
                 new GlobalFake(),
-                new ProfessionsCacheServiceFake(context));
+                new ProfessionsCacheServiceFake(context),
+                configuration);
 
             var mockUpdate = new Mock<Update>();
             mockUpdate.Object.Message = new Message()

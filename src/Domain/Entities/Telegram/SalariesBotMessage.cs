@@ -3,24 +3,25 @@ using Domain.Validation.Exceptions;
 
 namespace Domain.Entities.Telegram;
 
-public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
+public class SalariesBotMessage : IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
 
     public long ChatId { get; protected set; }
 
-    public long UsageCount { get; protected set; }
-
     public string Username { get; protected set; }
 
-    public string ReceivedMessageText { get; protected set; }
+    public bool IsAdmin { get; protected set; }
 
     public TelegramBotUsageType UsageType { get; protected set; }
 
-    public TelegramBotUsage(
+    public DateTimeOffset CreatedAt { get; protected set; }
+
+    public SalariesBotMessage(
         long chatId,
         string username,
-        TelegramBotUsageType usageType)
+        TelegramBotUsageType usageType,
+        bool isAdmin)
     {
         username = username?.Trim().ToLowerInvariant();
         if (string.IsNullOrEmpty(username))
@@ -29,20 +30,12 @@ public class TelegramBotUsage : HasDatesBase, IHasIdBase<Guid>
         }
 
         ChatId = chatId;
-        UsageCount = 0;
         Username = username;
         UsageType = usageType;
+        IsAdmin = isAdmin;
     }
 
-    public void IncrementUsageCount(
-        string receivedMessageText)
-    {
-        UsageCount++;
-        ReceivedMessageText = receivedMessageText;
-        UpdatedAt = DateTime.UtcNow;
-    }
-
-    protected TelegramBotUsage()
+    protected SalariesBotMessage()
     {
     }
 }

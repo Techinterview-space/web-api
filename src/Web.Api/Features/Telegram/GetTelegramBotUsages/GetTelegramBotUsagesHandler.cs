@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Telegram.GetTelegramBotUsages;
 
-public class GetTelegramBotUsagesHandler : Infrastructure.Services.Mediator.IRequestHandler<GetTelegramBotUsagesQuery, Pageable<TelegramBotUsageDto>>
+public class GetTelegramBotUsagesHandler
+    : Infrastructure.Services.Mediator.IRequestHandler<GetTelegramBotUsagesQuery, Pageable<TelegramBotUsageDto>>
 {
     private readonly DatabaseContext _context;
 
@@ -21,20 +22,18 @@ public class GetTelegramBotUsagesHandler : Infrastructure.Services.Mediator.IReq
         GetTelegramBotUsagesQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.TelegramBotUsages
-            .OrderByDescending(x => x.UsageCount)
+        return await _context.SalariesBotMessages
             .AsNoTracking()
             .Select(x => new TelegramBotUsageDto
             {
                 Id = x.Id,
                 ChatId = x.ChatId,
-                ReceivedMessageText = x.ReceivedMessageText,
-                UsageCount = x.UsageCount,
                 Username = x.Username,
                 UsageType = x.UsageType,
+                IsAdmin = x.IsAdmin,
                 CreatedAt = x.CreatedAt,
-                UpdatedAt = x.UpdatedAt,
             })
+            .OrderByDescending(x => x.CreatedAt)
             .AsPaginatedAsync(request, cancellationToken);
     }
 }

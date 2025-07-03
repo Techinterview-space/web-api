@@ -73,8 +73,10 @@ public class ProcessGithubProfileTelegramMessageHandler
 
         if (messageSentByBot)
         {
-            await AddInlineQueryClickAsync(
-                message,
+            await _context.SaveAsync(
+                new TelegramInlineReply(
+                    message.Chat.Id,
+                    TelegramBotType.GithubProfile),
                 cancellationToken);
 
             return null;
@@ -313,29 +315,6 @@ public class ProcessGithubProfileTelegramMessageHandler
                 "An error occurred while answering inline query: {Message}",
                 e.Message);
         }
-    }
-
-    private async Task AddInlineQueryClickAsync(
-        Message message,
-        CancellationToken cancellationToken)
-    {
-        if (message.From == null)
-        {
-            return;
-        }
-
-        var username = message.From.Username?.Trim() ?? message.From.Id.ToString();
-        var chatId = message.Chat.Id;
-        var chatName = message.Chat.Title?.Trim();
-
-        _context.Add(
-            new TelegramInlineReply(
-                username,
-                message.From.Id,
-                chatId,
-                chatName));
-
-        await _context.TrySaveChangesAsync(cancellationToken);
     }
 
     private async Task<string> GetGithubProfileDataAsync(

@@ -9,17 +9,13 @@ public record TelegramBotUsageDto
 
     public long? ChatId { get; init; }
 
-    public long UsageCount { get; init; }
-
     public string Username { get; init; }
-
-    public string ReceivedMessageText { get; init; }
 
     public TelegramBotUsageType UsageType { get; init; }
 
     public string UsageTypeAsString => UsageType.ToString();
 
-    public DateTimeOffset CreatedAt { get; init; }
+    public bool IsAdmin { get; init; }
 
-    public DateTimeOffset UpdatedAt { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
 }

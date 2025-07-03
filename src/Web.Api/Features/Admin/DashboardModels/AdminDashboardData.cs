@@ -14,7 +14,9 @@ public record AdminDashboardData
         List<DateTimeOffset> reviewLikesForLastDays,
         List<DateTimeOffset> reviewsForLastDays,
         List<DateTimeOffset> salariesBotMessages,
-        List<DateTimeOffset> githubProfileBotMessages)
+        List<DateTimeOffset> inlineClicksToSalariesBot,
+        List<DateTimeOffset> githubProfileBotMessages,
+        List<DateTimeOffset> inlineClicksToGithubProfileBot)
     {
         AverageRatingData = averageRatingData;
         TotalSalaries = totalSalaries;
@@ -25,7 +27,9 @@ public record AdminDashboardData
         ReviewLikesForLastTenDays = new ItemsPerDayChartData(reviewLikesForLastDays);
         ReviewsForLastTenDays = new ItemsPerDayChartData(reviewsForLastDays);
         SalariesBotMessages = new ItemsPerDayChartData(salariesBotMessages);
+        InlineClicksToSalariesBot = new ItemsPerDayChartData(inlineClicksToSalariesBot);
         GithubProfileBotMessages = new ItemsPerDayChartData(githubProfileBotMessages);
+        InlineClicksToGithubProfileBot = new ItemsPerDayChartData(inlineClicksToGithubProfileBot);
     }
 
     public AverageRatingData AverageRatingData { get; }
@@ -44,5 +48,9 @@ public record AdminDashboardData
 
     public ItemsPerDayChartData SalariesBotMessages { get; }
 
+    public ItemsPerDayChartData InlineClicksToSalariesBot { get; }
+
     public ItemsPerDayChartData GithubProfileBotMessages { get; }
+
+    public ItemsPerDayChartData InlineClicksToGithubProfileBot { get; }
 }

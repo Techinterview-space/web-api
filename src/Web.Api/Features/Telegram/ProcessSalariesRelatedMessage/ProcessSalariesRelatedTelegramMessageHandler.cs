@@ -18,6 +18,7 @@ using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.UserCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -41,6 +42,7 @@ public class ProcessSalariesRelatedTelegramMessageHandler
     private readonly DatabaseContext _context;
     private readonly IMemoryCache _cache;
     private readonly IGlobal _global;
+    private readonly IConfiguration _configuration;
 
     public ProcessSalariesRelatedTelegramMessageHandler(
         ILogger<ProcessSalariesRelatedTelegramMessageHandler> logger,
@@ -48,7 +50,8 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         DatabaseContext context,
         IMemoryCache cache,
         IGlobal global,
-        IProfessionsCacheService professionsCacheService)
+        IProfessionsCacheService professionsCacheService,
+        IConfiguration configuration)
     {
         _logger = logger;
         _currencyService = currencyService;
@@ -56,6 +59,7 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         _cache = cache;
         _global = global;
         _professionsCacheService = professionsCacheService;
+        _configuration = configuration;
     }
 
     public async Task<string> Handle(
@@ -92,8 +96,10 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         if (messageSentByBot)
         {
-            await AddInlineQueryClickAsync(
-                message,
+            await _context.SaveAsync(
+                new TelegramInlineReply(
+                    message.Chat.Id,
+                    TelegramBotType.Salaries),
                 cancellationToken);
 
             return null;
@@ -111,15 +117,14 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return null;
         }
 
-        var directMessageResult = await TryProcessDirectMessageBotCommandAsync(
+        var directMessageResult = await TryProcessBotCommandAsync(
             request,
             cancellationToken);
 
         if (directMessageResult.Processed)
         {
-            await IncrementTelegramBotUsageAsync(
+            await SaveBotMessageAsync(
                 message,
-                receivedMessageTextOrNull: messageText,
                 usageType: TelegramBotUsageType.DirectMessage,
                 cancellationToken: cancellationToken);
 
@@ -147,10 +152,15 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             replyMarkup: replyData.InlineKeyboardMarkup,
             cancellationToken: cancellationToken);
 
+        await SaveBotMessageAsync(
+            message,
+            usageType: TelegramBotUsageType.DirectMessage,
+            cancellationToken: cancellationToken);
+
         return replyData.ReplyText;
     }
 
-    private async Task<(bool Processed, string ReplyText)> TryProcessDirectMessageBotCommandAsync(
+    private async Task<(bool Processed, string ReplyText)> TryProcessBotCommandAsync(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
@@ -433,29 +443,6 @@ Chat ID: {message.Chat.Id}
         }
     }
 
-    private async Task AddInlineQueryClickAsync(
-        Message message,
-        CancellationToken cancellationToken)
-    {
-        if (message.From == null)
-        {
-            return;
-        }
-
-        var username = message.From.Username?.Trim() ?? message.From.Id.ToString();
-        var chatId = message.Chat.Id;
-        var chatName = message.Chat.Title?.Trim();
-
-        _context.Add(
-            new TelegramInlineReply(
-                username,
-                message.From.Id,
-                chatId,
-                chatName));
-
-        await _context.TrySaveChangesAsync(cancellationToken);
-    }
-
     private async Task<InlineQueryResultArticle> GetProfessionsGroupInlineResultAsync(
         int counter,
         TelegramBotUserCommandParameters professionGroupParams,
@@ -476,36 +463,24 @@ Chat ID: {message.Chat.Id}
             });
     }
 
-    private async Task IncrementTelegramBotUsageAsync(
+    private async Task SaveBotMessageAsync(
         Message message,
-        string receivedMessageTextOrNull,
         TelegramBotUsageType usageType,
         CancellationToken cancellationToken)
     {
-        var username = message.From?.Username ?? $"{message.From?.FirstName} {message.From?.LastName}".Trim();
+        var adminUsername = _configuration["Telegram:AdminUsername"];
+        var username = message.From?.Username?.Trim().ToLowerInvariant() ??
+                       message.From?.FirstName?.Trim().ToLowerInvariant() ??
+                       message.From?.LastName?.Trim().ToLowerInvariant() ??
+                       "unknown";
 
-        TelegramBotUsage usage = null;
-        if (!string.IsNullOrEmpty(username))
-        {
-            usage = await _context
-                .TelegramBotUsages
-                .FirstOrDefaultAsync(
-                    x => x.ChatId == message.Chat.Id,
-                    cancellationToken);
-        }
-
-        if (usage == null)
-        {
-            usage = new TelegramBotUsage(
+        await _context.SaveAsync(
+            new SalariesBotMessage(
                 message.Chat.Id,
                 username,
-                usageType);
-
-            _context.TelegramBotUsages.Add(usage);
-        }
-
-        usage.IncrementUsageCount(receivedMessageTextOrNull);
-        await _context.SaveChangesAsync(cancellationToken);
+                usageType,
+                username == adminUsername),
+            cancellationToken);
     }
 
     private async Task<User> GetBotUserName(

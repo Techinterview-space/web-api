@@ -6,26 +6,18 @@ public class TelegramInlineReply : IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
 
-    public string Username { get; protected set; }
-
     public long? ChatId { get; protected set; }
 
-    public string ChatName { get; protected set; }
-
-    public long UserId { get; protected set; }
+    public TelegramBotType? BotType { get; protected set; }
 
     public DateTimeOffset CreatedAt { get; protected set; }
 
     public TelegramInlineReply(
-        string username,
-        long userId,
         long? chatId,
-        string chatName)
+        TelegramBotType botType)
     {
-        Username = username;
-        UserId = userId;
         ChatId = chatId;
-        ChatName = chatName;
+        BotType = botType;
         CreatedAt = DateTimeOffset.UtcNow;
     }
 

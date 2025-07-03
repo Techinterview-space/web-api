@@ -4,21 +4,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Database.Config;
 
-internal class TelegramBotUserConfig : IEntityTypeConfiguration<TelegramBotUsage>
+internal class TelegramBotUserConfig : IEntityTypeConfiguration<SalariesBotMessage>
 {
     public void Configure(
-        EntityTypeBuilder<TelegramBotUsage> builder)
+        EntityTypeBuilder<SalariesBotMessage> builder)
     {
-        builder.ToTable("TelegramBotUsages");
+        builder.ToTable("SalariesBotMessages");
         builder.HasKey(x => x.Id);
 
         builder
-            .Property(x => x.UsageCount)
-            .HasDefaultValue(0);
-
-        builder
             .Property(x => x.Username)
-            .IsRequired(true);
+            .IsRequired(false);
 
         builder
             .Property(x => x.ChatId)

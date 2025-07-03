@@ -43,7 +43,7 @@ public class DatabaseContext : DbContext
 
     public DbSet<Profession> Professions { get; set; }
 
-    public DbSet<TelegramBotUsage> TelegramBotUsages { get; set; }
+    public DbSet<SalariesBotMessage> SalariesBotMessages { get; set; }
 
     public DbSet<TelegramUserSettings> TelegramUserSettings { get; set; }
 

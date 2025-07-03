@@ -82,13 +82,4 @@ public class TelegramBotController : ControllerBase
 
         return NoContent();
     }
-
-    [HttpGet("inline-reply-stats")]
-    public async Task<TelegramInlineUsagesData> GetTelegramInlineReplyStats(
-        CancellationToken cancellationToken)
-    {
-        return await _serviceProvider.HandleBy<GetTelegramInlineUsageStatsHandler, Nothing, TelegramInlineUsagesData>(
-            Nothing.Value,
-            cancellationToken);
-    }
 }

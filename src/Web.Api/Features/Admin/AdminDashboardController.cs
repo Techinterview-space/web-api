@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Telegram;
 using Domain.Enums;
 using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -77,6 +78,27 @@ public class AdminDashboardController : ControllerBase
             .Select(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
+        var inlineClicksToGithubProfileBot = await _context.TelegramInlineReplies
+            .Where(x =>
+                x.CreatedAt >= tenDaysAgoEdge &&
+                x.BotType == TelegramBotType.GithubProfile)
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var salariesBotMessages = await _context.SalariesBotMessages
+            .Where(x =>
+                x.CreatedAt >= tenDaysAgoEdge &&
+                !x.IsAdmin)
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var inlineClicksToSalariesBot = await _context.TelegramInlineReplies
+            .Where(x =>
+                x.CreatedAt >= tenDaysAgoEdge &&
+                (x.BotType == TelegramBotType.Salaries || x.BotType == null))
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
         return new AdminDashboardData(
             averageRatingData: new AverageRatingData(feedbackReviews),
             totalSalaries: salariesCount,
@@ -85,7 +107,9 @@ public class AdminDashboardController : ControllerBase
             userEmailsSourceData: userEmailsForLastTenDays,
             reviewLikesForLastDays: likesForLastTenDays,
             reviewsForLastDays: reviewsForLastTenDays,
-            salariesBotMessages: new List<DateTimeOffset>(0),
-            githubProfileBotMessages: messagesToGithubProfileBot);
+            salariesBotMessages: salariesBotMessages,
+            inlineClicksToSalariesBot: inlineClicksToSalariesBot,
+            githubProfileBotMessages: messagesToGithubProfileBot,
+            inlineClicksToGithubProfileBot: inlineClicksToGithubProfileBot);
     }
 }
