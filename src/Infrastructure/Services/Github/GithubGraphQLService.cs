@@ -60,6 +60,10 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                     }
                     repositories(first: 100, affiliations: [OWNER, ORGANIZATION_MEMBER,COLLABORATOR], ownerAffiliations:[OWNER, ORGANIZATION_MEMBER, COLLABORATOR]) {
                       totalCount
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
                       nodes {
                         stargazerCount
                         forkCount
@@ -125,7 +129,19 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 "Successfully fetched basic profile data for user {Username}",
                 username);
 
-            // Step 2: Get detailed commit statistics using user ID filtering (Python pattern)
+            // Step 2: Get all repositories with pagination if needed
+            var allRepositories = await GetAllRepositoriesAsync(
+                client,
+                username,
+                response.Data.User.Repositories,
+                cancellationToken);
+
+            _logger.LogInformation(
+                "Successfully fetched {RepositoryCount} repositories for user {Username}",
+                allRepositories.Count,
+                username);
+
+            // Step 3: Get detailed commit statistics using user ID filtering (Python pattern)
             var commitStats = await GetCommitStatisticsAsync(
                 client,
                 username,
@@ -144,6 +160,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             return GithubProfileDataResult.Success(
                 MapToGithubProfileData(
                     user: response.Data.User,
+                    allRepositories: allRepositories,
                     commitStats: commitStats,
                     monthsToFetchCommits: monthsToFetchCommits,
                     topLanguagesCount: 3));
@@ -174,6 +191,120 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             _client?.Dispose();
             _client = null;
         }
+    }
+
+    private async Task<List<RepositoryNode>> GetAllRepositoriesAsync(
+        GraphQLHttpClient client,
+        string username,
+        RepositoriesInfo initialRepositories,
+        CancellationToken cancellationToken)
+    {
+        var allRepositories = new List<RepositoryNode>();
+
+        // Add repositories from initial query
+        if (initialRepositories?.Nodes != null)
+        {
+            allRepositories.AddRange(initialRepositories.Nodes);
+        }
+
+        // Check if we need to fetch more repositories
+        if (initialRepositories?.PageInfo?.HasNextPage != true)
+        {
+            _logger.LogDebug(
+                "All repositories fetched in initial query for user {Username}: {Count} repositories",
+                username,
+                allRepositories.Count);
+            return allRepositories;
+        }
+
+        _logger.LogInformation(
+            "Fetching additional repositories for user {Username} beyond initial 100. Total repositories: {TotalCount}",
+            username,
+            initialRepositories.TotalCount);
+
+        var cursor = initialRepositories.PageInfo.EndCursor;
+
+        var repositoriesQuery = @"
+        query GetUserRepositories($username: String!, $cursor: String) {
+          user(login: $username) {
+            repositories(first: 100, affiliations: [OWNER, ORGANIZATION_MEMBER, COLLABORATOR], ownerAffiliations: [OWNER, ORGANIZATION_MEMBER, COLLABORATOR], after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              nodes {
+                stargazerCount
+                forkCount
+                isFork
+              }
+            }
+          }
+        }";
+
+        try
+        {
+            do
+            {
+                var query = new GraphQLRequest
+                {
+                    Query = repositoriesQuery,
+                    Variables = new
+                    {
+                        username = username,
+                        cursor = cursor
+                    }
+                };
+
+                var response = await client.SendQueryAsync<UserProfileResponse>(query, cancellationToken);
+
+                if (response.Errors?.Any() == true)
+                {
+                    _logger.LogWarning(
+                        "GraphQL errors fetching additional repositories for user {Username}: {Errors}",
+                        username,
+                        string.Join(", ", response.Errors.Select(e => e.Message)));
+                    break;
+                }
+
+                if (response.Data?.User?.Repositories?.Nodes == null)
+                {
+                    _logger.LogDebug("No additional repositories found for user {Username}", username);
+                    break;
+                }
+
+                var repositories = response.Data.User.Repositories;
+                allRepositories.AddRange(repositories.Nodes);
+
+                _logger.LogDebug(
+                    "Fetched {Count} additional repositories for user {Username}",
+                    repositories.Nodes.Count,
+                    username);
+
+                // Handle pagination
+                if (!repositories.PageInfo.HasNextPage)
+                {
+                    break;
+                }
+
+                cursor = repositories.PageInfo.EndCursor;
+            }
+            while (true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Error fetching additional repositories for user {Username}: {Message}",
+                username,
+                ex.Message);
+        }
+
+        _logger.LogInformation(
+            "Completed fetching repositories for user {Username}: {Count} total repositories",
+            username,
+            allRepositories.Count);
+
+        return allRepositories;
     }
 
     private async Task<CommitStatistics> GetCommitStatisticsAsync(
@@ -372,6 +503,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
 
     private GithubProfileData MapToGithubProfileData(
         UserProfile user,
+        List<RepositoryNode> allRepositories,
         CommitStatistics commitStats,
         int monthsToFetchCommits,
         int topLanguagesCount)
@@ -388,7 +520,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             PullRequestsCreatedByUser = user.PullRequests?.TotalCount ?? 0,
             IssuesOpenedByUser = user.Issues?.TotalCount ?? 0,
             CountOfStarredRepos = user.StarredRepositories?.TotalCount ?? 0,
-            CountOfForkedRepos = user.Repositories?.Nodes?.Count(r => r.IsFork) ?? 0,
+            CountOfForkedRepos = allRepositories?.Count(r => r.IsFork) ?? 0,
             CommitsCount = commitStats.CommitsCount,
             FilesAdjusted = commitStats.FilesAdjusted,
             ChangesInFilesCount = commitStats.ChangesInFilesCount,
@@ -547,6 +679,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
     public record RepositoriesInfo
     {
         public int TotalCount { get; set; }
+        public PageInfo PageInfo { get; set; }
         public List<RepositoryNode> Nodes { get; set; }
     }
 
