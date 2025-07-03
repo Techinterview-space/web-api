@@ -70,7 +70,10 @@ public class AdminDashboardController : ControllerBase
             .ToListAsync(cancellationToken);
 
         var messagesToGithubProfileBot = await _context.GithubProfileBotMessages
-            .Where(x => x.CreatedAt >= tenDaysAgoEdge)
+            .Include(x => x.GithubProfileBotChat)
+            .Where(x =>
+                x.CreatedAt >= tenDaysAgoEdge &&
+                !x.GithubProfileBotChat.IsAdmin)
             .Select(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
