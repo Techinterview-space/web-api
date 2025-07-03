@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,13 +69,20 @@ public class AdminDashboardController : ControllerBase
             .Select(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
 
+        var messagesToGithubProfileBot = await _context.GithubProfileBotMessages
+            .Where(x => x.CreatedAt >= tenDaysAgoEdge)
+            .Select(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+
         return new AdminDashboardData(
-            new AverageRatingData(feedbackReviews),
-            salariesCount,
-            reviewsCount,
-            usersWithUnsubscribeMeFromAllCount,
-            userEmailsForLastTenDays,
-            likesForLastTenDays,
-            reviewsForLastTenDays);
+            averageRatingData: new AverageRatingData(feedbackReviews),
+            totalSalaries: salariesCount,
+            totalCompanyReviews: reviewsCount,
+            usersWithUnsubscribeMeFromAllCount: usersWithUnsubscribeMeFromAllCount,
+            userEmailsSourceData: userEmailsForLastTenDays,
+            reviewLikesForLastDays: likesForLastTenDays,
+            reviewsForLastDays: reviewsForLastTenDays,
+            salariesBotMessages: new List<DateTimeOffset>(0),
+            githubProfileBotMessages: messagesToGithubProfileBot);
     }
 }

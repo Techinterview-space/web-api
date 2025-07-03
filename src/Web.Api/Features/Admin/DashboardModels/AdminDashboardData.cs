@@ -12,7 +12,9 @@ public record AdminDashboardData
         int usersWithUnsubscribeMeFromAllCount,
         List<DateTimeOffset> userEmailsSourceData,
         List<DateTimeOffset> reviewLikesForLastDays,
-        List<DateTimeOffset> reviewsForLastDays)
+        List<DateTimeOffset> reviewsForLastDays,
+        List<DateTimeOffset> salariesBotMessages,
+        List<DateTimeOffset> githubProfileBotMessages)
     {
         AverageRatingData = averageRatingData;
         TotalSalaries = totalSalaries;
@@ -22,6 +24,8 @@ public record AdminDashboardData
         UserEmailsForLastDays = new ItemsPerDayChartData(userEmailsSourceData);
         ReviewLikesForLastTenDays = new ItemsPerDayChartData(reviewLikesForLastDays);
         ReviewsForLastTenDays = new ItemsPerDayChartData(reviewsForLastDays);
+        SalariesBotMessages = new ItemsPerDayChartData(salariesBotMessages);
+        GithubProfileBotMessages = new ItemsPerDayChartData(githubProfileBotMessages);
     }
 
     public AverageRatingData AverageRatingData { get; }
@@ -37,4 +41,8 @@ public record AdminDashboardData
     public ItemsPerDayChartData ReviewLikesForLastTenDays { get; }
 
     public ItemsPerDayChartData ReviewsForLastTenDays { get; }
+
+    public ItemsPerDayChartData SalariesBotMessages { get; }
+
+    public ItemsPerDayChartData GithubProfileBotMessages { get; }
 }
