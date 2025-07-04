@@ -14,8 +14,9 @@ namespace Web.Api.Features.Telegram;
 public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
     where TBotProvider : ITelegramBotProvider
 {
+    protected ILogger<TChild> Logger { get; }
+
     private readonly TBotProvider _botClientProvider;
-    private readonly ILogger<TChild> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly DateTime _startedToListenTo;
 
@@ -25,7 +26,7 @@ public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
         IServiceScopeFactory serviceScopeFactory)
     {
         _botClientProvider = botClientProvider;
-        _logger = logger;
+        Logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
         _startedToListenTo = DateTime.UtcNow;
     }
@@ -62,7 +63,7 @@ public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(
+        Logger.LogError(
             exception,
             "An error occurred while polling: {Message}",
             exception.Message);
@@ -75,12 +76,12 @@ public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
         Update updateRequest,
         CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Received update of type {UpdateType}", updateRequest.Type);
+        Logger.LogDebug("Received update of type {UpdateType}", updateRequest.Type);
 
         var messageSent = updateRequest.Message?.Date;
         if (messageSent < _startedToListenTo)
         {
-            _logger.LogWarning(
+            Logger.LogWarning(
                 "Ignoring message sent at {MessageSentDate} because it was sent before the bot started listening at {StartedToListenTo}",
                 messageSent.Value.ToString("O"),
                 _startedToListenTo.ToString("O"));

@@ -66,7 +66,8 @@ public class ProcessGithubProfileTelegramMessageHandler
 
         var telegramBotUsername = _configuration["Telegram:GithubTelegramBotName"];
 
-        // Handle inline query click logging
+        // Handle inline query click logging only if the bot was added to the chat.
+        // TODO: mgorbatyuk: catch inline replies and log them
         var messageSentByBot =
             message.ViaBot is not null &&
             message.ViaBot.Username == telegramBotUsername;

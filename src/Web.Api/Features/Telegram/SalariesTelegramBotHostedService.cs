@@ -28,7 +28,8 @@ public class SalariesTelegramBotHostedService
         [
             UpdateType.InlineQuery,
             UpdateType.Message,
-            UpdateType.ChosenInlineResult
+            UpdateType.ChosenInlineResult,
+            UpdateType.ChannelPost,
         ];
     }
 
@@ -38,8 +39,27 @@ public class SalariesTelegramBotHostedService
         Update updateRequest,
         CancellationToken cancellationToken)
     {
-        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
+        if (updateRequest.Message is null &&
+            updateRequest.InlineQuery is null &&
+            updateRequest.ChosenInlineResult is null &&
+            updateRequest.ChannelPost is null)
         {
+            return Task.CompletedTask;
+        }
+
+        if (updateRequest.ChosenInlineResult is not null)
+        {
+            // Ignore commands in ChosenInlineResult
+            Logger.LogInformation(
+                "TELEGRAM_BOT. Salaries. Ignoring ChosenInlineResult with InlineMessageId: {InlineMessageId} " +
+                "from {Name}. " +
+                "Id {Id}. " +
+                "IsBot {IsBot}",
+                updateRequest.ChosenInlineResult.InlineMessageId,
+                updateRequest.ChosenInlineResult.From.Username,
+                updateRequest.ChosenInlineResult.From.Id,
+                updateRequest.ChosenInlineResult.From.IsBot);
+
             return Task.CompletedTask;
         }
 
