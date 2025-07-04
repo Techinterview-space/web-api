@@ -169,6 +169,16 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                 commitStats.CommitsCount,
                 commitStats.FilesAdjusted);
 
+            // Log organization repository information
+            var orgRepoCount = response.Data.User.OrganizationRepositoriesAsOwner?.TotalCount ?? 0;
+            var orgRepoStars = response.Data.User.OrganizationRepositoriesAsOwner?.Nodes?.Sum(r => r.StargazerCount) ?? 0;
+            
+            _logger.LogInformation(
+                "Successfully fetched organization repositories for user {Username}: {OrgRepoCount} repositories, {OrgRepoStars} total stars",
+                username,
+                orgRepoCount,
+                orgRepoStars);
+
             return GithubProfileDataResult.Success(
                 MapToGithubProfileData(
                     user: response.Data.User,
