@@ -66,6 +66,31 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
+        if (request.UpdateRequest.ChosenInlineResult is not null)
+        {
+            _logger.LogInformation(
+                "TELEGRAM_BOT. Salaries. Processing ChosenInlineResult " +
+                "with InlineMessageId: {InlineMessageId} " +
+                "from {Name}. " +
+                "Id {Id}. " +
+                "Query {Query}. " +
+                "IsBot {IsBot}",
+                request.UpdateRequest.ChosenInlineResult.InlineMessageId,
+                request.UpdateRequest.ChosenInlineResult.From.Username,
+                request.UpdateRequest.ChosenInlineResult.From.Id,
+                request.UpdateRequest.ChosenInlineResult.Query,
+                request.UpdateRequest.ChosenInlineResult.From.IsBot);
+
+            await _context.SaveAsync(
+                new TelegramInlineReply(
+                    request.UpdateRequest.ChosenInlineResult.From.Id,
+                    request.UpdateRequest.ChosenInlineResult.Query,
+                    TelegramBotType.Salaries),
+                cancellationToken);
+
+            return null;
+        }
+
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
 
         if (request.UpdateRequest.Type == UpdateType.InlineQuery &&
@@ -99,6 +124,7 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             await _context.SaveAsync(
                 new TelegramInlineReply(
                     message.Chat.Id,
+                    message.Text,
                     TelegramBotType.Salaries),
                 cancellationToken);
 

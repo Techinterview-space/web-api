@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Telegram.GithubProfile;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,9 @@ public class GithubProfileBotHostedService
         Update updateRequest,
         CancellationToken cancellationToken)
     {
-        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
+        if (updateRequest.Message is null &&
+            updateRequest.InlineQuery is null &&
+            updateRequest.ChosenInlineResult is null)
         {
             return Task.CompletedTask;
         }
