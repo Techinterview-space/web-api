@@ -25,7 +25,7 @@ namespace Web.Api.Tests.Telegram
 {
     public class ProcessSalariesRelatedTelegramMessageHandlerTests
     {
-        public const string ProcessMessage1 = "Зарплаты специалистов IT в Казахстане по грейдам:\n\n" +
+        public const string ProcessMessage1 = "Зарплаты специалистов IT в Казахстане по грейдам (медиана):\n\n" +
                                               "Джуны: <b>2,222</b> тг. (~5$)\n" +
                                               "Миддлы: <b>5,556</b> тг. (~12$)\n" +
                                               "Сеньоры: <b>8,889</b> тг. (~20$)\n" +
