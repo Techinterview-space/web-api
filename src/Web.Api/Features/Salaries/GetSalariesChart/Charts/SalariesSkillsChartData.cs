@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Infrastructure.Database;
 using Infrastructure.Salaries;
-using Microsoft.EntityFrameworkCore;
 using Web.Api.Features.Labels.Models;
 
 namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;

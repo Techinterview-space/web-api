@@ -169,6 +169,15 @@ public class GetSalariesChartHandlerTests
         Assert.Equal(3, salariesResponse.SalariesByMoneyBarChart.Items[0]);
 
         Assert.Equal(3, salariesResponse.Currencies.Count);
+
+        // Test new chart data properties
+        Assert.NotNull(salariesResponse.SalariesSkillsChartData);
+        Assert.NotNull(salariesResponse.WorkIndustriesChartData);
+        Assert.NotNull(salariesResponse.CitiesDoughnutChartData);
+
+        // Test that CitiesDoughnutChartData has empty items (no cities specified in test data)
+        Assert.Empty(salariesResponse.CitiesDoughnutChartData.Items);
+        Assert.Equal(4, salariesResponse.CitiesDoughnutChartData.NoDataCount);
     }
 
     [Fact]
@@ -226,6 +235,96 @@ public class GetSalariesChartHandlerTests
         Assert.Equal(4, salariesResponse.Salaries.Count);
         Assert.Equal(salary4.Value, salariesResponse.CurrentUserSalary.Value);
         Assert.Equal(3, salariesResponse.Currencies.Count);
+    }
+
+    [Fact]
+    public async Task Handle_UserHasSalaryWithSkillsAndIndustries_ChartDataPopulated()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+        // Create test skills and industries
+        var skill1 = new Skill("C#");
+        var skill2 = new Skill("JavaScript");
+        var industry1 = new WorkIndustry("Finance");
+        var industry2 = new WorkIndustry("E-commerce");
+
+        await context.SaveAsync(skill1);
+        await context.SaveAsync(skill2);
+        await context.SaveAsync(industry1);
+        await context.SaveAsync(industry2);
+
+        // Create salaries with skills and industries
+        var salary1 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 700_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                skillOrNull: skill1,
+                workIndustryOrNull: industry1,
+                kazakhstanCity: KazakhstanCity.Almaty,
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
+            .AsDomain());
+
+        var salary2 = await context.SaveAsync(new UserSalaryFake(
+                user2,
+                value: 600_000,
+                createdAt: DateTimeOffset.Now.AddDays(-2),
+                skillOrNull: skill2,
+                workIndustryOrNull: industry2,
+                kazakhstanCity: KazakhstanCity.Astana,
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
+            .AsDomain());
+
+        // Salary without skill/industry data
+        var salary3 = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 500_000,
+                createdAt: DateTimeOffset.Now.AddDays(-3),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
+            .AsDomain());
+
+        var salariesResponse = await new GetSalariesChartHandler(
+                new FakeAuth(user1),
+                context,
+                new CurrenciesServiceFake())
+            .Handle(new GetSalariesChartQuery(), default);
+
+        // Test skills chart data
+        Assert.NotNull(salariesResponse.SalariesSkillsChartData);
+        Assert.Equal(2, salariesResponse.SalariesSkillsChartData.Items.Count);
+        Assert.Equal(1, salariesResponse.SalariesSkillsChartData.NoDataCount); // salary3 has no skill
+
+        var skillItem1 = salariesResponse.SalariesSkillsChartData.Items.FirstOrDefault(x => x.Skill.Title == "C#");
+        var skillItem2 = salariesResponse.SalariesSkillsChartData.Items.FirstOrDefault(x => x.Skill.Title == "JavaScript");
+        Assert.NotNull(skillItem1);
+        Assert.NotNull(skillItem2);
+        Assert.Equal(1, skillItem1.Count);
+        Assert.Equal(1, skillItem2.Count);
+
+        // Test industries chart data
+        Assert.NotNull(salariesResponse.WorkIndustriesChartData);
+        Assert.Equal(2, salariesResponse.WorkIndustriesChartData.Items.Count);
+        Assert.Equal(1, salariesResponse.WorkIndustriesChartData.NoDataCount); // salary3 has no industry
+
+        var industryItem1 = salariesResponse.WorkIndustriesChartData.Items.FirstOrDefault(x => x.Industry.Title == "Finance");
+        var industryItem2 = salariesResponse.WorkIndustriesChartData.Items.FirstOrDefault(x => x.Industry.Title == "E-commerce");
+        Assert.NotNull(industryItem1);
+        Assert.NotNull(industryItem2);
+        Assert.Equal(1, industryItem1.Count);
+        Assert.Equal(1, industryItem2.Count);
+
+        // Test cities chart data
+        Assert.NotNull(salariesResponse.CitiesDoughnutChartData);
+        Assert.Equal(2, salariesResponse.CitiesDoughnutChartData.Items.Count);
+        Assert.Equal(1, salariesResponse.CitiesDoughnutChartData.NoDataCount); // salary3 has no city
+
+        var cityItem1 = salariesResponse.CitiesDoughnutChartData.Items.FirstOrDefault(x => x.City == KazakhstanCity.Almaty);
+        var cityItem2 = salariesResponse.CitiesDoughnutChartData.Items.FirstOrDefault(x => x.City == KazakhstanCity.Astana);
+        Assert.NotNull(cityItem1);
+        Assert.NotNull(cityItem2);
+        Assert.Equal(1, cityItem1.Count);
+        Assert.Equal(1, cityItem2.Count);
     }
 
     [Fact]
