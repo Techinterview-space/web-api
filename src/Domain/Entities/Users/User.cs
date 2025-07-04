@@ -148,9 +148,7 @@ public class User : BaseModel, IHasDeletedAt
             return false;
         }
 
-        var isLoggedAsSocial = IsAuth0Auth() &&
-               (currentUser.IsGoogleAuth() || currentUser.IsGithubAuth());
-
+        var isLoggedAsSocial = currentUser.IsGoogleAuth() || currentUser.IsGithubAuth();
         if (isLoggedAsSocial)
         {
             EmailConfirmed = true;
