@@ -91,18 +91,6 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return null;
         }
 
-        if (request.UpdateRequest.ChannelPost is not null)
-        {
-            _logger.LogInformation(
-                "TELEGRAM_BOT. Salaries. Processing ChannelPost " +
-                "from {ChatTitle}. " +
-                "Chat Id {ChatId}",
-                request.UpdateRequest.ChannelPost.Chat.Title,
-                request.UpdateRequest.ChannelPost.Chat.Id);
-
-            return null;
-        }
-
         var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
 
         if (request.UpdateRequest.Type == UpdateType.InlineQuery &&

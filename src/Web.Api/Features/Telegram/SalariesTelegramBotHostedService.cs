@@ -28,7 +28,6 @@ public class SalariesTelegramBotHostedService
             UpdateType.InlineQuery,
             UpdateType.Message,
             UpdateType.ChosenInlineResult,
-            UpdateType.ChannelPost,
         ];
     }
 
@@ -40,8 +39,7 @@ public class SalariesTelegramBotHostedService
     {
         if (updateRequest.Message is null &&
             updateRequest.InlineQuery is null &&
-            updateRequest.ChosenInlineResult is null &&
-            updateRequest.ChannelPost is null)
+            updateRequest.ChosenInlineResult is null)
         {
             return Task.CompletedTask;
         }

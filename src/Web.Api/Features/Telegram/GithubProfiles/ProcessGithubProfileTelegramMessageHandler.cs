@@ -52,10 +52,12 @@ public class ProcessGithubProfileTelegramMessageHandler
                 "with InlineMessageId: {InlineMessageId} " +
                 "from {Name}. " +
                 "Id {Id}. " +
+                "Query {Query}. " +
                 "IsBot {IsBot}",
                 request.UpdateRequest.ChosenInlineResult.InlineMessageId,
                 request.UpdateRequest.ChosenInlineResult.From.Username,
                 request.UpdateRequest.ChosenInlineResult.From.Id,
+                request.UpdateRequest.ChosenInlineResult.Query,
                 request.UpdateRequest.ChosenInlineResult.From.IsBot);
 
             await _context.SaveAsync(
@@ -64,18 +66,6 @@ public class ProcessGithubProfileTelegramMessageHandler
                     request.UpdateRequest.ChosenInlineResult.Query,
                     TelegramBotType.Salaries),
                 cancellationToken);
-
-            return null;
-        }
-
-        if (request.UpdateRequest.ChannelPost is not null)
-        {
-            _logger.LogInformation(
-                "TELEGRAM_BOT. Github. Processing ChannelPost " +
-                "from {ChatTitle}. " +
-                "Chat Id {ChatId}",
-                request.UpdateRequest.ChannelPost.Chat.Title,
-                request.UpdateRequest.ChannelPost.Chat.Id);
 
             return null;
         }
