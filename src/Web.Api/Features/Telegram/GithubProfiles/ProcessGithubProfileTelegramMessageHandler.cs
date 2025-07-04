@@ -45,6 +45,41 @@ public class ProcessGithubProfileTelegramMessageHandler
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
+        if (request.UpdateRequest.ChosenInlineResult is not null)
+        {
+            _logger.LogInformation(
+                "TELEGRAM_BOT. Github. Processing ChosenInlineResult " +
+                "with InlineMessageId: {InlineMessageId} " +
+                "from {Name}. " +
+                "Id {Id}. " +
+                "IsBot {IsBot}",
+                request.UpdateRequest.ChosenInlineResult.InlineMessageId,
+                request.UpdateRequest.ChosenInlineResult.From.Username,
+                request.UpdateRequest.ChosenInlineResult.From.Id,
+                request.UpdateRequest.ChosenInlineResult.From.IsBot);
+
+            await _context.SaveAsync(
+                new TelegramInlineReply(
+                    request.UpdateRequest.ChosenInlineResult.From.Id,
+                    request.UpdateRequest.ChosenInlineResult.Query,
+                    TelegramBotType.Salaries),
+                cancellationToken);
+
+            return null;
+        }
+
+        if (request.UpdateRequest.ChannelPost is not null)
+        {
+            _logger.LogInformation(
+                "TELEGRAM_BOT. Github. Processing ChannelPost " +
+                "from {ChatTitle}. " +
+                "Chat Id {ChatId}",
+                request.UpdateRequest.ChannelPost.Chat.Title,
+                request.UpdateRequest.ChannelPost.Chat.Id);
+
+            return null;
+        }
+
         // Handle inline queries
         if (request.UpdateRequest.Type == UpdateType.InlineQuery &&
             request.UpdateRequest.InlineQuery != null)
@@ -77,6 +112,7 @@ public class ProcessGithubProfileTelegramMessageHandler
             await _context.SaveAsync(
                 new TelegramInlineReply(
                     message.Chat.Id,
+                    message.Text,
                     TelegramBotType.GithubProfile),
                 cancellationToken);
 
