@@ -73,10 +73,12 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                 "with InlineMessageId: {InlineMessageId} " +
                 "from {Name}. " +
                 "Id {Id}. " +
+                "Query {Query}. " +
                 "IsBot {IsBot}",
                 request.UpdateRequest.ChosenInlineResult.InlineMessageId,
                 request.UpdateRequest.ChosenInlineResult.From.Username,
                 request.UpdateRequest.ChosenInlineResult.From.Id,
+                request.UpdateRequest.ChosenInlineResult.Query,
                 request.UpdateRequest.ChosenInlineResult.From.IsBot);
 
             await _context.SaveAsync(
