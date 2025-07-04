@@ -26,7 +26,10 @@ public record SalariesChartResponse
         bool hasSurveyRecentReply,
         DateTimeOffset? rangeStart,
         DateTimeOffset? rangeEnd,
-        List<CurrencyContent> currencies)
+        List<CurrencyContent> currencies,
+        SalariesSkillsChartData salariesSkillsChartData = null,
+        WorkIndustriesChartData workIndustriesChartData = null,
+        CitiesDoughnutChartData citiesDoughnutChartData = null)
         : this(
             salaries,
             currentUserSalary,
@@ -36,7 +39,10 @@ public record SalariesChartResponse
             rangeEnd,
             salaries.Count,
             true,
-            currencies)
+            currencies,
+            salariesSkillsChartData,
+            workIndustriesChartData,
+            citiesDoughnutChartData)
     {
     }
 
@@ -49,7 +55,10 @@ public record SalariesChartResponse
         DateTimeOffset? rangeEnd,
         int totalCountInStats,
         bool hasAuthentication,
-        List<CurrencyContent> currencies)
+        List<CurrencyContent> currencies,
+        SalariesSkillsChartData salariesSkillsChartData = null,
+        WorkIndustriesChartData workIndustriesChartData = null,
+        CitiesDoughnutChartData citiesDoughnutChartData = null)
     {
         Salaries = salaries;
         Currencies = currencies;
@@ -61,6 +70,11 @@ public record SalariesChartResponse
         RangeEnd = rangeEnd;
         TotalCountInStats = totalCountInStats;
         HasAuthentication = hasAuthentication;
+
+        // Set the new chart data properties
+        SalariesSkillsChartData = salariesSkillsChartData;
+        WorkIndustriesChartData = workIndustriesChartData;
+        CitiesDoughnutChartData = citiesDoughnutChartData;
 
         DevelopersByAgeChartData = new DevelopersByAgeChartData(salaries);
         DevelopersByExperienceYearsChartData = new DevelopersByExperienceYears(salaries);
@@ -160,7 +174,10 @@ public record SalariesChartResponse
             null,
             salariesCount,
             hasAuthentication,
-            new List<CurrencyContent>(0))
+            new List<CurrencyContent>(0),
+            null, // SalariesSkillsChartData
+            null, // WorkIndustriesChartData  
+            null) // CitiesDoughnutChartData
         {
             AverageSalary = local.Count > 0 ? local.Average() : 0,
             MedianSalary = local.Count > 0 ? local.Median() : 0,
@@ -239,4 +256,10 @@ public record SalariesChartResponse
     public SalariesByGenderChart SalariesByGenderChartForLocal { get; }
 
     public SalariesByGenderChart SalariesByGenderChartForRemote { get; }
+
+    public SalariesSkillsChartData SalariesSkillsChartData { get; }
+
+    public WorkIndustriesChartData WorkIndustriesChartData { get; }
+
+    public CitiesDoughnutChartData CitiesDoughnutChartData { get; }
 }
