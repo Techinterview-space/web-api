@@ -19,9 +19,5 @@ internal class TelegramBotUserConfig : IEntityTypeConfiguration<SalariesBotMessa
         builder
             .Property(x => x.ChatId)
             .IsRequired(true);
-
-        builder
-            .HasIndex(x => x.ChatId)
-            .IsUnique(true);
     }
 }
