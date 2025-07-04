@@ -32,7 +32,8 @@ public class DeleteGithubProfileHandlerTests
             PullRequestsCreatedByUser = 2,
             IssuesOpenedByUser = 1,
             CountOfStarredRepos = 0,
-            CountOfForkedRepos = 0
+            CountOfForkedRepos = 0,
+            OrganizationRepoStarsAsOwner = 0
         };
 
         var githubProfile = new GithubProfile("testuser", githubProfileData);

@@ -28,6 +28,8 @@ public record GithubProfileData
 
     public int CountOfForkedRepos { get; init; }
 
+    public int OrganizationRepoStarsAsOwner { get; init; }
+
     public int CommitsCount { get; init; }
 
     public int FilesAdjusted { get; init; }
@@ -66,6 +68,7 @@ public record GithubProfileData
         int issuesOpenedByUser,
         int countOfStarredRepos,
         int countOfForkedRepos,
+        int organizationRepoStarsAsOwner,
         int commitsCount,
         int filesAdjusted,
         int changesInFilesCount,
@@ -87,6 +90,7 @@ public record GithubProfileData
         IssuesOpenedByUser = issuesOpenedByUser;
         CountOfStarredRepos = countOfStarredRepos;
         CountOfForkedRepos = countOfForkedRepos;
+        OrganizationRepoStarsAsOwner = organizationRepoStarsAsOwner;
         CommitsCount = commitsCount;
         FilesAdjusted = filesAdjusted;
         ChangesInFilesCount = changesInFilesCount;
@@ -113,6 +117,7 @@ public record GithubProfileData
                      $"- Followers: <b>{Followers:N0}</b>\n" +
                      $"- Following: <b>{Following:N0}</b>\n" +
                      $"- Total stars received: <b>{CountOfStarredRepos:N0}</b>\n" +
+                     $"- Organization repo stars (as owner): <b>{OrganizationRepoStarsAsOwner:N0}</b>\n" +
                      $"- Public Repos: <b>{PublicRepos:N0}</b>\n\n" +
 
                      $"- Issues created: <b>{IssuesOpenedByUser:N0}</b>\n" +

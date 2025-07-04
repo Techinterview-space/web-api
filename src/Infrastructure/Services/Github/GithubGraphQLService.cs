@@ -70,6 +70,18 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
                         isFork
                       }
                     }
+                    organizationRepositoriesAsOwner: repositories(first: 100, affiliations: [ORGANIZATION_MEMBER], ownerAffiliations: [OWNER]) {
+                      totalCount
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                      nodes {
+                        stargazerCount
+                        forkCount
+                        isFork
+                      }
+                    }
                     starredRepositories {
                       totalCount
                     }
@@ -508,6 +520,9 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         int monthsToFetchCommits,
         int topLanguagesCount)
     {
+        // Calculate organization repository stars where user is owner
+        var organizationRepoStarsAsOwner = user.OrganizationRepositoriesAsOwner?.Nodes?.Sum(r => r.StargazerCount) ?? 0;
+
         return new GithubProfileData
         {
             Name = user.Name ?? user.Login,
@@ -521,6 +536,7 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
             IssuesOpenedByUser = user.Issues?.TotalCount ?? 0,
             CountOfStarredRepos = user.StarredRepositories?.TotalCount ?? 0,
             CountOfForkedRepos = allRepositories?.Count(r => r.IsFork) ?? 0,
+            OrganizationRepoStarsAsOwner = organizationRepoStarsAsOwner,
             CommitsCount = commitStats.CommitsCount,
             FilesAdjusted = commitStats.FilesAdjusted,
             ChangesInFilesCount = commitStats.ChangesInFilesCount,
@@ -662,6 +678,8 @@ public class GithubGraphQlService : IGithubGraphQLService, IDisposable
         public CountInfo Following { get; set; }
 
         public RepositoriesInfo Repositories { get; set; }
+
+        public RepositoriesInfo OrganizationRepositoriesAsOwner { get; set; }
 
         public CountInfo StarredRepositories { get; set; }
         public CountInfo Issues { get; set; }
