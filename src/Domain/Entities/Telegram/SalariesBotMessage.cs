@@ -23,16 +23,11 @@ public class SalariesBotMessage : IHasIdBase<Guid>
         TelegramBotUsageType usageType,
         bool isAdmin)
     {
-        username = username?.Trim().ToLowerInvariant();
-        if (string.IsNullOrEmpty(username))
-        {
-            throw new BadRequestException("Username is not defined.");
-        }
-
         ChatId = chatId;
-        Username = username;
+        Username = username?.Trim().ToLowerInvariant();
         UsageType = usageType;
         IsAdmin = isAdmin;
+        CreatedAt = DateTimeOffset.UtcNow;
     }
 
     protected SalariesBotMessage()
