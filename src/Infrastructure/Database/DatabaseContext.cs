@@ -99,7 +99,7 @@ public class DatabaseContext : DbContext
         await TrySaveChangesAsync();
     }
 
-    public async Task<TEntity> SaveAsync<TEntity>(
+    public virtual async Task<TEntity> SaveAsync<TEntity>(
         TEntity entity,
         CancellationToken cancellationToken = default)
         where TEntity : class

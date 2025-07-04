@@ -105,7 +105,6 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            // Create chart data
             var salariesSkillsChartData = new SalariesSkillsChartData(salaries, skills);
             var workIndustriesChartData = new WorkIndustriesChartData(salaries, industries);
             var citiesDoughnutChartData = new CitiesDoughnutChartData(salaries);
