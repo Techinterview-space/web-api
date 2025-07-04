@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Validation;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -23,6 +26,17 @@ public class InMemoryDatabaseContext : DatabaseContext
     {
         Database.EnsureDeleted();
         Database.EnsureCreated();
+    }
+
+    public override async Task<TEntity> SaveAsync<TEntity>(
+        TEntity entity,
+        CancellationToken cancellationToken = default)
+        where TEntity : class
+    {
+        var entry = await AddAsync(entity, cancellationToken);
+        await TrySaveChangesAsync(cancellationToken);
+
+        return entry.Entity;
     }
 
     protected override bool IsInMemory()

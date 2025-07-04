@@ -10,6 +10,7 @@ using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Microsoft.EntityFrameworkCore;
+using Web.Api.Features.Labels.Models;
 using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 using Web.Api.Features.Salaries.Models;
 using Web.Api.Features.Surveys.Services;
@@ -83,13 +84,41 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
                 request,
                 cancellationToken);
 
+            // Fetch skills and industries data for chart data creation
+            var skills = await _context.Skills
+                .Select(x => new LabelEntityDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    HexColor = x.HexColor,
+                })
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var industries = await _context.WorkIndustries
+                .Select(x => new LabelEntityDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    HexColor = x.HexColor,
+                })
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var salariesSkillsChartData = new SalariesSkillsChartData(salaries, skills);
+            var workIndustriesChartData = new WorkIndustriesChartData(salaries, industries);
+            var citiesDoughnutChartData = new CitiesDoughnutChartData(salaries);
+
             return new SalariesChartResponse(
                 salaries,
                 new UserSalaryAdminDto(userSalariesForLastYear.First()),
                 hasSurveyRecentReply,
                 salariesQuery.From,
                 salariesQuery.To,
-                currencies);
+                currencies,
+                salariesSkillsChartData,
+                workIndustriesChartData,
+                citiesDoughnutChartData);
         }
 
         public Task<SalariesChartResponse> Handle(
