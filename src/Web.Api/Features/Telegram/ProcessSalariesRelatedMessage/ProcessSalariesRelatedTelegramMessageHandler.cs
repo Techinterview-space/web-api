@@ -327,7 +327,7 @@ Chat ID: {message.Chat.Id}
                 Currency.USD,
                 cancellationToken);
 
-            replyText = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам:\n";
+            replyText = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам (медиана):\n";
 
             foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
