@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Domain.Enums;
 using Infrastructure.Salaries;
@@ -8,7 +8,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 public record CitiesDoughnutChartData
 {
     public List<CitiesDoughnutChartDataItem> Items { get; }
-    
+
     public int NoDataCount { get; }
 
     public CitiesDoughnutChartData(List<UserSalaryDto> salaries)
@@ -18,15 +18,13 @@ public record CitiesDoughnutChartData
             .ToList();
 
         var cityGroups = salariesWithCities
-            .GroupBy(x => x.City.Value)
+            .GroupBy(x => x.City.GetValueOrDefault())
             .ToList();
 
         Items = cityGroups
-            .Select(group => new CitiesDoughnutChartDataItem
-            {
-                City = group.Key,
-                Count = group.Count()
-            })
+            .Select(group => new CitiesDoughnutChartDataItem(
+                city: group.Key,
+                count: group.Count()))
             .OrderByDescending(item => item.Count)
             .ToList();
 
@@ -35,8 +33,16 @@ public record CitiesDoughnutChartData
 
     public record CitiesDoughnutChartDataItem
     {
-        public KazakhstanCity City { get; init; }
-        
-        public int Count { get; init; }
+        public CitiesDoughnutChartDataItem(
+            KazakhstanCity city,
+            int count)
+        {
+            City = city;
+            Count = count;
+        }
+
+        public KazakhstanCity City { get; }
+
+        public int Count { get; }
     }
 }

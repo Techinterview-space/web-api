@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Infrastructure.Salaries;
 using Web.Api.Features.Labels.Models;
@@ -8,11 +8,11 @@ namespace Web.Api.Features.Salaries.GetSalariesChart.Charts;
 public record WorkIndustriesChartData
 {
     public List<WorkIndustriesChartDataItem> Items { get; }
-    
+
     public int NoDataCount { get; }
 
     public WorkIndustriesChartData(
-        List<UserSalaryDto> salaries, 
+        List<UserSalaryDto> salaries,
         List<LabelEntityDto> industries)
     {
         var salariesWithIndustries = salaries
@@ -20,19 +20,17 @@ public record WorkIndustriesChartData
             .ToList();
 
         var industryGroups = salariesWithIndustries
-            .GroupBy(x => x.WorkIndustryId.Value)
+            .GroupBy(x => x.WorkIndustryId.GetValueOrDefault())
             .ToList();
 
         Items = industryGroups
             .Select(group =>
             {
                 var industry = industries.FirstOrDefault(i => i.Id == group.Key);
-                return industry != null 
-                    ? new WorkIndustriesChartDataItem
-                    {
-                        Industry = industry,
-                        Count = group.Count()
-                    } 
+                return industry != null
+                    ? new WorkIndustriesChartDataItem(
+                        industry: industry,
+                        count: group.Count())
                     : null;
             })
             .Where(item => item != null)
@@ -44,8 +42,16 @@ public record WorkIndustriesChartData
 
     public record WorkIndustriesChartDataItem
     {
-        public LabelEntityDto Industry { get; init; }
-        
-        public int Count { get; init; }
+        public WorkIndustriesChartDataItem(
+            LabelEntityDto industry,
+            int count)
+        {
+            Industry = industry;
+            Count = count;
+        }
+
+        public LabelEntityDto Industry { get; }
+
+        public int Count { get; }
     }
 }

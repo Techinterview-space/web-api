@@ -360,7 +360,7 @@ public class GetSalariesChartHandlerTests
         Assert.True(salariesResponse.ShouldAddOwnSalary);
         Assert.Empty(salariesResponse.Salaries);
         Assert.Empty(salariesResponse.Currencies);
-        
+
         // Test that chart data properties are null for RequireOwnSalary case
         Assert.Null(salariesResponse.SalariesSkillsChartData);
         Assert.Null(salariesResponse.WorkIndustriesChartData);

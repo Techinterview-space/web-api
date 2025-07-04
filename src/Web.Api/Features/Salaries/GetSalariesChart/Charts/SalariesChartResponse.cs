@@ -176,7 +176,7 @@ public record SalariesChartResponse
             hasAuthentication,
             new List<CurrencyContent>(0),
             null, // SalariesSkillsChartData
-            null, // WorkIndustriesChartData  
+            null, // WorkIndustriesChartData
             null) // CitiesDoughnutChartData
         {
             AverageSalary = local.Count > 0 ? local.Average() : 0,
