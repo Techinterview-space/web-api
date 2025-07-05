@@ -23,6 +23,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
     {
         private static readonly List<DeveloperGrade> _grades = new List<DeveloperGrade>
         {
+            DeveloperGrade.Trainee,
             DeveloperGrade.Junior,
             DeveloperGrade.Middle,
             DeveloperGrade.Senior,
@@ -175,11 +176,11 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
         {
             var localSalaries = salaries
                 .Where(x => x.Company == CompanyType.Local)
-                .TakeMiddleCollection(10, 10);
+                .TakeMiddleCollection(5, 5);
 
             var remoteSalaries = salaries
                 .Where(x => x.Company == CompanyType.Foreign)
-                .TakeMiddleCollection(10, 10);
+                .TakeMiddleCollection(5, 5);
 
             var localData = _grades
                 .Select(grade => CreateGradeBoxPlotData(localSalaries, grade))
