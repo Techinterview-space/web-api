@@ -48,7 +48,7 @@ public record ChartSharePageViewModel
         Grade = requestParams.Grade;
         FrontendUrlToRedirect = frontendUrl + queryParams;
         MedianSalary = chartResponse.MedianSalary;
-        CountOfSalaries = chartResponse.Salaries.Count;
+        CountOfSalaries = chartResponse.SalariesCount;
         MetaDescription = description;
     }
 
