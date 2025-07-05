@@ -184,10 +184,43 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             var max = gradeSalaries.Last();
             var median = gradeSalaries.Median();
             var mean = gradeSalaries.Average();
-            var q1 = gradeSalaries.Skip(gradeSalaries.Count / 4).Take(1).FirstOrDefault();
-            var q3 = gradeSalaries.Skip((gradeSalaries.Count * 3) / 4).Take(1).FirstOrDefault();
+
+            // Calculate quartiles properly
+            var q1 = CalculatePercentile(gradeSalaries, 25);
+            var q3 = CalculatePercentile(gradeSalaries, 75);
 
             return new GradeBoxPlotData(grade, min, q1, median, q3, max, mean, gradeSalaries);
+        }
+
+        private static double CalculatePercentile(List<double> sortedValues, double percentile)
+        {
+            if (sortedValues.Count == 0)
+            {
+                return 0;
+            }
+
+            if (sortedValues.Count == 1)
+            {
+                return sortedValues[0];
+            }
+
+            var n = sortedValues.Count;
+            var index = (percentile / 100.0) * (n - 1);
+            var lower = (int)Math.Floor(index);
+            var upper = (int)Math.Ceiling(index);
+            var weight = index - lower;
+
+            if (upper >= n)
+            {
+                return sortedValues[n - 1];
+            }
+
+            if (lower < 0)
+            {
+                return sortedValues[0];
+            }
+
+            return (sortedValues[lower] * (1 - weight)) + (sortedValues[upper] * weight);
         }
 
         private static ProfessionsDistributionChartData CreateProfessionsDistributionChartData(

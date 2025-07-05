@@ -70,6 +70,7 @@ public record SalariesChartResponse
         PeopleByGenderChartData peopleByGenderChartData = null)
     {
         Salaries = salaries;
+        SalariesCount = salaries?.Count ?? 0;
         Currencies = currencies;
 
         CurrentUserSalary = currentUserSalary;
@@ -205,6 +206,8 @@ public record SalariesChartResponse
     }
 
     public List<UserSalaryDto> Salaries { get; }
+
+    public int SalariesCount { get; }
 
     public List<CurrencyContent> Currencies { get; }
 
