@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
+using Domain.Extensions;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
@@ -109,6 +110,22 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             var workIndustriesChartData = new WorkIndustriesChartData(salaries, industries);
             var citiesDoughnutChartData = new CitiesDoughnutChartData(salaries);
 
+            // Fetch professions data for professions distribution chart
+            var professions = await _context.Professions
+                .Select(x => new LabelEntityDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    HexColor = x.HexColor,
+                })
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            // Create new chart data structures
+            var gradesMinMaxChartData = CreateGradesMinMaxChartData(salaries);
+            var professionsDistributionChartData = CreateProfessionsDistributionChartData(salaries, professions);
+            var peopleByGenderChartData = CreatePeopleByGenderChartData(salaries);
+
             return new SalariesChartResponse(
                 salaries,
                 new UserSalaryAdminDto(userSalariesForLastYear.First()),
@@ -118,7 +135,10 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
                 currencies,
                 salariesSkillsChartData,
                 workIndustriesChartData,
-                citiesDoughnutChartData);
+                citiesDoughnutChartData,
+                gradesMinMaxChartData,
+                professionsDistributionChartData,
+                peopleByGenderChartData);
         }
 
         public Task<SalariesChartResponse> Handle(
@@ -126,6 +146,132 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             CancellationToken cancellationToken)
         {
             return Handle((ISalariesChartQueryParams)request, cancellationToken);
+        }
+
+        private static GradesMinMaxChartData CreateGradesMinMaxChartData(List<UserSalaryDto> salaries)
+        {
+            var localSalaries = salaries.Where(x => x.Company == CompanyType.Local).ToList();
+            var remoteSalaries = salaries.Where(x => x.Company == CompanyType.Foreign).ToList();
+
+            var grades = new[]
+            {
+                Domain.Entities.Enums.DeveloperGrade.Junior,
+                Domain.Entities.Enums.DeveloperGrade.Middle,
+                Domain.Entities.Enums.DeveloperGrade.Senior,
+                Domain.Entities.Enums.DeveloperGrade.Lead,
+            };
+
+            var localData = grades.Select(grade => CreateGradeBoxPlotData(localSalaries, grade)).ToList();
+            var remoteData = grades.Select(grade => CreateGradeBoxPlotData(remoteSalaries, grade)).ToList();
+
+            return new GradesMinMaxChartData(localData, remoteData);
+        }
+
+        private static GradeBoxPlotData CreateGradeBoxPlotData(List<UserSalaryDto> salaries, Domain.Entities.Enums.DeveloperGrade grade)
+        {
+            var gradeSalaries = salaries
+                .Where(x => x.Grade == grade)
+                .Select(x => x.Value)
+                .OrderBy(x => x)
+                .ToList();
+
+            if (gradeSalaries.Count == 0)
+            {
+                return new GradeBoxPlotData(grade, 0, 0, 0, 0, 0, 0, new List<double>());
+            }
+
+            var min = gradeSalaries.First();
+            var max = gradeSalaries.Last();
+            var median = gradeSalaries.Median();
+            var mean = gradeSalaries.Average();
+            var q1 = gradeSalaries.Skip(gradeSalaries.Count / 4).Take(1).FirstOrDefault();
+            var q3 = gradeSalaries.Skip((gradeSalaries.Count * 3) / 4).Take(1).FirstOrDefault();
+
+            return new GradeBoxPlotData(grade, min, q1, median, q3, max, mean, gradeSalaries);
+        }
+
+        private static ProfessionsDistributionChartData CreateProfessionsDistributionChartData(
+            List<UserSalaryDto> salaries,
+            List<LabelEntityDto> professions)
+        {
+            var localSalaries = salaries.Where(x => x.Company == CompanyType.Local).ToList();
+            var remoteSalaries = salaries.Where(x => x.Company == CompanyType.Foreign).ToList();
+
+            var localData = CreateProfessionDistributionData(localSalaries, professions);
+            var remoteData = CreateProfessionDistributionData(remoteSalaries, professions);
+
+            return new ProfessionsDistributionChartData(localData, remoteData);
+        }
+
+        private static ProfessionDistributionData CreateProfessionDistributionData(
+            List<UserSalaryDto> salaries,
+            List<LabelEntityDto> professions)
+        {
+            if (salaries.Count == 0)
+            {
+                return new ProfessionDistributionData();
+            }
+
+            var professionCounts = salaries
+                .GroupBy(x => x.ProfessionId)
+                .Select(g => new
+                {
+                    ProfessionId = g.Key,
+                    Count = g.Count(),
+                    Percentage = (double)g.Count() / salaries.Count * 100
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            var items = professionCounts
+                .Where(x => x.ProfessionId.HasValue)
+                .Select(x =>
+                {
+                    var profession = professions.FirstOrDefault(p => p.Id == x.ProfessionId.Value);
+                    return profession != null
+                        ? new ProfessionDistributionItem(profession, x.Count, x.Percentage)
+                        : null;
+                })
+                .Where(x => x != null)
+                .ToList();
+
+            var otherCount = professionCounts.Where(x => !x.ProfessionId.HasValue).Sum(x => x.Count);
+            var otherPercentage = otherCount > 0 ? (double)otherCount / salaries.Count * 100 : 0;
+
+            return new ProfessionDistributionData(items, otherCount, otherPercentage, salaries.Count);
+        }
+
+        private static PeopleByGenderChartData CreatePeopleByGenderChartData(List<UserSalaryDto> salaries)
+        {
+            var localSalaries = salaries.Where(x => x.Company == CompanyType.Local).ToList();
+            var remoteSalaries = salaries.Where(x => x.Company == CompanyType.Foreign).ToList();
+
+            var localData = CreateGenderDistributionData(localSalaries);
+            var remoteData = CreateGenderDistributionData(remoteSalaries);
+
+            return new PeopleByGenderChartData(localData, remoteData);
+        }
+
+        private static GenderDistributionData CreateGenderDistributionData(List<UserSalaryDto> salaries)
+        {
+            if (salaries.Count == 0)
+            {
+                return new GenderDistributionData();
+            }
+
+            var genderCounts = salaries
+                .Where(x => x.Gender.HasValue && x.Gender != Domain.Enums.Gender.Undefined)
+                .GroupBy(x => x.Gender.Value)
+                .Select(g => new GenderDistributionItem(
+                    g.Key,
+                    g.Count(),
+                    (double)g.Count() / salaries.Count * 100))
+                .ToList();
+
+            var noGenderCount = salaries.Count(x => !x.Gender.HasValue || x.Gender == Domain.Enums.Gender.Undefined);
+            var noGenderPercentage = noGenderCount > 0 ? (double)noGenderCount / salaries.Count * 100 : 0;
+
+            return new GenderDistributionData(genderCounts, noGenderCount, noGenderPercentage, salaries.Count);
         }
 
         private async Task<List<CurrencyContent>> GetCurrenciesAsync(

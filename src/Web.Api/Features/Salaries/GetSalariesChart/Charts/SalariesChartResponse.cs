@@ -29,7 +29,10 @@ public record SalariesChartResponse
         List<CurrencyContent> currencies,
         SalariesSkillsChartData salariesSkillsChartData = null,
         WorkIndustriesChartData workIndustriesChartData = null,
-        CitiesDoughnutChartData citiesDoughnutChartData = null)
+        CitiesDoughnutChartData citiesDoughnutChartData = null,
+        GradesMinMaxChartData gradesMinMaxChartData = null,
+        ProfessionsDistributionChartData professionsDistributionChartData = null,
+        PeopleByGenderChartData peopleByGenderChartData = null)
         : this(
             salaries,
             currentUserSalary,
@@ -42,7 +45,10 @@ public record SalariesChartResponse
             currencies,
             salariesSkillsChartData,
             workIndustriesChartData,
-            citiesDoughnutChartData)
+            citiesDoughnutChartData,
+            gradesMinMaxChartData,
+            professionsDistributionChartData,
+            peopleByGenderChartData)
     {
     }
 
@@ -58,7 +64,10 @@ public record SalariesChartResponse
         List<CurrencyContent> currencies,
         SalariesSkillsChartData salariesSkillsChartData = null,
         WorkIndustriesChartData workIndustriesChartData = null,
-        CitiesDoughnutChartData citiesDoughnutChartData = null)
+        CitiesDoughnutChartData citiesDoughnutChartData = null,
+        GradesMinMaxChartData gradesMinMaxChartData = null,
+        ProfessionsDistributionChartData professionsDistributionChartData = null,
+        PeopleByGenderChartData peopleByGenderChartData = null)
     {
         Salaries = salaries;
         Currencies = currencies;
@@ -75,6 +84,9 @@ public record SalariesChartResponse
         SalariesSkillsChartData = salariesSkillsChartData;
         WorkIndustriesChartData = workIndustriesChartData;
         CitiesDoughnutChartData = citiesDoughnutChartData;
+        GradesMinMaxChartData = gradesMinMaxChartData;
+        ProfessionsDistributionChartData = professionsDistributionChartData;
+        PeopleByGenderChartData = peopleByGenderChartData;
 
         DevelopersByAgeChartData = new DevelopersByAgeChartData(salaries);
         DevelopersByExperienceYearsChartData = new DevelopersByExperienceYears(salaries);
@@ -177,7 +189,10 @@ public record SalariesChartResponse
             new List<CurrencyContent>(0),
             null, // SalariesSkillsChartData
             null, // WorkIndustriesChartData
-            null) // CitiesDoughnutChartData
+            null, // CitiesDoughnutChartData
+            null, // GradesMinMaxChartData
+            null, // ProfessionsDistributionChartData
+            null) // PeopleByGenderChartData
         {
             AverageSalary = local.Count > 0 ? local.Average() : 0,
             MedianSalary = local.Count > 0 ? local.Median() : 0,
@@ -262,4 +277,10 @@ public record SalariesChartResponse
     public WorkIndustriesChartData WorkIndustriesChartData { get; }
 
     public CitiesDoughnutChartData CitiesDoughnutChartData { get; }
+
+    public GradesMinMaxChartData GradesMinMaxChartData { get; }
+
+    public ProfessionsDistributionChartData ProfessionsDistributionChartData { get; }
+
+    public PeopleByGenderChartData PeopleByGenderChartData { get; }
 }
