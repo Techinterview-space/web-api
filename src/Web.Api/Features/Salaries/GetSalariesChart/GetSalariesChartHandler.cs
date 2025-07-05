@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.ValueObjects;
@@ -20,6 +21,14 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
 {
     public class GetSalariesChartHandler : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesChartQuery, SalariesChartResponse>
     {
+        private static readonly List<DeveloperGrade> _grades = new List<DeveloperGrade>
+        {
+            DeveloperGrade.Junior,
+            DeveloperGrade.Middle,
+            DeveloperGrade.Senior,
+            DeveloperGrade.Lead,
+        };
+
         private readonly IAuthorization _auth;
         private readonly DatabaseContext _context;
         private readonly ICurrencyService _currencyService;
@@ -122,9 +131,23 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
                 .ToListAsync(cancellationToken);
 
             // Create new chart data structures
+            var localSalaries = salaries
+                .Where(x => x.Company == CompanyType.Local)
+                .ToList();
+
+            var remoteSalaries = salaries
+                .Where(x => x.Company == CompanyType.Foreign)
+                .ToList();
+
             var gradesMinMaxChartData = CreateGradesMinMaxChartData(salaries);
-            var professionsDistributionChartData = CreateProfessionsDistributionChartData(salaries, professions);
-            var peopleByGenderChartData = CreatePeopleByGenderChartData(salaries);
+            var professionsDistributionChartData = CreateProfessionsDistributionChartData(
+                localSalaries,
+                remoteSalaries,
+                professions);
+
+            var peopleByGenderChartData = new PeopleByGenderChartData(
+                CreateGenderDistributionData(localSalaries),
+                CreateGenderDistributionData(remoteSalaries));
 
             return new SalariesChartResponse(
                 salaries,
@@ -150,24 +173,26 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
 
         private static GradesMinMaxChartData CreateGradesMinMaxChartData(List<UserSalaryDto> salaries)
         {
-            var localSalaries = salaries.Where(x => x.Company == CompanyType.Local).ToList();
-            var remoteSalaries = salaries.Where(x => x.Company == CompanyType.Foreign).ToList();
+            var localSalaries = salaries
+                .Where(x => x.Company == CompanyType.Local)
+                .TakeMiddleCollection(10, 10);
 
-            var grades = new[]
-            {
-                Domain.Entities.Enums.DeveloperGrade.Junior,
-                Domain.Entities.Enums.DeveloperGrade.Middle,
-                Domain.Entities.Enums.DeveloperGrade.Senior,
-                Domain.Entities.Enums.DeveloperGrade.Lead,
-            };
+            var remoteSalaries = salaries
+                .Where(x => x.Company == CompanyType.Foreign)
+                .TakeMiddleCollection(10, 10);
 
-            var localData = grades.Select(grade => CreateGradeBoxPlotData(localSalaries, grade)).ToList();
-            var remoteData = grades.Select(grade => CreateGradeBoxPlotData(remoteSalaries, grade)).ToList();
+            var localData = _grades
+                .Select(grade => CreateGradeBoxPlotData(localSalaries, grade))
+                .ToList();
+
+            var remoteData = _grades
+                .Select(grade => CreateGradeBoxPlotData(remoteSalaries, grade))
+                .ToList();
 
             return new GradesMinMaxChartData(localData, remoteData);
         }
 
-        private static GradeBoxPlotData CreateGradeBoxPlotData(List<UserSalaryDto> salaries, Domain.Entities.Enums.DeveloperGrade grade)
+        private static GradeBoxPlotData CreateGradeBoxPlotData(List<UserSalaryDto> salaries, DeveloperGrade grade)
         {
             var gradeSalaries = salaries
                 .Where(x => x.Grade == grade)
@@ -186,50 +211,17 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             var mean = gradeSalaries.Average();
 
             // Calculate quartiles properly
-            var q1 = CalculatePercentile(gradeSalaries, 25);
-            var q3 = CalculatePercentile(gradeSalaries, 75);
+            var q1 = gradeSalaries.GetPercentileValue(25);
+            var q3 = gradeSalaries.GetPercentileValue(75);
 
             return new GradeBoxPlotData(grade, min, q1, median, q3, max, mean, gradeSalaries);
         }
 
-        private static double CalculatePercentile(List<double> sortedValues, double percentile)
-        {
-            if (sortedValues.Count == 0)
-            {
-                return 0;
-            }
-
-            if (sortedValues.Count == 1)
-            {
-                return sortedValues[0];
-            }
-
-            var n = sortedValues.Count;
-            var index = (percentile / 100.0) * (n - 1);
-            var lower = (int)Math.Floor(index);
-            var upper = (int)Math.Ceiling(index);
-            var weight = index - lower;
-
-            if (upper >= n)
-            {
-                return sortedValues[n - 1];
-            }
-
-            if (lower < 0)
-            {
-                return sortedValues[0];
-            }
-
-            return (sortedValues[lower] * (1 - weight)) + (sortedValues[upper] * weight);
-        }
-
         private static ProfessionsDistributionChartData CreateProfessionsDistributionChartData(
-            List<UserSalaryDto> salaries,
+            List<UserSalaryDto> localSalaries,
+            List<UserSalaryDto> remoteSalaries,
             List<LabelEntityDto> professions)
         {
-            var localSalaries = salaries.Where(x => x.Company == CompanyType.Local).ToList();
-            var remoteSalaries = salaries.Where(x => x.Company == CompanyType.Foreign).ToList();
-
             var localData = CreateProfessionDistributionData(localSalaries, professions);
             var remoteData = CreateProfessionDistributionData(remoteSalaries, professions);
 
@@ -274,18 +266,8 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             return new ProfessionDistributionData(items, otherCount, otherPercentage, salaries.Count);
         }
 
-        private static PeopleByGenderChartData CreatePeopleByGenderChartData(List<UserSalaryDto> salaries)
-        {
-            var localSalaries = salaries.Where(x => x.Company == CompanyType.Local).ToList();
-            var remoteSalaries = salaries.Where(x => x.Company == CompanyType.Foreign).ToList();
-
-            var localData = CreateGenderDistributionData(localSalaries);
-            var remoteData = CreateGenderDistributionData(remoteSalaries);
-
-            return new PeopleByGenderChartData(localData, remoteData);
-        }
-
-        private static GenderDistributionData CreateGenderDistributionData(List<UserSalaryDto> salaries)
+        private static GenderDistributionData CreateGenderDistributionData(
+            List<UserSalaryDto> salaries)
         {
             if (salaries.Count == 0)
             {

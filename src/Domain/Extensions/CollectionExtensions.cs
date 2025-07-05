@@ -56,6 +56,77 @@ public static class CollectionExtensions
             .ToArray();
     }
 
+    public static List<T> TakeMiddleCollection<T>(
+        this IEnumerable<T> items,
+        int skipFirstPercentage,
+        int skipLastPercentage)
+    {
+        var itemsList = items as IList<T> ?? items.ToList();
+
+        var count = itemsList.Count;
+        if (count == 0)
+        {
+            return new List<T>();
+        }
+
+        if (skipFirstPercentage < 0 || skipLastPercentage < 0)
+        {
+            throw new InvalidOperationException("Percentages must be non-negative.");
+        }
+
+        if (skipFirstPercentage + skipLastPercentage >= 100)
+        {
+            throw new InvalidOperationException("Sum of skip percentages must be less than 100.");
+        }
+
+        var skipFirstCount = (int)Math.Ceiling(count * skipFirstPercentage / 100.0);
+        var skipLastCount = (int)Math.Ceiling(count * skipLastPercentage / 100.0);
+
+        var takeCount = count - skipFirstCount - skipLastCount;
+        if (takeCount <= 0)
+        {
+            return new List<T>();
+        }
+
+        return itemsList
+            .Skip(skipFirstCount)
+            .Take(takeCount)
+            .ToList();
+    }
+
+    public static double GetPercentileValue(
+        this List<double> sortedValues,
+        double percentile)
+    {
+        if (sortedValues.Count == 0)
+        {
+            return 0;
+        }
+
+        if (sortedValues.Count == 1)
+        {
+            return sortedValues[0];
+        }
+
+        var countOfValues = sortedValues.Count;
+        var index = (percentile / 100.0) * (countOfValues - 1);
+        var lower = (int)Math.Floor(index);
+        var upper = (int)Math.Ceiling(index);
+        var weight = index - lower;
+
+        if (upper >= countOfValues)
+        {
+            return sortedValues[countOfValues - 1];
+        }
+
+        if (lower < 0)
+        {
+            return sortedValues[0];
+        }
+
+        return (sortedValues[lower] * (1 - weight)) + (sortedValues[upper] * weight);
+    }
+
     public static T GetRandomItemOrDefault<T>(
         this List<T> items,
         int? seed = null)
