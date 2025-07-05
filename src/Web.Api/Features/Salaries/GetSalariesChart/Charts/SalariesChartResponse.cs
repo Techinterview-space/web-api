@@ -69,7 +69,6 @@ public record SalariesChartResponse
         ProfessionsDistributionChartData professionsDistributionChartData = null,
         PeopleByGenderChartData peopleByGenderChartData = null)
     {
-        Salaries = salaries;
         SalariesCount = salaries?.Count ?? 0;
         Currencies = currencies;
 
@@ -204,8 +203,6 @@ public record SalariesChartResponse
             OnlyLocalCompanySalaries = onlyLocalCompanySalaries,
         };
     }
-
-    public List<UserSalaryDto> Salaries { get; }
 
     public int SalariesCount { get; }
 

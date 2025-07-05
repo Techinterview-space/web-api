@@ -84,7 +84,7 @@ public class GetSalariesChartHandlerTests
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
         Assert.Equal(4, salariesResponse.TotalCountInStats);
-        Assert.Empty(salariesResponse.Salaries);
+        Assert.Equal(0, salariesResponse.SalariesCount);
         Assert.Equal(802_500, salariesResponse.AverageSalary);
         Assert.Equal(675_000, salariesResponse.MedianSalary);
 
@@ -159,7 +159,7 @@ public class GetSalariesChartHandlerTests
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
-        Assert.Equal(4, salariesResponse.Salaries.Count);
+        Assert.Equal(4, salariesResponse.SalariesCount);
         Assert.Equal(802_500, salariesResponse.AverageSalary);
         Assert.Equal(675_000, salariesResponse.MedianSalary);
 
@@ -232,7 +232,7 @@ public class GetSalariesChartHandlerTests
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.False(salariesResponse.ShouldAddOwnSalary);
-        Assert.Equal(4, salariesResponse.Salaries.Count);
+        Assert.Equal(4, salariesResponse.SalariesCount);
         Assert.Equal(salary4.Value, salariesResponse.CurrentUserSalary.Value);
         Assert.Equal(3, salariesResponse.Currencies.Count);
     }
@@ -358,7 +358,7 @@ public class GetSalariesChartHandlerTests
             .Handle(new GetSalariesChartQuery(), default);
 
         Assert.True(salariesResponse.ShouldAddOwnSalary);
-        Assert.Empty(salariesResponse.Salaries);
+        Assert.Equal(0, salariesResponse.SalariesCount);
         Assert.Empty(salariesResponse.Currencies);
 
         // Test that chart data properties are null for RequireOwnSalary case
