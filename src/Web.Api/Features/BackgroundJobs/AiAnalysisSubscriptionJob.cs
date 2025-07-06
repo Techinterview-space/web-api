@@ -11,6 +11,7 @@ using Infrastructure.Salaries;
 using Infrastructure.Services.AiServices;
 using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.Html;
 using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -106,10 +107,11 @@ public class AiAnalysisSubscriptionJob
                 continue;
             }
 
+            var htmlReport = new MarkdownToHtml(response).ToString();
             var analysis = new AiAnalysisRecord(
                 subscription: subscription,
                 aiReportSource: report.ToJson(),
-                aiReport: response,
+                aiReport: htmlReport,
                 processingTimeMs: elapsed.TotalMilliseconds,
                 model);
 
