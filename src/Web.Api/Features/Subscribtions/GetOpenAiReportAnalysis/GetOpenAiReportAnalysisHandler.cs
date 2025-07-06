@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
+using Domain.Entities.StatData;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.AiServices;
 using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.Html;
 using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 
@@ -54,13 +57,27 @@ public class GetOpenAiReportAnalysisHandler
             .InitializeAsync(cancellationToken);
 
         var report = new OpenAiBodyReport(data, Currency.KZT);
+
+        var currentTimestamp = Stopwatch.GetTimestamp();
         var analysisResult = await _aiService.AnalyzeSalariesWeeklyUpdateAsync(
             report,
             null,
             cancellationToken);
+        var elapsed = Stopwatch.GetElapsedTime(currentTimestamp);
+
+        var rawResponseText = analysisResult.GetResponseTextOrNull();
+        var analysis = await _context.SaveAsync(
+            new AiAnalysisRecord(
+                subscription: subscription,
+                aiReportSource: report.ToJson(),
+                aiReport: new MarkdownToHtml(rawResponseText).ToString(),
+                processingTimeMs: elapsed.TotalMilliseconds,
+                analysisResult.Model),
+            cancellationToken);
 
         return new GetOpenAiReportAnalysisResponse(
-            analysisResult.GetResponseTextOrNull(),
+            rawResponseText,
+            analysis.AiReport,
             report,
             analysisResult.Model);
     }

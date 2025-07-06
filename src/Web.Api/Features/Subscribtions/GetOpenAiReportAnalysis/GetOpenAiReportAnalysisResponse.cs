@@ -1,20 +1,17 @@
 ﻿using Infrastructure.Services.AiServices.Custom.Models;
-using Infrastructure.Services.Html;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 
 public record GetOpenAiReportAnalysisResponse
 {
     public GetOpenAiReportAnalysisResponse(
-        string analysis,
+        string analysisRaw,
+        string analysisHtml,
         OpenAiBodyReport report,
         string model)
     {
-        Analysis = analysis;
-        Html = Analysis != null
-            ? new MarkdownToHtml(Analysis).ToString()
-            : null;
-
+        Analysis = analysisRaw;
+        Html = analysisHtml;
         Report = report;
         Model = model;
     }
