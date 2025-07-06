@@ -1,4 +1,4 @@
-using Infrastructure.Services.Html;
+﻿using Infrastructure.Services.Html;
 using Xunit;
 
 namespace InfrastructureTests.Services.Html;
