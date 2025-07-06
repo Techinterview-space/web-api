@@ -1,5 +1,5 @@
 ﻿using System;
-using Domain.Entities.OpenAI;
+using Domain.Entities.Prompts;
 
 namespace Web.Api.Features.Admin.AiPrompts.Models;
 

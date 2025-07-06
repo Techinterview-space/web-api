@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.OpenAI;
+﻿namespace Domain.Entities.Prompts;
 
 public enum AiEngine
 {

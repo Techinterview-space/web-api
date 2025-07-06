@@ -1,4 +1,4 @@
-﻿using Domain.Entities.OpenAI;
+﻿using Domain.Entities.Prompts;
 using Infrastructure.Ai.ChatGpt;
 using Infrastructure.Ai.Claude;
 using Microsoft.Extensions.DependencyInjection;

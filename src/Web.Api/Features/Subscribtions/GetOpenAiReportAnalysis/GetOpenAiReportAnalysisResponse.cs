@@ -7,16 +7,16 @@ public record GetOpenAiReportAnalysisResponse
     public GetOpenAiReportAnalysisResponse(
         string analysis,
         OpenAiBodyReport report,
-        string bearer)
+        string model)
     {
         Analysis = analysis;
         Report = report;
-        Bearer = bearer;
+        Model = model;
     }
 
     public string Analysis { get; }
 
     public OpenAiBodyReport Report { get; }
 
-    public string Bearer { get; }
+    public string Model { get; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.OpenAI;
+﻿namespace Domain.Entities.Prompts;
 
 public enum OpenAiPromptType
 {
@@ -7,4 +7,6 @@ public enum OpenAiPromptType
     Company = 1,
 
     Chat = 2,
+
+    SalariesWeeklyUpdate = 3,
 }

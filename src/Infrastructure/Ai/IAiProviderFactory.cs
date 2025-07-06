@@ -1,4 +1,4 @@
-﻿using Domain.Entities.OpenAI;
+﻿using Domain.Entities.Prompts;
 
 namespace Infrastructure.Ai;
 

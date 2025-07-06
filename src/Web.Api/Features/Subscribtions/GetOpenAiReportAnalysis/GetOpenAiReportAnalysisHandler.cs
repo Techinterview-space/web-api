@@ -5,6 +5,7 @@ using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
+using Infrastructure.Services.AiServices;
 using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.AiServices.Custom.Models;
 using Infrastructure.Services.Professions;
@@ -12,20 +13,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 
-public class GetOpenAiReportAnalysisHandler : Infrastructure.Services.Mediator.IRequestHandler<GetOpenAiReportAnalysisQuery, GetOpenAiReportAnalysisResponse>
+public class GetOpenAiReportAnalysisHandler
+    : Infrastructure.Services.Mediator.IRequestHandler<GetOpenAiReportAnalysisQuery, GetOpenAiReportAnalysisResponse>
 {
     private readonly DatabaseContext _context;
     private readonly IProfessionsCacheService _professionsCacheService;
     private readonly ICustomOpenAiService _openApiService;
+    private readonly IArtificialIntellectService _aiService;
 
     public GetOpenAiReportAnalysisHandler(
         DatabaseContext context,
         IProfessionsCacheService professionsCacheService,
-        ICustomOpenAiService openApiService)
+        ICustomOpenAiService openApiService,
+        IArtificialIntellectService aiService)
     {
         _context = context;
         _professionsCacheService = professionsCacheService;
         _openApiService = openApiService;
+        _aiService = aiService;
     }
 
     public async Task<GetOpenAiReportAnalysisResponse> Handle(
@@ -49,9 +54,14 @@ public class GetOpenAiReportAnalysisHandler : Infrastructure.Services.Mediator.I
             .InitializeAsync(cancellationToken);
 
         var report = new OpenAiBodyReport(data, Currency.KZT);
-        return new GetOpenAiReportAnalysisResponse(
-            await _openApiService.GetAnalysisAsync(report, cancellationToken),
+        var analysisResult = await _aiService.AnalyzeSalariesWeeklyUpdateAsync(
             report,
-            _openApiService.GetBearer());
+            null,
+            cancellationToken);
+
+        return new GetOpenAiReportAnalysisResponse(
+            analysisResult.GetResponseTextOrNull(),
+            report,
+            analysisResult.Model);
     }
 }

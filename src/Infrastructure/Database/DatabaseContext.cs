@@ -4,7 +4,7 @@ using Domain.Entities.CSV;
 using Domain.Entities.Github;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
-using Domain.Entities.OpenAI;
+using Domain.Entities.Prompts;
 using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;

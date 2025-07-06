@@ -1,8 +1,9 @@
 ﻿using System.Text.Json;
 using Domain.Entities.Companies;
-using Domain.Entities.OpenAI;
+using Domain.Entities.Prompts;
 using Infrastructure.Ai;
 using Infrastructure.Database;
+using Infrastructure.Services.AiServices.Custom.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.AiServices;
@@ -31,13 +32,7 @@ public class AiService : IArtificialIntellectService
             throw new InvalidOperationException("Company does not have relevant reviews.");
         }
 
-        var promptData = await _context
-            .OpenAiPrompts
-            .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync(
-                x => x.Type == OpenAiPromptType.Company && x.IsActive,
-                cancellationToken)
-            ?? throw new InvalidOperationException($"System does not have eny prompts for {OpenAiPromptType.Company}.");
+        var promptData = await GetActivePromptAsync(OpenAiPromptType.Company, cancellationToken);
 
         var input = JsonSerializer.Serialize(
             new CompanyAnalyzeAiRequest(company));
@@ -57,14 +52,7 @@ public class AiService : IArtificialIntellectService
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        var promptData = await _context
-            .OpenAiPrompts
-            .OrderByDescending(x => x.CreatedAt)
-            .FirstOrDefaultAsync(
-                x => x.Type == OpenAiPromptType.Chat && x.IsActive,
-                cancellationToken)
-                     ?? throw new InvalidOperationException($"System does not have eny prompts for {OpenAiPromptType.Chat}.");
-
+        var promptData = await GetActivePromptAsync(OpenAiPromptType.Chat, cancellationToken);
         var aiProvider = _aiProviderFactory.GetProvider(promptData.Engine);
 
         return await aiProvider.AnalyzeChatAsync(
@@ -73,5 +61,34 @@ public class AiService : IArtificialIntellectService
             promptData.Model,
             correlationId,
             cancellationToken);
+    }
+
+    public async Task<AiChatResult> AnalyzeSalariesWeeklyUpdateAsync(
+        OpenAiBodyReport report,
+        string correlationId = null,
+        CancellationToken cancellationToken = default)
+    {
+        var promptData = await GetActivePromptAsync(OpenAiPromptType.SalariesWeeklyUpdate, cancellationToken);
+        var aiProvider = _aiProviderFactory.GetProvider(promptData.Engine);
+
+        return await aiProvider.AnalyzeChatAsync(
+            report.ToJson(),
+            promptData.Prompt,
+            promptData.Model,
+            correlationId,
+            cancellationToken);
+    }
+
+    private async Task<OpenAiPrompt> GetActivePromptAsync(
+        OpenAiPromptType promptType,
+        CancellationToken cancellationToken)
+    {
+        return await _context
+            .OpenAiPrompts
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync(
+                x => x.Type == promptType && x.IsActive,
+                cancellationToken)
+            ?? throw new InvalidOperationException($"System does not have any prompts for {promptType}.");
     }
 }
