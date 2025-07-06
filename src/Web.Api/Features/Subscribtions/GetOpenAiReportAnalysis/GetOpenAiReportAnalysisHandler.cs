@@ -42,7 +42,6 @@ public class GetOpenAiReportAnalysisHandler
     {
         var subscription = await _context
                                .StatDataChangeSubscriptions
-                               .AsNoTracking()
                                .FirstOrDefaultAsync(
                                    x => x.Id == request.SubscriptionId,
                                    cancellationToken: cancellationToken)
