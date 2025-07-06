@@ -69,7 +69,7 @@ public class GetOpenAiReportAnalysisHandler
             new AiAnalysisRecord(
                 subscription: subscription,
                 aiReportSource: report.ToJson(),
-                aiReport: new MarkdownToHtml(rawResponseText).ToString(),
+                aiReport: new MarkdownToTelegramHtml(rawResponseText).ToString(),
                 processingTimeMs: elapsed.TotalMilliseconds,
                 analysisResult.Model),
             cancellationToken);
