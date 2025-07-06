@@ -16,11 +16,14 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
 
     public double ProcessingTimeMs { get; protected set; }
 
+    public string Model { get; protected set; }
+
     public AiAnalysisRecord(
         StatDataChangeSubscription subscription,
         string aiReportSource,
         string aiReport,
-        double processingTimeMs)
+        double processingTimeMs,
+        string model)
     {
         Id = Guid.NewGuid();
         SubscriptionId = subscription.Id;
@@ -42,6 +45,7 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
         AiReportSource = aiReportSource;
         AiReport = aiReport;
         ProcessingTimeMs = processingTimeMs;
+        Model = model?.Trim();
     }
 
     public string GetClearedReport()

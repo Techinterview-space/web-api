@@ -8,6 +8,7 @@ using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
+using Infrastructure.Services.AiServices;
 using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.AiServices.Custom.Models;
 using Infrastructure.Services.Professions;
@@ -21,23 +22,25 @@ public class AiAnalysisSubscriptionJob
 {
     private readonly DatabaseContext _context;
     private readonly IProfessionsCacheService _professionsCacheService;
-    private readonly ICustomOpenAiService _openAiService;
+    private readonly IArtificialIntellectService _aiService;
 
     public AiAnalysisSubscriptionJob(
         ILogger<AiAnalysisSubscriptionJob> logger,
         DatabaseContext context,
         IProfessionsCacheService professionsCacheService,
-        ICustomOpenAiService openAiService)
+        ICustomOpenAiService openAiService,
+        IArtificialIntellectService aiService)
         : base(logger)
     {
         _context = context;
         _professionsCacheService = professionsCacheService;
-        _openAiService = openAiService;
+        _aiService = aiService;
     }
 
     public override async Task ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
+        var correlationId = $"job-{Guid.NewGuid()}";
         var subscriptions = await _context.StatDataChangeSubscriptions
             .Where(x =>
                 x.DeletedAt == null &&
@@ -46,7 +49,10 @@ public class AiAnalysisSubscriptionJob
 
         if (subscriptions.Count == 0)
         {
-            Logger.LogInformation("No Subscriptions found. Exiting job.");
+            Logger.LogInformation(
+                "No Subscriptions found. Exiting job. CorrelationId: {CorrelationId}",
+                correlationId);
+
             return;
         }
 
@@ -65,24 +71,38 @@ public class AiAnalysisSubscriptionJob
             var report = new OpenAiBodyReport(data, Currency.KZT);
 
             var currentTimestamp = Stopwatch.GetTimestamp();
-            var response = await _openAiService.GetAnalysisAsync(
+
+            // todo change
+            var analysisResponse = await _aiService.AnalyzeSalariesWeeklyUpdateAsync(
                 report,
+                correlationId,
                 cancellationToken);
 
             var elapsed = Stopwatch.GetElapsedTime(currentTimestamp);
 
+            var response = analysisResponse.GetResponseTextOrNull();
+            var model = analysisResponse.Model;
+
             Logger.LogInformation(
-                "Subscription {SubscriptionId} analysis completed in {ElapsedMilliseconds} ms. Response length: {ResponseLength}",
+                "Subscription {SubscriptionId} analysis completed in {ElapsedMilliseconds} ms. " +
+                "Response length: {ResponseLength}. " +
+                "Model: {Model}. " +
+                "CorrelationId: {CorrelationId}",
                 subscription.Id,
                 elapsed.TotalMilliseconds,
-                response.Length);
+                response.Length,
+                model,
+                correlationId);
 
             response = response.Trim('`');
             if (response.Length == 0)
             {
                 Logger.LogWarning(
-                    "Subscription {SubscriptionId} analysis returned empty response.",
-                    subscription.Id);
+                    "Subscription {SubscriptionId} analysis returned empty response. " +
+                    "CorrelationId: {CorrelationId}",
+                    subscription.Id,
+                    correlationId);
+
                 continue;
             }
 
@@ -90,7 +110,8 @@ public class AiAnalysisSubscriptionJob
                 subscription: subscription,
                 aiReportSource: report.ToJson(),
                 aiReport: response,
-                processingTimeMs: elapsed.TotalMilliseconds);
+                processingTimeMs: elapsed.TotalMilliseconds,
+                model);
 
             results.Add(analysis);
         }
@@ -99,7 +120,8 @@ public class AiAnalysisSubscriptionJob
         await _context.SaveChangesAsync(cancellationToken);
 
         Logger.LogInformation(
-            "Saved {Count} analysis results.",
-            results.Count);
+            "Saved {Count} analysis results. CorrelationId: {CorrelationId}",
+            results.Count,
+            correlationId);
     }
 }

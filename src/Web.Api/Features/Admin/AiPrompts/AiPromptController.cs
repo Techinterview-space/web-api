@@ -38,7 +38,8 @@ public class AiPromptController : ControllerBase
         await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
 
         return await _context.OpenAiPrompts
-            .OrderBy(x => x.Id)
+            .OrderBy(x => x.IsActive)
+            .ThenByDescending(x => x.UpdatedAt)
             .Select(x => new OpenAiPromptDto
             {
                 Id = x.Id,
