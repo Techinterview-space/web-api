@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.Html;
 
 namespace Web.Api.Features.Subscribtions.GetOpenAiReportAnalysis;
 
@@ -10,11 +11,17 @@ public record GetOpenAiReportAnalysisResponse
         string model)
     {
         Analysis = analysis;
+        Html = Analysis != null
+            ? new MarkdownToHtml(Analysis).ToString()
+            : null;
+
         Report = report;
         Model = model;
     }
 
     public string Analysis { get; }
+
+    public string Html { get; }
 
     public OpenAiBodyReport Report { get; }
 
