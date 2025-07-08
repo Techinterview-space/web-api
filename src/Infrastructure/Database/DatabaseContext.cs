@@ -8,6 +8,7 @@ using Domain.Entities.Prompts;
 using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.CompanyReviews;
 using Domain.Entities.StatData.Salary;
 using Domain.Entities.Telegram;
 using Domain.Entities.Users;
@@ -52,9 +53,9 @@ public class DatabaseContext : DbContext
 
     public DbSet<SalariesSurveyReply> SalariesSurveyReplies { get; set; }
 
-    public DbSet<StatDataChangeSubscription> StatDataChangeSubscriptions { get; set; }
+    public DbSet<StatDataChangeSubscription> SalariesSubscriptions { get; set; }
 
-    public DbSet<StatDataChangeSubscriptionRecord> StatDataChangeSubscriptionRecords { get; set; }
+    public DbSet<StatDataChangeSubscriptionRecord> SalariesSubscriptionRecords { get; set; }
 
     public DbSet<Company> Companies { get; set; }
 
@@ -68,7 +69,7 @@ public class DatabaseContext : DbContext
 
     public DbSet<TelegramInlineReply> TelegramInlineReplies { get; set; }
 
-    public DbSet<SubscriptionTelegramMessage> StatDataChangeSubscriptionTgMessages { get; set; }
+    public DbSet<SubscriptionTelegramMessage> SalariesSubscriptionTelegramMessages { get; set; }
 
     public DbSet<UserEmail> UserEmails { get; set; }
 
@@ -85,6 +86,8 @@ public class DatabaseContext : DbContext
     public DbSet<OpenAiPrompt> OpenAiPrompts { get; set; }
 
     public DbSet<CompanyOpenAiAnalysis> CompanyOpenAiAnalysisRecords { get; set; }
+
+    public DbSet<LastWeekCompanyReviewsSubscription> CompanyReviewsSubscriptions { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

@@ -11,12 +11,12 @@ namespace Web.Api.Features.SalarySubscribtions.SendUpdatesToSubscriptionChat;
 public class SendUpdatesToSalarySubscriptionChatHandler
     : Infrastructure.Services.Mediator.IRequestHandler<SendUpdatesToSalarySubscriptionChatCommand, int>
 {
-    private readonly StatDataChangeSubscriptionService _service;
+    private readonly SalariesSubscriptionService _service;
     private readonly DatabaseContext _context;
     private readonly ICorrelationIdAccessor _correlation;
 
     public SendUpdatesToSalarySubscriptionChatHandler(
-        StatDataChangeSubscriptionService service,
+        SalariesSubscriptionService service,
         DatabaseContext context,
         ICorrelationIdAccessor correlation)
     {
@@ -29,7 +29,7 @@ public class SendUpdatesToSalarySubscriptionChatHandler
         SendUpdatesToSalarySubscriptionChatCommand request,
         CancellationToken cancellationToken)
     {
-        var hasSubscription = await _context.StatDataChangeSubscriptions
+        var hasSubscription = await _context.SalariesSubscriptions
             .AnyAsync(x => x.Id == request.SubscriptionId, cancellationToken);
 
         if (!hasSubscription)

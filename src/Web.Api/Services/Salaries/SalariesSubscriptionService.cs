@@ -26,7 +26,7 @@ using Web.Api.Features.BackgroundJobs.Models;
 
 namespace Web.Api.Services.Salaries;
 
-public class StatDataChangeSubscriptionService
+public class SalariesSubscriptionService
 {
     public const string SalariesPageUrl = "techinterview.space/salaries";
     public const int CountOfDaysToSendMonthlyNotification = 24;
@@ -37,15 +37,15 @@ public class StatDataChangeSubscriptionService
     private readonly IProfessionsCacheService _professionsCacheService;
     private readonly IGlobal _global;
     private readonly ISalariesTelegramBotClientProvider _botClientProvider;
-    private readonly ILogger<StatDataChangeSubscriptionService> _logger;
+    private readonly ILogger<SalariesSubscriptionService> _logger;
 
-    public StatDataChangeSubscriptionService(
+    public SalariesSubscriptionService(
         DatabaseContext context,
         ICurrencyService currencyService,
         IProfessionsCacheService professionsCacheService,
         IGlobal global,
         ISalariesTelegramBotClientProvider botClientProvider,
-        ILogger<StatDataChangeSubscriptionService> logger)
+        ILogger<SalariesSubscriptionService> logger)
     {
         _context = context;
         _currencyService = currencyService;
@@ -84,7 +84,7 @@ public class StatDataChangeSubscriptionService
         string correlationId,
         CancellationToken cancellationToken)
     {
-        var subscriptions = await _context.StatDataChangeSubscriptions
+        var subscriptions = await _context.SalariesSubscriptions
             .Include(x => x.StatDataChangeSubscriptionTgMessages.OrderBy(z => z.CreatedAt))
             .Include(x => x.AiAnalysisRecords.OrderBy(z => z.CreatedAt))
             .Where(x => x.DeletedAt == null)
@@ -234,7 +234,7 @@ public class StatDataChangeSubscriptionService
                 subscriptionData.LastCacheItemOrNull,
                 subscriptionData.GetStatDataCacheItemSalaryData());
 
-            _context.StatDataChangeSubscriptionRecords.Add(subscriptionRecord);
+            _context.SalariesSubscriptionRecords.Add(subscriptionRecord);
             listOfDataToBeSent.Add((subscriptionRecord, dataTobeSent));
         }
 
@@ -274,7 +274,7 @@ public class StatDataChangeSubscriptionService
             }
             else
             {
-                _context.StatDataChangeSubscriptionTgMessages.Add(
+                _context.SalariesSubscriptionTelegramMessages.Add(
                     new SubscriptionTelegramMessage(
                         data.Item.Subscription,
                         data.Data.ReplyText));

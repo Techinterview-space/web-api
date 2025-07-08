@@ -33,7 +33,7 @@ public class ActivateSalarySubscriptionHandler : IRequestHandler<ActivateSalaryS
             throw new NoPermissionsException("You don't have permissions to perform this.");
         }
 
-        var cacheRecord = await _context.StatDataChangeSubscriptions
+        var cacheRecord = await _context.SalariesSubscriptions
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
             ?? throw NotFoundException.CreateFromEntity<StatDataChangeSubscription>(request.Id);
 

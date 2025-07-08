@@ -22,7 +22,7 @@ public class GetSalarySubscriptionsHandler
         GetSalarySubscriptionsQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.StatDataChangeSubscriptions
+        return await _context.SalariesSubscriptions
             .Include(x => x.StatDataChangeSubscriptionTgMessages.OrderBy(z => z.CreatedAt))
             .OrderBy(x => x.CreatedAt)
             .Select(SalarySubscriptionDto.Transform)

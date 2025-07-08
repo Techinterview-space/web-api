@@ -31,7 +31,7 @@ public class EditSalarySubscriptionHandler : Infrastructure.Services.Mediator.IR
             throw new BadRequestException("Name is required.");
         }
 
-        var existingSubscription = await _context.StatDataChangeSubscriptions
+        var existingSubscription = await _context.SalariesSubscriptions
             .FirstOrDefaultAsync(
                 x => x.Id == request.SubscriptionId,
                 cancellationToken);

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Domain.ValueObjects.Pagination;
-using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.AiServices.Salaries;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.SalarySubscribtions.ActivateSubscription;
@@ -120,7 +120,7 @@ public class SalaryTelegramSubscriptionsController : ControllerBase
         CancellationToken cancellationToken)
     {
         return Ok(
-            await _serviceProvider.HandleBy<GetSalaryAiReportHandler, GetSalaryAiReportQuery, OpenAiBodyReport>(
+            await _serviceProvider.HandleBy<GetSalaryAiReportHandler, GetSalaryAiReportQuery, SalariesAiBodyReport>(
                 new GetSalaryAiReportQuery(id),
                 cancellationToken));
     }

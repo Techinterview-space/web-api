@@ -23,11 +23,11 @@ public class DeleteSalarySubscriptionHandler
         DeleteSalarySubscriptionCommand request,
         CancellationToken cancellationToken)
     {
-        var cacheRecord = await _context.StatDataChangeSubscriptions
+        var cacheRecord = await _context.SalariesSubscriptions
                               .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
                           ?? throw NotFoundException.CreateFromEntity<StatDataChangeSubscription>(request.Id);
 
-        _context.StatDataChangeSubscriptions.Remove(cacheRecord);
+        _context.SalariesSubscriptions.Remove(cacheRecord);
 
         await _context.SaveChangesAsync(cancellationToken);
         return Nothing.Value;

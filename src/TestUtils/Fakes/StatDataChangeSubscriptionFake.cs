@@ -75,7 +75,7 @@ public class StatDataChangeSubscriptionFake : StatDataChangeSubscription
         var entity = context.Add(AsDomain());
         context.SaveChanges();
 
-        return context.StatDataChangeSubscriptions
+        return context.SalariesSubscriptions
             .Include(x => x.StatDataChangeSubscriptionTgMessages)
             .Include(x => x.Records)
             .Include(x => x.AiAnalysisRecords)

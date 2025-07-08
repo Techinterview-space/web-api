@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.AiServices.Custom.Models;
+﻿using Infrastructure.Services.AiServices.Salaries;
 
 namespace Web.Api.Features.SalarySubscribtions.GetOpenAiReportAnalysis;
 
@@ -7,7 +7,7 @@ public record GetOpenAiReportAnalysisResponse
     public GetOpenAiReportAnalysisResponse(
         string analysisRaw,
         string analysisHtml,
-        OpenAiBodyReport report,
+        SalariesAiBodyReport report,
         string model)
     {
         Analysis = analysisRaw;
@@ -20,7 +20,7 @@ public record GetOpenAiReportAnalysisResponse
 
     public string Html { get; }
 
-    public OpenAiBodyReport Report { get; }
+    public SalariesAiBodyReport Report { get; }
 
     public string Model { get; }
 }

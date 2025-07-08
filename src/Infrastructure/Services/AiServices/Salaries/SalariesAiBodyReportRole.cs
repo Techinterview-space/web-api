@@ -1,21 +1,20 @@
 ﻿using Domain.Entities.Salaries;
-using Domain.Entities.StatData;
 using Domain.Entities.StatData.Salary;
 
-namespace Infrastructure.Services.AiServices.Custom.Models;
+namespace Infrastructure.Services.AiServices.Salaries;
 
-public record OpenAiBodyReportRole
+public record SalariesAiBodyReportRole
 {
     private const int HistoricalDataCount = 3;
 
-    public OpenAiBodyReportRole(
+    public SalariesAiBodyReportRole(
         Profession profession,
         List<SalaryBaseData> salaries,
         DateTimeOffset now)
     {
         RoleName = profession.Title;
-        CurrentSalary = new OpenAiBodyReportRoleSalaryData(salaries);
-        HistoricalData = new List<OpenAiBodyReportRoleHistoricalDataItem>();
+        CurrentSalary = new SalariesAiBodyReportRoleSalaryData(salaries);
+        HistoricalData = new List<SalariesAiBodyReportRoleHistoricalDataItem>();
 
         for (var i = 0; i < HistoricalDataCount; i++)
         {
@@ -34,7 +33,7 @@ public record OpenAiBodyReportRole
                 : HistoricalData[i - 1].Average;
 
             HistoricalData.Add(
-                new OpenAiBodyReportRoleHistoricalDataItem(
+                new SalariesAiBodyReportRoleHistoricalDataItem(
                     salariesForDate,
                     now.AddDays(-daysCount),
                     averageSalaryToCompare));
@@ -43,7 +42,7 @@ public record OpenAiBodyReportRole
 
     public string RoleName { get; }
 
-    public OpenAiBodyReportRoleSalaryData CurrentSalary { get; }
+    public SalariesAiBodyReportRoleSalaryData CurrentSalary { get; }
 
-    public List<OpenAiBodyReportRoleHistoricalDataItem> HistoricalData { get; }
+    public List<SalariesAiBodyReportRoleHistoricalDataItem> HistoricalData { get; }
 }

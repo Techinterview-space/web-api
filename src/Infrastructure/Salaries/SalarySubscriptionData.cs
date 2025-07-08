@@ -52,7 +52,7 @@ public record SalarySubscriptionData
     public async Task<SalarySubscriptionData> InitializeAsync(
         CancellationToken cancellationToken)
     {
-        LastCacheItems = await _context.StatDataChangeSubscriptionRecords
+        LastCacheItems = await _context.SalariesSubscriptionRecords
             .AsNoTracking()
             .Where(x => x.SubscriptionId == _subscription.Id)
             .OrderByDescending(x => x.CreatedAt)

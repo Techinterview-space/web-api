@@ -1,19 +1,19 @@
 ﻿using Domain.Entities.Salaries;
 using Infrastructure.Salaries;
 
-namespace Infrastructure.Services.AiServices.Custom.Models;
+namespace Infrastructure.Services.AiServices.Salaries;
 
-public record OpenAiBodyReport
+public record SalariesAiBodyReport
 {
     private readonly SalarySubscriptionData _subscriptionData;
 
-    public OpenAiBodyReport(
+    public SalariesAiBodyReport(
         SalarySubscriptionData subscriptionData,
         Currency currency)
     {
         _subscriptionData = subscriptionData.IsInitializedOrFail();
-        ReportMetadata = new OpenAiBodyReportMetadata(currency);
-        Roles = new List<OpenAiBodyReportRole>();
+        ReportMetadata = new SalariesAiBodyReportMetadata(currency);
+        Roles = new List<SalariesAiBodyReportRole>();
 
         var now = DateTimeOffset.UtcNow;
 
@@ -24,16 +24,16 @@ public record OpenAiBodyReport
                 .ToList();
 
             Roles.Add(
-                new OpenAiBodyReportRole(
+                new SalariesAiBodyReportRole(
                     profession,
                     salariesForProfession,
                     now));
         }
     }
 
-    public OpenAiBodyReportMetadata ReportMetadata { get; }
+    public SalariesAiBodyReportMetadata ReportMetadata { get; }
 
-    public List<OpenAiBodyReportRole> Roles { get; }
+    public List<SalariesAiBodyReportRole> Roles { get; }
 
     public string ToJson()
     {

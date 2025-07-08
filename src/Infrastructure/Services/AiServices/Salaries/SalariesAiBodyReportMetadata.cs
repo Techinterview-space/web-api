@@ -1,8 +1,8 @@
 ﻿using Domain.Entities.Salaries;
 
-namespace Infrastructure.Services.AiServices.Custom.Models;
+namespace Infrastructure.Services.AiServices.Salaries;
 
-public record OpenAiBodyReportMetadata
+public record SalariesAiBodyReportMetadata
 {
     public string ReportDate { get; }
 
@@ -10,7 +10,7 @@ public record OpenAiBodyReportMetadata
 
     public string PeriodType { get; }
 
-    public OpenAiBodyReportMetadata(
+    public SalariesAiBodyReportMetadata(
         Currency currency)
     {
         Currency = currency.ToString();

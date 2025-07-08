@@ -4,38 +4,29 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
-using Domain.Entities.StatData.Salary;
 using Infrastructure.Database;
-using Infrastructure.Salaries;
 using Infrastructure.Services.AiServices;
-using Infrastructure.Services.AiServices.Custom;
-using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.AiServices.Reviews;
 using Infrastructure.Services.Html;
-using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Web.Api.Features.BackgroundJobs;
 
-public class AiAnalysisSubscriptionJob
-    : InvocableJobBase<AiAnalysisSubscriptionJob>
+public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
+    : InvocableJobBase<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>
 {
     private readonly DatabaseContext _context;
-    private readonly IProfessionsCacheService _professionsCacheService;
     private readonly IArtificialIntellectService _aiService;
 
-    public AiAnalysisSubscriptionJob(
-        ILogger<AiAnalysisSubscriptionJob> logger,
+    public CompanyReviewsAiAnalysisSubscriptionWeeklyJob(
+        ILogger<CompanyReviewsAiAnalysisSubscriptionWeeklyJob> logger,
         DatabaseContext context,
-        IProfessionsCacheService professionsCacheService,
-        ICustomOpenAiService openAiService,
         IArtificialIntellectService aiService)
         : base(logger)
     {
         _context = context;
-        _professionsCacheService = professionsCacheService;
         _aiService = aiService;
     }
 
@@ -43,7 +34,7 @@ public class AiAnalysisSubscriptionJob
         CancellationToken cancellationToken = default)
     {
         var correlationId = $"job-{Guid.NewGuid()}";
-        var subscriptions = await _context.StatDataChangeSubscriptions
+        var subscriptions = await _context.CompanyReviewsSubscriptions
             .Where(x =>
                 x.DeletedAt == null &&
                 x.UseAiAnalysis)
@@ -52,30 +43,20 @@ public class AiAnalysisSubscriptionJob
         if (subscriptions.Count == 0)
         {
             Logger.LogInformation(
-                "No Subscriptions found. Exiting job. CorrelationId: {CorrelationId}",
+                "No Company Reviews Subscriptions found. Exiting job. CorrelationId: {CorrelationId}",
                 correlationId);
 
             return;
         }
 
-        var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
-
         var results = new List<AiAnalysisRecord>();
         foreach (var subscription in subscriptions)
         {
-            var data = await new SalarySubscriptionData(
-                    allProfessions,
-                    subscription,
-                    _context,
-                    DateTimeOffset.UtcNow)
-                .InitializeAsync(cancellationToken);
-
-            var report = new OpenAiBodyReport(data, Currency.KZT);
-
             var currentTimestamp = Stopwatch.GetTimestamp();
 
-            // todo change
-            var analysisResponse = await _aiService.AnalyzeSalariesWeeklyUpdateAsync(
+            // TODO mgporbatyuk: implement CompanyReviewsSubscriptionData
+            var report = new CompanyReviewsAiReport();
+            var analysisResponse = await _aiService.AnalyzeCompanyReviewsWeeklyUpdateAsync(
                 report,
                 correlationId,
                 cancellationToken);
@@ -86,7 +67,7 @@ public class AiAnalysisSubscriptionJob
             var model = analysisResponse.Model;
 
             Logger.LogInformation(
-                "Subscription {SubscriptionId} analysis completed in {ElapsedMilliseconds} ms. " +
+                "Company Reviews Subscription {SubscriptionId} analysis completed in {ElapsedMilliseconds} ms. " +
                 "Response length: {ResponseLength}. " +
                 "Model: {Model}. " +
                 "CorrelationId: {CorrelationId}",
@@ -100,7 +81,7 @@ public class AiAnalysisSubscriptionJob
             if (response.Length == 0)
             {
                 Logger.LogWarning(
-                    "Subscription {SubscriptionId} analysis returned empty response. " +
+                    "Company Reviews Subscription {SubscriptionId} analysis returned empty response. " +
                     "CorrelationId: {CorrelationId}",
                     subscription.Id,
                     correlationId);
@@ -108,9 +89,9 @@ public class AiAnalysisSubscriptionJob
                 continue;
             }
 
-            var htmlReport = new MarkdownToHtml(response).ToString();
+            var htmlReport = new MarkdownToTelegramHtml(response).ToString();
             var analysis = new AiAnalysisRecord(
-                subscription: subscription,
+                subscription,
                 aiReportSource: report.ToJson(),
                 aiReport: htmlReport,
                 processingTimeMs: elapsed.TotalMilliseconds,
@@ -123,7 +104,7 @@ public class AiAnalysisSubscriptionJob
         await _context.SaveChangesAsync(cancellationToken);
 
         Logger.LogInformation(
-            "Saved {Count} analysis results. CorrelationId: {CorrelationId}",
+            "Company Reviews. Saved {Count} analysis results. CorrelationId: {CorrelationId}",
             results.Count,
             correlationId);
     }

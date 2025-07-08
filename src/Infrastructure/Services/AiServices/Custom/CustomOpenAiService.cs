@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using Infrastructure.Jwt;
-using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.AiServices.Salaries;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +31,7 @@ public class CustomOpenAiService : ICustomOpenAiService
     }
 
     public async Task<string> GetAnalysisAsync(
-        OpenAiBodyReport report,
+        SalariesAiBodyReport report,
         CancellationToken cancellationToken = default)
     {
         var apiUrl = _configuration["OpenAiApiUrl"];

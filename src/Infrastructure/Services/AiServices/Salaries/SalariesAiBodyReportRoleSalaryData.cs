@@ -1,12 +1,11 @@
-﻿using Domain.Entities.StatData;
-using Domain.Entities.StatData.Salary;
+﻿using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 
-namespace Infrastructure.Services.AiServices.Custom.Models;
+namespace Infrastructure.Services.AiServices.Salaries;
 
-public record OpenAiBodyReportRoleSalaryData
+public record SalariesAiBodyReportRoleSalaryData
 {
-    public OpenAiBodyReportRoleSalaryData(
+    public SalariesAiBodyReportRoleSalaryData(
         List<SalaryBaseData> salaries)
     {
         if (salaries.Count == 0)

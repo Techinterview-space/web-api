@@ -3,7 +3,8 @@ using Domain.Entities.Companies;
 using Domain.Entities.Prompts;
 using Infrastructure.Ai;
 using Infrastructure.Database;
-using Infrastructure.Services.AiServices.Custom.Models;
+using Infrastructure.Services.AiServices.Reviews;
+using Infrastructure.Services.AiServices.Salaries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services.AiServices;
@@ -64,7 +65,7 @@ public class AiService : IArtificialIntellectService
     }
 
     public async Task<AiChatResult> AnalyzeSalariesWeeklyUpdateAsync(
-        OpenAiBodyReport report,
+        SalariesAiBodyReport report,
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
@@ -77,6 +78,14 @@ public class AiService : IArtificialIntellectService
             promptData.Model,
             correlationId,
             cancellationToken);
+    }
+
+    public Task<AiChatResult> AnalyzeCompanyReviewsWeeklyUpdateAsync(
+        CompanyReviewsAiReport report,
+        string correlationId = null,
+        CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task<OpenAiPrompt> GetActivePromptAsync(

@@ -17,20 +17,20 @@ using Xunit;
 
 namespace Web.Api.Tests.Services.Salaries;
 
-public class StatDataChangeSubscriptionServiceTests
+public class SalariesSubscriptionServiceTests
 {
     [Fact]
     public async Task ProcessAllSubscriptionsAsync_NoSubscriptions_NoData_EmptyResult()
     {
         await using var context = new InMemoryDatabaseContext();
 
-        var target = new StatDataChangeSubscriptionService(
+        var target = new SalariesSubscriptionService(
             context,
             new CurrencyServiceFake(),
             new ProfessionsCacheServiceFake(context),
             new GlobalFake(),
             new TelegramBotClientProviderFake(),
-            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+            new Mock<ILogger<SalariesSubscriptionService>>().Object);
 
         var result = await target.ProcessAllSubscriptionsAsync(
             "test",
@@ -93,13 +93,13 @@ public class StatDataChangeSubscriptionServiceTests
             .Please(context);
 
         var tgProvider = new TelegramBotClientProviderFake();
-        var target = new StatDataChangeSubscriptionService(
+        var target = new SalariesSubscriptionService(
             context,
             new CurrencyServiceFake(),
             new ProfessionsCacheServiceFake(context),
             new GlobalFake(),
             tgProvider,
-            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+            new Mock<ILogger<SalariesSubscriptionService>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await target.ProcessAllSubscriptionsAsync(
@@ -108,7 +108,7 @@ public class StatDataChangeSubscriptionServiceTests
 
         Assert.Equal(1, result);
 
-        var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
+        var sentMessages = context.SalariesSubscriptionTelegramMessages.ToList();
         Assert.Equal(2, sentMessages.Count);
 
         Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
@@ -172,13 +172,13 @@ public class StatDataChangeSubscriptionServiceTests
             .Please(context);
 
         var tgProvider = new TelegramBotClientProviderFake();
-        var target = new StatDataChangeSubscriptionService(
+        var target = new SalariesSubscriptionService(
             context,
             new CurrencyServiceFake(),
             new ProfessionsCacheServiceFake(context),
             new GlobalFake(),
             tgProvider,
-            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+            new Mock<ILogger<SalariesSubscriptionService>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await target.ProcessAllSubscriptionsAsync(
@@ -187,7 +187,7 @@ public class StatDataChangeSubscriptionServiceTests
 
         Assert.Equal(0, result);
 
-        var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
+        var sentMessages = context.SalariesSubscriptionTelegramMessages.ToList();
         Assert.Single(sentMessages);
 
         Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
@@ -248,13 +248,13 @@ public class StatDataChangeSubscriptionServiceTests
             .Please(context);
 
         var tgProvider = new TelegramBotClientProviderFake();
-        var target = new StatDataChangeSubscriptionService(
+        var target = new SalariesSubscriptionService(
             context,
             new CurrencyServiceFake(),
             new ProfessionsCacheServiceFake(context),
             new GlobalFake(),
             tgProvider,
-            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+            new Mock<ILogger<SalariesSubscriptionService>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await target.ProcessAllSubscriptionsAsync(
@@ -263,7 +263,7 @@ public class StatDataChangeSubscriptionServiceTests
 
         Assert.Equal(1, result);
 
-        var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
+        var sentMessages = context.SalariesSubscriptionTelegramMessages.ToList();
         Assert.Equal(2, sentMessages.Count);
 
         Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
@@ -330,13 +330,13 @@ public class StatDataChangeSubscriptionServiceTests
             .Please(context);
 
         var tgProvider = new TelegramBotClientProviderFake();
-        var target = new StatDataChangeSubscriptionService(
+        var target = new SalariesSubscriptionService(
             context,
             new CurrencyServiceFake(),
             new ProfessionsCacheServiceFake(context),
             new GlobalFake(),
             tgProvider,
-            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+            new Mock<ILogger<SalariesSubscriptionService>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await target.ProcessAllSubscriptionsAsync(
@@ -345,7 +345,7 @@ public class StatDataChangeSubscriptionServiceTests
 
         Assert.Equal(0, result);
 
-        var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
+        var sentMessages = context.SalariesSubscriptionTelegramMessages.ToList();
         Assert.Single(sentMessages);
 
         Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
@@ -388,13 +388,13 @@ public class StatDataChangeSubscriptionServiceTests
         Assert.Empty(subscription.StatDataChangeSubscriptionTgMessages);
 
         var tgProvider = new TelegramBotClientProviderFake();
-        var target = new StatDataChangeSubscriptionService(
+        var target = new SalariesSubscriptionService(
             context,
             new CurrencyServiceFake(),
             new ProfessionsCacheServiceFake(context),
             new GlobalFake(),
             tgProvider,
-            new Mock<ILogger<StatDataChangeSubscriptionService>>().Object);
+            new Mock<ILogger<SalariesSubscriptionService>>().Object);
 
         context.ChangeTracker.Clear();
         var result = await target.ProcessAllSubscriptionsAsync(
@@ -403,7 +403,7 @@ public class StatDataChangeSubscriptionServiceTests
 
         Assert.Equal(1, result);
 
-        var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
+        var sentMessages = context.SalariesSubscriptionTelegramMessages.ToList();
         Assert.Single(sentMessages);
 
         Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);

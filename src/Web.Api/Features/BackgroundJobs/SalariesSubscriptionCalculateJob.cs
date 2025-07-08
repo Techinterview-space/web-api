@@ -6,14 +6,14 @@ using Web.Api.Services.Salaries;
 
 namespace Web.Api.Features.BackgroundJobs;
 
-public class StatDataChangeSubscriptionCalculateJob
-    : InvocableJobBase<StatDataChangeSubscriptionCalculateJob>
+public class SalariesSubscriptionCalculateJob
+    : InvocableJobBase<SalariesSubscriptionCalculateJob>
 {
-    private readonly StatDataChangeSubscriptionService _service;
+    private readonly SalariesSubscriptionService _service;
 
-    public StatDataChangeSubscriptionCalculateJob(
-        ILogger<StatDataChangeSubscriptionCalculateJob> logger,
-        StatDataChangeSubscriptionService service)
+    public SalariesSubscriptionCalculateJob(
+        ILogger<SalariesSubscriptionCalculateJob> logger,
+        SalariesSubscriptionService service)
         : base(logger)
     {
         _service = service;
@@ -28,7 +28,7 @@ public class StatDataChangeSubscriptionCalculateJob
             cancellationToken);
 
         Logger.LogInformation(
-            "StatDataChangeSubscriptionCalculateJob finished with {Count} subscriptions to process. Correlation {CorrelationId}",
+            "SalariesSubscriptionCalculateJob finished with {Count} subscriptions to process. Correlation {CorrelationId}",
             result,
             correlationId);
     }

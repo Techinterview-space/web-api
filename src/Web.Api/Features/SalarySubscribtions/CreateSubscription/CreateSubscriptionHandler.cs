@@ -35,7 +35,7 @@ public class CreateSubscriptionHandler
             throw new BadRequestException("Telegram chat ID is required.");
         }
 
-        var existingSubscription = await _context.StatDataChangeSubscriptions
+        var existingSubscription = await _context.SalariesSubscriptions
             .FirstOrDefaultAsync(
                 x => x.TelegramChatId == request.TelegramChatId,
                 cancellationToken);

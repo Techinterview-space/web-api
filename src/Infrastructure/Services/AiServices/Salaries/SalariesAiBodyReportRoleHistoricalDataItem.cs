@@ -1,12 +1,11 @@
-﻿using Domain.Entities.StatData;
-using Domain.Entities.StatData.Salary;
+﻿using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 
-namespace Infrastructure.Services.AiServices.Custom.Models;
+namespace Infrastructure.Services.AiServices.Salaries;
 
-public record OpenAiBodyReportRoleHistoricalDataItem
+public record SalariesAiBodyReportRoleHistoricalDataItem
 {
-    public OpenAiBodyReportRoleHistoricalDataItem(
+    public SalariesAiBodyReportRoleHistoricalDataItem(
         List<SalaryBaseData> salariesForDate,
         DateTimeOffset date,
         double averageSalaryToCompare)

@@ -27,16 +27,35 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
     public virtual LastWeekCompanyReviewsSubscription CompanyReviewsSubscription { get; protected set; }
 
     public AiAnalysisRecord(
-        StatDataChangeSubscription subscription,
+        StatDataChangeSubscription salarySubscription,
+        string aiReportSource,
+        string aiReport,
+        double processingTimeMs,
+        string model)
+        : this(aiReportSource, aiReport, processingTimeMs, model)
+    {
+        SubscriptionId = salarySubscription.Id;
+        Subscription = salarySubscription;
+    }
+
+    public AiAnalysisRecord(
+        LastWeekCompanyReviewsSubscription companyReviewsSubscription,
+        string aiReportSource,
+        string aiReport,
+        double processingTimeMs,
+        string model)
+        : this(aiReportSource, aiReport, processingTimeMs, model)
+    {
+        CompanyReviewsSubscriptionId = companyReviewsSubscription.Id;
+    }
+
+    private AiAnalysisRecord(
         string aiReportSource,
         string aiReport,
         double processingTimeMs,
         string model)
     {
         Id = Guid.NewGuid();
-        SubscriptionId = subscription.Id;
-        Subscription = subscription;
-
         aiReportSource = aiReportSource?.Trim();
         aiReport = aiReport?.Trim();
 
