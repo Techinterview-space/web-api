@@ -8,6 +8,7 @@ using Domain.Entities.Prompts;
 using Domain.Entities.Questions;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation;
@@ -67,7 +68,7 @@ public class DatabaseContext : DbContext
 
     public DbSet<TelegramInlineReply> TelegramInlineReplies { get; set; }
 
-    public DbSet<StatDataChangeSubscriptionTgMessage> StatDataChangeSubscriptionTgMessages { get; set; }
+    public DbSet<SubscriptionTelegramMessage> StatDataChangeSubscriptionTgMessages { get; set; }
 
     public DbSet<UserEmail> UserEmails { get; set; }
 

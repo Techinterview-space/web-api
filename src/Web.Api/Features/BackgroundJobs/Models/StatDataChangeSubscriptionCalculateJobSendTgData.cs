@@ -1,5 +1,6 @@
 ﻿using System;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 
 namespace Web.Api.Features.BackgroundJobs.Models;
 

@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 
 namespace Infrastructure.Services.AiServices.Custom.Models;

@@ -1,14 +1,12 @@
 ﻿using System;
+using Domain.Entities.StatData.CompanyReviews;
+using Domain.Entities.StatData.Salary;
 
 namespace Domain.Entities.StatData;
 
 public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
 {
     public Guid Id { get; protected set; }
-
-    public Guid SubscriptionId { get; protected set; }
-
-    public virtual StatDataChangeSubscription Subscription { get; protected set; }
 
     public string AiReportSource { get; protected set; }
 
@@ -17,6 +15,16 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
     public double ProcessingTimeMs { get; protected set; }
 
     public string Model { get; protected set; }
+
+    // TODO rename to SalarySubscriptionId
+    public Guid? SubscriptionId { get; protected set; }
+
+    // TODO rename to SalarySubscription
+    public virtual StatDataChangeSubscription Subscription { get; protected set; }
+
+    public Guid? CompanyReviewsSubscriptionId { get; protected set; }
+
+    public virtual LastWeekCompanyReviewsSubscription CompanyReviewsSubscription { get; protected set; }
 
     public AiAnalysisRecord(
         StatDataChangeSubscription subscription,
@@ -54,16 +62,6 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
             .Trim()
             .Trim('`')
             .Trim('\r', '\n');
-    }
-
-    public long GetChatId()
-    {
-        if (Subscription is null)
-        {
-            throw new InvalidOperationException("You must load StatDataCache before calling this method.");
-        }
-
-        return Subscription.TelegramChatId;
     }
 
     protected AiAnalysisRecord()

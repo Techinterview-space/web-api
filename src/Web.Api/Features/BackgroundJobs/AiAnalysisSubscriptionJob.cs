@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.AiServices;

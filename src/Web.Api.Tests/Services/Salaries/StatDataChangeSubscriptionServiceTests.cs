@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TestUtils.Db;
@@ -79,7 +80,7 @@ public class StatDataChangeSubscriptionServiceTests
         var record1 = new StatDataChangeSubscriptionRecordFake(
             subscription,
             null,
-            new StatDataCacheItemSalaryData(
+            new SalariesStatDataCacheItemSalaryData(
                 new List<SalaryBaseData>
                 {
                     new SalaryBaseData(salary1),
@@ -110,10 +111,10 @@ public class StatDataChangeSubscriptionServiceTests
         var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
         Assert.Equal(2, sentMessages.Count);
 
-        Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
         Assert.Equal(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[0].Id);
 
-        Assert.Equal(subscription.Id, sentMessages[1].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[1].SalarySubscriptionId);
         Assert.NotEqual(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[1].Id);
     }
 
@@ -158,7 +159,7 @@ public class StatDataChangeSubscriptionServiceTests
         var record1 = new StatDataChangeSubscriptionRecordFake(
             subscription,
             null,
-            new StatDataCacheItemSalaryData(
+            new SalariesStatDataCacheItemSalaryData(
                 new List<SalaryBaseData>
                 {
                     new SalaryBaseData(salary1),
@@ -189,7 +190,7 @@ public class StatDataChangeSubscriptionServiceTests
         var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
         Assert.Single(sentMessages);
 
-        Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
         Assert.Equal(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[0].Id);
     }
 
@@ -234,7 +235,7 @@ public class StatDataChangeSubscriptionServiceTests
         var record1 = new StatDataChangeSubscriptionRecordFake(
             subscription,
             null,
-            new StatDataCacheItemSalaryData(
+            new SalariesStatDataCacheItemSalaryData(
                 new List<SalaryBaseData>
                 {
                     new SalaryBaseData(salary1),
@@ -265,10 +266,10 @@ public class StatDataChangeSubscriptionServiceTests
         var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
         Assert.Equal(2, sentMessages.Count);
 
-        Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
         Assert.Equal(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[0].Id);
 
-        Assert.Equal(subscription.Id, sentMessages[1].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[1].SalarySubscriptionId);
         Assert.NotEqual(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[1].Id);
     }
 
@@ -316,7 +317,7 @@ public class StatDataChangeSubscriptionServiceTests
         var record1 = new StatDataChangeSubscriptionRecordFake(
             subscription,
             null,
-            new StatDataCacheItemSalaryData(
+            new SalariesStatDataCacheItemSalaryData(
                 new List<SalaryBaseData>
                 {
                     new SalaryBaseData(salary1),
@@ -347,7 +348,7 @@ public class StatDataChangeSubscriptionServiceTests
         var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
         Assert.Single(sentMessages);
 
-        Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
         Assert.Equal(subscription.StatDataChangeSubscriptionTgMessages[0].Id, sentMessages[0].Id);
     }
 
@@ -405,6 +406,6 @@ public class StatDataChangeSubscriptionServiceTests
         var sentMessages = context.StatDataChangeSubscriptionTgMessages.ToList();
         Assert.Single(sentMessages);
 
-        Assert.Equal(subscription.Id, sentMessages[0].SubscriptionId);
+        Assert.Equal(subscription.Id, sentMessages[0].SalarySubscriptionId);
     }
 }

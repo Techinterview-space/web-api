@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using TestUtils.Fakes;
 using Xunit;
 

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
@@ -58,18 +59,18 @@ public class StatDataChangeSubscriptionService
         string correlationId,
         CancellationToken cancellationToken)
     {
-        return ProcessAllSubscriptionsInternalAsync(
+        return ProcessAllSalarySubscriptionsInternalAsync(
             null,
             correlationId,
             cancellationToken);
     }
 
-    public Task<int> ProcessSubscriptionAsync(
+    public Task<int> ProcessSalarySubscriptionAsync(
         Guid id,
         string correlationId,
         CancellationToken cancellationToken)
     {
-        return ProcessAllSubscriptionsInternalAsync(
+        return ProcessAllSalarySubscriptionsInternalAsync(
             new List<Guid>
             {
                 id
@@ -78,7 +79,7 @@ public class StatDataChangeSubscriptionService
             cancellationToken);
     }
 
-    private async Task<int> ProcessAllSubscriptionsInternalAsync(
+    private async Task<int> ProcessAllSalarySubscriptionsInternalAsync(
         List<Guid> subscriptionIds,
         string correlationId,
         CancellationToken cancellationToken)
@@ -129,7 +130,7 @@ public class StatDataChangeSubscriptionService
             var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n\n";
 
             var hasAnyDifference = lastCacheItemOrNull == null;
-            foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
+            foreach (var gradeGroup in SalariesStatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
                 var median = subscriptionData.Salaries
                     .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)
@@ -274,7 +275,7 @@ public class StatDataChangeSubscriptionService
             else
             {
                 _context.StatDataChangeSubscriptionTgMessages.Add(
-                    new StatDataChangeSubscriptionTgMessage(
+                    new SubscriptionTelegramMessage(
                         data.Item.Subscription,
                         data.Data.ReplyText));
 

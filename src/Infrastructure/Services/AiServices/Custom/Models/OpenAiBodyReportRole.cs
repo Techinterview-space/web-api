@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 
 namespace Infrastructure.Services.AiServices.Custom.Models;
 

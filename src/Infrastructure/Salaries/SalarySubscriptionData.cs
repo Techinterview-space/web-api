@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 using Infrastructure.Database;
 using Infrastructure.Services.Telegram.UserCommands;
@@ -88,10 +89,10 @@ public record SalarySubscriptionData
             $"SalarySubscriptionData is not initialized. Call {nameof(InitializeAsync)}() method first.");
     }
 
-    public StatDataCacheItemSalaryData GetStatDataCacheItemSalaryData()
+    public SalariesStatDataCacheItemSalaryData GetStatDataCacheItemSalaryData()
     {
         IsInitializedOrFail();
-        return new StatDataCacheItemSalaryData(
+        return new SalariesStatDataCacheItemSalaryData(
             Salaries,
             TotalSalaryCount);
     }

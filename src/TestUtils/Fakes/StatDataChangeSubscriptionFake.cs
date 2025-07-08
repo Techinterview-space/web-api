@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,9 +40,9 @@ public class StatDataChangeSubscriptionFake : StatDataChangeSubscription
     public StatDataChangeSubscriptionFake WithLastMessageDate(
         DateTime lastMessageDate)
     {
-        StatDataChangeSubscriptionTgMessages ??= new List<StatDataChangeSubscriptionTgMessage>();
+        StatDataChangeSubscriptionTgMessages ??= new List<SubscriptionTelegramMessage>();
         StatDataChangeSubscriptionTgMessages.Add(
-            new StatDataChangeSubscriptionTgMessageFake(
+            new SubscriptionTelegramMessageFake(
                 this,
                 lastMessageDate)
                 .AsDomain());
