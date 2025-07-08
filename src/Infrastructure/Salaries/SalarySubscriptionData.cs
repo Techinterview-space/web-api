@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 using Infrastructure.Database;
 using Infrastructure.Services.Telegram.UserCommands;
@@ -51,7 +52,7 @@ public record SalarySubscriptionData
     public async Task<SalarySubscriptionData> InitializeAsync(
         CancellationToken cancellationToken)
     {
-        LastCacheItems = await _context.StatDataChangeSubscriptionRecords
+        LastCacheItems = await _context.SalariesSubscriptionRecords
             .AsNoTracking()
             .Where(x => x.SubscriptionId == _subscription.Id)
             .OrderByDescending(x => x.CreatedAt)
@@ -88,10 +89,10 @@ public record SalarySubscriptionData
             $"SalarySubscriptionData is not initialized. Call {nameof(InitializeAsync)}() method first.");
     }
 
-    public StatDataCacheItemSalaryData GetStatDataCacheItemSalaryData()
+    public SalariesStatDataCacheItemSalaryData GetStatDataCacheItemSalaryData()
     {
         IsInitializedOrFail();
-        return new StatDataCacheItemSalaryData(
+        return new SalariesStatDataCacheItemSalaryData(
             Salaries,
             TotalSalaryCount);
     }

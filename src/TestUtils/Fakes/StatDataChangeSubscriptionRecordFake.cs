@@ -2,6 +2,7 @@
 using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Infrastructure.Database;
 
 namespace TestUtils.Fakes;
@@ -11,7 +12,7 @@ public class StatDataChangeSubscriptionRecordFake : StatDataChangeSubscriptionRe
     public StatDataChangeSubscriptionRecordFake(
         StatDataChangeSubscription subscription,
         StatDataChangeSubscriptionRecord previousStatDataChangeSubscriptionRecordOrNull,
-        StatDataCacheItemSalaryData data,
+        SalariesStatDataCacheItemSalaryData data,
         DateTimeOffset? createdAt = null)
         : base(
             subscription,
@@ -27,7 +28,7 @@ public class StatDataChangeSubscriptionRecordFake : StatDataChangeSubscriptionRe
     public StatDataChangeSubscriptionRecordFake WithSalaries(
         params UserSalary[] userSalaries)
     {
-        Data = new StatDataCacheItemSalaryData(
+        Data = new SalariesStatDataCacheItemSalaryData(
             userSalaries
                 .Select(x => new SalaryBaseData(x))
                 .ToList(),

@@ -1058,6 +1058,9 @@ namespace Domain.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("CompanyReviewsSubscriptionId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1067,7 +1070,7 @@ namespace Domain.Migrations
                     b.Property<double>("ProcessingTimeMs")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid>("SubscriptionId")
+                    b.Property<Guid?>("SubscriptionId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -1075,12 +1078,46 @@ namespace Domain.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyReviewsSubscriptionId");
+
                     b.HasIndex("SubscriptionId");
 
                     b.ToTable("AiAnalysisRecords", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscription", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.CompanyReviews.LastWeekCompanyReviewsSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Regularity")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TelegramChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("UseAiAnalysis")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LastWeekCompanyReviewsSubscription");
+                });
+
+            modelBuilder.Entity("Domain.Entities.StatData.Salary.StatDataChangeSubscription", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1127,7 +1164,7 @@ namespace Domain.Migrations
                     b.ToTable("StatDataChangeSubscriptions", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscriptionRecord", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.Salary.StatDataChangeSubscriptionRecord", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1157,7 +1194,7 @@ namespace Domain.Migrations
                     b.ToTable("StatDataChangeSubscriptionRecords", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscriptionTgMessage", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.SubscriptionTelegramMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1166,13 +1203,16 @@ namespace Domain.Migrations
                     b.Property<long>("ChatId")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid?>("CompanyReviewsSubscriptionId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Message")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("SubscriptionId")
+                    b.Property<Guid?>("SalarySubscriptionId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
@@ -1180,7 +1220,9 @@ namespace Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SubscriptionId");
+                    b.HasIndex("CompanyReviewsSubscriptionId");
+
+                    b.HasIndex("SalarySubscriptionId");
 
                     b.ToTable("StatDataChangeSubscriptionTgMessages", (string)null);
                 });
@@ -1605,24 +1647,28 @@ namespace Domain.Migrations
 
             modelBuilder.Entity("Domain.Entities.StatData.AiAnalysisRecord", b =>
                 {
-                    b.HasOne("Domain.Entities.StatData.StatDataChangeSubscription", "Subscription")
+                    b.HasOne("Domain.Entities.StatData.CompanyReviews.LastWeekCompanyReviewsSubscription", "CompanyReviewsSubscription")
                         .WithMany("AiAnalysisRecords")
-                        .HasForeignKey("SubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CompanyReviewsSubscriptionId");
+
+                    b.HasOne("Domain.Entities.StatData.Salary.StatDataChangeSubscription", "Subscription")
+                        .WithMany("AiAnalysisRecords")
+                        .HasForeignKey("SubscriptionId");
+
+                    b.Navigation("CompanyReviewsSubscription");
 
                     b.Navigation("Subscription");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscriptionRecord", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.Salary.StatDataChangeSubscriptionRecord", b =>
                 {
-                    b.HasOne("Domain.Entities.StatData.StatDataChangeSubscriptionRecord", "PreviousRecord")
+                    b.HasOne("Domain.Entities.StatData.Salary.StatDataChangeSubscriptionRecord", "PreviousRecord")
                         .WithMany("NextRecords")
                         .HasForeignKey("PreviousRecordId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("FK_StatDataChangeSubscriptionRecord_PreviousRecord");
 
-                    b.HasOne("Domain.Entities.StatData.StatDataChangeSubscription", "Subscription")
+                    b.HasOne("Domain.Entities.StatData.Salary.StatDataChangeSubscription", "Subscription")
                         .WithMany("Records")
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1634,15 +1680,21 @@ namespace Domain.Migrations
                     b.Navigation("Subscription");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscriptionTgMessage", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.SubscriptionTelegramMessage", b =>
                 {
-                    b.HasOne("Domain.Entities.StatData.StatDataChangeSubscription", "Subscription")
-                        .WithMany("StatDataChangeSubscriptionTgMessages")
-                        .HasForeignKey("SubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Domain.Entities.StatData.CompanyReviews.LastWeekCompanyReviewsSubscription", "CompanyReviewsSubscription")
+                        .WithMany("TelegramMessages")
+                        .HasForeignKey("CompanyReviewsSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("Subscription");
+                    b.HasOne("Domain.Entities.StatData.Salary.StatDataChangeSubscription", "SalarySubscription")
+                        .WithMany("StatDataChangeSubscriptionTgMessages")
+                        .HasForeignKey("SalarySubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("CompanyReviewsSubscription");
+
+                    b.Navigation("SalarySubscription");
                 });
 
             modelBuilder.Entity("Domain.Entities.Telegram.TelegramUserSettings", b =>
@@ -1747,7 +1799,14 @@ namespace Domain.Migrations
                     b.Navigation("Salaries");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscription", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.CompanyReviews.LastWeekCompanyReviewsSubscription", b =>
+                {
+                    b.Navigation("AiAnalysisRecords");
+
+                    b.Navigation("TelegramMessages");
+                });
+
+            modelBuilder.Entity("Domain.Entities.StatData.Salary.StatDataChangeSubscription", b =>
                 {
                     b.Navigation("AiAnalysisRecords");
 
@@ -1756,7 +1815,7 @@ namespace Domain.Migrations
                     b.Navigation("StatDataChangeSubscriptionTgMessages");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StatData.StatDataChangeSubscriptionRecord", b =>
+            modelBuilder.Entity("Domain.Entities.StatData.Salary.StatDataChangeSubscriptionRecord", b =>
                 {
                     b.Navigation("NextRecords");
                 });

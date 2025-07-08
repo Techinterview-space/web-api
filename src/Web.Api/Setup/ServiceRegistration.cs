@@ -56,7 +56,7 @@ public static class ServiceRegistration
             .AddTransient<GithubProfileBotHostedService>()
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
-            .AddTransient<StatDataChangeSubscriptionService>()
+            .AddTransient<SalariesSubscriptionService>()
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()

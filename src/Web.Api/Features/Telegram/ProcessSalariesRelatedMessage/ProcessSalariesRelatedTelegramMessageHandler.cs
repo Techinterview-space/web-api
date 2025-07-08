@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Domain.Entities.Telegram;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
@@ -329,7 +330,7 @@ Chat ID: {message.Chat.Id}
 
             replyText = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам (медиана):\n";
 
-            foreach (var gradeGroup in StatDataCacheItemSalaryData.GradeGroupsForRegularStats)
+            foreach (var gradeGroup in SalariesStatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
                 var median = salaries
                                 .Where(x => x.Grade.GetGroupNameOrNull() == gradeGroup)

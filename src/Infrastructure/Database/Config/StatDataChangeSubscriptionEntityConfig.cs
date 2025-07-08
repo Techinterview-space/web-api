@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

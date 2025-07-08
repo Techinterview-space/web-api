@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.StatData;
+using Domain.Entities.StatData.Salary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,5 +25,10 @@ public class AiAnalysisRecordEntityConfig : IEntityTypeConfiguration<AiAnalysisR
             .HasOne(x => x.Subscription)
             .WithMany(x => x.AiAnalysisRecords)
             .HasForeignKey(x => x.SubscriptionId);
+
+        builder
+            .HasOne(x => x.CompanyReviewsSubscription)
+            .WithMany(x => x.AiAnalysisRecords)
+            .HasForeignKey(x => x.CompanyReviewsSubscriptionId);
     }
 }
