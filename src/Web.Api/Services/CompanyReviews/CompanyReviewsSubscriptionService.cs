@@ -93,7 +93,7 @@ public class CompanyReviewsSubscriptionService
                 continue;
             }
 
-            textMessageToBeSent += aiAnalysis.AiReport + $"\n" +
+            textMessageToBeSent += aiAnalysis.AiReport + $"\n\n" +
                                    $"<em>Модель {aiAnalysis.Model}</em>\n\n";
 
             if (subscription.Regularity is SubscriptionRegularityType.Monthly &&
