@@ -1,10 +1,9 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities.Salaries;
-using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Infrastructure.Services.AiServices.Reviews;
-using Infrastructure.Services.AiServices.Salaries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.CompanyReviewsSubscriptions.GetSalaryAiReport;
@@ -24,14 +23,15 @@ public record GetCompanyReviewsAiReportHandler
         GetCompanyReviewsAiReportQuery request,
         CancellationToken cancellationToken)
     {
-        var subscription = await _context
-            .CompanyReviewsSubscriptions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(
-                x => x.Id == request.SubscriptionId,
-                cancellationToken: cancellationToken)
-            ?? throw new NotFoundException($"Subscription {request.SubscriptionId} not found");
+        var reviewsForLastWeek = await _context.CompanyReviews
+            .Include(x => x.Company)
+            .Where(x =>
+                x.CreatedAt >= DateTime.UtcNow.AddDays(-7) &&
+                x.ApprovedAt != null &&
+                x.OutdatedAt == null)
+            .Select(CompanyReviewAiReportItem.Transformation)
+            .ToListAsync(cancellationToken);
 
-        return new CompanyReviewsAiReport();
+        return new CompanyReviewsAiReport(reviewsForLastWeek);
     }
 }

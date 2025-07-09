@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Web.Api.Features.Emails.ViewModels;
 
-namespace Web.Api.Features.BackgroundJobs;
+namespace Web.Api.Features.BackgroundJobs.Salaries;
 
 public class SalaryUpdateReminderEmailJob
     : InvocableJobBase<SalaryUpdateReminderEmailJob>

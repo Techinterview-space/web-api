@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
@@ -20,16 +21,13 @@ public class GetCompanyReviewsAiReportAnalysisHandler
     : Infrastructure.Services.Mediator.IRequestHandler<GetCompanyReviewsAiReportAnalysisQuery, GetCompanyReviewsAiReportAnalysisResponse>
 {
     private readonly DatabaseContext _context;
-    private readonly IProfessionsCacheService _professionsCacheService;
     private readonly IArtificialIntellectService _aiService;
 
     public GetCompanyReviewsAiReportAnalysisHandler(
         DatabaseContext context,
-        IProfessionsCacheService professionsCacheService,
         IArtificialIntellectService aiService)
     {
         _context = context;
-        _professionsCacheService = professionsCacheService;
         _aiService = aiService;
     }
 
@@ -44,7 +42,16 @@ public class GetCompanyReviewsAiReportAnalysisHandler
                                    cancellationToken: cancellationToken)
                            ?? throw new NotFoundException($"Subscription {request.SubscriptionId} not found");
 
-        var report = new CompanyReviewsAiReport();
+        var reviewsForLastWeek = await _context.CompanyReviews
+            .Include(x => x.Company)
+            .Where(x =>
+                x.CreatedAt >= DateTime.UtcNow.AddDays(-7) &&
+                x.ApprovedAt != null &&
+                x.OutdatedAt == null)
+            .Select(CompanyReviewAiReportItem.Transformation)
+            .ToListAsync(cancellationToken);
+
+        var report = new CompanyReviewsAiReport(reviewsForLastWeek);
 
         var currentTimestamp = Stopwatch.GetTimestamp();
         var analysisResult = await _aiService.AnalyzeCompanyReviewsWeeklyUpdateAsync(

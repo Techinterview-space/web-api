@@ -10,6 +10,7 @@ using Moq;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using Web.Api.Features.BackgroundJobs;
+using Web.Api.Features.BackgroundJobs.Salaries;
 using Xunit;
 
 namespace Web.Api.Tests.Features.BackgroundJobs;

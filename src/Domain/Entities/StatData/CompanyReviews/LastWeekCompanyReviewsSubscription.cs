@@ -34,6 +34,20 @@ public class LastWeekCompanyReviewsSubscription : SubscriptionEntityBase
     }
 
     // TODO remove copypaste
+    public AiAnalysisRecord GetLastAiAnalysisRecordForTodayOrNull()
+    {
+        if (AiAnalysisRecords is null)
+        {
+            throw new InvalidOperationException("AI records are not loaded.");
+        }
+
+        var dayAgoEdge = DateTimeOffset.UtcNow.AddDays(-1);
+        return AiAnalysisRecords
+            .Where(x => x.CreatedAt >= dayAgoEdge)
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefault();
+    }
+
     public bool LastMessageWasSentDaysAgo(
         int daysCount)
     {
