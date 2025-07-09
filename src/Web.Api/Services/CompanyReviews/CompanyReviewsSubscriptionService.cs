@@ -20,7 +20,7 @@ namespace Web.Api.Services.CompanyReviews;
 
 public class CompanyReviewsSubscriptionService
 {
-    public const string SalariesPageUrl = "techinterview.space/salaries";
+    public const string RecentCompanyReviewsPageUrl = "techinterview.space";
     public const int CountOfDaysToSendMonthlyNotification = 24;
 
     private readonly DatabaseContext _context;
@@ -125,7 +125,7 @@ public class CompanyReviewsSubscriptionService
                 .AddQueryParam("utm_campaign", "telegram-reviews-update");
 
             textMessageToBeSent +=
-                $"<em>Другие отзывы можно посмотреть на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>\n" +
+                $"<em>Другие отзывы можно посмотреть на сайте <a href=\"{salariesChartPageLink}\">{RecentCompanyReviewsPageUrl}</a></em>\n" +
                 $"<em>Будем рады, если вы оставите <b>анонимный</b> отзыв о компании, в которой работаете или работали</em>";
 
             textMessageToBeSent += "\n\n#отзывы_о_компаниях";
@@ -134,7 +134,7 @@ public class CompanyReviewsSubscriptionService
                 textMessageToBeSent.Trim(),
                 new InlineKeyboardMarkup(
                     InlineKeyboardButton.WithUrl(
-                        text: SalariesPageUrl,
+                        text: RecentCompanyReviewsPageUrl,
                         url: salariesChartPageLink.ToString())));
 
             messagesToBeSent.Add((subscription, messageToBeSent));
