@@ -107,19 +107,6 @@ public class CompanyReviewsSubscriptionService
                 continue;
             }
 
-            var skipWeeklyNotification = subscription.Regularity is SubscriptionRegularityType.Weekly &&
-                                         !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification);
-
-            if (skipWeeklyNotification)
-            {
-                _logger.LogInformation(
-                    "No difference in salaries for subscription weekly {SubscriptionId} ({Name}). Skipping notification.",
-                    subscription.Id,
-                    subscription.Name);
-
-                continue;
-            }
-
             var salariesChartPageLink = new CompanyReviewsPageLink(_global)
                 .AddQueryParam("utm_source", subscription.TelegramChatId.ToString())
                 .AddQueryParam("utm_campaign", "telegram-reviews-update");
