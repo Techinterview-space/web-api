@@ -19,8 +19,7 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
     // TODO rename to SalarySubscriptionId
     public Guid? SubscriptionId { get; protected set; }
 
-    // TODO rename to SalarySubscription
-    public virtual StatDataChangeSubscription Subscription { get; protected set; }
+    public virtual StatDataChangeSubscription SalarySubscription { get; protected set; }
 
     public Guid? CompanyReviewsSubscriptionId { get; protected set; }
 
@@ -35,7 +34,7 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
         : this(aiReportSource, aiReport, processingTimeMs, model)
     {
         SubscriptionId = salarySubscription.Id;
-        Subscription = salarySubscription;
+        SalarySubscription = salarySubscription;
     }
 
     public AiAnalysisRecord(

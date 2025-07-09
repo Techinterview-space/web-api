@@ -1,11 +1,10 @@
 ﻿using Domain.Entities.StatData;
-using Domain.Entities.StatData.Salary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Database.Config;
 
-public class StatDataChangeSubscriptionTgMessageEntityConfiguration : IEntityTypeConfiguration<SubscriptionTelegramMessage>
+public class SubscriptionTelegramMessageEntityConfiguration : IEntityTypeConfiguration<SubscriptionTelegramMessage>
 {
     public void Configure(
         EntityTypeBuilder<SubscriptionTelegramMessage> builder)

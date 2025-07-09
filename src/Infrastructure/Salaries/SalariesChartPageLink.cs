@@ -3,7 +3,7 @@ using Infrastructure.Services.Global;
 
 namespace Infrastructure.Salaries;
 
-public record ChartPageLink
+public record SalariesChartPageLink
 {
     private readonly ISalariesChartQueryParams _requestOrNull;
     private readonly string _frontendBaseUrl;
@@ -11,7 +11,7 @@ public record ChartPageLink
 
     private string _result;
 
-    public ChartPageLink(
+    public SalariesChartPageLink(
         string baseUrl,
         ISalariesChartQueryParams requestOrNull)
     {
@@ -20,7 +20,7 @@ public record ChartPageLink
         _additionalQueryParams = new Dictionary<string, string>();
     }
 
-    public ChartPageLink(
+    public SalariesChartPageLink(
         IGlobal global,
         ISalariesChartQueryParams requestOrNull)
         : this(
@@ -29,7 +29,7 @@ public record ChartPageLink
     {
     }
 
-    public ChartPageLink AddQueryParam(string key, string value)
+    public SalariesChartPageLink AddQueryParam(string key, string value)
     {
         _additionalQueryParams[key] = value;
         return this;

@@ -13,7 +13,6 @@ using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
-using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.Salaries;
 using Infrastructure.Services.Telegram.UserCommands;
@@ -308,11 +307,11 @@ public class SalariesSubscriptionService
         return successfulySent;
     }
 
-    private ChartPageLink GetChartPageLink(
+    private SalariesChartPageLink GetChartPageLink(
         StatDataChangeSubscription subscription,
         TelegramBotUserCommandParameters filterData)
     {
-        return new ChartPageLink(_global, filterData)
+        return new SalariesChartPageLink(_global, filterData)
             .AddQueryParam("utm_source", subscription.TelegramChatId.ToString())
             .AddQueryParam("utm_campaign", "telegram-regular-stats-update");
     }

@@ -9,4 +9,6 @@ public enum OpenAiPromptType
     Chat = 2,
 
     SalariesWeeklyUpdate = 3,
+
+    CompanyReviewsWeeklyUpdate = 4,
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Entities.StatData.CompanyReviews;
 
@@ -17,7 +19,47 @@ public class LastWeekCompanyReviewsSubscription : SubscriptionEntityBase
     {
     }
 
+    public void Update(
+        string name,
+        SubscriptionRegularityType regularityType,
+        bool useAiAnalysis)
+    {
+        Name = name;
+        Regularity = regularityType;
+        UseAiAnalysis = useAiAnalysis;
+    }
+
     protected LastWeekCompanyReviewsSubscription()
     {
+    }
+
+    // TODO remove copypaste
+    public bool LastMessageWasSentDaysAgo(
+        int daysCount)
+    {
+        var latestMessageSentDifference = GetDifferenceBetweenNowAndLatestSentMessage();
+        return latestMessageSentDifference == null ||
+               latestMessageSentDifference.Value > TimeSpan.FromDays(daysCount);
+    }
+
+    // TODO remove copypaste
+    public TimeSpan? GetDifferenceBetweenNowAndLatestSentMessage()
+    {
+        if (TelegramMessages is null)
+        {
+            throw new InvalidOperationException("TelegramMessages are not loaded.");
+        }
+
+        var lastMessage = TelegramMessages
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefault();
+
+        if (lastMessage is null)
+        {
+            return null;
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        return now - lastMessage.CreatedAt;
     }
 }

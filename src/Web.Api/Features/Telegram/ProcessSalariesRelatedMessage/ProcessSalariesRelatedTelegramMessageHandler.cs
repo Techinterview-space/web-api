@@ -202,7 +202,7 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         if (messageText.Equals("/start", StringComparison.InvariantCultureIgnoreCase))
         {
             var startReplyData = new TelegramBotStartCommandReplyData(
-                new ChartPageLink(
+                new SalariesChartPageLink(
                     _global,
                     null)
                     .AddQueryParam("utm_source", message.Chat.Id.ToString())
@@ -315,7 +315,7 @@ Chat ID: {message.Chat.Id}
                 return (totalCount, salaries);
             });
 
-        var salariesChartPageLink = new ChartPageLink(_global, requestParams)
+        var salariesChartPageLink = new SalariesChartPageLink(_global, requestParams)
             .AddQueryParam("utm_source", utmSource)
             .AddQueryParam("utm_campaign", "telegram-reply");
 

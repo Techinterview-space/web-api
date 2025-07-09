@@ -80,12 +80,20 @@ public class AiService : IArtificialIntellectService
             cancellationToken);
     }
 
-    public Task<AiChatResult> AnalyzeCompanyReviewsWeeklyUpdateAsync(
+    public async Task<AiChatResult> AnalyzeCompanyReviewsWeeklyUpdateAsync(
         CompanyReviewsAiReport report,
         string correlationId = null,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var promptData = await GetActivePromptAsync(OpenAiPromptType.CompanyReviewsWeeklyUpdate, cancellationToken);
+        var aiProvider = _aiProviderFactory.GetProvider(promptData.Engine);
+
+        return await aiProvider.AnalyzeChatAsync(
+            report.ToJson(),
+            promptData.Prompt,
+            promptData.Model,
+            correlationId,
+            cancellationToken);
     }
 
     private async Task<OpenAiPrompt> GetActivePromptAsync(
