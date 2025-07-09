@@ -22,7 +22,7 @@ public class AiAnalysisRecordEntityConfig : IEntityTypeConfiguration<AiAnalysisR
             .IsRequired();
 
         builder
-            .HasOne(x => x.Subscription)
+            .HasOne(x => x.SalarySubscription)
             .WithMany(x => x.AiAnalysisRecords)
             .HasForeignKey(x => x.SubscriptionId);
 

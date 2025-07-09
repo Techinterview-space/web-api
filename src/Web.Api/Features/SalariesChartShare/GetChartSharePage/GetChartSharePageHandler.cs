@@ -50,7 +50,7 @@ namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
                 },
                 cancellationToken);
 
-            var frontendLink = new ChartPageLink(_global, request);
+            var frontendLink = new SalariesChartPageLink(_global, request);
 
             var formattedMedianSalary = SalaryFormat(chartResponse.MedianSalary);
             var ogTitle = $"Медианная зп: {formattedMedianSalary} тг | techinterview.space";

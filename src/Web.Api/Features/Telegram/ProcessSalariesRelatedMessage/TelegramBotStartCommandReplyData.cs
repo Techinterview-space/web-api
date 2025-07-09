@@ -6,14 +6,14 @@ namespace Web.Api.Features.Telegram.ProcessSalariesRelatedMessage;
 public record TelegramBotStartCommandReplyData : TelegramBotReplyData
 {
     public TelegramBotStartCommandReplyData(
-        ChartPageLink frontendLink)
+        SalariesChartPageLink frontendLink)
         : base(
             PrepareText(frontendLink))
     {
     }
 
     private static string PrepareText(
-        ChartPageLink frontendLink)
+        SalariesChartPageLink frontendLink)
     {
         return $@"Привет!
 

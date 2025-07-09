@@ -29,6 +29,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Web.Api.Features.Salaries.Providers;
 using Web.Api.Features.Telegram;
+using Web.Api.Services.CompanyReviews;
 using Web.Api.Services.Emails;
 using Web.Api.Services.Salaries;
 using Web.Api.Services.Views;
@@ -57,6 +58,7 @@ public static class ServiceRegistration
             .AddTransient<ICurrencyService, CurrencyService>()
             .AddTransient<IProfessionsCacheService, ProfessionsCacheService>()
             .AddTransient<SalariesSubscriptionService>()
+            .AddTransient<CompanyReviewsSubscriptionService>()
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()

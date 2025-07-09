@@ -16,7 +16,7 @@ public record HelpCommandMessageBuilder
 
     public TelegramBotReplyData Build()
     {
-        var salariesLink = new ChartPageLink(_globalSettings, null);
+        var salariesLink = new SalariesChartPageLink(_globalSettings, null);
         var surveyLink = $"{_globalSettings.FrontendBaseUrl}/salaries/survey";
         var historicalDataLink = $"{_globalSettings.FrontendBaseUrl}/salaries/historical-data";
         var botInstructionLink = $"{_globalSettings.FrontendBaseUrl}/about-telegram-bot";
