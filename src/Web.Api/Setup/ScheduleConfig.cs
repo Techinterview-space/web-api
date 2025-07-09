@@ -4,6 +4,8 @@ using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.BackgroundJobs;
+using Web.Api.Features.BackgroundJobs.Companies;
+using Web.Api.Features.BackgroundJobs.Salaries;
 
 namespace Web.Api.Setup;
 
@@ -16,9 +18,10 @@ public static class ScheduleConfig
             .AddScheduler()
             .AddTransient<CurrenciesResetJob>()
             .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
-            .AddTransient<SalariesSubscriptionCalculateJob>()
+            .AddTransient<SalariesSubscriptionPublishMessageJob>()
             .AddTransient<SalariesAiAnalysisSubscriptionWeeklyJob>()
-            .AddTransient<SalaryUpdateReminderEmailJob>();
+            .AddTransient<SalaryUpdateReminderEmailJob>()
+            .AddTransient<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>();
 
         return services;
     }
@@ -38,10 +41,10 @@ public static class ScheduleConfig
                 .RunOnceAtStart();
 
             scheduler
-                .Schedule<SalariesSubscriptionCalculateJob>()
+                .Schedule<SalariesSubscriptionPublishMessageJob>()
                 .DailyAt(6, 0)
                 .Wednesday()
-                .PreventOverlapping(nameof(SalariesSubscriptionCalculateJob));
+                .PreventOverlapping(nameof(SalariesSubscriptionPublishMessageJob));
 
             // this job should go before StatDataChangeSubscriptionCalculateJob
             scheduler
@@ -51,10 +54,22 @@ public static class ScheduleConfig
                 .PreventOverlapping(nameof(SalariesAiAnalysisSubscriptionWeeklyJob));
 
             scheduler
-                .Schedule<SalariesSubscriptionCalculateJob>()
+                .Schedule<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>()
+                .DailyAt(6, 0)
+                .Friday()
+                .PreventOverlapping(nameof(CompanyReviewsAiAnalysisSubscriptionWeeklyJob));
+
+            scheduler
+                .Schedule<SalariesSubscriptionPublishMessageJob>()
                 .EveryMinute()
                 .When(() => Task.FromResult(Debugger.IsAttached))
-                .PreventOverlapping(nameof(SalariesSubscriptionCalculateJob));
+                .PreventOverlapping(nameof(SalariesSubscriptionPublishMessageJob));
+
+            scheduler
+                .Schedule<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>()
+                .EveryMinute()
+                .When(() => Task.FromResult(Debugger.IsAttached))
+                .PreventOverlapping(nameof(CompanyReviewsAiAnalysisSubscriptionWeeklyJob));
 
             for (var i = 0; i < 10; i++)
             {

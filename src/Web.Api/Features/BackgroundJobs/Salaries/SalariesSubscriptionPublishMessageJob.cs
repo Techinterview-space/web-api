@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Web.Api.Services.Salaries;
 
-namespace Web.Api.Features.BackgroundJobs;
+namespace Web.Api.Features.BackgroundJobs.Salaries;
 
-public class SalariesSubscriptionCalculateJob
-    : InvocableJobBase<SalariesSubscriptionCalculateJob>
+public class SalariesSubscriptionPublishMessageJob
+    : InvocableJobBase<SalariesSubscriptionPublishMessageJob>
 {
     private readonly SalariesSubscriptionService _service;
 
-    public SalariesSubscriptionCalculateJob(
-        ILogger<SalariesSubscriptionCalculateJob> logger,
+    public SalariesSubscriptionPublishMessageJob(
+        ILogger<SalariesSubscriptionPublishMessageJob> logger,
         SalariesSubscriptionService service)
         : base(logger)
     {

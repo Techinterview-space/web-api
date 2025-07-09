@@ -4,29 +4,35 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
 using Infrastructure.Database;
+using Infrastructure.Salaries;
 using Infrastructure.Services.AiServices;
-using Infrastructure.Services.AiServices.Reviews;
+using Infrastructure.Services.AiServices.Salaries;
 using Infrastructure.Services.Html;
+using Infrastructure.Services.Professions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Web.Api.Features.BackgroundJobs;
+namespace Web.Api.Features.BackgroundJobs.Salaries;
 
-public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
-    : InvocableJobBase<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>
+public class SalariesAiAnalysisSubscriptionWeeklyJob
+    : InvocableJobBase<SalariesAiAnalysisSubscriptionWeeklyJob>
 {
     private readonly DatabaseContext _context;
+    private readonly IProfessionsCacheService _professionsCacheService;
     private readonly IArtificialIntellectService _aiService;
 
-    public CompanyReviewsAiAnalysisSubscriptionWeeklyJob(
-        ILogger<CompanyReviewsAiAnalysisSubscriptionWeeklyJob> logger,
+    public SalariesAiAnalysisSubscriptionWeeklyJob(
+        ILogger<SalariesAiAnalysisSubscriptionWeeklyJob> logger,
         DatabaseContext context,
+        IProfessionsCacheService professionsCacheService,
         IArtificialIntellectService aiService)
         : base(logger)
     {
         _context = context;
+        _professionsCacheService = professionsCacheService;
         _aiService = aiService;
     }
 
@@ -34,7 +40,7 @@ public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
         CancellationToken cancellationToken = default)
     {
         var correlationId = $"job-{Guid.NewGuid()}";
-        var subscriptions = await _context.CompanyReviewsSubscriptions
+        var subscriptions = await _context.SalariesSubscriptions
             .Where(x =>
                 x.DeletedAt == null &&
                 x.UseAiAnalysis)
@@ -43,20 +49,29 @@ public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
         if (subscriptions.Count == 0)
         {
             Logger.LogInformation(
-                "No Company Reviews Subscriptions found. Exiting job. CorrelationId: {CorrelationId}",
+                "No Salary Subscriptions found. Exiting job. CorrelationId: {CorrelationId}",
                 correlationId);
 
             return;
         }
 
+        var allProfessions = await _professionsCacheService.GetProfessionsAsync(cancellationToken);
+
         var results = new List<AiAnalysisRecord>();
         foreach (var subscription in subscriptions)
         {
+            var data = await new SalarySubscriptionData(
+                    allProfessions,
+                    subscription,
+                    _context,
+                    DateTimeOffset.UtcNow)
+                .InitializeAsync(cancellationToken);
+
+            var report = new SalariesAiBodyReport(data, Currency.KZT);
+
             var currentTimestamp = Stopwatch.GetTimestamp();
 
-            // TODO mgporbatyuk: implement CompanyReviewsSubscriptionData
-            var report = new CompanyReviewsAiReport();
-            var analysisResponse = await _aiService.AnalyzeCompanyReviewsWeeklyUpdateAsync(
+            var analysisResponse = await _aiService.AnalyzeSalariesWeeklyUpdateAsync(
                 report,
                 correlationId,
                 cancellationToken);
@@ -67,7 +82,7 @@ public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
             var model = analysisResponse.Model;
 
             Logger.LogInformation(
-                "Company Reviews Subscription {SubscriptionId} analysis completed in {ElapsedMilliseconds} ms. " +
+                "Salary Subscription {SubscriptionId} analysis completed in {ElapsedMilliseconds} ms. " +
                 "Response length: {ResponseLength}. " +
                 "Model: {Model}. " +
                 "CorrelationId: {CorrelationId}",
@@ -81,7 +96,7 @@ public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
             if (response.Length == 0)
             {
                 Logger.LogWarning(
-                    "Company Reviews Subscription {SubscriptionId} analysis returned empty response. " +
+                    "Salary Subscription {SubscriptionId} analysis returned empty response. " +
                     "CorrelationId: {CorrelationId}",
                     subscription.Id,
                     correlationId);
@@ -104,7 +119,7 @@ public class CompanyReviewsAiAnalysisSubscriptionWeeklyJob
         await _context.SaveChangesAsync(cancellationToken);
 
         Logger.LogInformation(
-            "Company Reviews. Saved {Count} analysis results. CorrelationId: {CorrelationId}",
+            "Salaries. Saved {Count} analysis results. CorrelationId: {CorrelationId}",
             results.Count,
             correlationId);
     }

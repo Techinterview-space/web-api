@@ -2,9 +2,12 @@
 
 public record CompanyReviewsAiReport
 {
-    public CompanyReviewsAiReport()
+    public List<CompanyReviewAiReportItem> Reviews { get; }
+
+    public CompanyReviewsAiReport(
+        List<CompanyReviewAiReportItem> reviews)
     {
-        throw new NotImplementedException();
+        Reviews = reviews ?? throw new ArgumentNullException(nameof(reviews));
     }
 
     public string ToJson()

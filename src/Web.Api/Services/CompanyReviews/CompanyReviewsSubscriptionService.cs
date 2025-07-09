@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.StatData;
+using Domain.Entities.StatData.CompanyReviews;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
@@ -44,7 +45,7 @@ public class CompanyReviewsSubscriptionService
         string correlationId,
         CancellationToken cancellationToken)
     {
-        return ProcessAllCompanyReviewsSubscriptionsInternalAsync(
+        return ProcessAllCompanyReviewsSubscriptionsAsync(
             new List<Guid>
             {
                 subscriptionId
@@ -53,17 +54,7 @@ public class CompanyReviewsSubscriptionService
             cancellationToken);
     }
 
-    public Task<int> ProcessAllCompanyReviewsSubscriptionsAsync(
-        string correlationId,
-        CancellationToken cancellationToken)
-    {
-        return ProcessAllCompanyReviewsSubscriptionsInternalAsync(
-            new List<Guid>(0),
-            correlationId,
-            cancellationToken);
-    }
-
-    private async Task<int> ProcessAllCompanyReviewsSubscriptionsInternalAsync(
+    public async Task<int> ProcessAllCompanyReviewsSubscriptionsAsync(
         List<Guid> subscriptionIds,
         string correlationId,
         CancellationToken cancellationToken)
@@ -82,9 +73,28 @@ public class CompanyReviewsSubscriptionService
                 correlationId);
         }
 
+        var messagesToBeSent = new List<(LastWeekCompanyReviewsSubscription Subscription, TelegramBotReplyData MessageToBeSent)>();
+        var now = DateTime.UtcNow;
         foreach (var subscription in subscriptions)
         {
-            var textMessageToBeSent = string.Empty;
+            var textMessageToBeSent = $"<b>Новые отзывы о компаниях</b>\n\n" +
+                                      $"Дата сообщения: {now:dd.MM.yyyy HH:mm}\n" +
+                                      $"AI анализ:\n";
+
+            var aiAnalysis = subscription.GetLastAiAnalysisRecordForTodayOrNull();
+            if (aiAnalysis == null)
+            {
+                _logger.LogWarning(
+                    "No AI analysis found for subscription {SubscriptionId} ({Name}). CorrelationId: {CorrelationId}",
+                    subscription.Id,
+                    subscription.Name,
+                    correlationId);
+
+                continue;
+            }
+
+            textMessageToBeSent += aiAnalysis.AiReport + $"\n" +
+                                   $"<em>Модель {aiAnalysis.Model}</em>\n\n";
 
             if (subscription.Regularity is SubscriptionRegularityType.Monthly &&
                 !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification))
@@ -115,19 +125,63 @@ public class CompanyReviewsSubscriptionService
                 .AddQueryParam("utm_campaign", "telegram-reviews-update");
 
             textMessageToBeSent +=
-                $"\n<em>Разные графики и фильтры доступны по ссылке <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
+                $"<em>Другие отзывы можно посмотреть на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>\n" +
+                $"<em>Будем рады, если вы оставите <b>анонимный</b> отзыв о компании, в которой работаете или работали</em>";
 
             textMessageToBeSent += "\n\n#отзывы_о_компаниях";
 
-            var dataTobeSent = new TelegramBotReplyData(
+            var messageToBeSent = new TelegramBotReplyData(
                 textMessageToBeSent.Trim(),
                 new InlineKeyboardMarkup(
                     InlineKeyboardButton.WithUrl(
                         text: SalariesPageUrl,
                         url: salariesChartPageLink.ToString())));
+
+            messagesToBeSent.Add((subscription, messageToBeSent));
         }
 
-        throw new NotImplementedException();
+        var client = _botClientProvider.CreateClient();
+        if (client is null)
+        {
+            _logger.LogWarning(
+                "Telegram bot is disabled. CorrelationId: {CorrelationId}",
+                correlationId);
+
+            return 0;
+        }
+
+        var itemsToBeSaved = 0;
+        foreach (var (subscription, messageToBeSent) in messagesToBeSent)
+        {
+            if (await TrySendTelegramMessageAsync(
+                    subscription.TelegramChatId,
+                    messageToBeSent,
+                    client,
+                    cancellationToken))
+            {
+                itemsToBeSaved++;
+                _context.SalariesSubscriptionTelegramMessages.Add(
+                    new SubscriptionTelegramMessage(
+                        subscription,
+                        messageToBeSent.ReplyText));
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Failed to send message to chat {ChatId} for subscription {SubscriptionId} ({Name}). CorrelationId: {CorrelationId}",
+                    subscription.TelegramChatId,
+                    subscription.Id,
+                    subscription.Name,
+                    correlationId);
+            }
+        }
+
+        if (itemsToBeSaved > 0)
+        {
+            await _context.TrySaveChangesAsync(cancellationToken);
+        }
+
+        return itemsToBeSaved;
     }
 
     private async Task<bool> TrySendTelegramMessageAsync(
