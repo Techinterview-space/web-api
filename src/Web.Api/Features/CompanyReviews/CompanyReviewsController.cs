@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 using Domain.Entities.Companies;
 using Domain.Enums;
 using Domain.Validation;
@@ -41,6 +45,33 @@ public class CompanyReviewsController : ControllerBase
             await _serviceProvider.HandleBy<GetRecentCompanyReviewsHandler, GetRecentCompanyReviewsQuery, Pageable<CompanyReviewDto>>(
                 new GetRecentCompanyReviewsQuery(queryParams),
                 cancellationToken));
+    }
+
+    [HttpGet("reviews/recent.rss")]
+    [Produces("application/rss+xml")]
+    public async Task<IActionResult> GetRecentReviewsRss(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        CancellationToken cancellationToken = default)
+    {
+        var rssData = await _serviceProvider.HandleBy<GetRecentCompanyReviewsRssHandler, GetRecentCompanyReviewsRssQuery, RssChannel>(
+            new GetRecentCompanyReviewsRssQuery(page, pageSize),
+            cancellationToken);
+
+        var xmlSerializer = new XmlSerializer(typeof(RssChannel));
+        var stringBuilder = new StringBuilder();
+        
+        using (var writer = XmlWriter.Create(stringBuilder, new XmlWriterSettings
+        {
+            Encoding = Encoding.UTF8,
+            Indent = true,
+            OmitXmlDeclaration = false
+        }))
+        {
+            xmlSerializer.Serialize(writer, rssData);
+        }
+
+        return Content(stringBuilder.ToString(), "application/rss+xml; charset=utf-8");
     }
 
     [HttpPost("{companyId:guid}/reviews")]
