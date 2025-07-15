@@ -65,7 +65,8 @@ public class CompanyReviewsController : ControllerBase
         {
             Encoding = Encoding.UTF8,
             Indent = true,
-            OmitXmlDeclaration = false
+            OmitXmlDeclaration = false,
+            Async = true
         });
 
         xmlSerializer.Serialize(writer, rssData);
