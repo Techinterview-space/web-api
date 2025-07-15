@@ -1,11 +1,10 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace Web.Api.Features.CompanyReviews.GetRecentReviews;
 
 [XmlRoot("rss")]
-public class RssChannel
+public record RssChannel
 {
     [XmlAttribute("version")]
     public string Version { get; set; } = "2.0";
@@ -14,7 +13,7 @@ public class RssChannel
     public Channel Channel { get; set; }
 }
 
-public class Channel
+public record Channel
 {
     [XmlElement("title")]
     public string Title { get; set; }
@@ -47,7 +46,7 @@ public class Channel
     public List<RssItem> Items { get; set; } = new List<RssItem>();
 }
 
-public class RssItem
+public record RssItem
 {
     [XmlElement("title")]
     public string Title { get; set; }

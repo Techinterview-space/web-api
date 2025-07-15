@@ -60,18 +60,19 @@ public class CompanyReviewsController : ControllerBase
 
         var xmlSerializer = new XmlSerializer(typeof(RssChannel));
         var stringBuilder = new StringBuilder();
-        
-        using (var writer = XmlWriter.Create(stringBuilder, new XmlWriterSettings
+
+        await using var writer = XmlWriter.Create(stringBuilder, new XmlWriterSettings
         {
             Encoding = Encoding.UTF8,
             Indent = true,
             OmitXmlDeclaration = false
-        }))
-        {
-            xmlSerializer.Serialize(writer, rssData);
-        }
+        });
 
-        return Content(stringBuilder.ToString(), "application/rss+xml; charset=utf-8");
+        xmlSerializer.Serialize(writer, rssData);
+
+        return Content(
+            stringBuilder.ToString(),
+            "application/rss+xml; charset=utf-8");
     }
 
     [HttpPost("{companyId:guid}/reviews")]

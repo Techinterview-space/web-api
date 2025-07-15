@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.CompanyReviews.GetRecentReviews;
 
@@ -68,7 +67,7 @@ public class GetRecentCompanyReviewsRssHandler
     {
         var rating = review.TotalRating.ToString("F1");
         var employment = review.UserEmployment.ToString();
-        
+
         var description = $"⭐ Overall Rating: {rating}/5.0 &lt;br/&gt;" +
                          $"💼 Employment Type: {WebUtility.HtmlEncode(employment)} &lt;br/&gt;" +
                          $"📊 Detailed Ratings: &lt;br/&gt;" +

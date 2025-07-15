@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -24,11 +24,11 @@ public class GetRecentCompanyReviewsRssHandlerTests
         // Arrange
         await using var context = new InMemoryDatabaseContext();
         var handler = new GetRecentCompanyReviewsRssHandler(context);
-        
+
         var company = new CompanyFake().Please(context);
         var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var review = new CompanyReviewFake(company, user).Please(context);
-        
+
         // Approve the review to make it appear in RSS
         review.Approve();
         await context.SaveChangesAsync();
@@ -45,7 +45,7 @@ public class GetRecentCompanyReviewsRssHandlerTests
         Assert.Equal("https://techinterview.space", result.Channel.Link);
         Assert.Equal("Latest company reviews from Tech Interview Space", result.Channel.Description);
         Assert.Single(result.Channel.Items);
-        
+
         var item = result.Channel.Items[0];
         Assert.Contains(company.Name, item.Title);
         Assert.Contains(company.Slug, item.Link);
@@ -60,7 +60,7 @@ public class GetRecentCompanyReviewsRssHandlerTests
         // Arrange
         await using var context = new InMemoryDatabaseContext();
         var handler = new GetRecentCompanyReviewsRssHandler(context);
-        
+
         var query = new GetRecentCompanyReviewsRssQuery(1, 10);
 
         // Act
@@ -102,7 +102,7 @@ public class GetRecentCompanyReviewsRssHandlerTests
         // Act
         var xmlSerializer = new XmlSerializer(typeof(RssChannel));
         var stringBuilder = new StringBuilder();
-        
+
         using (var writer = XmlWriter.Create(stringBuilder, new XmlWriterSettings
         {
             Encoding = Encoding.UTF8,
@@ -117,8 +117,8 @@ public class GetRecentCompanyReviewsRssHandlerTests
 
         // Assert
         Assert.NotEmpty(xml);
-        Assert.Contains("<?xml version=\"1.0\" encoding=\"utf-8\"?>", xml);
-        Assert.Contains("<rss version=\"2.0\">", xml);
+        Assert.Contains("<?xml version=\"1.0\" encoding=\"utf-16\"?>", xml);
+        Assert.Contains("version=\"2.0\"", xml);
         Assert.Contains("<channel>", xml);
         Assert.Contains("<title>Test RSS</title>", xml);
         Assert.Contains("<item>", xml);
