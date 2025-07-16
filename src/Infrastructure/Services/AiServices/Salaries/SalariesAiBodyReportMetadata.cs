@@ -1,14 +1,18 @@
-﻿using Domain.Entities.Salaries;
+﻿using System.Text.Json.Serialization;
+using Domain.Entities.Salaries;
 
 namespace Infrastructure.Services.AiServices.Salaries;
 
 public record SalariesAiBodyReportMetadata
 {
-    public string ReportDate { get; }
+    [JsonPropertyName("reportDate")]
+    public string ReportDate { get; init; }
 
-    public string Currency { get; }
+    [JsonPropertyName("currency")]
+    public string Currency { get; init; }
 
-    public string PeriodType { get; }
+    [JsonPropertyName("periodType")]
+    public string PeriodType { get; init; }
 
     public SalariesAiBodyReportMetadata(
         Currency currency)
@@ -16,5 +20,9 @@ public record SalariesAiBodyReportMetadata
         Currency = currency.ToString();
         ReportDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
         PeriodType = "weekly";
+    }
+
+    public SalariesAiBodyReportMetadata()
+    {
     }
 }

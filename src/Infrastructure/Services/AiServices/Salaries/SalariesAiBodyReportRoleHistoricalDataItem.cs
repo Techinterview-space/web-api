@@ -1,4 +1,5 @@
-﻿using Domain.Entities.StatData.Salary;
+﻿using System.Text.Json.Serialization;
+using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 
 namespace Infrastructure.Services.AiServices.Salaries;
@@ -29,13 +30,22 @@ public record SalariesAiBodyReportRoleHistoricalDataItem
             2);
     }
 
-    public string Date { get; }
+    public SalariesAiBodyReportRoleHistoricalDataItem()
+    {
+    }
 
-    public double Average { get; }
+    [JsonPropertyName("date")]
+    public string Date { get; init; }
 
-    public double Median { get; }
+    [JsonPropertyName("average")]
+    public double Average { get; init; }
 
-    public int Count { get; }
+    [JsonPropertyName("median")]
+    public double Median { get; init; }
 
-    public double PercentChange { get; }
+    [JsonPropertyName("count")]
+    public int Count { get; init; }
+
+    [JsonPropertyName("percentChange")]
+    public double PercentChange { get; init; }
 }

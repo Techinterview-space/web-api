@@ -1,4 +1,5 @@
-﻿using Domain.Entities.StatData.Salary;
+﻿using System.Text.Json.Serialization;
+using Domain.Entities.StatData.Salary;
 using Domain.Extensions;
 
 namespace Infrastructure.Services.AiServices.Salaries;
@@ -29,13 +30,22 @@ public record SalariesAiBodyReportRoleSalaryData
         Count = salaryValues.Count;
     }
 
-    public double Average { get; }
+    public SalariesAiBodyReportRoleSalaryData()
+    {
+    }
 
-    public double Median { get; }
+    [JsonPropertyName("average")]
+    public double Average { get; init; }
 
-    public double? Min { get; }
+    [JsonPropertyName("median")]
+    public double Median { get; init; }
 
-    public double? Max { get; }
+    [JsonPropertyName("min")]
+    public double? Min { get; init; }
 
-    public int Count { get; }
+    [JsonPropertyName("max")]
+    public double? Max { get; init; }
+
+    [JsonPropertyName("count")]
+    public int Count { get; init; }
 }

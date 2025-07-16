@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Salaries;
+﻿using System.Text.Json.Serialization;
+using Domain.Entities.Salaries;
 using Domain.ValueObjects;
 using Infrastructure.Salaries;
 
@@ -36,9 +37,11 @@ public record SalariesAiBodyReport
         }
     }
 
-    public SalariesAiBodyReportMetadata ReportMetadata { get; }
+    [JsonPropertyName("reportMetadata")]
+    public SalariesAiBodyReportMetadata ReportMetadata { get; init; }
 
-    public List<SalariesAiBodyReportRole> Roles { get; }
+    [JsonPropertyName("roles")]
+    public List<SalariesAiBodyReportRole> Roles { get; init; }
 
     public string ToJson()
     {

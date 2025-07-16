@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Salaries;
+﻿using System.Text.Json.Serialization;
+using Domain.Entities.Salaries;
 using Domain.Entities.StatData.Salary;
 
 namespace Infrastructure.Services.AiServices.Salaries;
@@ -40,9 +41,16 @@ public record SalariesAiBodyReportRole
         }
     }
 
-    public string RoleName { get; }
+    [JsonPropertyName("roleName")]
+    public string RoleName { get; init; }
 
-    public SalariesAiBodyReportRoleSalaryData CurrentSalary { get; }
+    [JsonPropertyName("currentSalary")]
+    public SalariesAiBodyReportRoleSalaryData CurrentSalary { get; init; }
 
-    public List<SalariesAiBodyReportRoleHistoricalDataItem> HistoricalData { get; }
+    [JsonPropertyName("historicalData")]
+    public List<SalariesAiBodyReportRoleHistoricalDataItem> HistoricalData { get; init; }
+
+    public SalariesAiBodyReportRole()
+    {
+    }
 }
