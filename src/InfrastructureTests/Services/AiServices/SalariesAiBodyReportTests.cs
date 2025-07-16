@@ -288,5 +288,27 @@ public class SalariesAiBodyReportTests
 
         Assert.NotNull(target);
         Assert.Equal(8, target.Roles.Count);
+
+        foreach (var role in target.Roles)
+        {
+            Assert.NotNull(role.RoleName);
+            Assert.NotNull(role.CurrentSalary);
+            Assert.NotEmpty(role.HistoricalData);
+
+            Assert.True(role.CurrentSalary.Average > 0);
+            Assert.True(role.CurrentSalary.Median > 0);
+            Assert.True(role.CurrentSalary.Min >= 0);
+            Assert.True(role.CurrentSalary.Max >= role.CurrentSalary.Min);
+            Assert.True(role.CurrentSalary.Count > 0);
+
+            foreach (var historicalData in role.HistoricalData)
+            {
+                Assert.NotNull(historicalData.Date);
+                Assert.True(historicalData.Average > 0);
+                Assert.True(historicalData.Median > 0);
+                Assert.True(historicalData.Count > 0);
+                Assert.InRange(historicalData.PercentChange, -1.0, 1.0); // Assuming percent change is between -100% and +100%
+            }
+        }
     }
 }

@@ -53,22 +53,15 @@ public record SalariesAiBodyReport
         var stringBuilder = new System.Text.StringBuilder();
         stringBuilder.Append("Рейтинг медианных зарплат (от высокой к низкой)\n\n");
 
-        var counter = 1;
+        var counter = 0;
         foreach (var role in Roles.OrderByDescending(x => x.CurrentSalary.Median))
         {
-            stringBuilder.AppendLine($"{counter}. <b>{role.RoleName}</b> - {new SalaryShortFormattedValue(role.CurrentSalary.Median)}");
-            stringBuilder.AppendLine();
-
             counter++;
-        }
-
-        foreach (var role in Roles)
-        {
-            stringBuilder.AppendLine($"<b>{role.RoleName}</b>");
-
+            stringBuilder.AppendLine($"{counter}. <b>{role.RoleName}</b> - {new SalaryShortFormattedValue(role.CurrentSalary.Median)}");
             if (role.HistoricalData.Count == 0)
             {
                 stringBuilder.AppendLine($"{role.CurrentSalary.Count}шт, изменений медианы нет");
+                stringBuilder.AppendLine();
                 continue;
             }
 
@@ -92,12 +85,14 @@ public record SalariesAiBodyReport
             if (isStable || role.HistoricalData.Count == 1)
             {
                 stringBuilder.AppendLine($"{role.CurrentSalary.Count}шт{textForCountChange}, изменений медианы нет");
+                stringBuilder.AppendLine();
                 continue;
             }
 
             if (changeInPercent is >= -1 and <= 1)
             {
                 stringBuilder.AppendLine($"{role.CurrentSalary.Count}шт{textForCountChange}, колебание медианы в рамках 1 процента");
+                stringBuilder.AppendLine();
                 continue;
             }
 
@@ -108,6 +103,7 @@ public record SalariesAiBodyReport
                 $"Изменение на {changeInPercent:F2}%");
 
             stringBuilder.AppendLine($"{role.CurrentSalary.Count}шт{textForCountChange}");
+            stringBuilder.AppendLine();
         }
 
         return stringBuilder.ToString();

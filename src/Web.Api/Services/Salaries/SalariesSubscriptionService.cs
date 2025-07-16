@@ -220,7 +220,7 @@ public class SalariesSubscriptionService
                 {
                     var detailedChanges = analysis.ParseSourceAs<SalariesAiBodyReport>().ToTelegramHtmlSummary();
                     textMessageToBeSent += $"\n\n{detailedChanges}" +
-                                           $"\n\n<em>AI анализ:</em>\n{analysis.GetClearedReport()}";
+                                           $"\n\n<em>🤖 AI анализ:</em>\n\n{analysis.GetClearedReport()}";
                 }
             }
 
