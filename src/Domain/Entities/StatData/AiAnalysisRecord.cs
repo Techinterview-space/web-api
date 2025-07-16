@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using Domain.Entities.StatData.CompanyReviews;
 using Domain.Entities.StatData.Salary;
 
@@ -80,6 +81,11 @@ public class AiAnalysisRecord : HasDatesBase, IHasIdBase<Guid>
             .Trim()
             .Trim('`')
             .Trim('\r', '\n');
+    }
+
+    public T ParseSourceAs<T>()
+    {
+        return JsonSerializer.Deserialize<T>(AiReportSource);
     }
 
     protected AiAnalysisRecord()

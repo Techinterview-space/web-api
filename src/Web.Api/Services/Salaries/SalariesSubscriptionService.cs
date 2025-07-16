@@ -11,6 +11,7 @@ using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
+using Infrastructure.Services.AiServices.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram.ReplyMessages;
@@ -217,7 +218,9 @@ public class SalariesSubscriptionService
                 var analysis = subscription.GetLastAiAnalysisRecordForTodayOrNull();
                 if (analysis != null)
                 {
-                    textMessageToBeSent += $"\n\n<em>AI анализ:</em>\n{analysis.GetClearedReport()}";
+                    var detailedChanges = analysis.ParseSourceAs<SalariesAiBodyReport>().ToTelegramHtmlSummary();
+                    textMessageToBeSent += $"\n\n{detailedChanges}" +
+                                           $"\n\n<em>AI анализ:</em>\n{analysis.GetClearedReport()}";
                 }
             }
 
