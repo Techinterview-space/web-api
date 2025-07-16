@@ -128,7 +128,7 @@ public class SalariesSubscriptionService
             var professions = subscriptionData.FilterData.GetProfessionsTitleOrNull();
             var textMessageToBeSent = $"Зарплаты {professions ?? "специалистов IT в Казахстане"} по грейдам на дату {now:yyyy-MM-dd}:\n\n";
 
-            var hasAnyDifference = lastCacheItemOrNull == null;
+            var hasAnyValuableDifference = lastCacheItemOrNull == null;
             foreach (var gradeGroup in SalariesStatDataCacheItemSalaryData.GradeGroupsForRegularStats)
             {
                 var median = subscriptionData.Salaries
@@ -147,14 +147,16 @@ public class SalariesSubscriptionService
                 var oldGradeValue = lastCacheItemOrNull?.Data.GetMedianLocalSalaryByGrade(gradeGroup);
                 if (oldGradeValue is > 0)
                 {
-                    var diffInPercent = (median - oldGradeValue.Value) / oldGradeValue.Value * 100;
+                    var diffInPercent = Math.Round((median - oldGradeValue.Value) / oldGradeValue.Value * 100, 2);
 
-                    if (diffInPercent is >= PercentToShowDifference or <= -PercentToShowDifference)
+                    if (diffInPercent is > 0 or < 0)
                     {
-                        hasAnyDifference = true;
-
                         var sign = diffInPercent > 0 ? "🔼 " : "🔻 ";
-                        line += $"{sign}{diffInPercent.ToString("N0", CultureInfo.InvariantCulture)}%. ";
+                        line += $"{sign}{diffInPercent.ToString("N", CultureInfo.InvariantCulture)}%. ";
+
+                        hasAnyValuableDifference =
+                            diffInPercent is >= PercentToShowDifference or <= -PercentToShowDifference ||
+                            hasAnyValuableDifference;
                     }
                 }
 
@@ -188,7 +190,7 @@ public class SalariesSubscriptionService
             }
 
             var skipWeeklyNotification = subscription.Regularity is SubscriptionRegularityType.Weekly &&
-                                         !hasAnyDifference &&
+                                         !hasAnyValuableDifference &&
                                          subscription.PreventNotificationIfNoDifference &&
                                          !subscription.LastMessageWasSentDaysAgo(CountOfDaysToSendMonthlyNotification);
 
