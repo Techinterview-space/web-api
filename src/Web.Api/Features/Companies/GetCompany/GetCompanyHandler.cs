@@ -71,7 +71,8 @@ public class GetCompanyHandler : Infrastructure.Services.Mediator.IRequestHandle
             .Include(x => x.Reviews
                     .Where(r =>
                         r.ApprovedAt != null &&
-                        r.OutdatedAt == null))
+                        r.OutdatedAt == null)
+                    .OrderByDescending(r => r.CreatedAt))
             .Where(x => x.DeletedAt == null)
             .GetCompanyByIdentifierOrNullAsync(
                 identifier,
