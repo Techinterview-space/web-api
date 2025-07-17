@@ -311,4 +311,13 @@ public class SalariesAiBodyReportTests
             }
         }
     }
+
+    [Fact]
+    public void ToTelegramHtmlSummary_NotNull()
+    {
+        var target = JsonSerializer.Deserialize<SalariesAiBodyReport>(Json);
+
+        var telegramText = target.ToTelegramHtmlSummary();
+        Assert.NotNull(telegramText);
+    }
 }

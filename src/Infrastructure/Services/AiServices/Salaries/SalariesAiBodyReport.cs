@@ -72,7 +72,7 @@ public record SalariesAiBodyReport
             medians.Add(role.CurrentSalary.Median);
 
             var isStable = medians
-                .All(x => x >= x * 0.98 && x <= x * 1.02);
+                .All(x => x >= role.CurrentSalary.Median * 0.98 && role.CurrentSalary.Median <= x * 1.02);
 
             var firstHistoricalData = role.HistoricalData[^1];
             var changeInPercent = (role.CurrentSalary.Median - firstHistoricalData.Median) / firstHistoricalData.Median * 100;
