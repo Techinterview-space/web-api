@@ -132,6 +132,35 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return null;
         }
 
+        var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
+
+        if (message.Entities?.Length > 0 &&
+            message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
+            message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true)
+        {
+            // If the message is a bot command, we will process it separately.
+            var jobSalaryInfo = new JobPostingParser(message.Text).GetResult();
+            if (!jobSalaryInfo.HasAnySalary())
+            {
+                return null;
+            }
+
+            var jobPostReply = new TelegramBotReplyData(
+                $"Зарплата в вакансии: {jobSalaryInfo.MinSalary} - {jobSalaryInfo.MaxSalary}");
+
+            await request.BotClient.SendMessage(
+                message.Chat.Id,
+                jobPostReply.ReplyText,
+                parseMode: jobPostReply.ParseMode,
+                replyParameters: new ReplyParameters
+                {
+                    MessageId = replyToMessageId,
+                },
+                cancellationToken: cancellationToken);
+
+            return jobPostReply.ReplyText;
+        }
+
         var mentionedInGroupChat =
             message.Entities?.Length > 0 &&
             message.Entities[0].Type == MessageEntityType.Mention &&
@@ -167,7 +196,6 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             parameters,
             cancellationToken);
 
-        var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
         await request.BotClient.SendMessage(
             message.Chat.Id,
             replyData.ReplyText,

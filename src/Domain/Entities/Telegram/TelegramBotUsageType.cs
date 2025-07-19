@@ -8,7 +8,7 @@ public enum TelegramBotUsageType
 
     GroupMention = 2,
 
-    SupergroupMention = 3,
+    Supergroup = 3,
 
     InlineQuery = 4,
 }

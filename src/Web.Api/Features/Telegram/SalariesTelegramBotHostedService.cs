@@ -28,6 +28,7 @@ public class SalariesTelegramBotHostedService
             UpdateType.InlineQuery,
             UpdateType.Message,
             UpdateType.ChosenInlineResult,
+            UpdateType.ChannelPost,
         ];
     }
 
