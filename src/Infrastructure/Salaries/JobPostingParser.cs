@@ -1,26 +1,40 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Salaries;
 
 public class JobPostingParser
 {
     // Regex pattern for detecting job postings with salary ranges
-    private static readonly Regex JobPostingRegex = new Regex(
+    private static readonly Regex JobPostingThousandsRegex = new Regex(
         @"#вакансия.*?(?:вилка|зарплата|зп|от|до|salary)\s*(?:от\s*)?(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)?|" +
         @"#вакансия.*?(?:вилка|зарплата|зп|от|salary)\s*(?:от\s*)?(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)",
         RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
 
     // More specific regex patterns for different salary formats
-    private static readonly Regex SalaryRangeRegex = new Regex(
+    private static readonly Regex SalaryRangeInThousandsRegex = new Regex(
         @"(?:вилка|зарплата|зп|от|до|salary)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тенге)?",
         RegexOptions.IgnoreCase);
 
-    private static readonly Regex FromSalarySingleRegex = new Regex(
+    private static readonly Regex FromSalarySingleThousandRegex = new Regex(
         @"(?:вилка|зарплата|зп|от|salary)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)",
         RegexOptions.IgnoreCase);
 
-    private static readonly Regex UpToSalarySingleRegex = new Regex(
+    private static readonly Regex UpToSalarySingleThousandRegex = new Regex(
         @"(?:вилка|зарплата|зп|до|salary)\s*:?\s*(?:до\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)",
+        RegexOptions.IgnoreCase);
+
+    // Additional regex for million format like "От 1.2млн до 1.9млн"
+    private static readonly Regex SalaryRangeInMillionRegex = new Regex(
+        @"(?:от\s*)?(\d+(?:[.,]\d+)?)\s*(?:млн|million|м)\s*(?:до|-)?\s*(\d+(?:[.,]\d+)?)\s*(?:млн|million|м)",
+        RegexOptions.IgnoreCase);
+
+    private static readonly Regex FromSalarySingleMillionRegex = new Regex(
+        @"((?:от\s*)|(?:>|>=\s*))(\d+(?:[.,]\d+)?)\s*(?:млн|million|м)(?!\s*(?:до|-))",
+        RegexOptions.IgnoreCase);
+
+    private static readonly Regex UpToSalarySingleMillionRegex = new Regex(
+        @"((?:до\s*)|(?:<=|<\s*))(\d+(?:[.,]\d+)?)\s*(?:млн|million|м)(?!\s*(?:до|-))",
         RegexOptions.IgnoreCase);
 
     private readonly string _sourceMessage;
@@ -44,12 +58,54 @@ public class JobPostingParser
         double? maxSalary = null;
         string originalText = null;
 
+        // Try to find million salary range first (most specific)
+        var millionRangeMatch = SalaryRangeInMillionRegex.Match(_sourceMessage);
+        if (millionRangeMatch.Success)
+        {
+            minSalary = ParseSalaryInMillions(millionRangeMatch.Groups[1].Value);
+            maxSalary = ParseSalaryInMillions(millionRangeMatch.Groups[2].Value);
+            originalText = millionRangeMatch.Value;
+
+            return new SalaryInfo(
+                minSalary,
+                maxSalary,
+                originalText,
+                true);
+        }
+
+        // Try to find single million salary value
+        var millionSingleMatch = FromSalarySingleMillionRegex.Match(_sourceMessage);
+        if (millionSingleMatch.Success)
+        {
+            minSalary = ParseSalaryInMillions(millionSingleMatch.Groups[2].Value);
+            originalText = millionSingleMatch.Value;
+
+            return new SalaryInfo(
+                minSalary,
+                null,
+                originalText,
+                true);
+        }
+
+        var upToMillionSingleMatch = UpToSalarySingleMillionRegex.Match(_sourceMessage);
+        if (upToMillionSingleMatch.Success)
+        {
+            maxSalary = ParseSalaryInMillions(upToMillionSingleMatch.Groups[2].Value);
+            originalText = upToMillionSingleMatch.Value;
+
+            return new SalaryInfo(
+                null,
+                maxSalary,
+                originalText,
+                true);
+        }
+
         // Try to find salary range first
-        var rangeMatch = SalaryRangeRegex.Match(_sourceMessage);
+        var rangeMatch = SalaryRangeInThousandsRegex.Match(_sourceMessage);
         if (rangeMatch.Success)
         {
-            minSalary = ParseSalaryValue(rangeMatch.Groups[1].Value);
-            maxSalary = ParseSalaryValue(rangeMatch.Groups[2].Value);
+            minSalary = ParseSalaryInThousands(rangeMatch.Groups[1].Value);
+            maxSalary = ParseSalaryInThousands(rangeMatch.Groups[2].Value);
             originalText = rangeMatch.Value;
 
             return new SalaryInfo(
@@ -60,10 +116,10 @@ public class JobPostingParser
         }
 
         // Try to find single salary value
-        var fromSingleMatch = FromSalarySingleRegex.Match(_sourceMessage);
+        var fromSingleMatch = FromSalarySingleThousandRegex.Match(_sourceMessage);
         if (fromSingleMatch.Success)
         {
-            minSalary = ParseSalaryValue(fromSingleMatch.Groups[1].Value);
+            minSalary = ParseSalaryInThousands(fromSingleMatch.Groups[1].Value);
             originalText = fromSingleMatch.Value;
 
             return new SalaryInfo(
@@ -73,10 +129,10 @@ public class JobPostingParser
                 true);
         }
 
-        var upToSingleSalary = UpToSalarySingleRegex.Match(_sourceMessage);
+        var upToSingleSalary = UpToSalarySingleThousandRegex.Match(_sourceMessage);
         if (upToSingleSalary.Success)
         {
-            maxSalary = ParseSalaryValue(upToSingleSalary.Groups[1].Value);
+            maxSalary = ParseSalaryInThousands(upToSingleSalary.Groups[1].Value);
             originalText = upToSingleSalary.Value;
 
             return new SalaryInfo(
@@ -93,7 +149,7 @@ public class JobPostingParser
             true);
     }
 
-    private static double ParseSalaryValue(
+    private static double ParseSalaryInThousands(
         string salaryText)
     {
         // Remove spaces and parse the number
@@ -114,8 +170,26 @@ public class JobPostingParser
         return 0;
     }
 
+    private static double ParseSalaryInMillions(
+        string salaryText)
+    {
+        // Replace comma with dot for decimal parsing and remove spaces
+        var cleanText = salaryText
+            .Replace(",", ".")
+            .Replace(" ", string.Empty)
+            .Trim();
+
+        if (double.TryParse(cleanText, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+        {
+            // Convert millions to actual value
+            return value * 1_000_000;
+        }
+
+        return 0;
+    }
+
     public static bool IsJobPostingWithSalary(string message)
     {
-        return JobPostingRegex.IsMatch(message);
+        return JobPostingThousandsRegex.IsMatch(message);
     }
 }

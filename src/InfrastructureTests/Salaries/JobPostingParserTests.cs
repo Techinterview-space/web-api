@@ -46,6 +46,22 @@ public class JobPostingParserTests
 Проект: цифровая платформа для агросектора: учёт, планирование, аналитика, управление
 полями и техникой. Продукт стабильно работает в продакшене и масштабируется.";
 
+    public const string MultilineText6 = @"#вакансия 6
+Senior Developer От 1.2млн до 1.9млн
+Проект: цифровая платформа для агросектора";
+
+    public const string MultilineText7 = @"#вакансия 7
+TeamLead от 2,5млн до 3млн
+Проект: цифровая платформа для агросектора";
+
+    public const string MultilineText8 = @"#вакансия 8
+Архитектор от 1.8млн
+Проект: цифровая платформа для агросектора";
+
+    public const string MultilineText9 = @"#вакансия 9
+Архитектор до 1.8млн
+Проект: цифровая платформа для агросектора";
+
     [Theory]
     [InlineData("#вакансия Разработчик C# Вилка от 500к до 800к", 500_000d, 800_000d)]
     [InlineData("#вакансия Python разработчик Зарплата 500 000 - 1300000", 500_000d, 1_300_000d)]
@@ -70,6 +86,10 @@ public class JobPostingParserTests
     [InlineData(MultilineText3, null, 800_000d)]
     [InlineData(MultilineText4, 800_000d, null)]
     [InlineData(MultilineText5, 800_000d, 1_300_000d)]
+    [InlineData(MultilineText6, 1_200_000d, 1_900_000d)]
+    [InlineData(MultilineText7, 2_500_000d, 3_000_000d)]
+    [InlineData(MultilineText8, 1_800_000d, null)]
+    [InlineData(MultilineText9, null, 1_800_000d)]
     public void MultilineText_Cases_Match(
         string text,
         double? min,
