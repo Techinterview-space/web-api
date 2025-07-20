@@ -12,11 +12,15 @@ public class JobPostingParser
 
     // More specific regex patterns for different salary formats
     private static readonly Regex SalaryRangeRegex = new Regex(
-        @"(?:вилка|зарплата|зп|от|до|salary)\s*(?:от\s*)?(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)?",
+        @"(?:вилка|зарплата|зп|от|до|salary)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тенге)?",
         RegexOptions.IgnoreCase);
 
-    private static readonly Regex SalarySingleRegex = new Regex(
-        @"(?:вилка|зарплата|зп|от|salary)\s*(?:от\s*)?(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)",
+    private static readonly Regex FromSalarySingleRegex = new Regex(
+        @"(?:вилка|зарплата|зп|от|salary)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)",
+        RegexOptions.IgnoreCase);
+
+    private static readonly Regex UpToSalarySingleRegex = new Regex(
+        @"(?:вилка|зарплата|зп|до|salary)\s*:?\s*(?:до\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)",
         RegexOptions.IgnoreCase);
 
     private readonly string _sourceMessage;
@@ -31,13 +35,13 @@ public class JobPostingParser
     {
         // Check if message contains #вакансия
         if (string.IsNullOrEmpty(_sourceMessage) ||
-            !_sourceMessage.Contains("#вакансия", StringComparison.InvariantCultureIgnoreCase) ||
-            !JobPostingRegex.IsMatch(_sourceMessage))
+            !_sourceMessage.Contains("#вакансия", StringComparison.InvariantCultureIgnoreCase))
         {
             return SalaryInfo.NoInfo(_sourceMessage);
         }
 
         double? minSalary = null;
+        double? maxSalary = null;
         string originalText = null;
 
         // Try to find salary range first
@@ -45,7 +49,7 @@ public class JobPostingParser
         if (rangeMatch.Success)
         {
             minSalary = ParseSalaryValue(rangeMatch.Groups[1].Value);
-            var maxSalary = ParseSalaryValue(rangeMatch.Groups[2].Value);
+            maxSalary = ParseSalaryValue(rangeMatch.Groups[2].Value);
             originalText = rangeMatch.Value;
 
             return new SalaryInfo(
@@ -56,15 +60,28 @@ public class JobPostingParser
         }
 
         // Try to find single salary value
-        var singleMatch = SalarySingleRegex.Match(_sourceMessage);
-        if (singleMatch.Success)
+        var fromSingleMatch = FromSalarySingleRegex.Match(_sourceMessage);
+        if (fromSingleMatch.Success)
         {
-            minSalary = ParseSalaryValue(singleMatch.Groups[1].Value);
-            originalText = singleMatch.Value;
+            minSalary = ParseSalaryValue(fromSingleMatch.Groups[1].Value);
+            originalText = fromSingleMatch.Value;
 
             return new SalaryInfo(
                 minSalary,
                 null,
+                originalText,
+                true);
+        }
+
+        var upToSingleSalary = UpToSalarySingleRegex.Match(_sourceMessage);
+        if (upToSingleSalary.Success)
+        {
+            maxSalary = ParseSalaryValue(upToSingleSalary.Groups[1].Value);
+            originalText = upToSingleSalary.Value;
+
+            return new SalaryInfo(
+                null,
+                maxSalary,
                 originalText,
                 true);
         }
