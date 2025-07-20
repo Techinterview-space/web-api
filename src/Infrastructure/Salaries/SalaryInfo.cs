@@ -34,4 +34,22 @@ public record SalaryInfo
 
     public bool HasAnySalary()
         => MinSalary.HasValue || MaxSalary.HasValue;
+
+    public string ToTelegramHtml()
+    {
+        var stringBuilder = new System.Text.StringBuilder();
+        stringBuilder.Append("Указанная зарплата в вакансии: ");
+
+        if (MinSalary.HasValue)
+        {
+            stringBuilder.Append($"от <b>{MinSalary.Value:N0}</b> ");
+        }
+
+        if (MaxSalary.HasValue)
+        {
+            stringBuilder.Append($"до <b>{MaxSalary.Value:N0}</b>.");
+        }
+
+        return stringBuilder.ToString();
+    }
 }

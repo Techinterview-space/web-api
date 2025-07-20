@@ -26,6 +26,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 namespace Web.Api.Features.Telegram.ProcessSalariesRelatedMessage;
 
@@ -142,6 +143,31 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             var jobSalaryInfo = new JobPostingParser(message.Text).GetResult();
             if (!jobSalaryInfo.HasAnySalary())
             {
+                return null;
+            }
+
+            // todo mgorbatyuk: get profession from JobSubscriptions
+            var frontendDev = allProfessions.FirstOrDefault(x => x.IdAsEnum == UserProfessionEnum.FrontendDeveloper);
+
+            var salariesForReply = await new SalariesForChartQuery(
+                    _context,
+                    new TelegramBotUserCommandParameters(frontendDev),
+                    DateTimeOffset.UtcNow)
+                .Where(x => x.Company == CompanyType.Local)
+                .Where(x => x.Grade != null)
+                .ToQueryable(x => new SalaryBaseData
+                {
+                    Grade = x.Grade.Value,
+                    Value = x.Value,
+                })
+                .ToListAsync(cancellationToken);
+
+            if (salariesForReply.Count == 0)
+            {
+                _logger.LogInformation(
+                    "No salaries found for profession {Profession} in job posting reply.",
+                    frontendDev?.Title ?? "Unknown Profession");
+
                 return null;
             }
 

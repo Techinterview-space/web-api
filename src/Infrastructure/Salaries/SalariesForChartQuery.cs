@@ -35,6 +35,8 @@ public record SalariesForChartQuery
     private readonly List<long> _selectedProfessionIds;
     private readonly DatabaseContext _context;
 
+    private IQueryable<UserSalary> _query;
+
     public SalariesForChartQuery(
         DatabaseContext context,
         DeveloperGrade? grade,
@@ -61,6 +63,8 @@ public record SalariesForChartQuery
         SalarySourceTypes = salarySourceTypes ?? new List<SalarySourceType>();
         QuarterTo = quarterTo;
         YearTo = yearTo;
+
+        _query = BuildQuery();
     }
 
     public SalariesForChartQuery(
@@ -94,12 +98,18 @@ public record SalariesForChartQuery
     {
     }
 
+    public SalariesForChartQuery Where(
+        Expression<Func<UserSalary, bool>> predicate)
+    {
+        _query = _query.Where(predicate);
+        return this;
+    }
+
     public IQueryable<UserSalaryDto> ToQueryable(
         CompanyType? companyType = null)
     {
-        var query = BuildQuery(companyType);
-
-        return query
+        return _query
+            .When(companyType.HasValue, x => x.Company == companyType.Value)
             .OrderBy(x => x.Value)
             .Select(x => new UserSalaryDto
             {
@@ -125,20 +135,17 @@ public record SalariesForChartQuery
         Expression<Func<UserSalary, TResult>> selector,
         CompanyType? companyType = null)
     {
-        var query = BuildQuery(companyType);
-
-        return query
+        return _query
+            .When(companyType.HasValue, x => x.Company == companyType.Value)
             .OrderBy(x => x.Value)
             .Select(selector);
     }
 
-    private IQueryable<UserSalary> BuildQuery(
-        CompanyType? companyType = null)
+    private IQueryable<UserSalary> BuildQuery()
     {
         var query = _context.Salaries
             .Where(x => x.UseInStats)
             .Where(x => x.ProfessionId != (long)UserProfessionEnum.HrNonIt)
-            .When(companyType.HasValue, x => x.Company == companyType.Value)
             .When(Grade.HasValue, x => x.Grade == Grade.Value)
             .When(SalarySourceTypes is { Count: > 0 }, x =>
                 x.SourceType != null &&
