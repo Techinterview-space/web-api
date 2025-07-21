@@ -140,6 +140,16 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
             message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true)
         {
+            _logger.LogInformation(
+                "TELEGRAM_BOT. Salaries. Processing job posting message from {Name}. " +
+                "Id {Id}. " +
+                "Type {Type}. " +
+                "Text: {Text}",
+                message.Chat.Username,
+                message.Chat.Id,
+                message.Chat.Type.ToString(),
+                message.Text);
+
             // If the message is a bot command, we will process it separately.
             var jobSalaryInfo = new JobPostingParser(message.Text).GetResult();
             if (!jobSalaryInfo.HasAnySalary())
