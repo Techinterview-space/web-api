@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Enums;
 using Domain.Entities.StatData.Salary;
+using Domain.Enums;
 using Domain.Extensions;
 
 namespace Domain.ValueObjects;
 
 public record SalaryGradeRanges
 {
-    private static readonly List<DeveloperGrade> _gradesToBeUsedInCalculation = new ()
+    private static readonly List<GradeGroup> _gradesToBeUsedInCalculation = new ()
     {
-        DeveloperGrade.Lead,
-        DeveloperGrade.Senior,
-        DeveloperGrade.Middle,
-        DeveloperGrade.Junior,
+        GradeGroup.Lead,
+        GradeGroup.Senior,
+        GradeGroup.Middle,
+        GradeGroup.Junior,
     };
 
     private readonly Dictionary<DeveloperGrade, List<SalaryBaseData>> _salaries;
@@ -37,8 +38,9 @@ public record SalaryGradeRanges
                     .ToList());
 
         _developerGradeValues = new Dictionary<DeveloperGrade, SalaryGradeRangesItem>();
-        foreach (var grade in _gradesToBeUsedInCalculation)
+        foreach (var gradeGroup in _gradesToBeUsedInCalculation)
         {
+            var grade = gradeGroup.ToDeveloperGrade();
             if (!_salaries.TryGetValue(grade, out var gradeSalaries))
             {
                 _developerGradeValues.Add(
@@ -51,9 +53,9 @@ public record SalaryGradeRanges
                 continue;
             }
 
-            var higherGrade = grade.Next();
-            var higherGradeOrNull = _developerGradeValues.Count > 0 && _developerGradeValues.ContainsKey(higherGrade)
-                ? _developerGradeValues[higherGrade]
+            var higherGrade = gradeGroup.Next().ToDeveloperGrade();
+            var higherGradeOrNull = _developerGradeValues.Count > 0 && _developerGradeValues.TryGetValue(higherGrade, out var value)
+                ? value
                 : null;
 
             var min = gradeSalaries.First().Value;
@@ -68,7 +70,7 @@ public record SalaryGradeRanges
         }
     }
 
-    public SalaryGradeRangesItem InWhatRangeValueIs(
+    public List<DeveloperGrade> InWhatRangeValueIs(
         double? min,
         double? max)
     {
@@ -77,27 +79,53 @@ public record SalaryGradeRanges
             throw new InvalidOperationException("Min and max cannot be null.");
         }
 
+        var result = new List<DeveloperGrade>();
         if (max.HasValue && !min.HasValue)
         {
-            return InWhatRangeValueIs(max.Value);
+            if (HasDeveloperGradeValue(max.Value, out var grade))
+            {
+                result.Add(grade);
+            }
         }
-
-        if (!max.HasValue)
+        else if (!max.HasValue)
         {
-            return InWhatRangeValueIs(min.Value);
+            if (HasDeveloperGradeValue(min.Value, out var grade))
+            {
+                result.Add(grade);
+            }
+        }
+        else
+        {
+            if (HasDeveloperGradeValue(min.Value, out var minGrade))
+            {
+                result.Add(minGrade);
+            }
+
+            var valueToSearch = (max.Value + min.Value) / 2;
+            if (HasDeveloperGradeValue(valueToSearch, out var midGrade))
+            {
+                result.Add(midGrade);
+            }
+
+            if (HasDeveloperGradeValue(max.Value, out var maxGrade))
+            {
+                result.Add(maxGrade);
+            }
         }
 
-        // If both min and max are provided, we need to find the range that contains both values.
-        throw new NotSupportedException("Min and max cannot be null.");
+        return result
+            .Distinct()
+            .ToList();
     }
 
-    private SalaryGradeRangesItem InWhatRangeValueIs(
-        double value)
+    private bool HasDeveloperGradeValue(
+        double value,
+        out DeveloperGrade grade)
     {
-        var item = _developerGradeValues
-            .FirstOrDefault(x => x.Value.IsInRange(value)).Value;
+        grade = _developerGradeValues
+            .FirstOrDefault(x => x.Value.IsInRange(value)).Value.Grade;
 
-        return item;
+        return grade != default;
     }
 }
 

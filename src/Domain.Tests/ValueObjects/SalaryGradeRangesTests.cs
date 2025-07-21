@@ -103,6 +103,7 @@ public class SalaryGradeRangesTests
         var result = target.InWhatRangeValueIs(min, null);
 
         Assert.NotNull(result);
-        Assert.Equal(expectedGrade, result.Grade);
+        Assert.Single(result);
+        Assert.Equal(expectedGrade, result[0]);
     }
 }

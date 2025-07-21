@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Domain.Attributes;
+using Domain.Entities.Enums;
 using Domain.Enums;
 
 namespace Domain.Extensions;
@@ -87,7 +88,8 @@ public static class EnumHelper
         return attribute?.GroupName;
     }
 
-    public static string ToCustomString(this GradeGroup enumValue)
+    public static string ToCustomString(
+        this GradeGroup enumValue)
     {
         return enumValue switch
         {
@@ -97,6 +99,21 @@ public static class EnumHelper
             GradeGroup.Senior => "Сеньоры",
             GradeGroup.Lead => "Лиды",
             _ => throw new ArgumentException($"No string mapping found for enum value {enumValue}")
+        };
+    }
+
+    public static DeveloperGrade ToDeveloperGrade(
+        this GradeGroup enumValue)
+    {
+        return enumValue switch
+        {
+            GradeGroup.Trainee => DeveloperGrade.Trainee,
+            GradeGroup.Junior => DeveloperGrade.Junior,
+            GradeGroup.Middle => DeveloperGrade.Middle,
+            GradeGroup.Senior => DeveloperGrade.Senior,
+            GradeGroup.Lead => DeveloperGrade.Lead,
+            GradeGroup.Undefined => DeveloperGrade.Unknown,
+            _ => throw new ArgumentException($"No DeveloperGrade mapping found for enum value {enumValue}")
         };
     }
 
