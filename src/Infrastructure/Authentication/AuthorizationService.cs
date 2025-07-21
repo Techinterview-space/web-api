@@ -80,12 +80,6 @@ public record AuthorizationService : IAuthorization
                 _http.CurrentUser.UserId,
                 cancellationToken);
 
-        _logger.LogInformation(
-            "Trying to get user by email: {Email} or identityId: {IdentityId}. Result: {UserId}",
-            _http.CurrentUser.Email,
-            _http.CurrentUser.UserId,
-            user?.Id.ToString() ?? "null");
-
         if (user == null)
         {
             var claimsUser = new User(_http.CurrentUser);
