@@ -136,20 +136,26 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
 
-        if (message.Entities?.Length > 0 &&
-            message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
-            message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true)
-        {
-            _logger.LogInformation(
-                "TELEGRAM_BOT. Salaries. Processing job posting message from {Name}. " +
-                "Id {Id}. " +
-                "Type {Type}. " +
-                "Text: {Text}",
-                message.Chat.Username,
-                message.Chat.Id,
-                message.Chat.Type.ToString(),
-                message.Text);
+        var hasJopPostingInfo = message.Entities?.Length > 0 &&
+                                message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
+                                message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true;
 
+        _logger.LogInformation(
+            "TELEGRAM_BOT. techinterview_space_bot. Processing job posting message from {Name}. " +
+            "Id {Id}. " +
+            "Type {Type}. " +
+            "ReplyTo {replyToMessageId}. " +
+            "Has Job info {HasJobInfo}. " +
+            "Text: {Text}",
+            message.Chat.Username,
+            message.Chat.Id,
+            message.Chat.Type.ToString(),
+            replyToMessageId,
+            hasJopPostingInfo,
+            message.Text);
+
+        if (hasJopPostingInfo)
+        {
             // If the message is a bot command, we will process it separately.
             var jobSalaryInfo = new JobPostingParser(message.Text).GetResult();
             if (!jobSalaryInfo.HasAnySalary())
