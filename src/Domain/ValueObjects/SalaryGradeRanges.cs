@@ -109,15 +109,15 @@ public record SalaryGradeRanges
         text += "📈<b>Диапазон:</b> ";
         if (min.HasValue && max.HasValue)
         {
-            text += $"{min.Value:N0} - {max.Value:N0} ₸\n";
+            text += $"{new SalarySpaceFormattedValue(min.Value)} - {new SalarySpaceFormattedValue(max.Value)} ₸\n";
         }
         else if (min.HasValue)
         {
-            text += $"от {min.Value:N0} ₸.\n";
+            text += $"от {new SalarySpaceFormattedValue(min.Value)} ₸\n";
         }
         else if (max.HasValue)
         {
-            text += $"до {max.Value:N0} ₸.\n";
+            text += $"до {new SalarySpaceFormattedValue(max.Value)} ₸\n";
         }
 
         text += $"На основе {_salariesCount} анкет.";
