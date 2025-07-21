@@ -91,36 +91,39 @@ public record SalaryGradeRanges
         if (_professions != null && _professions.Count > 0)
         {
             professionPostfix = _professions.Count == 1
-                ? $" по специальности <b>{_professions[0].Title}</b>"
-                : $" по специальностям <b>{string.Join(", ", _professions.Select(x => x.Title))}</b>";
+                ? $" ({_professions[0].Title})"
+                : $" ({string.Join(", ", _professions.Select(x => x.Title))})";
         }
 
         string text;
         if (developerGrades.Count == 1)
         {
-            text = $"Зарплата в вакансии соответствует уровню <b>{developerGrades[0]}</b>{professionPostfix}.\n\n";
+            text = $"💰Указанная зарплата соответствует уровню <b>{developerGrades[0]}</b>{professionPostfix}.\n\n";
         }
         else
         {
-            text = $"Зарплата в вакансии соответствует уровням {string.Join(", ", developerGrades.Select(x => $"<b>{x}</b>"))}{professionPostfix}, " +
-                   $"но скорее всего это <b>{developerGrades[1]}</b> на основе среднего арифметического вилки.\n\n";
+            text = $"💰Указанная зарплата соответствует уровням {string.Join(", ", developerGrades.Select(x => $"<b>{x}</b>"))}{professionPostfix}. " +
+                   $"По среднему значению ближе к уровню <b>{developerGrades[1]}</b>.\n\n";
         }
 
-        text += $"Данные построены на основе анализа следующих данных:\n";
-        if (min.HasValue)
+        text += "📈<b>Диапазон:</b> ";
+        if (min.HasValue && max.HasValue)
         {
-            text += $"От <b>{min.Value:N0}</b>.\n";
+            text += $"{min.Value:N0} - {max.Value:N0} ₸\n";
         }
-
-        if (max.HasValue)
+        else if (min.HasValue)
         {
-            text += $"До <b>{max.Value:N0}</b>.\n";
+            text += $"от {min.Value:N0} ₸.\n";
+        }
+        else if (max.HasValue)
+        {
+            text += $"до {max.Value:N0} ₸.\n";
         }
 
-        text += $"Кол-во анкет: <b>{_salariesCount}</b>";
+        text += $"На основе {_salariesCount} анкет.";
 
         // TODO mgorbatyuk: add utm_source link there
-        text += "\n\n<em>Данные предоставлены порталом <a href=\"https://techinterview.space/salaries\">techinterview.space</a></em>";
+        text += "\n\n<em>Источник techinterview.space</em>";
         return text;
     }
 

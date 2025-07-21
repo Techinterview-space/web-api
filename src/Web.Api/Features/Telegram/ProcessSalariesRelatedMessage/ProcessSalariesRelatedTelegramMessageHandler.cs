@@ -216,6 +216,10 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                     {
                         MessageId = replyToMessageId,
                     },
+                    linkPreviewOptions: new LinkPreviewOptions
+                    {
+                        IsDisabled = true,
+                    },
                     cancellationToken: cancellationToken);
             }
             else
