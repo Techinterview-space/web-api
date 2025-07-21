@@ -138,10 +138,11 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         var hasJopPostingInfo = message.Entities?.Length > 0 &&
                                 message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
-                                message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true;
+                                message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true &&
+                                (message.Chat.Type is ChatType.Supergroup or ChatType.Group);
 
         _logger.LogInformation(
-            "TELEGRAM_BOT. techinterview_space_bot. Processing job posting message from {Name}. " +
+            "techinterview_space_bot. Processing job posting message from {Name}. " +
             "Id {Id}. " +
             "Type {Type}. " +
             "ReplyTo {replyToMessageId}. " +
@@ -163,12 +164,24 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                 return null;
             }
 
-            // todo mgorbatyuk: get profession from JobSubscriptions
-            var frontendDev = allProfessions.FirstOrDefault(x => x.IdAsEnum == UserProfessionEnum.FrontendDeveloper);
+            var jobPostingSubscription = await _context.JobPostingMessageSubscriptions
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    x => x.TelegramChatId == message.Chat.Id,
+                    cancellationToken);
+
+            if (jobPostingSubscription is null)
+            {
+                return null;
+            }
+
+            var jobPostingProfessions = allProfessions
+                .Where(x => jobPostingSubscription.ProfessionIds.Contains(x.Id))
+                .ToList();
 
             var salariesForReply = await new SalariesForChartQuery(
                     _context,
-                    new TelegramBotUserCommandParameters(frontendDev),
+                    new TelegramBotUserCommandParameters(jobPostingProfessions),
                     DateTimeOffset.UtcNow)
                 .Where(x => x.Company == CompanyType.Local)
                 .Where(x => x.Grade != null)
@@ -182,14 +195,14 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             if (salariesForReply.Count == 0)
             {
                 _logger.LogInformation(
-                    "No salaries found for profession {Profession} in job posting reply.",
-                    frontendDev?.Title ?? "Unknown Profession");
+                    "No salaries found for JobPosting subscription ID {JobPostingMessageSubscriptionId} in job posting reply.",
+                    jobPostingSubscription.Id);
 
                 return null;
             }
 
             var textToSend =
-                new SalaryGradeRanges(salariesForReply, frontendDev).ToTelegramHtml(
+                new SalaryGradeRanges(salariesForReply, jobPostingProfessions).ToTelegramHtml(
                     jobSalaryInfo.MinSalary,
                     jobSalaryInfo.MaxSalary);
 
@@ -208,8 +221,8 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             else
             {
                 _logger.LogInformation(
-                    "Empty reply text for profession {Profession} in job posting reply.",
-                    frontendDev?.Title ?? "Unknown Profession");
+                    "Empty reply text for subscription {JobPostingMessageSubscriptionId} in job posting reply.",
+                    jobPostingSubscription.Id);
             }
 
             return textToSend;

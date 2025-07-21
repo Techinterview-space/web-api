@@ -21,18 +21,18 @@ public record SalaryGradeRanges
 
     private readonly Dictionary<DeveloperGrade, List<SalaryBaseData>> _salaries;
     private readonly Dictionary<DeveloperGrade, SalaryGradeRangesItem> _developerGradeValues;
-    private readonly Profession _profession;
+    private readonly List<Profession> _professions;
 
     public SalaryGradeRanges(
         List<SalaryBaseData> salaries,
-        Profession profession)
+        List<Profession> professionses)
     {
         if (salaries == null)
         {
             throw new InvalidOperationException("Salaries cannot be null.");
         }
 
-        _profession = profession;
+        _professions = professionses;
 
         _salaries = salaries
             .GroupBy(x => x.Grade)
@@ -85,9 +85,13 @@ public record SalaryGradeRanges
             return null;
         }
 
-        var professionPostfix = _profession != null
-            ? $" по специальности <b>{_profession.Title}</b>"
-            : string.Empty;
+        var professionPostfix = string.Empty;
+        if (_professions != null && _professions.Count > 0)
+        {
+            professionPostfix = _professions.Count == 1
+                ? $" по специальности <b>{_professions[0].Title}</b>"
+                : $" по специальностям <b>{string.Join(", ", _professions.Select(x => x.Title))}</b>";
+        }
 
         string text;
         if (developerGrades.Count == 1)

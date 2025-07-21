@@ -89,6 +89,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<LastWeekCompanyReviewsSubscription> CompanyReviewsSubscriptions { get; set; }
 
+    public DbSet<JobPostingMessageSubscription> JobPostingMessageSubscriptions { get; set; }
+
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
         where TEntity : class, IBaseModel
