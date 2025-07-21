@@ -19,6 +19,7 @@ public record SalaryGradeRanges
         GradeGroup.Junior,
     };
 
+    private readonly int _salariesCount;
     private readonly Dictionary<DeveloperGrade, List<SalaryBaseData>> _salaries;
     private readonly Dictionary<DeveloperGrade, SalaryGradeRangesItem> _developerGradeValues;
     private readonly List<Profession> _professions;
@@ -32,6 +33,7 @@ public record SalaryGradeRanges
             throw new InvalidOperationException("Salaries cannot be null.");
         }
 
+        _salariesCount = salaries.Count;
         _professions = professionses;
 
         _salaries = salaries
@@ -115,7 +117,7 @@ public record SalaryGradeRanges
             text += $"До <b>{max.Value:N0}</b>.\n";
         }
 
-        text += $"Кол-во анкет: <b>{_salaries.Count}</b>";
+        text += $"Кол-во анкет: <b>{_salariesCount}</b>";
 
         // TODO mgorbatyuk: add utm_source link there
         text += "\n\n<em>Данные предоставлены порталом <a href=\"https://techinterview.space/salaries\">techinterview.space</a></em>";
