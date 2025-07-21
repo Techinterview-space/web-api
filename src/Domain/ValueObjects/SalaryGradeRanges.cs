@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Enums;
+using Domain.Entities.Salaries;
 using Domain.Entities.StatData.Salary;
 using Domain.Enums;
 using Domain.Extensions;
@@ -20,14 +21,18 @@ public record SalaryGradeRanges
 
     private readonly Dictionary<DeveloperGrade, List<SalaryBaseData>> _salaries;
     private readonly Dictionary<DeveloperGrade, SalaryGradeRangesItem> _developerGradeValues;
+    private readonly Profession _profession;
 
     public SalaryGradeRanges(
-        List<SalaryBaseData> salaries)
+        List<SalaryBaseData> salaries,
+        Profession profession)
     {
         if (salaries == null)
         {
             throw new InvalidOperationException("Salaries cannot be null.");
         }
+
+        _profession = profession;
 
         _salaries = salaries
             .GroupBy(x => x.Grade)
@@ -68,6 +73,49 @@ public record SalaryGradeRanges
                     min,
                     max));
         }
+    }
+
+    public string ToTelegramHtml(
+        double? min,
+        double? max)
+    {
+        var developerGrades = InWhatRangeValueIs(min, max);
+        if (developerGrades.Count == 0)
+        {
+            return null;
+        }
+
+        var professionPostfix = _profession != null
+            ? $" по специальности <b>{_profession.Title}</b>"
+            : string.Empty;
+
+        string text;
+        if (developerGrades.Count == 1)
+        {
+            text = $"Зарплата в вакансии соответствует уровню <b>{developerGrades[0]}</b>{professionPostfix}.\n\n";
+        }
+        else
+        {
+            text = $"Зарплата в вакансии соответствует уровням {string.Join(", ", developerGrades.Select(x => $"<b>{x}</b>"))}{professionPostfix}, " +
+                   $"но скорее всего это <b>{developerGrades[1]}</b> на основе среднего арифметического вилки.\n\n";
+        }
+
+        text += $"Данные построены на основе анализа следующих данных:\n";
+        if (min.HasValue)
+        {
+            text += $"От <b>{min.Value:N0}</b>.\n";
+        }
+
+        if (max.HasValue)
+        {
+            text += $"До <b>{max.Value:N0}</b>.\n";
+        }
+
+        text += $"Кол-во анкет: <b>{_salaries.Count}</b>";
+
+        // TODO mgorbatyuk: add utm_source link there
+        text += "\n\n<em>Данные предоставлены порталом <a href=\"https://techinterview.space/salaries\">techinterview.space</a></em>";
+        return text;
     }
 
     public List<DeveloperGrade> InWhatRangeValueIs(

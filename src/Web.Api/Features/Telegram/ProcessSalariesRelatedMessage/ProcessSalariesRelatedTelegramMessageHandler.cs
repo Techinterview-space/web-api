@@ -9,6 +9,7 @@ using Domain.Entities.StatData;
 using Domain.Entities.StatData.Salary;
 using Domain.Entities.Telegram;
 using Domain.Extensions;
+using Domain.ValueObjects;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
@@ -171,20 +172,31 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                 return null;
             }
 
-            var jobPostReply = new TelegramBotReplyData(
-                $"Зарплата в вакансии: {jobSalaryInfo.MinSalary} - {jobSalaryInfo.MaxSalary}");
+            var textToSend =
+                new SalaryGradeRanges(salariesForReply, frontendDev).ToTelegramHtml(
+                    jobSalaryInfo.MinSalary,
+                    jobSalaryInfo.MaxSalary);
 
-            await request.BotClient.SendMessage(
-                message.Chat.Id,
-                jobPostReply.ReplyText,
-                parseMode: jobPostReply.ParseMode,
-                replyParameters: new ReplyParameters
-                {
-                    MessageId = replyToMessageId,
-                },
-                cancellationToken: cancellationToken);
+            if (textToSend is not null)
+            {
+                await request.BotClient.SendMessage(
+                    message.Chat.Id,
+                    textToSend,
+                    parseMode: ParseMode.Html,
+                    replyParameters: new ReplyParameters
+                    {
+                        MessageId = replyToMessageId,
+                    },
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                _logger.LogInformation(
+                    "Empty reply text for profession {Profession} in job posting reply.",
+                    frontendDev?.Title ?? "Unknown Profession");
+            }
 
-            return jobPostReply.ReplyText;
+            return textToSend;
         }
 
         var mentionedInGroupChat =

@@ -99,11 +99,29 @@ public class SalaryGradeRangesTests
         double min,
         DeveloperGrade expectedGrade)
     {
-        var target = new SalaryGradeRanges(_fullSetOfSalaries);
+        var target = new SalaryGradeRanges(_fullSetOfSalaries, null);
         var result = target.InWhatRangeValueIs(min, null);
 
         Assert.NotNull(result);
         Assert.Single(result);
         Assert.Equal(expectedGrade, result[0]);
+    }
+
+    [Theory]
+    [InlineData(90_000, 120_000, DeveloperGrade.Junior)]
+    [InlineData(90_000, 220_000, DeveloperGrade.Junior, DeveloperGrade.Middle)]
+    [InlineData(219_000, 1_200_000, DeveloperGrade.Junior, DeveloperGrade.Lead)]
+    [InlineData(219_000, 1_000_000, DeveloperGrade.Junior, DeveloperGrade.Senior, DeveloperGrade.Lead)]
+    public void InWhatRangeValueIs_ProvidedSalaryRange_Ok(
+        double min,
+        double max,
+        params DeveloperGrade[] expectedGrades)
+    {
+        var target = new SalaryGradeRanges(_fullSetOfSalaries, null);
+        var result = target.InWhatRangeValueIs(min, max);
+
+        Assert.NotNull(result);
+        Assert.Equal(expectedGrades.Length, result.Count);
+        Assert.Equal(expectedGrades, result);
     }
 }
