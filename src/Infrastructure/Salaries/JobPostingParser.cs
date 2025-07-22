@@ -37,12 +37,20 @@ public class JobPostingParser
         @"((?:до\s*)|(?:<=|<\s*))(\d+(?:[.,]\d+)?)\s*(?:млн|million|м)(?!\s*(?:до|-))",
         RegexOptions.IgnoreCase);
 
+    private static readonly Regex SalariesWithDotsRegex = new Regex(
+        @"(\d+(?:\.\d{3})+)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     private readonly string _sourceMessage;
 
     public JobPostingParser(
         string sourceMessage)
     {
-        _sourceMessage = sourceMessage ?? string.Empty;
+        _sourceMessage = sourceMessage?
+            .Replace("на руки", string.Empty) ?? string.Empty;
+
+        _sourceMessage = SalariesWithDotsRegex.Replace(
+            _sourceMessage, m => m.Value.Replace(".", " "));
     }
 
     public SalaryInfo GetResult()
