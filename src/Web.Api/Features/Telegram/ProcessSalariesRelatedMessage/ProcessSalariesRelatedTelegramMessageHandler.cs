@@ -141,20 +141,6 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                                 message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true &&
                                 (message.Chat.Type is ChatType.Supergroup or ChatType.Group);
 
-        _logger.LogInformation(
-            "techinterview_space_bot. Processing job posting message from {Name}. " +
-            "Id {Id}. " +
-            "Type {Type}. " +
-            "ReplyTo {replyToMessageId}. " +
-            "Has Job info {HasJobInfo}. " +
-            "Text: {Text}",
-            message.Chat.Username,
-            message.Chat.Id,
-            message.Chat.Type.ToString(),
-            replyToMessageId,
-            hasJopPostingInfo,
-            message.Text);
-
         if (hasJopPostingInfo)
         {
             // If the message is a bot command, we will process it separately.
