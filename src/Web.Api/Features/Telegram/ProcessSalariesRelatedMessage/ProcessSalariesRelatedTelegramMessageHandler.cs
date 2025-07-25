@@ -136,10 +136,12 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
 
-        var hasJopPostingInfo = message.Entities?.Length > 0 &&
-                                message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
-                                message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true &&
-                                (message.Chat.Type is ChatType.Supergroup or ChatType.Group);
+        var hasJoPostHashtag = message.Entities?.Length > 0 &&
+                               message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
+                               message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true;
+
+        var hasJopPostingInfo = message.Chat.Type is ChatType.Supergroup or ChatType.Group &&
+                                (hasJoPostHashtag || messageText.Contains("#вакансия", StringComparison.InvariantCultureIgnoreCase));
 
         if (hasJopPostingInfo)
         {
