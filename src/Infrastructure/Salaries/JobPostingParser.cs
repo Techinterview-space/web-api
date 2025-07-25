@@ -13,15 +13,15 @@ public class JobPostingParser
 
     // More specific regex patterns for different salary formats
     private static readonly Regex SalaryRangeInThousandsRegex = new Regex(
-        @"(?:вилка|зарплата|зп|от|до|salary)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тенге)?",
+        @"(?:вилка|зарплата|зп|от|до|salary|заработная плата)?\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тенге|тг)?",
         RegexOptions.IgnoreCase);
 
     private static readonly Regex FromSalarySingleThousandRegex = new Regex(
-        @"(?:вилка|зарплата|зп|от|salary)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)",
+        @"(?:вилка|зарплата|зп|от|salary|заработная плата)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тг|тенге)",
         RegexOptions.IgnoreCase);
 
     private static readonly Regex UpToSalarySingleThousandRegex = new Regex(
-        @"(?:вилка|зарплата|зп|до|salary)\s*:?\s*(?:до\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)",
+        @"(?:вилка|зарплата|зп|до|salary|заработная плата)\s*:?\s*(?:до\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тг|тенге)",
         RegexOptions.IgnoreCase);
 
     // Additional regex for million format like "От 1.2млн до 1.9млн"
@@ -39,6 +39,10 @@ public class JobPostingParser
 
     private static readonly Regex SalariesWithDotsRegex = new Regex(
         @"(\d+(?:\.\d{3})+)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex JustOneSalaryValueRegex = new Regex(
+        @"\b\d{1,3}(?:(?:\.|,|'|\s)\d{3})+\b",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private readonly string _sourceMessage;
@@ -66,7 +70,7 @@ public class JobPostingParser
         double? maxSalary = null;
         string originalText = null;
 
-        // Try to find million salary range first (most specific)
+        // Try to find a million salary range first (most specific)
         var millionRangeMatch = SalaryRangeInMillionRegex.Match(_sourceMessage);
         if (millionRangeMatch.Success)
         {
@@ -146,6 +150,19 @@ public class JobPostingParser
             return new SalaryInfo(
                 null,
                 maxSalary,
+                originalText,
+                true);
+        }
+
+        var justOneSalary = JustOneSalaryValueRegex.Match(_sourceMessage);
+        if (justOneSalary.Success)
+        {
+            minSalary = ParseSalaryInThousands(justOneSalary.Groups[1].Value);
+            originalText = justOneSalary.Value;
+
+            return new SalaryInfo(
+                minSalary,
+                null,
                 originalText,
                 true);
         }
