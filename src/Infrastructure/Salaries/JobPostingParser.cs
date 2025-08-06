@@ -158,6 +158,11 @@ public class JobPostingParser
         if (justOneSalary.Success)
         {
             minSalary = ParseSalaryInThousands(justOneSalary.Groups[1].Value);
+            if (minSalary == 0)
+            {
+                minSalary = ParseSalaryInThousands(justOneSalary.Groups[0].Value);
+            }
+
             originalText = justOneSalary.Value;
 
             return new SalaryInfo(

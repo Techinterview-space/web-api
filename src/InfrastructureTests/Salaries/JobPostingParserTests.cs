@@ -96,6 +96,25 @@ TeamLead от 2,5млн до 3млн
 Занятость: оффлайн, полный день
 Заработная плата: по договоренности";
 
+    public const string MultilineText15 = @"#вакансия 15 #nextjs #frontend #удаленно
+Next.js Developer на проект
+Оплата: 100 000 KZT
+Сроки: 1-2 недели
+Формат: Удалённо, проектная работа
+Контакты для отклика: @zhumabekov_04
+О проекте:
+Ищем Frontend-разработчика для связки веб-платформы на Next.js.
+Вся верстка уже готова — нужно подключить backend API и
+реализовать логику отображения.
+Требования:
+- Уверенное знание Next.js и React
+- Опыт работы с REST API
+- Ответственность и соблюдение сроков
+Обязанности:
+- Интеграция АРІ с готовыми страницами
+- Настройка роутинга и состояния
+- Отладка и тестирование";
+
     [Theory]
     [InlineData("#вакансия Разработчик C# Вилка от 500к до 800к", 500_000d, 800_000d)]
     [InlineData("#вакансия Python разработчик Зарплата 500 000 - 1300000", 500_000d, 1_300_000d)]
@@ -129,6 +148,7 @@ TeamLead от 2,5млн до 3млн
     [InlineData(MultilineText12, 500_000d, 800_000d)]
     [InlineData(MultilineText13, 500_000d, null)]
     [InlineData(MultilineText14, null, null)]
+    [InlineData(MultilineText15, 100_000d, null)]
     public void MultilineText_Cases_Match(
         string text,
         double? min,

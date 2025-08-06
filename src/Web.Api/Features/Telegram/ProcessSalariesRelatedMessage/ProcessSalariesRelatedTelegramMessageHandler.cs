@@ -136,14 +136,19 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         var replyToMessageId = request.UpdateRequest.Message.ReplyToMessage?.MessageId ?? request.UpdateRequest.Message.MessageId;
 
-        var hasJoPostHashtag = message.Entities?.Length > 0 &&
+        var hasJobPostHashtag = message.Entities?.Length > 0 &&
                                message.Entities.Any(x => x.Type is MessageEntityType.Hashtag) &&
                                message.EntityValues?.Any(x => x.ToLowerInvariant() == "#вакансия") == true;
 
-        var hasJopPostingInfo = message.Chat.Type is ChatType.Supergroup or ChatType.Group &&
-                                (hasJoPostHashtag || messageText.Contains("#вакансия", StringComparison.InvariantCultureIgnoreCase));
+        var hasJobPostingInfo = message.Chat.Type is ChatType.Supergroup or ChatType.Group &&
+                                (hasJobPostHashtag ||
+                                 (messageText.Contains("#вакансия", StringComparison.InvariantCultureIgnoreCase) &&
+                                  !messageText.Contains("проектная работа", StringComparison.InvariantCultureIgnoreCase) &&
+                                  !messageText.Contains("частичная занятость", StringComparison.InvariantCultureIgnoreCase) &&
+                                  !messageText.Contains("парттайм", StringComparison.InvariantCultureIgnoreCase) &&
+                                  !messageText.Contains("parttime", StringComparison.InvariantCultureIgnoreCase)));
 
-        if (hasJopPostingInfo)
+        if (hasJobPostingInfo)
         {
             // If the message is a bot command, we will process it separately.
             var jobSalaryInfo = new JobPostingParser(message.Text).GetResult();

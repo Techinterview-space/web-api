@@ -33,7 +33,14 @@ public record SalaryInfo
     }
 
     public bool HasAnySalary()
-        => MinSalary.HasValue || MaxSalary.HasValue;
+    {
+        if (MinSalary.HasValue && MaxSalary.HasValue)
+        {
+            return MaxSalary.Value >= MinSalary.Value;
+        }
+
+        return MinSalary.HasValue || MaxSalary.HasValue;
+    }
 
     public string ToTelegramHtml()
     {
