@@ -89,7 +89,6 @@ TeamLead от 2,5млн до 3млн
 Заработная плата: 500 000тг в месяц";
 
     public const string MultilineText14 = @"#вакансия 14 #developer #алматы #backend #php
-
 Вакансия: Back-end разработчик
 Компания: Adata.kz
 Требуемый опыт работы: 1-3 года
@@ -114,6 +113,39 @@ Next.js Developer на проект
 - Интеграция АРІ с готовыми страницами
 - Настройка роутинга и состояния
 - Отладка и тестирование";
+
+    public const string MultilineText16 = @"#вакансия 16 #developer #алматы #backend #php
+Вакансия: Back-end разработчик
+Компания: Adata.kz
+Оплата: 5000 - 10000 KZT
+Требуемый опыт работы: 1-3 года
+Занятость: оффлайн, полный день
+Заработная плата: по договоренности";
+
+    public const string MultilineText17 = @"#вакансия 
+Middle Frontend Developer
+Компания: Казтелепорт
+Локация: офис, г. Алматы, ул. Абая 109в
+График: 8:00–17:00 или 9:00–18:00
+Зарплата: до 800 000 ₸/мес
+Бонусы: 13-я зарплата, ежегодная индексация
+
+Проект:
+- Разработка лендингов и портала облачных услуг.
+
+Стек:
+- Next.js, Astro.js, React, TypeScript, TanStack Query, TanStack Table, Zustand.
+
+Обязанности:
+- Разработка и поддержка интерфейсов
+- Интеграция с API
+- Оптимизация скорости и SEO
+
+Требования:
+- Опыт с TypeScript и React от 2 лет
+ 
+Плюсом будет:
+- Опыт с Astro.js";
 
     [Theory]
     [InlineData("#вакансия Разработчик C# Вилка от 500к до 800к", 500_000d, 800_000d)]
@@ -149,6 +181,8 @@ Next.js Developer на проект
     [InlineData(MultilineText13, 500_000d, null)]
     [InlineData(MultilineText14, null, null)]
     [InlineData(MultilineText15, 100_000d, null)]
+    [InlineData(MultilineText16, 5_000d, 10_000d)]
+    [InlineData(MultilineText17, null, 800_000d)]
     public void MultilineText_Cases_Match(
         string text,
         double? min,

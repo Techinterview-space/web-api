@@ -51,7 +51,13 @@ public class JobPostingParser
         string sourceMessage)
     {
         _sourceMessage = sourceMessage?
-            .Replace("на руки", string.Empty) ?? string.Empty;
+            .Replace("на руки", string.Empty)
+            .Replace("8:00", string.Empty)
+            .Replace("9:00", string.Empty)
+            .Replace("10:00", string.Empty)
+            .Replace("17:00", string.Empty)
+            .Replace("18:00", string.Empty)
+            .Replace("19:00", string.Empty) ?? string.Empty;
 
         _sourceMessage = SalariesWithDotsRegex.Replace(
             _sourceMessage, m => m.Value.Replace(".", " "));
@@ -116,8 +122,13 @@ public class JobPostingParser
         var rangeMatch = SalaryRangeInThousandsRegex.Match(_sourceMessage);
         if (rangeMatch.Success)
         {
-            minSalary = ParseSalaryInThousands(rangeMatch.Groups[1].Value);
-            maxSalary = ParseSalaryInThousands(rangeMatch.Groups[2].Value);
+            var fullMatch = rangeMatch.Groups[0].Value;
+            var containsThousands = fullMatch.Contains("тыс") ||
+                                    fullMatch.Contains("к") ||
+                                    fullMatch.Contains("k");
+
+            minSalary = ParseSalaryInThousands(rangeMatch.Groups[1].Value, containsThousands);
+            maxSalary = ParseSalaryInThousands(rangeMatch.Groups[2].Value, containsThousands);
             originalText = rangeMatch.Value;
 
             return new SalaryInfo(
@@ -180,7 +191,8 @@ public class JobPostingParser
     }
 
     private static double ParseSalaryInThousands(
-        string salaryText)
+        string salaryText,
+        bool adjustThousandsLessThan10k = true)
     {
         // Remove spaces and parse the number
         var cleanText = salaryText.Replace(" ", string.Empty);
@@ -189,7 +201,7 @@ public class JobPostingParser
         {
             // Check if it's in thousands (к, тыс, тысяч)
             // If the number is less than 10000, assume it's in thousands
-            if (value < 10000)
+            if (value < 10000 && adjustThousandsLessThan10k)
             {
                 return value * 1000;
             }
