@@ -5,6 +5,16 @@ namespace Infrastructure.Salaries;
 
 public class JobPostingParser
 {
+    public const int MinimalSalaryThreshold = 85_000;
+
+    private static readonly Regex SalaryWithTengeBeforeRegex = new Regex(
+        @"до \b\d{1,3}(?: \d{3})*\s*тенге\b",
+        RegexOptions.IgnoreCase);
+
+    private static readonly Regex SalaryWithTengeFromRegex = new Regex(
+        @"от \b\d{1,3}(?: \d{3})*\s*тенге\b",
+        RegexOptions.IgnoreCase);
+
     // Regex pattern for detecting job postings with salary ranges
     private static readonly Regex JobPostingThousandsRegex = new Regex(
         @"#вакансия.*?(?:вилка|зарплата|зп|от|до|salary)\s*(?:от\s*)?(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*(\d+(?:\s*\d+)*)\s*(?:к|000|тыс|тысяч)?|" +
@@ -131,11 +141,15 @@ public class JobPostingParser
             maxSalary = ParseSalaryInThousands(rangeMatch.Groups[2].Value, containsThousands);
             originalText = rangeMatch.Value;
 
-            return new SalaryInfo(
-                minSalary,
-                maxSalary,
-                originalText,
-                true);
+            if (minSalary >= MinimalSalaryThreshold && maxSalary >= MinimalSalaryThreshold &&
+                ((maxSalary - minSalary) / minSalary >= 0.1))
+            {
+                return new SalaryInfo(
+                    minSalary,
+                    maxSalary,
+                    originalText,
+                    true);
+            }
         }
 
         // Try to find single salary value
@@ -168,14 +182,35 @@ public class JobPostingParser
         var justOneSalary = JustOneSalaryValueRegex.Match(_sourceMessage);
         if (justOneSalary.Success)
         {
-            minSalary = ParseSalaryInThousands(justOneSalary.Groups[1].Value);
-            if (minSalary == 0)
+            var doesNotContainUsdOrEur = !_sourceMessage.Contains('$') &&
+                                    !_sourceMessage.Contains("USD", StringComparison.InvariantCultureIgnoreCase) &&
+                                    !_sourceMessage.Contains("eur", StringComparison.InvariantCultureIgnoreCase) &&
+                                    !_sourceMessage.Contains('€');
+
+            if (doesNotContainUsdOrEur)
             {
-                minSalary = ParseSalaryInThousands(justOneSalary.Groups[0].Value);
+                minSalary = ParseSalaryInThousands(justOneSalary.Groups[1].Value);
+                if (minSalary == 0)
+                {
+                    minSalary = ParseSalaryInThousands(justOneSalary.Groups[0].Value);
+                }
+
+                originalText = justOneSalary.Value;
+
+                return new SalaryInfo(
+                    minSalary,
+                    null,
+                    originalText,
+                    true);
             }
+        }
 
-            originalText = justOneSalary.Value;
-
+        var tengeMatch = SalaryWithTengeBeforeRegex.Match(_sourceMessage);
+        if (tengeMatch.Success &&
+            double.TryParse(tengeMatch.Groups[0].Value.Replace("тенге", string.Empty).Trim(), out var tengeValue))
+        {
+            originalText = tengeMatch.Groups[0].Value.Replace("тенге", string.Empty).Trim();
+            minSalary = tengeValue;
             return new SalaryInfo(
                 minSalary,
                 null,
