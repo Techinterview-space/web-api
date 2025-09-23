@@ -168,6 +168,15 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                 return null;
             }
 
+            if (jobPostingSubscription.DeletedAt.HasValue)
+            {
+                _logger.LogInformation(
+                    "JobPosting subscription ID {JobPostingMessageSubscriptionId} is deleted, skipping job posting reply.",
+                    jobPostingSubscription.Id);
+
+                return null;
+            }
+
             var jobPostingProfessions = allProfessions
                 .Where(x => jobPostingSubscription.ProfessionIds.Contains(x.Id))
                 .ToList();
