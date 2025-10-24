@@ -55,6 +55,7 @@ public record SalaryGradeRanges
                     new SalaryGradeRangesItem(
                         grade,
                         null,
+                        null,
                         null));
 
                 continue;
@@ -66,6 +67,7 @@ public record SalaryGradeRanges
                 : null;
 
             var min = gradeSalaries.First().Value;
+            var median = gradeSalaries.Select(x => x.Value).Median();
             var max = (higherGradeOrNull?.Min - 1) ?? gradeSalaries.Last().Value;
 
             _developerGradeValues.Add(
@@ -73,7 +75,8 @@ public record SalaryGradeRanges
                 new SalaryGradeRangesItem(
                     grade,
                     min,
-                    max));
+                    max,
+                    median));
         }
     }
 
@@ -191,11 +194,13 @@ public record SalaryGradeRangesItem
     public SalaryGradeRangesItem(
         DeveloperGrade grade,
         double? min,
-        double? max)
+        double? max,
+        double? median)
     {
         Grade = grade;
         Min = min;
         Max = max;
+        Median = median;
     }
 
     public DeveloperGrade Grade { get; }
@@ -204,15 +209,18 @@ public record SalaryGradeRangesItem
 
     public double? Max { get; }
 
+    public double? Median { get; }
+
     public bool IsInRange(
         double value)
     {
         if (Min.HasValue && Max.HasValue)
         {
             return
+                CloseToMedian(value) ||
                 (value >= Min.Value && value <= Max.Value) ||
                 (Grade is DeveloperGrade.Junior && value < Min.Value) ||
-                (Grade is DeveloperGrade.Lead && value > Max);
+                (Grade is DeveloperGrade.Lead && value > Median);
         }
 
         if (Min.HasValue)
@@ -224,6 +232,29 @@ public record SalaryGradeRangesItem
 
         return
             value <= Max ||
-            (Grade is DeveloperGrade.Lead && value > Max);
+            (Grade is DeveloperGrade.Lead && value > Median);
+    }
+
+    private bool CloseToMedian(
+        double value)
+    {
+        if (Median == null)
+        {
+            return false;
+        }
+
+        if (Min.HasValue && value < Min.Value)
+        {
+            return false;
+        }
+
+        if (Max.HasValue && value > Max.Value)
+        {
+            return false;
+        }
+
+        var difference = Math.Abs(Median.Value - value);
+        var threshold = Median.Value * 0.20;
+        return difference <= threshold;
     }
 }
