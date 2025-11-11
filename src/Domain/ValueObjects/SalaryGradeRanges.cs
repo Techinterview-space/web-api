@@ -68,7 +68,7 @@ public record SalaryGradeRanges
 
             var min = gradeSalaries.First().Value;
             var median = gradeSalaries.Select(x => x.Value).Median();
-            var max = (higherGradeOrNull?.Min - 1) ?? gradeSalaries.Last().Value;
+            var max = gradeSalaries.Last().Value;
 
             _developerGradeValues.Add(
                 grade,
@@ -182,10 +182,37 @@ public record SalaryGradeRanges
         double value,
         out DeveloperGrade grade)
     {
-        grade = _developerGradeValues
-            .FirstOrDefault(x => x.Value.IsInRange(value)).Value.Grade;
+        var closestGradeByMedianData = _developerGradeValues
+            .Where(x => x.Value.Median.HasValue)
+            .Select(x => new
+            {
+                x.Value.Median,
+                RelativeDifference = x.Value.GetDifferenceWithMedian(value, false),
+                AbsoluteDifference = x.Value.GetDifferenceWithMedian(value, true),
+                x.Value.Grade
+            })
+            .Where(x => x.AbsoluteDifference.HasValue)
+            .OrderBy(x => x.AbsoluteDifference.Value)
+            .ToList();
 
-        return grade != default;
+        if (closestGradeByMedianData.Count > 0)
+        {
+            grade = closestGradeByMedianData[0].Grade;
+            return true;
+        }
+
+        var matches = _developerGradeValues
+            .Where(x => x.Value.IsInRange(value))
+            .ToList();
+
+        if (matches.Count > 0)
+        {
+            grade = matches[0].Value.Grade;
+            return true;
+        }
+
+        grade = default;
+        return false;
     }
 }
 
@@ -217,7 +244,6 @@ public record SalaryGradeRangesItem
         if (Min.HasValue && Max.HasValue)
         {
             return
-                CloseToMedian(value) ||
                 (value >= Min.Value && value <= Max.Value) ||
                 (Grade is DeveloperGrade.Junior && value < Min.Value) ||
                 (Grade is DeveloperGrade.Lead && value > Median);
@@ -235,26 +261,17 @@ public record SalaryGradeRangesItem
             (Grade is DeveloperGrade.Lead && value > Median);
     }
 
-    private bool CloseToMedian(
-        double value)
+    public double? GetDifferenceWithMedian(
+        double value,
+        bool absolute)
     {
         if (Median == null)
         {
-            return false;
+            return null;
         }
 
-        if (Min.HasValue && value < Min.Value)
-        {
-            return false;
-        }
-
-        if (Max.HasValue && value > Max.Value)
-        {
-            return false;
-        }
-
-        var difference = Math.Abs(Median.Value - value);
-        var threshold = Median.Value * 0.20;
-        return difference <= threshold;
+        return absolute
+            ? Math.Abs(Median.Value - value)
+            : Median.Value - value;
     }
 }

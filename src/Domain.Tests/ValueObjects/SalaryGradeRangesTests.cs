@@ -80,17 +80,17 @@ public class SalaryGradeRangesTests
     [InlineData(100_000, DeveloperGrade.Junior)]
     [InlineData(200_000, DeveloperGrade.Junior)]
     [InlineData(219_000, DeveloperGrade.Junior)]
+    [InlineData(220_000, DeveloperGrade.Junior)]
 
-    [InlineData(220_000, DeveloperGrade.Middle)]
     [InlineData(360_000, DeveloperGrade.Middle)]
     [InlineData(400_000, DeveloperGrade.Middle)]
-    [InlineData(510_000, DeveloperGrade.Middle)]
 
+    [InlineData(510_000, DeveloperGrade.Senior)]
     [InlineData(520_000, DeveloperGrade.Senior)]
     [InlineData(560_000, DeveloperGrade.Senior)]
     [InlineData(600_000, DeveloperGrade.Senior)]
-    [InlineData(690_000, DeveloperGrade.Senior)]
 
+    [InlineData(690_000, DeveloperGrade.Lead)]
     [InlineData(700_000, DeveloperGrade.Lead)]
     [InlineData(760_000, DeveloperGrade.Lead)]
     [InlineData(850_000, DeveloperGrade.Lead)]
@@ -109,7 +109,7 @@ public class SalaryGradeRangesTests
 
     [Theory]
     [InlineData(90_000, 120_000, DeveloperGrade.Junior)]
-    [InlineData(90_000, 220_000, DeveloperGrade.Junior, DeveloperGrade.Middle)]
+    [InlineData(90_000, 220_000, DeveloperGrade.Junior)]
     [InlineData(219_000, 1_200_000, DeveloperGrade.Junior, DeveloperGrade.Lead)]
     [InlineData(219_000, 1_000_000, DeveloperGrade.Junior, DeveloperGrade.Senior, DeveloperGrade.Lead)]
     public void InWhatRangeValueIs_ProvidedSalaryRange_Ok(

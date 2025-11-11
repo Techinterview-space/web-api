@@ -65,6 +65,86 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         _configuration = configuration;
     }
 
+    public async Task<(bool Processed, string TextToSend)> ProcessJobRelatedMessageAsync(
+        string messageText,
+        long chatId,
+        List<Profession> allProfessions,
+        CancellationToken cancellationToken)
+    {
+        allProfessions ??= await _professionsCacheService.GetProfessionsAsync(cancellationToken);
+
+        // If the message is a bot command, we will process it separately.
+        var jobSalaryInfo = new JobPostingParser(messageText).GetResult();
+        if (!jobSalaryInfo.HasAnySalary())
+        {
+            return (false, null);
+        }
+
+        var salaries = await _context.Salaries.CountAsync(cancellationToken);
+        var s = await _context.JobPostingMessageSubscriptions.ToListAsync(cancellationToken);
+        var jobPostingSubscription = await _context.JobPostingMessageSubscriptions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(
+                x => x.TelegramChatId == chatId,
+                cancellationToken);
+
+        if (jobPostingSubscription is null)
+        {
+            return (false, null);
+        }
+
+        if (jobPostingSubscription.DeletedAt.HasValue)
+        {
+            _logger.LogInformation(
+                "JobPosting subscription ID {JobPostingMessageSubscriptionId} is deleted, skipping job posting reply.",
+                jobPostingSubscription.Id);
+
+            return (false, null);
+        }
+
+        var jobPostingProfessions = allProfessions
+            .Where(x => jobPostingSubscription.ProfessionIds.Contains(x.Id))
+            .ToList();
+
+        var salariesForReply = await new SalariesForChartQuery(
+                _context,
+                new TelegramBotUserCommandParameters(jobPostingProfessions),
+                DateTimeOffset.UtcNow)
+            .Where(x => x.Company == CompanyType.Local)
+            .Where(x => x.Grade != null)
+            .ToQueryable(x => new SalaryBaseData
+            {
+                Grade = x.Grade.Value,
+                Value = x.Value,
+            })
+            .ToListAsync(cancellationToken);
+
+        if (salariesForReply.Count == 0)
+        {
+            _logger.LogInformation(
+                "No salaries found for JobPosting subscription ID {JobPostingMessageSubscriptionId} in job posting reply.",
+                jobPostingSubscription.Id);
+
+            return (false, null);
+        }
+
+        var textToSend =
+            new SalaryGradeRanges(salariesForReply, jobPostingProfessions).ToTelegramHtml(
+                jobSalaryInfo.MinSalary,
+                jobSalaryInfo.MaxSalary);
+
+        if (textToSend is not null)
+        {
+            return (true, textToSend);
+        }
+
+        _logger.LogInformation(
+            "Empty reply text for subscription {JobPostingMessageSubscriptionId} in job posting reply.",
+            jobPostingSubscription.Id);
+
+        return (false, null);
+    }
+
     public async Task<string> Handle(
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
@@ -150,69 +230,17 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         if (hasJobPostingInfo)
         {
-            // If the message is a bot command, we will process it separately.
-            var jobSalaryInfo = new JobPostingParser(message.Text).GetResult();
-            if (!jobSalaryInfo.HasAnySalary())
-            {
-                return null;
-            }
+            var (processed, jobTextToSend) = await ProcessJobRelatedMessageAsync(
+                messageText,
+                message.Chat.Id,
+                allProfessions,
+                cancellationToken);
 
-            var jobPostingSubscription = await _context.JobPostingMessageSubscriptions
-                .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    x => x.TelegramChatId == message.Chat.Id,
-                    cancellationToken);
-
-            if (jobPostingSubscription is null)
-            {
-                return null;
-            }
-
-            if (jobPostingSubscription.DeletedAt.HasValue)
-            {
-                _logger.LogInformation(
-                    "JobPosting subscription ID {JobPostingMessageSubscriptionId} is deleted, skipping job posting reply.",
-                    jobPostingSubscription.Id);
-
-                return null;
-            }
-
-            var jobPostingProfessions = allProfessions
-                .Where(x => jobPostingSubscription.ProfessionIds.Contains(x.Id))
-                .ToList();
-
-            var salariesForReply = await new SalariesForChartQuery(
-                    _context,
-                    new TelegramBotUserCommandParameters(jobPostingProfessions),
-                    DateTimeOffset.UtcNow)
-                .Where(x => x.Company == CompanyType.Local)
-                .Where(x => x.Grade != null)
-                .ToQueryable(x => new SalaryBaseData
-                {
-                    Grade = x.Grade.Value,
-                    Value = x.Value,
-                })
-                .ToListAsync(cancellationToken);
-
-            if (salariesForReply.Count == 0)
-            {
-                _logger.LogInformation(
-                    "No salaries found for JobPosting subscription ID {JobPostingMessageSubscriptionId} in job posting reply.",
-                    jobPostingSubscription.Id);
-
-                return null;
-            }
-
-            var textToSend =
-                new SalaryGradeRanges(salariesForReply, jobPostingProfessions).ToTelegramHtml(
-                    jobSalaryInfo.MinSalary,
-                    jobSalaryInfo.MaxSalary);
-
-            if (textToSend is not null)
+            if (processed && jobTextToSend is not null)
             {
                 await request.BotClient.SendMessage(
                     message.Chat.Id,
-                    textToSend,
+                    jobTextToSend,
                     parseMode: ParseMode.Html,
                     replyParameters: new ReplyParameters
                     {
@@ -224,14 +252,8 @@ public class ProcessSalariesRelatedTelegramMessageHandler
                     },
                     cancellationToken: cancellationToken);
             }
-            else
-            {
-                _logger.LogInformation(
-                    "Empty reply text for subscription {JobPostingMessageSubscriptionId} in job posting reply.",
-                    jobPostingSubscription.Id);
-            }
 
-            return textToSend;
+            return jobTextToSend;
         }
 
         var mentionedInGroupChat =
@@ -260,13 +282,11 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return directMessageResult.ReplyText;
         }
 
-        var parameters = TelegramBotUserCommandParameters.CreateFromMessage(
-            messageText,
-            allProfessions);
-
-        var replyData = await ReplyWithSalariesAsync(
+        TelegramBotReplyData replyData = await ReplyWithSalariesAsync(
             message.Chat.Id.ToString(),
-            parameters,
+            TelegramBotUserCommandParameters.CreateFromMessage(
+                messageText,
+                allProfessions),
             cancellationToken);
 
         await request.BotClient.SendMessage(
