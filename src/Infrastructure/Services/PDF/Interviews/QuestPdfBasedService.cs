@@ -20,12 +20,6 @@ public class QuestPdfBasedService : IInterviewPdfService
     public FileData Render(
         Interview interview)
     {
-        var options = new MarkdownRendererOptions
-        {
-            BlockQuoteBorderColor = Colors.Grey.Medium,
-            BlockQuoteBorderThickness = 5
-        };
-
         var content = new InterviewMarkdownBody(interview)
             .WithFooter(_global)
             .ToString();
@@ -35,7 +29,13 @@ public class QuestPdfBasedService : IInterviewPdfService
             container.Page(page =>
             {
                 page.Margin(20);
-                page.Content().Markdown(content, options);
+                page
+                    .Content()
+                    .Markdown(content, o =>
+                    {
+                        o.BlockQuoteBorderColor = Colors.Grey.Medium;
+                        o.BlockQuoteBorderThickness = 5;
+                    });
             });
         });
 
