@@ -1,5 +1,7 @@
 ## Tech.Interviewer
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Techinterview-space/web-api?utm_source=oss&utm_medium=github&utm_campaign=Techinterview-space%2Fweb-api&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 This repo is for Backend API for [techinterview.space](https://techinterview.space).
 
 ## Apps

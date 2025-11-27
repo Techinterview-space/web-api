@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+
+early_access: false
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  auto_title_placeholder: "@coderabbitai"
+  review_status: true
+  collapse_walkthrough: false
+  poem: false
+  
+  path_instructions:
+    - path: "**/*.cs"
+      instructions: |
+        Review C# code for:
+        - SOLID principles and clean architecture adherence
+        - Proper async/await usage and avoiding async void
+        - Null safety and proper use of nullable reference types
+        - Dependency injection best practices
+        - Exception handling patterns
+        - Memory management and IDisposable implementation
+        - LINQ query optimization
+    
+    - path: "**/Controllers/**/*.cs"
+      instructions: |
+        Review API controllers for:
+        - Proper HTTP verb usage and RESTful conventions
+        - Input validation and model binding
+        - Appropriate status code returns
+        - Authorization attributes and security
+        - Consistent error response formats
+    
+    - path: "**/Services/**/*.cs"
+      instructions: |
+        Review service layer for:
+        - Single responsibility principle
+        - Proper abstraction through interfaces
+        - Transaction management
+        - Business logic encapsulation
+    
+    - path: "**/Repositories/**/*.cs"
+      instructions: |
+        Review repository layer for:
+        - Efficient database queries
+        - Proper use of Entity Framework Core
+        - Avoiding N+1 query problems
+        - Correct use of AsNoTracking where appropriate
+    
+    - path: "**/*Tests.cs"
+      instructions: |
+        Review test files for:
+        - Adequate test coverage
+        - Proper use of xUnit/NUnit/MSTest assertions
+        - Mock objects with Moq or NSubstitute
+        - Arrange-Act-Assert pattern
+        - Integration test isolation
+    
+    - path: "**/appsettings*.json"
+      instructions: |
+        Check for:
+        - No hardcoded secrets or connection strings
+        - Proper configuration structure
+        - Environment-specific overrides
+    
+    - path: "**/Program.cs"
+      instructions: |
+        Review application startup for:
+        - Proper service registration order
+        - Middleware pipeline configuration
+        - Environment-based configuration
+    
+    - path: "**/Migrations/**/*.cs"
+      instructions: |
+        Review EF Core migrations for:
+        - Data integrity preservation
+        - Proper index creation
+        - Reversible migrations where possible
+
+  path_filters:
+    - "!**/obj/**"
+    - "!**/bin/**"
+    - "!**/*.Designer.cs"
+    - "!**/Migrations/*.Designer.cs"
+    - "!**/*.g.cs"
+    - "!**/wwwroot/lib/**"
+    - "!**/*.min.js"
+    - "!**/*.min.css"
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: "auto"
+  issues:
+    scope: "auto"
+  pull_requests:
+    scope: "auto"
