@@ -226,12 +226,7 @@ public class SalariesSubscriptionService
 
             textMessageToBeSent += "\n\n#статистика_зарплат";
 
-            var dataTobeSent = new TelegramBotReplyData(
-                textMessageToBeSent.Trim(),
-                new InlineKeyboardMarkup(
-                    InlineKeyboardButton.WithUrl(
-                        text: SalariesPageUrl,
-                        url: salariesChartPageLink.ToString())));
+            var dataTobeSent = new TelegramBotReplyData(textMessageToBeSent.Trim());
 
             var subscriptionRecord = new StatDataChangeSubscriptionRecord(
                 subscription,

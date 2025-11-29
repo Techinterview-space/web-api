@@ -485,12 +485,7 @@ Chat ID: {message.Chat.Id}
                 $"на сайте <a href=\"{salariesChartPageLink}\">{SalariesPageUrl}</a></em>";
         }
 
-        return new TelegramBotReplyData(
-            replyText.Trim(),
-            new InlineKeyboardMarkup(
-                InlineKeyboardButton.WithUrl(
-                    text: SalariesPageUrl,
-                    url: salariesChartPageLink.ToString())));
+        return new TelegramBotReplyData(replyText.Trim());
     }
 
     private async Task ProcessInlineQueryAsync(

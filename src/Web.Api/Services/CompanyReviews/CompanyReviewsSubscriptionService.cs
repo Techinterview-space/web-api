@@ -20,7 +20,7 @@ namespace Web.Api.Services.CompanyReviews;
 
 public class CompanyReviewsSubscriptionService
 {
-    public const string RecentCompanyReviewsPageUrl = "techinterview.space";
+    public const string RecentCompanyReviewsPageUrl = "techinterview.space/companies";
     public const int CountOfDaysToSendMonthlyNotification = 24;
 
     private readonly DatabaseContext _context;
@@ -117,12 +117,7 @@ public class CompanyReviewsSubscriptionService
 
             textMessageToBeSent += "\n\n#отзывы_о_компаниях";
 
-            var messageToBeSent = new TelegramBotReplyData(
-                textMessageToBeSent.Trim(),
-                new InlineKeyboardMarkup(
-                    InlineKeyboardButton.WithUrl(
-                        text: RecentCompanyReviewsPageUrl,
-                        url: salariesChartPageLink.ToString())));
+            var messageToBeSent = new TelegramBotReplyData(textMessageToBeSent.Trim());
 
             messagesToBeSent.Add((subscription, messageToBeSent));
         }
