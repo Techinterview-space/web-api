@@ -48,6 +48,8 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
 
     public int? YearTo { get; init; }
 
+    public DateTime? DateTo { get; init; }
+
     public string GetKeyPostfix()
     {
         var grade = Grade?.ToString() ?? "all";

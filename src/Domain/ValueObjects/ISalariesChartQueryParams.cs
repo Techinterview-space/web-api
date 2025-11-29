@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
@@ -15,11 +16,13 @@ public interface ISalariesChartQueryParams
 
     public List<KazakhstanCity> Cities { get; }
 
-    public List<SalarySourceType> SalarySourceTypes { get; init; }
+    public List<SalarySourceType> SalarySourceTypes { get; }
 
     public int? QuarterTo { get; }
 
     public int? YearTo { get; }
+
+    public DateTime? DateTo { get; }
 
     public bool HasAnyFilter =>
         Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;

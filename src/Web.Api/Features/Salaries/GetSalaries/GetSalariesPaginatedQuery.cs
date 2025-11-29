@@ -32,6 +32,9 @@ public record GetSalariesPaginatedQuery
     [FromQuery(Name = "yearTo")]
     public int? YearTo { get; init; }
 
+    [FromQuery(Name = "dateTo")]
+    public System.DateTime? DateTo { get; init; }
+
     public bool HasAnyFilter =>
         Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;
 

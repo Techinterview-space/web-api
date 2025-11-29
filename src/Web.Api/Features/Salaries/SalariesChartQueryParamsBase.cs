@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
@@ -29,6 +30,9 @@ public record SalariesChartQueryParamsBase : ISalariesChartQueryParams
 
     [FromQuery(Name = "yearTo")]
     public int? YearTo { get; init; }
+
+    [FromQuery(Name = "dateTo")]
+    public DateTime? DateTo { get; init; }
 
     public bool HasAnyFilter =>
         Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;

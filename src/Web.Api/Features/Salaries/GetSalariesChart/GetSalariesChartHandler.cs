@@ -7,6 +7,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.ValueObjects;
+using Domain.ValueObjects.Dates;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
@@ -52,11 +53,23 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
 
             var userSalariesForLastYear = new List<UserSalary>();
 
-            var now = DateTimeOffset.Now;
+            var endDateForStats = DateTimeOffset.Now;
+            if (request.DateTo.HasValue)
+            {
+                endDateForStats = new DateTimeOffset(
+                    year: request.DateTo.Value.Year,
+                    month: request.DateTo.Value.Month,
+                    day: DateTime.DaysInMonth(request.DateTo.Value.Year, request.DateTo.Value.Month),
+                    hour: 23,
+                    minute: 59,
+                    second: 59,
+                    offset: TimeSpan.Zero);
+            }
+
             var salariesQuery = new SalariesForChartQuery(
                 _context,
                 request,
-                now);
+                endDateForStats);
 
             if (currentUser != null)
             {
