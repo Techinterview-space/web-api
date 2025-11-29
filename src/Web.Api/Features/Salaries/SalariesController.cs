@@ -75,6 +75,7 @@ public class SalariesController : ControllerBase
                 SalarySourceTypes = request.SalarySourceTypes,
                 QuarterTo = request.QuarterTo,
                 YearTo = request.YearTo,
+                DateTo = request.DateTo,
             },
             cancellationToken);
     }
