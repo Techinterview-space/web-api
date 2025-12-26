@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Web.Api.Features.Salaries;
 
 namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
-public record GetSalariesHistoricalChartQueryParams : SalariesChartQueryParamsBase
+public record GetSalariesHistoricalChartQueryParams
 {
     [FromQuery(Name = "from")]
     public DateTimeOffset? From { get; init; }
