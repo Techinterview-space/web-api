@@ -49,7 +49,7 @@ public record SalariesChartQueryParamsBase : ISalariesChartQueryParams
     public virtual DateTime? DateTo { get; init; }
 
     public virtual bool HasAnyFilter =>
-        Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;
+        Grade.HasValue || SelectedProfessionIds?.Count > 0 || Cities?.Count > 0;
 
     public virtual string GetKeyPostfix()
     {
