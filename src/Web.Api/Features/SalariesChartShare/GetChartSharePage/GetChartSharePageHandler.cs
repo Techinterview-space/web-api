@@ -50,14 +50,15 @@ namespace Web.Api.Features.SalariesChartShare.GetChartSharePage
                 },
                 cancellationToken);
 
-            var frontendLink = new SalariesChartPageLink(_global, request);
+            var queryParamsForDatabase = request.CreateDatabaseQueryParams();
+            var frontendLink = new SalariesChartPageLink(_global, queryParamsForDatabase);
 
             var formattedMedianSalary = SalaryFormat(chartResponse.MedianSalary);
             var ogTitle = $"Медианная зп: {formattedMedianSalary} тг | techinterview.space";
             string description;
             string contentDescription;
 
-            if (request.HasAnyFilter)
+            if (queryParamsForDatabase.HasAnyFilter)
             {
                 description = contentDescription = "Специалисты ";
                 if (professionsToInclude.Count > 0)

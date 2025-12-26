@@ -2,7 +2,6 @@
 using Infrastructure.Configs;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
-using MaximGorbatyuk.DatabaseSqlEndpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,15 +106,6 @@ public class Startup
 
         HealthCheckCustomResponse.Setup(app);
         ScheduleConfig.Use(app);
-
-        app
-            .UseSqlEndpoints<DatabaseContext>(
-                checkForAuthentication: true,
-                roleToCheckForAuthorization: nameof(Role.Admin),
-                sqlEngine: SqlEngine.PostgreSQL)
-            .UseTableOutputEndpoint()
-            .UseExecuteEndpoint()
-            .UseReadEndpoint();
 
         app.UseEndpoints(endpoints =>
         {

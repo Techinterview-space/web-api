@@ -2,6 +2,7 @@
 using Domain.Entities.Companies;
 using Domain.Entities.CSV;
 using Domain.Entities.Github;
+using Domain.Entities.HistoricalRecords;
 using Domain.Entities.Interviews;
 using Domain.Entities.Labels;
 using Domain.Entities.Prompts;
@@ -90,6 +91,10 @@ public class DatabaseContext : DbContext
     public DbSet<LastWeekCompanyReviewsSubscription> CompanyReviewsSubscriptions { get; set; }
 
     public DbSet<JobPostingMessageSubscription> JobPostingMessageSubscriptions { get; set; }
+
+    public DbSet<SalariesHistoricalDataRecordTemplate> SalariesHistoricalDataRecordTemplates { get; set; }
+
+    public DbSet<SalariesHistoricalDataRecord> SalariesHistoricalDataRecords { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

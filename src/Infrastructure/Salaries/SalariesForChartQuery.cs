@@ -69,7 +69,7 @@ public record SalariesForChartQuery
 
     public SalariesForChartQuery(
         DatabaseContext context,
-        ISalariesChartQueryParams request,
+        SalariesChartQueryParamsBase request,
         DateTimeOffset now)
         : this(
             context,
@@ -81,7 +81,7 @@ public record SalariesForChartQuery
 
     public SalariesForChartQuery(
         DatabaseContext context,
-        ISalariesChartQueryParams request,
+        SalariesChartQueryParamsBase request,
         DateTimeOffset from,
         DateTimeOffset to)
         : this(

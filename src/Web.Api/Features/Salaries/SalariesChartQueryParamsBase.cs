@@ -34,13 +34,16 @@ public record SalariesChartQueryParamsBase : ISalariesChartQueryParams
     [FromQuery(Name = "dateTo")]
     public DateTime? DateTo { get; init; }
 
-    public bool HasAnyFilter =>
-        Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;
-
-    public string GetKeyPostfix()
+    public Domain.ValueObjects.SalariesChartQueryParamsBase CreateDatabaseQueryParams()
     {
-        var grade = Grade?.ToString() ?? "all";
-        var professions = SelectedProfessionIds.Count == 0 ? "all" : string.Join("_", SelectedProfessionIds);
-        return $"{grade}_{professions}";
+        return new Domain.ValueObjects.SalariesChartQueryParamsBase(
+            Grade,
+            SelectedProfessionIds,
+            Skills,
+            Cities,
+            SalarySourceTypes,
+            QuarterTo,
+            YearTo,
+            DateTo);
     }
 }

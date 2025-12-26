@@ -23,9 +23,4 @@ public interface ISalariesChartQueryParams
     public int? YearTo { get; }
 
     public DateTime? DateTo { get; }
-
-    public bool HasAnyFilter =>
-        Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;
-
-    string GetKeyPostfix();
 }

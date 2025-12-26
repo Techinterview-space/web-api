@@ -46,7 +46,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
         }
 
         public async Task<SalariesChartResponse> Handle(
-            ISalariesChartQueryParams request,
+            SalariesChartQueryParamsBase request,
             CancellationToken cancellationToken)
         {
             var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
@@ -68,7 +68,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
 
             var salariesQuery = new SalariesForChartQuery(
                 _context,
-                request,
+                request.CreateDatabaseQueryParams(),
                 endDateForStats);
 
             if (currentUser != null)
@@ -182,7 +182,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             GetSalariesChartQuery request,
             CancellationToken cancellationToken)
         {
-            return Handle((ISalariesChartQueryParams)request, cancellationToken);
+            return Handle((SalariesChartQueryParamsBase)request, cancellationToken);
         }
 
         private static GradesMinMaxChartData CreateGradesMinMaxChartData(List<UserSalaryDto> salaries)

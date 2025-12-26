@@ -5,7 +5,7 @@ using Domain.ValueObjects;
 
 namespace Infrastructure.Services.Telegram.UserCommands;
 
-public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
+public record TelegramBotUserCommandParameters : SalariesChartQueryParamsBase
 {
     public TelegramBotUserCommandParameters()
         : this(new List<Profession>())
@@ -32,30 +32,15 @@ public record TelegramBotUserCommandParameters : ISalariesChartQueryParams
             .ToList();
     }
 
-    public DeveloperGrade? Grade { get; }
-
-    public List<long> SelectedProfessionIds { get; } = new ();
-
-    public List<long> Skills { get; } = new ();
-
-    public List<KazakhstanCity> Cities => new List<KazakhstanCity>(0);
+    public override List<KazakhstanCity> Cities => new List<KazakhstanCity>(0);
 
     public List<Profession> SelectedProfessions { get; }
 
-    public List<SalarySourceType> SalarySourceTypes { get; init; } = new ();
+    public override int? QuarterTo => null;
 
-    public int? QuarterTo { get; init; }
+    public override int? YearTo => null;
 
-    public int? YearTo { get; init; }
-
-    public DateTime? DateTo { get; init; }
-
-    public string GetKeyPostfix()
-    {
-        var grade = Grade?.ToString() ?? "all";
-        var professions = SelectedProfessionIds.Count == 0 ? "all" : string.Join("_", SelectedProfessionIds);
-        return $"{grade}_{professions}";
-    }
+    public override DateTime? DateTo => null;
 
     public string GetProfessionsTitleOrNull()
     {

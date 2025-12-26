@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
-using Infrastructure.Extensions;
-using Infrastructure.Salaries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
@@ -13,68 +11,50 @@ namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 public class GetSalariesHistoricalChartHandler
     : Infrastructure.Services.Mediator.IRequestHandler<GetSalariesHistoricalChartQueryParams, GetSalariesHistoricalChartResponse>
 {
-    private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
 
     public GetSalariesHistoricalChartHandler(
-        DatabaseContext context,
-        IAuthorization auth)
+        DatabaseContext context)
     {
         _context = context;
-        _auth = auth;
     }
 
     public async Task<GetSalariesHistoricalChartResponse> Handle(
         GetSalariesHistoricalChartQueryParams request,
         CancellationToken cancellationToken)
     {
-        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
-
-        var hasAuthentication = currentUser != null;
-        var shouldAddOwnSalary = false;
-
-        var to = request.To ?? DateTimeOffset.Now;
+        var to = request.To ?? DateTimeOffset.UtcNow;
         var from = request.From ?? to.AddMonths(-12);
 
-        var salariesQuery = new SalariesForChartQuery(
-            _context,
-            request,
-            from,
-            to);
-
-        if (currentUser != null)
-        {
-            var userSalariesForLastYear = await _context.Salaries
-                .GetUserRelevantSalariesAsync(
-                    currentUser.Id,
-                    cancellationToken);
-
-            shouldAddOwnSalary = !userSalariesForLastYear.Any();
-        }
-
-        if (currentUser is null || shouldAddOwnSalary)
-        {
-            return GetSalariesHistoricalChartResponse.NoSalaryOrAuthorization(
-                hasAuthentication,
-                shouldAddOwnSalary,
-                from,
-                to);
-        }
-
-        var salaries = await salariesQuery
-            .ToQueryable(x => new UserSalarySimpleDto
-            {
-                Value = x.Value,
-                Company = x.Company,
-                Grade = x.Grade,
-                CreatedAt = x.CreatedAt,
-            })
+        // Query historical data records within the date range
+        var historicalRecords = await _context.SalariesHistoricalDataRecords
+            .AsNoTracking()
+            .Include(x => x.SalariesHistoricalDataRecordTemplate)
+            .Where(x => x.Date >= from && x.Date <= to)
+            .OrderBy(x => x.Date)
             .ToListAsync(cancellationToken);
 
+        // Group by template
+        var groupedByTemplate = historicalRecords
+            .GroupBy(x => x.TemplateId)
+            .Select(group =>
+            {
+                var template = group.First().SalariesHistoricalDataRecordTemplate;
+                var dataPoints = group
+                    .OrderBy(x => x.Date)
+                    .Select(record => new HistoricalDataPoint(record))
+                    .ToList();
+
+                return new HistoricalDataByTemplate(
+                    template.Id,
+                    template.ProfessionIds ?? new List<long>(),
+                    dataPoints);
+            })
+            .ToList();
+
         return new GetSalariesHistoricalChartResponse(
-            salaries,
+            groupedByTemplate,
             from,
-            to,
-            !request.Grade.HasValue);
+            to);
     }
 }

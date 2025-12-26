@@ -67,9 +67,11 @@ public class GetSurveyHistoricalChartHandler
         var lastSurvey = await new SalariesSurveyUserService(_context)
             .GetLastSurveyOrNullAsync(currentUser, cancellationToken);
 
+        var queryParamsForDatabase = request.CreateDatabaseQueryParams();
+        var cacheKey = CacheKey + queryParamsForDatabase.GetKeyPostfix();
         var surveyReplies = await _memoryCache
             .GetOrCreateAsync(
-                CacheKey + request.GetKeyPostfix(),
+                cacheKey,
                 async (entry) =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
