@@ -22,7 +22,8 @@ public static class ScheduleConfig
             .AddTransient<SalariesAiAnalysisSubscriptionWeeklyJob>()
             .AddTransient<SalaryUpdateReminderEmailJob>()
             .AddTransient<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>()
-            .AddTransient<SalariesHistoricalDataJob>();
+            .AddTransient<SalariesHistoricalDataJob>()
+            .AddTransient<SalariesHistoricalDataBackfillJob>();
 
         return services;
     }
@@ -41,6 +42,11 @@ public static class ScheduleConfig
                 .Schedule<SalariesHistoricalDataJob>()
                 .DailyAt(13, 0)
                 .PreventOverlapping(nameof(SalariesHistoricalDataJob));
+
+            scheduler
+                .Schedule<SalariesHistoricalDataBackfillJob>()
+                .Hourly()
+                .PreventOverlapping(nameof(SalariesHistoricalDataBackfillJob));
 
             scheduler
                 .Schedule<TelegramSalariesRegularStatsUpdateJob>()
