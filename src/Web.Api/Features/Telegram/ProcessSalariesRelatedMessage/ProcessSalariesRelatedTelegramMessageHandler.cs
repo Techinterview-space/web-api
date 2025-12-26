@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
-using Domain.Entities.StatData;
 using Domain.Entities.StatData.Salary;
 using Domain.Entities.Telegram;
 using Domain.Extensions;
@@ -26,8 +25,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.ReplyMarkups;
-using Web.Api.Features.Salaries.GetSalariesChart.Charts;
 
 namespace Web.Api.Features.Telegram.ProcessSalariesRelatedMessage;
 
@@ -80,8 +77,6 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return (false, null);
         }
 
-        var salaries = await _context.Salaries.CountAsync(cancellationToken);
-        var s = await _context.JobPostingMessageSubscriptions.ToListAsync(cancellationToken);
         var jobPostingSubscription = await _context.JobPostingMessageSubscriptions
             .AsNoTracking()
             .FirstOrDefaultAsync(

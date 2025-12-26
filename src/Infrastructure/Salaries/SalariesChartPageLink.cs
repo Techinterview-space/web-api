@@ -5,7 +5,7 @@ namespace Infrastructure.Salaries;
 
 public record SalariesChartPageLink
 {
-    private readonly ISalariesChartQueryParams _requestOrNull;
+    private readonly SalariesChartQueryParamsBase _requestOrNull;
     private readonly string _frontendBaseUrl;
     private readonly Dictionary<string, string> _additionalQueryParams;
 
@@ -13,7 +13,7 @@ public record SalariesChartPageLink
 
     public SalariesChartPageLink(
         string baseUrl,
-        ISalariesChartQueryParams requestOrNull)
+        SalariesChartQueryParamsBase requestOrNull)
     {
         _requestOrNull = requestOrNull;
         _frontendBaseUrl = baseUrl;
@@ -22,7 +22,7 @@ public record SalariesChartPageLink
 
     public SalariesChartPageLink(
         IGlobal global,
-        ISalariesChartQueryParams requestOrNull)
+        SalariesChartQueryParamsBase requestOrNull)
         : this(
             global.FrontendBaseUrl + "/salaries",
             requestOrNull)

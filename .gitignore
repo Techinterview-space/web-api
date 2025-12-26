@@ -35,3 +35,4 @@ src/Frontend/.angular
 volume
 src/.env
 /src/.vs
+src/dotnet-analysis.json

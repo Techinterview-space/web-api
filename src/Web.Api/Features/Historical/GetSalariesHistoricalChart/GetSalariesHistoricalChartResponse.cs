@@ -1,100 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using Domain.Entities.Enums;
-using Domain.Entities.Salaries;
-using Domain.ValueObjects;
-using Domain.ValueObjects.Dates;
-using Infrastructure.Salaries;
-using Web.Api.Features.Historical.GetSalariesHistoricalChart.Charts;
+using Domain.Entities.HistoricalRecords;
+using Domain.Enums;
 
 namespace Web.Api.Features.Historical.GetSalariesHistoricalChart;
 
 public record GetSalariesHistoricalChartResponse
 {
-    public static readonly List<DeveloperGrade> GradesToBeUsedInChart = new ()
-    {
-        DeveloperGrade.Junior,
-        DeveloperGrade.Middle,
-        DeveloperGrade.Senior,
-        DeveloperGrade.Lead,
-    };
-
     public GetSalariesHistoricalChartResponse()
     {
     }
 
     public GetSalariesHistoricalChartResponse(
-        List<UserSalarySimpleDto> salaries,
+        List<HistoricalDataByTemplate> templates,
         DateTimeOffset from,
-        DateTimeOffset to,
-        bool addGradeChartData)
+        DateTimeOffset to)
     {
+        Templates = templates;
         From = from;
         To = to;
-        HasAuthentication = true;
-        ShouldAddOwnSalary = false;
-
-        var twentyWeeksBeforeTo = to.DateTime.AddYears(-1);
-        var weekSplitterFrom = from.Earlier(twentyWeeksBeforeTo)
-            ? twentyWeeksBeforeTo
-            : from.DateTime;
-
-        var rangeSplitter = new DateTimeRangeSplitter(
-            weekSplitterFrom,
-            to.DateTime,
-            TimeSpan.FromDays(30));
-
-        var localSalaries = new List<UserSalarySimpleDto>();
-        var remoteSalaries = new List<UserSalarySimpleDto>();
-
-        foreach (var salary in salaries)
-        {
-            if (salary.Company is CompanyType.Local)
-            {
-                localSalaries.Add(salary);
-            }
-            else if (salary.Company is CompanyType.Foreign)
-            {
-                remoteSalaries.Add(salary);
-            }
-        }
-
-        SalariesCountWeekByWeekChart = new SalariesCountWeekByWeekChart(
-            localSalaries,
-            remoteSalaries,
-            rangeSplitter,
-            addGradeChartData);
     }
 
-    // TODO mgorbatyuk: rename to avoid using "weeks"
-    public SalariesCountWeekByWeekChart SalariesCountWeekByWeekChart { get; private set; }
-
-    public bool ShouldAddOwnSalary { get; private set; }
-
-    public bool HasAuthentication { get; private set; }
+    public List<HistoricalDataByTemplate> Templates { get; private set; } = new ();
 
     public DateTimeOffset From { get; private set; }
 
     public DateTimeOffset To { get; private set; }
 
-    public DateTimeOffset ChartFrom { get; private set; }
-
-    public DateTimeOffset ChartTo { get; private set; }
-
     public static GetSalariesHistoricalChartResponse NoSalaryOrAuthorization(
-        bool hasAuthentication,
-        bool shouldAddOwnSalary,
         DateTimeOffset from,
         DateTimeOffset to)
     {
         return new GetSalariesHistoricalChartResponse
         {
-            HasAuthentication = hasAuthentication,
-            ShouldAddOwnSalary = shouldAddOwnSalary,
             From = from,
             To = to,
-            ChartFrom = from,
-            ChartTo = to,
         };
     }
+}
+
+public record HistoricalDataByTemplate
+{
+    public HistoricalDataByTemplate(
+        Guid templateId,
+        string name,
+        List<long> professionIds,
+        List<HistoricalDataPoint> dataPoints)
+    {
+        TemplateId = templateId;
+        Name = name;
+        ProfessionIds = professionIds;
+        DataPoints = dataPoints;
+    }
+
+    public Guid TemplateId { get; }
+
+    public string Name { get; }
+
+    public List<long> ProfessionIds { get; }
+
+    public List<HistoricalDataPoint> DataPoints { get; }
+}
+
+public record HistoricalDataPoint
+{
+    public HistoricalDataPoint(
+        SalariesHistoricalDataRecord record)
+    {
+        Date = record.Date;
+        MedianLocalSalary = record.Data.MedianLocalSalary;
+        AverageLocalSalary = record.Data.AverageLocalSalary;
+        MinLocalSalary = record.Data.MinLocalSalary;
+        MaxLocalSalary = record.Data.MaxLocalSalary;
+        TotalSalaryCount = record.Data.TotalSalaryCount;
+        MedianLocalSalaryByGrade = record.Data.MedianLocalSalaryByGrade ?? new Dictionary<Domain.Enums.GradeGroup, double>();
+    }
+
+    public DateTimeOffset Date { get; }
+
+    public double MedianLocalSalary { get; }
+
+    public double AverageLocalSalary { get; }
+
+    public double? MinLocalSalary { get; }
+
+    public double? MaxLocalSalary { get; }
+
+    public int TotalSalaryCount { get; }
+
+    public Dictionary<GradeGroup, double> MedianLocalSalaryByGrade { get; }
 }

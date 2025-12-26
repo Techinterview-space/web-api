@@ -1,0 +1,6 @@
+﻿using Web.Api.Features.SalariesHistoricalDataTemplates.Shared;
+
+namespace Web.Api.Features.SalariesHistoricalDataTemplates.CreateTemplate;
+
+public record CreateSalariesHistoricalDataRecordTemplateBodyRequest
+    : UpdateSalariesHistoricalDataRecordTemplateBodyRequest;

@@ -21,19 +21,26 @@ public static class ScheduleConfig
             .AddTransient<SalariesSubscriptionPublishMessageJob>()
             .AddTransient<SalariesAiAnalysisSubscriptionWeeklyJob>()
             .AddTransient<SalaryUpdateReminderEmailJob>()
-            .AddTransient<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>();
+            .AddTransient<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>()
+            .AddTransient<SalariesHistoricalDataJob>();
 
         return services;
     }
 
     public static void Use(IApplicationBuilder app)
     {
+        var isDebuggerAttached = Debugger.IsAttached;
         app.ApplicationServices.UseScheduler((scheduler) =>
         {
             scheduler
                 .Schedule<CurrenciesResetJob>()
                 .DailyAt(6, 0)
                 .RunOnceAtStart();
+
+            scheduler
+                .Schedule<SalariesHistoricalDataJob>()
+                .DailyAt(13, 0)
+                .PreventOverlapping(nameof(SalariesHistoricalDataJob));
 
             scheduler
                 .Schedule<TelegramSalariesRegularStatsUpdateJob>()
@@ -62,14 +69,20 @@ public static class ScheduleConfig
             scheduler
                 .Schedule<SalariesSubscriptionPublishMessageJob>()
                 .EveryMinute()
-                .When(() => Task.FromResult(Debugger.IsAttached))
+                .When(() => Task.FromResult(isDebuggerAttached))
                 .PreventOverlapping(nameof(SalariesSubscriptionPublishMessageJob));
 
             scheduler
                 .Schedule<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>()
                 .EveryMinute()
-                .When(() => Task.FromResult(Debugger.IsAttached))
+                .When(() => Task.FromResult(isDebuggerAttached))
                 .PreventOverlapping(nameof(CompanyReviewsAiAnalysisSubscriptionWeeklyJob));
+
+            scheduler
+                .Schedule<SalariesHistoricalDataJob>()
+                .EveryMinute()
+                .When(() => Task.FromResult(isDebuggerAttached))
+                .PreventOverlapping(nameof(SalariesHistoricalDataJob));
 
             for (var i = 0; i < 10; i++)
             {

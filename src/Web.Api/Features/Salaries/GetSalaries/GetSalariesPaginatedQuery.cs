@@ -8,8 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Features.Salaries.GetSalaries;
 
-public record GetSalariesPaginatedQuery
-    : PageModel, ISalariesChartQueryParams
+public record GetSalariesPaginatedQuery : PageModel, ISalariesChartQueryParams
 {
     [FromQuery(Name = "grade")]
     public DeveloperGrade? Grade { get; init; }
@@ -35,13 +34,16 @@ public record GetSalariesPaginatedQuery
     [FromQuery(Name = "dateTo")]
     public System.DateTime? DateTo { get; init; }
 
-    public bool HasAnyFilter =>
-        Grade.HasValue || SelectedProfessionIds.Count > 0 || Cities.Count > 0;
-
-    public string GetKeyPostfix()
+    public Domain.ValueObjects.SalariesChartQueryParamsBase CreateDatabaseQueryParams()
     {
-        var grade = Grade?.ToString() ?? "all";
-        var professions = SelectedProfessionIds.Count == 0 ? "all" : string.Join("_", SelectedProfessionIds);
-        return $"{grade}_{professions}";
+        return new Domain.ValueObjects.SalariesChartQueryParamsBase(
+            Grade,
+            SelectedProfessionIds,
+            Skills,
+            Cities,
+            SalarySourceTypes,
+            QuarterTo,
+            YearTo,
+            DateTo);
     }
 }

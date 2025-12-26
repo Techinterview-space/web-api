@@ -23,7 +23,7 @@ public class GetSalariesPaginatedQueryHandler : Infrastructure.Services.Mediator
     {
         var query = new SalariesAdminQuery(_context)
             .WithSource(request.SalarySourceTypes)
-            .ApplyFilters(request)
+            .ApplyFilters(request.CreateDatabaseQueryParams())
             .ApplyShowInStats(true)
             .ApplyOrder(GetAllSalariesOrderType.CreatedAtDesc)
             .ToPublicDtoQueryable();
