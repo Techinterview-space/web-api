@@ -8,8 +8,11 @@ namespace TestUtils.Fakes;
 public class SalariesHistoricalDataRecordTemplateFake : SalariesHistoricalDataRecordTemplate
 {
     public SalariesHistoricalDataRecordTemplateFake(
+        string name = "Test Template",
         List<long> professionIds = null)
-        : base(professionIds ?? new List<long>())
+        : base(
+            name,
+            professionIds ?? new List<long>())
     {
     }
 

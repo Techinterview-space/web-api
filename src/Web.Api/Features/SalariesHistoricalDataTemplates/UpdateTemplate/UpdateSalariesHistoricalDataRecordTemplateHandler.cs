@@ -53,7 +53,9 @@ public class UpdateSalariesHistoricalDataRecordTemplateHandler
             throw new BadRequestException("Some profession IDs are invalid.");
         }
 
-        existingTemplate.Update(professions);
+        existingTemplate.Update(
+            request.Name,
+            professions);
 
         await _context.SaveChangesAsync(cancellationToken);
         return new SalariesHistoricalDataRecordTemplateDto(existingTemplate);

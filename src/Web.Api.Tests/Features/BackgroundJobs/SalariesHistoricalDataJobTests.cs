@@ -29,6 +29,7 @@ public class SalariesHistoricalDataJobTests
         var profession = context.Professions.First(x => x.Id == 1);
 
         var template = await new SalariesHistoricalDataRecordTemplateFake(
+                "Test Template",
                 new List<long> { profession.Id })
             .PleaseAsync(context);
 
@@ -86,6 +87,7 @@ public class SalariesHistoricalDataJobTests
         var profession = context.Professions.First(x => x.Id == 1);
 
         var template = await new SalariesHistoricalDataRecordTemplateFake(
+                "No Salaries Template",
                 new List<long> { profession.Id })
             .PleaseAsync(context);
 
@@ -127,6 +129,7 @@ public class SalariesHistoricalDataJobTests
         var profession = context.Professions.First(x => x.Id == 1);
 
         var template = await new SalariesHistoricalDataRecordTemplateFake(
+                "Test Template",
                 new List<long> { profession.Id })
             .PleaseAsync(context);
 

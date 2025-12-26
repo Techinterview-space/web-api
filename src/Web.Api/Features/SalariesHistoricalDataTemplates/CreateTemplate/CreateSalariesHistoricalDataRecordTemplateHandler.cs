@@ -42,7 +42,9 @@ public class CreateSalariesHistoricalDataRecordTemplateHandler
         }
 
         var newTemplate = _context.Add(
-            new SalariesHistoricalDataRecordTemplate(professions));
+            new SalariesHistoricalDataRecordTemplate(
+                request.Name,
+                professions));
 
         await _context.SaveChangesAsync(cancellationToken);
         return new SalariesHistoricalDataRecordTemplateDto(newTemplate.Entity);

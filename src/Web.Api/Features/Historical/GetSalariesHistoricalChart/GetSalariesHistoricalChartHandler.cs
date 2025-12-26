@@ -47,6 +47,7 @@ public class GetSalariesHistoricalChartHandler
 
                 return new HistoricalDataByTemplate(
                     template.Id,
+                    template.Name,
                     template.ProfessionIds ?? new List<long>(),
                     dataPoints);
             })

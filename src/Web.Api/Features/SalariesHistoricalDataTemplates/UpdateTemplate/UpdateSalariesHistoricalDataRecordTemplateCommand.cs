@@ -13,6 +13,7 @@ public record UpdateSalariesHistoricalDataRecordTemplateCommand
         UpdateSalariesHistoricalDataRecordTemplateBodyRequest request)
     {
         TemplateId = templateId;
+        Name = request.Name;
         ProfessionIds = request.ProfessionIds;
     }
 }

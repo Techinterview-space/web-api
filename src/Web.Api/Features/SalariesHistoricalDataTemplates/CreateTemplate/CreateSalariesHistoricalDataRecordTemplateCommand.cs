@@ -6,6 +6,7 @@ public record CreateSalariesHistoricalDataRecordTemplateCommand
     public CreateSalariesHistoricalDataRecordTemplateCommand(
         CreateSalariesHistoricalDataRecordTemplateBodyRequest request)
     {
+        Name = request.Name;
         ProfessionIds = request.ProfessionIds;
     }
 }

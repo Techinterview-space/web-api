@@ -15,12 +15,15 @@ public record SalariesHistoricalDataRecordTemplateDto
         SalariesHistoricalDataRecordTemplate entity)
     {
         Id = entity.Id;
+        Name = entity.Name;
         ProfessionIds = entity.ProfessionIds;
         CreatedAt = entity.CreatedAt;
         UpdatedAt = entity.UpdatedAt;
     }
 
     public Guid Id { get; init; }
+
+    public string Name { get; init; }
 
     public List<long> ProfessionIds { get; init; }
 
@@ -31,6 +34,7 @@ public record SalariesHistoricalDataRecordTemplateDto
     public static readonly Expression<Func<SalariesHistoricalDataRecordTemplate, SalariesHistoricalDataRecordTemplateDto>> Transform = x => new SalariesHistoricalDataRecordTemplateDto
     {
         Id = x.Id,
+        Name = x.Name,
         ProfessionIds = x.ProfessionIds,
         CreatedAt = x.CreatedAt,
         UpdatedAt = x.UpdatedAt,

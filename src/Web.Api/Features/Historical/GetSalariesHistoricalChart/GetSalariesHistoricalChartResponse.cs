@@ -44,15 +44,19 @@ public record HistoricalDataByTemplate
 {
     public HistoricalDataByTemplate(
         Guid templateId,
+        string name,
         List<long> professionIds,
         List<HistoricalDataPoint> dataPoints)
     {
         TemplateId = templateId;
+        Name = name;
         ProfessionIds = professionIds;
         DataPoints = dataPoints;
     }
 
     public Guid TemplateId { get; }
+
+    public string Name { get; }
 
     public List<long> ProfessionIds { get; }
 
