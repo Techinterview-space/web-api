@@ -66,15 +66,15 @@ public record HistoricalDataByTemplate
 public record HistoricalDataPoint
 {
     public HistoricalDataPoint(
-        SalariesHistoricalDataRecord record)
+        AggregatedWeekData data)
     {
-        Date = record.Date;
-        MedianLocalSalary = record.Data.MedianLocalSalary;
-        AverageLocalSalary = record.Data.AverageLocalSalary;
-        MinLocalSalary = record.Data.MinLocalSalary;
-        MaxLocalSalary = record.Data.MaxLocalSalary;
-        TotalSalaryCount = record.Data.TotalSalaryCount;
-        MedianLocalSalaryByGrade = record.Data.MedianLocalSalaryByGrade ?? new Dictionary<Domain.Enums.GradeGroup, double>();
+        Date = data.Date;
+        MedianLocalSalary = data.MedianLocalSalary;
+        AverageLocalSalary = data.AverageLocalSalary;
+        MinLocalSalary = data.MinLocalSalary;
+        MaxLocalSalary = data.MaxLocalSalary;
+        TotalSalaryCount = data.TotalSalaryCount;
+        MedianLocalSalaryByGrade = data.MedianLocalSalaryByGrade;
     }
 
     public DateTimeOffset Date { get; }
@@ -90,4 +90,21 @@ public record HistoricalDataPoint
     public int TotalSalaryCount { get; }
 
     public Dictionary<GradeGroup, double> MedianLocalSalaryByGrade { get; }
+}
+
+public class AggregatedWeekData
+{
+    public DateTimeOffset Date { get; set; }
+
+    public double MedianLocalSalary { get; set; }
+
+    public double AverageLocalSalary { get; set; }
+
+    public double? MinLocalSalary { get; set; }
+
+    public double? MaxLocalSalary { get; set; }
+
+    public int TotalSalaryCount { get; set; }
+
+    public Dictionary<GradeGroup, double> MedianLocalSalaryByGrade { get; set; } = new ();
 }
