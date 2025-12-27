@@ -45,7 +45,7 @@ public static class ScheduleConfig
 
             scheduler
                 .Schedule<SalariesHistoricalDataBackfillJob>()
-                .Hourly()
+                .EveryFifteenMinutes()
                 .PreventOverlapping(nameof(SalariesHistoricalDataBackfillJob));
 
             scheduler

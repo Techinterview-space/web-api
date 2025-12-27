@@ -19,7 +19,9 @@ public class SalariesHistoricalDataBackfillJob
 {
     private const int MaxDaysPerExecution = 5;
     private readonly DatabaseContext _context;
-    private static readonly DateTimeOffset EarliestDate = new (new DateTime(2024, 1, 1), TimeSpan.Zero);
+    private static readonly DateTimeOffset EarliestDate = new (
+        new DateTime(2025, 1, 1),
+        TimeSpan.Zero);
 
     public SalariesHistoricalDataBackfillJob(
         ILogger<SalariesHistoricalDataBackfillJob> logger,
@@ -53,20 +55,29 @@ public class SalariesHistoricalDataBackfillJob
         var today = new DateTimeOffset(now.Date, TimeSpan.Zero);
 
         var totalCreatedRecordsCount = 0;
-        var daysProcessed = 0;
-        var currentDate = today;
 
-        // Go back day by day from today to 2024-01-01, processing up to MaxDaysPerExecution days
-        while (currentDate >= EarliestDate && daysProcessed < MaxDaysPerExecution)
+        foreach (var template in templatesToBeProcessed)
         {
-            Logger.LogInformation(
-                "Processing date {Date}. CorrelationId: {CorrelationId}",
-                currentDate,
-                correlationId);
-
             var createdRecordsForDate = 0;
-            foreach (var template in templatesToBeProcessed)
+
+            var earliestRecord = await _context.SalariesHistoricalDataRecords
+                .AsNoTracking()
+                .Where(x => x.TemplateId == template.Id)
+                .OrderBy(x => x.Date)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var currentDate = earliestRecord != null
+                ? earliestRecord.Date.AddDays(-1)
+                : today;
+
+            // Go back day by day from today to 2024-01-01, processing up to MaxDaysPerExecution days
+            while (currentDate >= EarliestDate && createdRecordsForDate < MaxDaysPerExecution)
             {
+                Logger.LogInformation(
+                    "Processing date {Date}. CorrelationId: {CorrelationId}",
+                    currentDate,
+                    correlationId);
+
                 var existingRecord = await _context.SalariesHistoricalDataRecords
                     .AsNoTracking()
                     .Where(x => x.TemplateId == template.Id && x.Date == currentDate)
@@ -74,13 +85,15 @@ public class SalariesHistoricalDataBackfillJob
 
                 if (existingRecord != null)
                 {
-                    Logger.LogDebug(
+                    Logger.LogInformation(
                         "Record {RecordId} for template {TemplateId} already exists for date {Date}. CorrelationId: {CorrelationId}",
                         existingRecord.Id,
                         template.Id,
                         currentDate,
                         correlationId);
 
+                    // Move to previous day
+                    currentDate = currentDate.AddDays(-1);
                     continue;
                 }
 
@@ -111,7 +124,7 @@ public class SalariesHistoricalDataBackfillJob
                         currentDate,
                         correlationId);
 
-                    continue;
+                    break;
                 }
 
                 var dataForRecord = new SalariesStatDataCacheItemSalaryData(
@@ -125,6 +138,9 @@ public class SalariesHistoricalDataBackfillJob
 
                 _context.Add(newRecord);
                 createdRecordsForDate++;
+
+                // Move to previous day
+                currentDate = currentDate.AddDays(-1);
             }
 
             if (createdRecordsForDate > 0)
@@ -147,15 +163,10 @@ public class SalariesHistoricalDataBackfillJob
                     currentDate,
                     correlationId);
             }
-
-            // Move to previous day
-            currentDate = currentDate.AddDays(-1);
-            daysProcessed++;
         }
 
         Logger.LogInformation(
-            "Historical data backfill job completed. Days processed: {DaysProcessed}, Total records created: {TotalRecordsCreated}. CorrelationId: {CorrelationId}",
-            daysProcessed,
+            "Historical data backfill job completed, Total records created: {TotalRecordsCreated}. CorrelationId: {CorrelationId}",
             totalCreatedRecordsCount,
             correlationId);
     }

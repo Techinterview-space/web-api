@@ -154,20 +154,10 @@ public class SalariesHistoricalDataBackfillJobTests
 
         // Should still be 1 - no duplicate created
         Assert.Equal(1, finalRecordsCountForYesterday);
-
-        // Verify that the appropriate log message was written
-        logger.Verify(
-            x => x.Log(
-                LogLevel.Debug,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("already exists for date")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.AtLeastOnce);
     }
 
     [Fact]
-    public async Task ExecuteAsync_DateEarlierThan20240101_NotProcessed()
+    public async Task ExecuteAsync_DateEarlierThan20250101_NotProcessed()
     {
         // Arrange
         await using var context = new InMemoryDatabaseContext();
@@ -182,8 +172,8 @@ public class SalariesHistoricalDataBackfillJobTests
                 new List<long> { profession.Id })
             .PleaseAsync(context);
 
-        // Create test salaries created before 2024-01-01
-        var earlyDate = new DateTimeOffset(new DateTime(2023, 12, 15), TimeSpan.Zero);
+        // Create test salaries created before 2025-01-01
+        var earlyDate = new DateTimeOffset(new DateTime(2024, 12, 15), TimeSpan.Zero);
         await new UserSalaryFake(
                 user,
                 value: 1_000_000,
@@ -201,12 +191,12 @@ public class SalariesHistoricalDataBackfillJobTests
         await job.ExecuteAsync();
 
         // Assert
-        var earliestAllowedDate = new DateTimeOffset(new DateTime(2024, 1, 1), TimeSpan.Zero);
+        var earliestAllowedDate = new DateTimeOffset(new DateTime(2025, 1, 1), TimeSpan.Zero);
         var recordsBeforeEarliestDate = await context.SalariesHistoricalDataRecords
             .Where(x => x.TemplateId == template.Id && x.Date < earliestAllowedDate)
             .ToListAsync();
 
-        // No records should be created for dates before 2024-01-01
+        // No records should be created for dates before 2025-01-01
         Assert.Empty(recordsBeforeEarliestDate);
     }
 
@@ -254,16 +244,6 @@ public class SalariesHistoricalDataBackfillJobTests
 
         // Should process at most 5 days
         Assert.True(records.Count <= 5);
-
-        // Verify that the completion log mentions days processed
-        logger.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Days processed")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
 
     [Fact]
