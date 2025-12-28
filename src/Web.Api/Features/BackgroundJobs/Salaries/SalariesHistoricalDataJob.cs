@@ -71,10 +71,11 @@ public class SalariesHistoricalDataJob
                     new SalariesForChartRequest(template.ProfessionIds ?? new List<long>()),
                     now);
 
-            var totalSalaryCount = await salariesQuery.CountAsync(cancellationToken);
             var salaries = await salariesQuery
+                .Where(x =>
+                    x.Grade.HasValue &&
+                    x.SourceType == null)
                 .ToQueryable(CompanyType.Local)
-                .Where(x => x.Grade.HasValue)
                 .Select(x => new SalaryBaseData
                 {
                     ProfessionId = x.ProfessionId,
@@ -97,7 +98,7 @@ public class SalariesHistoricalDataJob
 
             var dataForRecord = new SalariesStatDataCacheItemSalaryData(
                 salaries,
-                totalSalaryCount);
+                salaries.Count);
 
             var newRecord = new SalariesHistoricalDataRecord(
                 today,
