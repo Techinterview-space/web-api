@@ -6,6 +6,7 @@ using Domain.ValueObjects.Pagination;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.SalariesHistoricalDataTemplates.CreateTemplate;
+using Web.Api.Features.SalariesHistoricalDataTemplates.DeleteAllTemplateRecords;
 using Web.Api.Features.SalariesHistoricalDataTemplates.DeleteTemplate;
 using Web.Api.Features.SalariesHistoricalDataTemplates.GetTemplates;
 using Web.Api.Features.SalariesHistoricalDataTemplates.Shared;
@@ -68,6 +69,18 @@ public class SalariesHistoricalDataTemplatesController : ControllerBase
     {
         await _serviceProvider.HandleBy<DeleteSalariesHistoricalDataRecordTemplateHandler, DeleteSalariesHistoricalDataRecordTemplateCommand, Nothing>(
             new DeleteSalariesHistoricalDataRecordTemplateCommand(id),
+            cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}/records")]
+    public async Task<IActionResult> DeleteAllTemplateRecords(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        await _serviceProvider.HandleBy<DeleteAllTemplateRecordsHandler, DeleteAllTemplateRecordsCommand, Nothing>(
+            new DeleteAllTemplateRecordsCommand(id),
             cancellationToken);
 
         return NoContent();
