@@ -104,10 +104,10 @@ public class SalariesHistoricalDataBackfillJob
                     currentDate.DateTime);
 
                 var salaries = await salariesQuery
-                    .ToQueryable(CompanyType.Local)
                     .Where(x =>
                         x.Grade.HasValue &&
                         x.SourceType == null)
+                    .ToQueryable(CompanyType.Local)
                     .Select(x => new SalaryBaseData
                     {
                         ProfessionId = x.ProfessionId,
