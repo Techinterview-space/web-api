@@ -103,7 +103,6 @@ public class SalariesHistoricalDataBackfillJob
                     new SalariesForChartRequest(template.ProfessionIds ?? new List<long>()),
                     currentDate.DateTime);
 
-                var totalSalaryCount = await salariesQuery.CountAsync(cancellationToken);
                 var salaries = await salariesQuery
                     .ToQueryable(CompanyType.Local)
                     .Where(x => x.Grade.HasValue)
@@ -129,7 +128,7 @@ public class SalariesHistoricalDataBackfillJob
 
                 var dataForRecord = new SalariesStatDataCacheItemSalaryData(
                     salaries,
-                    totalSalaryCount);
+                    salaries.Count);
 
                 var newRecord = new SalariesHistoricalDataRecord(
                     currentDate,
