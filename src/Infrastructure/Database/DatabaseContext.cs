@@ -97,7 +97,7 @@ public class DatabaseContext : DbContext
 
     public DbSet<SalariesHistoricalDataRecord> SalariesHistoricalDataRecords { get; set; }
 
-    public DbSet<CurrencyEntity> CurrencyEntities { get; set; }
+    public DbSet<CurrenciesCollection> CurrencyCollections { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

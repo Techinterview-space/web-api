@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
-using Domain.Extensions;
 using Infrastructure.Currencies;
-using InfrastructureTests.Mocks;
 using MemoryCache.Testing.Moq;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,391 +16,36 @@ namespace InfrastructureTests.Services
 {
     public class CurrencyServiceTests
     {
-        public const string CurrenciesXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<rss version=""2.0"">
-    <channel>
-        <generator>Alternate RSS Builder</generator>
-        <title>Official exchange rates of National Bank of Republic Kazakhstan</title>
-        <link>www.nationalbank.kz</link>
-        <description>Official exchange rates of National Bank of Republic Kazakhstan</description>
-        <language>ru</language>
-        <copyright>www.nationalbank.kz</copyright>
-
-                                    <item>
-                    <title>AUD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>297.05</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.85</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>AZN</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>263.65</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.03</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>AMD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>11.54</description>
-                    <quant>10</quant>
-                    <index>DOWN</index>
-                    <change>-0.07</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>BYN</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>136.83</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.53</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>BRL</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>84.31</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.49</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>HUF</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>12.43</description>
-                    <quant>10</quant>
-                    <index></index>
-                    <change>0.00</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>HKD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>57.22</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.22</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>GEL</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>160.18</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.49</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>DKK</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>65.16</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.21</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>AED</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>121.69</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.47</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>USD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>446.89</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.75</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>EUR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>485.95</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.59</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>INR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>5.35</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.03</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>IRR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>10.6</description>
-                    <quant>1000</quant>
-                    <index>DOWN</index>
-                    <change>-0.10</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>CAD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>326.53</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.47</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>CNY</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>61.69</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.22</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>KWD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>1458.9</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-5.33</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>KGS</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>5.12</description>
-                    <quant>1</quant>
-                    <index></index>
-                    <change>0.00</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>MYR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>95.25</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.29</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>MXN</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>25.5</description>
-                    <quant>1</quant>
-                    <index>UP</index>
-                    <change>+0.06</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>MDL</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>25.54</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.04</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>NOK</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>42.26</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.20</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>PLN</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>112.98</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.19</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>SAR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>119.16</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.46</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>RUB</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>5.04</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.02</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>XDR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>592.31</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-2.56</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>SGD</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>331.89</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.08</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>TJS</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>41.88</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.17</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>THB</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>12.26</description>
-                    <quant>1</quant>
-                    <index>UP</index>
-                    <change>+0.04</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>TRY</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>13.87</description>
-                    <quant>1</quant>
-                    <index>UP</index>
-                    <change>+0.07</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>UZS</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>3.54</description>
-                    <quant>100</quant>
-                    <index>DOWN</index>
-                    <change>-0.02</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>UAH</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>11.14</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.05</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>GBP</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>571.13</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.78</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>CZK</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>19.74</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.03</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>SEK</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>43.03</description>
-                    <quant>1</quant>
-                    <index>UP</index>
-                    <change>+0.04</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>CHF</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>501.56</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-1.29</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>ZAR</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>23.57</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.21</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>KRW</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>32.69</description>
-                    <quant>100</quant>
-                    <index></index>
-                    <change>0.00</change>
-                    <link></link>
-                </item>
-                            <item>
-                    <title>JPY</title>
-                    <pubDate>07.06.2024</pubDate>
-                    <description>2.86</description>
-                    <quant>1</quant>
-                    <index>DOWN</index>
-                    <change>-0.02</change>
-                    <link></link>
-                </item>
-                        </channel>
-</rss>";
-
         [Fact]
-        public async Task GetCurrenciesAsync_HasValidResponseBody_ReturnsOneCurrency()
+        public async Task GetCurrenciesAsync_NoSavedDatabaseEntities_ReturnsOneCurrency()
         {
             await using var context = new InMemoryDatabaseContext();
-            var memoryConfig = new InMemoryConfig(
-                new Dictionary<string, string>
+
+            var now = DateTime.UtcNow;
+            var currenciesHttpService = new Mock<ICurrenciesHttpService>();
+            currenciesHttpService
+                .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
                 {
-                    { "Currencies:Url", "https://currencies.com/rates_all.xml" },
+                    new (
+                        400,
+                        Currency.USD,
+                        now),
+                    new (
+                        500,
+                        Currency.EUR,
+                        now),
                 });
 
             using var mockedCache = Create.MockedMemoryCache();
-            var mockHttpClientFactory = new HttpClientFactoryMock(CurrenciesXml);
 
             var currencyService = new CurrencyService(
-                mockHttpClientFactory.Object,
-                memoryConfig.Value(),
+                currenciesHttpService.Object,
                 mockedCache,
                 new Mock<ILogger<CurrencyService>>().Object,
                 context);
 
-            Assert.Equal(0, context.CurrencyEntities.Count());
+            Assert.Equal(0, context.CurrencyCollections.Count());
 
             context.ChangeTracker.Clear();
             var currency = await currencyService.GetCurrencyOrNullAsync(
@@ -412,47 +55,235 @@ namespace InfrastructureTests.Services
             // Assert
             Assert.NotNull(currency);
             Assert.Equal(Currency.USD, currency.Currency);
-            Assert.Equal(446.89, currency.Value);
-            Assert.Equal(new DateTime(2024, 6, 7).Date, currency.PubDate.Date);
+            Assert.Equal(400, currency.Value);
+            Assert.Equal(now, currency.PubDate);
+
+            Assert.Equal(1, context.CurrencyCollections.Count());
+            currenciesHttpService
+                .Verify(
+                    x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
         }
 
         [Fact]
-        public async Task GetAllCurrenciesAsync_ReturnsAllCurrencies()
+        public async Task GetAllCurrenciesAsync_NoSavedDatabaseRecord_ReturnsAllCurrencies()
         {
             await using var context = new InMemoryDatabaseContext();
-            var memoryConfig = new InMemoryConfig(
-                new Dictionary<string, string>
+            var now = DateTime.UtcNow;
+            var currenciesHttpService = new Mock<ICurrenciesHttpService>();
+            currenciesHttpService
+                .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
                 {
-                    { "Currencies:Url", "https://currencies.com/rates_all.xml" },
+                    new (
+                        400,
+                        Currency.USD,
+                        now),
+                    new (
+                        500,
+                        Currency.EUR,
+                        now),
                 });
 
             using var mockedCache = Create.MockedMemoryCache();
-            var mockHttpClientFactory = new HttpClientFactoryMock(CurrenciesXml);
 
             var currencyService = new CurrencyService(
-                mockHttpClientFactory.Object,
-                memoryConfig.Value(),
+                currenciesHttpService.Object,
                 mockedCache,
                 new Mock<ILogger<CurrencyService>>().Object,
                 context);
 
-            Assert.Equal(0, context.CurrencyEntities.Count());
+            var collection1 = new CurrenciesCollectionFake(DateTime.UtcNow.AddDays(-2)).Please(context);
+            var collection2 = new CurrenciesCollectionFake(DateTime.UtcNow.AddDays(-3)).Please(context);
+            var collection3 = new CurrenciesCollectionFake(DateTime.UtcNow.AddDays(-4)).Please(context);
+
+            Assert.Equal(3, context.CurrencyCollections.Count());
 
             context.ChangeTracker.Clear();
             var currencies = await currencyService.GetAllCurrenciesAsync(default);
 
+            Assert.NotNull(currencies);
+            Assert.Equal(3, currencies.Count);
+            Assert.Contains(currencies, x => x.Currency == Currency.USD);
+            Assert.Contains(currencies, x => x.Currency == Currency.EUR);
+            Assert.Contains(currencies, x => x.Currency == Currency.KZT);
+
+            Assert.Equal(collection1.CurrencyDate, currencies[0].PubDate);
+            Assert.NotEqual(collection2.CurrencyDate, currencies[0].PubDate);
+            Assert.NotEqual(collection3.CurrencyDate, currencies[0].PubDate);
+
             // Assert
-            var existingCurrencies = EnumHelper
-                .Values<Currency>(true)
-                .ToList();
+            currenciesHttpService
+                .Verify(
+                    x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()),
+                    Times.Never);
+        }
 
-            Assert.NotEmpty(existingCurrencies);
+        [Fact]
+        public async Task RefetchServiceCurrenciesAsync_HttpServiceReturnsRecords_NewRecordCreatedInDatabase()
+        {
+            // Arrange
+            await using var context = new InMemoryDatabaseContext();
+            var now = DateTime.UtcNow;
 
-            Assert.Equal(existingCurrencies.Count, currencies.Count);
-            foreach (var currency in currencies)
-            {
-                Assert.Contains(currency.Currency, existingCurrencies);
-            }
+            var currenciesHttpService = new Mock<ICurrenciesHttpService>();
+            currenciesHttpService
+                .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                {
+                    new (400, Currency.USD, now),
+                    new (500, Currency.EUR, now),
+                });
+
+            using var mockedCache = Create.MockedMemoryCache();
+
+            var currencyService = new CurrencyService(
+                currenciesHttpService.Object,
+                mockedCache,
+                new Mock<ILogger<CurrencyService>>().Object,
+                context);
+
+            Assert.Equal(0, context.CurrencyCollections.Count());
+
+            // Act
+            await currencyService.RefetchServiceCurrenciesAsync(CancellationToken.None);
+
+            // Assert
+            Assert.Equal(1, context.CurrencyCollections.Count());
+            var savedCollection = context.CurrencyCollections.First();
+            Assert.Equal(now.Date, savedCollection.CurrencyDate.Date);
+            Assert.Equal(2, savedCollection.Currencies.Count);
+
+            currenciesHttpService
+                .Verify(
+                    x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+        }
+
+        [Fact]
+        public async Task RefetchServiceCurrenciesAsync_HttpServiceReturnsNoRecords_NoRecordCreatedInDatabase()
+        {
+            // Arrange
+            await using var context = new InMemoryDatabaseContext();
+
+            var currenciesHttpService = new Mock<ICurrenciesHttpService>();
+            currenciesHttpService
+                .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>());
+
+            using var mockedCache = Create.MockedMemoryCache();
+
+            var currencyService = new CurrencyService(
+                currenciesHttpService.Object,
+                mockedCache,
+                new Mock<ILogger<CurrencyService>>().Object,
+                context);
+
+            Assert.Equal(0, context.CurrencyCollections.Count());
+
+            // Act
+            await currencyService.RefetchServiceCurrenciesAsync(CancellationToken.None);
+
+            // Assert
+            Assert.Equal(0, context.CurrencyCollections.Count());
+
+            currenciesHttpService
+                .Verify(
+                    x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+        }
+
+        [Fact]
+        public async Task RefetchServiceCurrenciesAsync_SomeDbRecordsForPrevousDate_NewRecordCreatedInDatabase()
+        {
+            // Arrange
+            await using var context = new InMemoryDatabaseContext();
+            var now = DateTime.UtcNow;
+
+            var record1 = new CurrenciesCollectionFake(now.Date.AddDays(-1)).Please(context);
+            var record2 = new CurrenciesCollectionFake(now.Date.AddDays(-2)).Please(context);
+
+            var currenciesHttpService = new Mock<ICurrenciesHttpService>();
+            currenciesHttpService
+                .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                {
+                    new (400, Currency.USD, now),
+                    new (500, Currency.EUR, now),
+                });
+
+            using var mockedCache = Create.MockedMemoryCache();
+
+            var currencyService = new CurrencyService(
+                currenciesHttpService.Object,
+                mockedCache,
+                new Mock<ILogger<CurrencyService>>().Object,
+                context);
+
+            Assert.Equal(2, context.CurrencyCollections.Count());
+
+            // Act
+            await currencyService.RefetchServiceCurrenciesAsync(CancellationToken.None);
+
+            // Assert
+            Assert.Equal(3, context.CurrencyCollections.Count());
+            var savedCollection = context.CurrencyCollections.Last();
+
+            Assert.NotEqual(record1.CurrencyDate, savedCollection.CurrencyDate);
+            Assert.NotEqual(record2.CurrencyDate, savedCollection.CurrencyDate);
+
+            Assert.Equal(now.Date, savedCollection.CurrencyDate.Date);
+            Assert.Equal(2, savedCollection.Currencies.Count);
+
+            currenciesHttpService
+                .Verify(
+                    x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()),
+                    Times.Once);
+        }
+
+        [Fact]
+        public async Task RefetchServiceCurrenciesAsync_ExistingRecordForSameDate_NoNewRecordCreated()
+        {
+            // Arrange
+            await using var context = new InMemoryDatabaseContext();
+            var now = DateTime.UtcNow;
+
+            var existingCollection = new CurrenciesCollectionFake(now.Date).Please(context);
+
+            var currenciesHttpService = new Mock<ICurrenciesHttpService>();
+            currenciesHttpService
+                .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                {
+                    new (400, Currency.USD, now),
+                    new (500, Currency.EUR, now),
+                });
+
+            using var mockedCache = Create.MockedMemoryCache();
+
+            var currencyService = new CurrencyService(
+                currenciesHttpService.Object,
+                mockedCache,
+                new Mock<ILogger<CurrencyService>>().Object,
+                context);
+
+            Assert.Equal(1, context.CurrencyCollections.Count());
+
+            context.ChangeTracker.Clear();
+
+            // Act
+            await currencyService.RefetchServiceCurrenciesAsync(CancellationToken.None);
+
+            // Assert
+            Assert.Equal(1, context.CurrencyCollections.Count());
+            var savedCollection = context.CurrencyCollections.First();
+            Assert.Equal(existingCollection.Id, savedCollection.Id);
+            Assert.Equal(now.Date, savedCollection.CurrencyDate);
+
+            currenciesHttpService
+                .Verify(
+                    x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()),
+                    Times.Never);
         }
     }
 }

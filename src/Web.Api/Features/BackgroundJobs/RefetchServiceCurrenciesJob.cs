@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Web.Api.Features.BackgroundJobs;
 
-public class CurrenciesResetJob : InvocableJobBase<CurrenciesResetJob>
+public class RefetchServiceCurrenciesJob : InvocableJobBase<RefetchServiceCurrenciesJob>
 {
     private readonly ICurrencyService _currencyService;
 
-    public CurrenciesResetJob(
-        ILogger<CurrenciesResetJob> logger,
+    public RefetchServiceCurrenciesJob(
+        ILogger<RefetchServiceCurrenciesJob> logger,
         ICurrencyService currencyService)
         : base(logger)
     {
@@ -20,6 +20,6 @@ public class CurrenciesResetJob : InvocableJobBase<CurrenciesResetJob>
     public override async Task ExecuteAsync(
         CancellationToken cancellationToken = default)
     {
-        await _currencyService.ResetCacheAsync(cancellationToken);
+        await _currencyService.RefetchServiceCurrenciesAsync(cancellationToken);
     }
 }

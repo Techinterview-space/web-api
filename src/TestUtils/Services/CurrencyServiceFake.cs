@@ -47,7 +47,7 @@ public class CurrencyServiceFake : ICurrencyService
         return Task.FromResult(_currencies);
     }
 
-    public Task ResetCacheAsync(CancellationToken cancellationToken)
+    public Task RefetchServiceCurrenciesAsync(CancellationToken cancellationToken)
     {
         throw new System.NotImplementedException();
     }

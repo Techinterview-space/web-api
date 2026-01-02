@@ -18,15 +18,6 @@ namespace Domain.Entities.Currencies
         }
 
         public CurrencyContent(
-            CurrencyEntity entity)
-            : this(
-                entity.Value,
-                entity.Currency,
-                entity.ForDate.Date)
-        {
-        }
-
-        public CurrencyContent(
             string value,
             string currency,
             string pubDate)
