@@ -34,7 +34,7 @@ public class CurrenciesHttpService : ICurrenciesHttpService
 
         try
         {
-            using var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient();
             var xmlContent = await client.GetStringAsync(currenciesUrl, cancellationToken);
             var xdoc = XDocument.Parse(xmlContent);
 

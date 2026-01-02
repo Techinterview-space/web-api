@@ -43,7 +43,7 @@ public class CustomOpenAiService : ICustomOpenAiService
         var responseContent = string.Empty;
         try
         {
-            using var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient();
 
             client.BaseAddress = new Uri(apiUrl);
             var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
