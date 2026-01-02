@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Infrastructure.Currencies;
-using InfrastructureTests.Fakes.Data;
 using InfrastructureTests.Mocks;
 using MemoryCache.Testing.Moq;
 using Microsoft.Extensions.Logging;
 using Moq;
+using TestUtils.Db;
 using TestUtils.Fakes;
 using Xunit;
 
@@ -17,57 +18,427 @@ namespace InfrastructureTests.Services
 {
     public class CurrencyServiceTests
     {
-        [Fact]
-        public async Task GetCurrenciesAsync_HasValidResponeBody_OkAsync()
-        {
-            // Arrange
-            var configDic = new Dictionary<string, string>
-            {
-                { "Currencies:Url", "https://currencies.com/rates_all.xml" },
-            };
+        public const string CurrenciesXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<rss version=""2.0"">
+    <channel>
+        <generator>Alternate RSS Builder</generator>
+        <title>Official exchange rates of National Bank of Republic Kazakhstan</title>
+        <link>www.nationalbank.kz</link>
+        <description>Official exchange rates of National Bank of Republic Kazakhstan</description>
+        <language>ru</language>
+        <copyright>www.nationalbank.kz</copyright>
 
-            var memoryConfig = new InMemoryConfig(configDic);
+                                    <item>
+                    <title>AUD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>297.05</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.85</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>AZN</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>263.65</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.03</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>AMD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>11.54</description>
+                    <quant>10</quant>
+                    <index>DOWN</index>
+                    <change>-0.07</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>BYN</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>136.83</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.53</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>BRL</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>84.31</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.49</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>HUF</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>12.43</description>
+                    <quant>10</quant>
+                    <index></index>
+                    <change>0.00</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>HKD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>57.22</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.22</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>GEL</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>160.18</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.49</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>DKK</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>65.16</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.21</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>AED</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>121.69</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.47</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>USD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>446.89</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.75</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>EUR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>485.95</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.59</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>INR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>5.35</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.03</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>IRR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>10.6</description>
+                    <quant>1000</quant>
+                    <index>DOWN</index>
+                    <change>-0.10</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>CAD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>326.53</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.47</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>CNY</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>61.69</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.22</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>KWD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>1458.9</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-5.33</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>KGS</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>5.12</description>
+                    <quant>1</quant>
+                    <index></index>
+                    <change>0.00</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>MYR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>95.25</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.29</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>MXN</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>25.5</description>
+                    <quant>1</quant>
+                    <index>UP</index>
+                    <change>+0.06</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>MDL</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>25.54</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.04</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>NOK</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>42.26</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.20</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>PLN</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>112.98</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.19</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>SAR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>119.16</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.46</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>RUB</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>5.04</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.02</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>XDR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>592.31</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-2.56</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>SGD</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>331.89</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.08</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>TJS</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>41.88</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.17</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>THB</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>12.26</description>
+                    <quant>1</quant>
+                    <index>UP</index>
+                    <change>+0.04</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>TRY</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>13.87</description>
+                    <quant>1</quant>
+                    <index>UP</index>
+                    <change>+0.07</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>UZS</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>3.54</description>
+                    <quant>100</quant>
+                    <index>DOWN</index>
+                    <change>-0.02</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>UAH</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>11.14</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.05</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>GBP</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>571.13</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.78</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>CZK</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>19.74</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.03</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>SEK</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>43.03</description>
+                    <quant>1</quant>
+                    <index>UP</index>
+                    <change>+0.04</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>CHF</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>501.56</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-1.29</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>ZAR</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>23.57</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.21</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>KRW</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>32.69</description>
+                    <quant>100</quant>
+                    <index></index>
+                    <change>0.00</change>
+                    <link></link>
+                </item>
+                            <item>
+                    <title>JPY</title>
+                    <pubDate>07.06.2024</pubDate>
+                    <description>2.86</description>
+                    <quant>1</quant>
+                    <index>DOWN</index>
+                    <change>-0.02</change>
+                    <link></link>
+                </item>
+                        </channel>
+</rss>";
+
+        [Fact]
+        public async Task GetCurrenciesAsync_HasValidResponseBody_ReturnsOneCurrency()
+        {
+            await using var context = new InMemoryDatabaseContext();
+            var memoryConfig = new InMemoryConfig(
+                new Dictionary<string, string>
+                {
+                    { "Currencies:Url", "https://currencies.com/rates_all.xml" },
+                });
+
             using var mockedCache = Create.MockedMemoryCache();
-            var mockHttpClientFactory = new HttpClientFactoryMock(FakeXml.CurrenciesXml);
+            var mockHttpClientFactory = new HttpClientFactoryMock(CurrenciesXml);
 
             var currencyService = new CurrencyService(
                 mockHttpClientFactory.Object,
                 memoryConfig.Value(),
                 mockedCache,
-                new Mock<ILogger<CurrencyService>>().Object);
+                new Mock<ILogger<CurrencyService>>().Object,
+                context);
 
-            // Act
-            var currencies = await currencyService.GetCurrenciesAsync(
-                [Currency.USD],
-                default);
+            Assert.Equal(0, context.CurrencyEntities.Count());
+
+            context.ChangeTracker.Clear();
+            var currency = await currencyService.GetCurrencyOrNullAsync(
+                Currency.USD,
+                CancellationToken.None);
 
             // Assert
-            Assert.Single(currencies);
-            Assert.Equal(Currency.USD, currencies[0].Currency);
-            Assert.Equal(446.89, currencies[0].Value);
-            Assert.Equal(new DateTime(2024, 6, 7).Date, currencies[0].PubDate.Date);
+            Assert.NotNull(currency);
+            Assert.Equal(Currency.USD, currency.Currency);
+            Assert.Equal(446.89, currency.Value);
+            Assert.Equal(new DateTime(2024, 6, 7).Date, currency.PubDate.Date);
         }
 
         [Fact]
-        public async Task GetAllCurrenciesAsync_OkAsync()
+        public async Task GetAllCurrenciesAsync_ReturnsAllCurrencies()
         {
-            // Arrange
-            var configDic = new Dictionary<string, string>
-            {
-                { "Currencies:Url", "https://currencies.com/rates_all.xml" },
-            };
+            await using var context = new InMemoryDatabaseContext();
+            var memoryConfig = new InMemoryConfig(
+                new Dictionary<string, string>
+                {
+                    { "Currencies:Url", "https://currencies.com/rates_all.xml" },
+                });
 
-            var memoryConfig = new InMemoryConfig(configDic);
             using var mockedCache = Create.MockedMemoryCache();
-            var mockHttpClientFactory = new HttpClientFactoryMock(FakeXml.CurrenciesXml);
+            var mockHttpClientFactory = new HttpClientFactoryMock(CurrenciesXml);
 
             var currencyService = new CurrencyService(
                 mockHttpClientFactory.Object,
                 memoryConfig.Value(),
                 mockedCache,
-                new Mock<ILogger<CurrencyService>>().Object);
+                new Mock<ILogger<CurrencyService>>().Object,
+                context);
 
-            // Act
+            Assert.Equal(0, context.CurrencyEntities.Count());
+
+            context.ChangeTracker.Clear();
             var currencies = await currencyService.GetAllCurrenciesAsync(default);
 
             // Assert

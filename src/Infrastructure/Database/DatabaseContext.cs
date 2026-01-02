@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Entities.Companies;
 using Domain.Entities.CSV;
+using Domain.Entities.Currencies;
 using Domain.Entities.Github;
 using Domain.Entities.HistoricalRecords;
 using Domain.Entities.Interviews;
@@ -95,6 +96,8 @@ public class DatabaseContext : DbContext
     public DbSet<SalariesHistoricalDataRecordTemplate> SalariesHistoricalDataRecordTemplates { get; set; }
 
     public DbSet<SalariesHistoricalDataRecord> SalariesHistoricalDataRecords { get; set; }
+
+    public DbSet<CurrencyEntity> CurrencyEntities { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

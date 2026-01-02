@@ -1,7 +1,9 @@
 ﻿using System.Xml.Linq;
+using Domain.Entities.Currencies;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
+using Infrastructure.Database;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,17 +18,20 @@ namespace Infrastructure.Currencies
         private readonly IConfiguration _configuration;
         private readonly IMemoryCache _cache;
         private readonly ILogger<CurrencyService> _logger;
+        private readonly DatabaseContext _context;
 
         public CurrencyService(
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration,
             IMemoryCache cache,
-            ILogger<CurrencyService> logger)
+            ILogger<CurrencyService> logger,
+            DatabaseContext context)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _cache = cache;
             _logger = logger;
+            _context = context;
         }
 
         public async Task<CurrencyContent> GetCurrencyOrNullAsync(

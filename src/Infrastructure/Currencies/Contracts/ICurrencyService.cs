@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Salaries;
+﻿using Domain.Entities.Currencies;
+using Domain.Entities.Salaries;
 
 namespace Infrastructure.Currencies.Contracts
 {

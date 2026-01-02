@@ -1,10 +1,10 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Xml.Linq;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
-using Domain.Migrations;
 
-namespace Infrastructure.Currencies.Contracts
+namespace Domain.Entities.Currencies
 {
     public record CurrencyContent
     {
@@ -14,6 +14,15 @@ namespace Infrastructure.Currencies.Contracts
                 item.Element("description")?.Value,
                 item.Element("title")?.Value,
                 item.Element("pubDate")?.Value)
+        {
+        }
+
+        public CurrencyContent(
+            CurrencyEntity entity)
+            : this(
+                entity.Value,
+                entity.Currency,
+                entity.ForDate.Date)
         {
         }
 
