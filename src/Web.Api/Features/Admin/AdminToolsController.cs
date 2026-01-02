@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Currencies;
 using Domain.Enums;
 using Domain.Validation;
 using Infrastructure.Currencies.Contracts;

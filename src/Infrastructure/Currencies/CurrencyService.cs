@@ -1,9 +1,9 @@
-﻿using System.Xml.Linq;
+﻿using Domain.Entities.Currencies;
 using Domain.Entities.Salaries;
-using Domain.Extensions;
 using Infrastructure.Currencies.Contracts;
+using Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Currencies
@@ -12,53 +12,30 @@ namespace Infrastructure.Currencies
     {
         private const string CacheKey = "CurrencyService__AllCurrencies";
 
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
+        private readonly ICurrenciesHttpService _currenciesHttpService;
         private readonly IMemoryCache _cache;
         private readonly ILogger<CurrencyService> _logger;
+        private readonly DatabaseContext _context;
 
         public CurrencyService(
-            IHttpClientFactory httpClientFactory,
-            IConfiguration configuration,
+            ICurrenciesHttpService currenciesHttpService,
             IMemoryCache cache,
-            ILogger<CurrencyService> logger)
+            ILogger<CurrencyService> logger,
+            DatabaseContext context)
         {
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
+            _currenciesHttpService = currenciesHttpService;
             _cache = cache;
             _logger = logger;
+            _context = context;
         }
 
         public async Task<CurrencyContent> GetCurrencyOrNullAsync(
             Currency currency,
             CancellationToken cancellationToken)
         {
-            return (await GetCurrenciesAsync(
-                    [currency],
-                    cancellationToken))
-                .FirstOrDefault();
-        }
-
-        public async Task<List<CurrencyContent>> GetCurrenciesAsync(
-            List<Currency> currenciesToGet,
-            CancellationToken cancellationToken)
-        {
-            if (currenciesToGet == null || !currenciesToGet.Any())
-            {
-                return new List<CurrencyContent>();
-            }
-
-            var currencies = await _cache.GetOrCreateAsync(
-                CacheKey,
-                async entry =>
-                {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                    return await GetCurrenciesInternalAsync(cancellationToken);
-                });
-
-            return currencies
-                .Where(x => currenciesToGet.Contains(x.Currency))
-                .ToList();
+            var allCurrencies = await GetAllCurrenciesAsync(cancellationToken);
+            return allCurrencies
+                .FirstOrDefault(x => x.Currency == currency);
         }
 
         public async Task<List<CurrencyContent>> GetAllCurrenciesAsync(
@@ -68,66 +45,84 @@ namespace Infrastructure.Currencies
                 CacheKey,
                 async entry =>
                 {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                    return await GetCurrenciesInternalAsync(cancellationToken);
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(6);
+
+                    var latestCurrenciesCollection = await _context.CurrencyCollections
+                        .OrderByDescending(x => x.CurrencyDate)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (latestCurrenciesCollection is not null)
+                    {
+                        return latestCurrenciesCollection.CreateCurrencies();
+                    }
+
+                    var recreatedCurrenciesCollection = await RecreateCurrenciesCollectionOrNullAsync(
+                        DateTime.UtcNow,
+                        cancellationToken);
+
+                    if (recreatedCurrenciesCollection is not null)
+                    {
+                        return recreatedCurrenciesCollection.CreateCurrencies();
+                    }
+
+                    return CreateDefaultCollection();
                 });
         }
 
-        public async Task ResetCacheAsync(
+        public async Task RefetchServiceCurrenciesAsync(
             CancellationToken cancellationToken)
         {
+            await RecreateCurrenciesCollectionOrNullAsync(
+                DateTime.UtcNow,
+                cancellationToken);
+
             if (_cache.TryGetValue(CacheKey, out _))
             {
                 _cache.Remove(CacheKey);
             }
-
-            await GetAllCurrenciesAsync(cancellationToken);
         }
 
-        private async Task<List<CurrencyContent>> GetCurrenciesInternalAsync(
+        private async Task<CurrenciesCollection> RecreateCurrenciesCollectionOrNullAsync(
+            DateTime forDate,
             CancellationToken cancellationToken)
         {
-            var currenciesUrl = _configuration["Currencies:Url"];
-            if (string.IsNullOrEmpty(currenciesUrl))
+            var dateForQuery = forDate.Date;
+            var existingEntity = await _context.CurrencyCollections
+                .FirstOrDefaultAsync(
+                    x => x.CurrencyDate == dateForQuery,
+                    cancellationToken);
+
+            if (existingEntity is null)
             {
-                throw new InvalidOperationException("Currencies url is not set");
-            }
-
-            try
-            {
-                using var client = _httpClientFactory.CreateClient();
-                var xmlContent = await client.GetStringAsync(currenciesUrl, cancellationToken);
-                var xdoc = XDocument.Parse(xmlContent);
-
-                var currenciesToSave = EnumHelper.Values<Currency>(true);
-                var items = xdoc.Descendants("item")
-                    .Select(x => new CurrencyContent(x))
-                    .Where(x => currenciesToSave.Contains(x.Currency))
-                    .ToList();
-
-                if (items.All(x => x.Currency is not Currency.KZT))
+                var currencies = await _currenciesHttpService.GetCurrenciesAsync(cancellationToken);
+                if (currencies.Count == 0)
                 {
-                    var pubDate = items.FirstOrDefault()?.PubDate ?? DateTime.UtcNow;
-                    items.Insert(
-                        0,
-                        new KztCurrencyContent(pubDate));
+                    return null;
                 }
 
-                return items;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(
-                    e,
-                    "Error while getting currencies from {Url}. Message {Message}",
-                    currenciesUrl,
-                    e.Message);
+                var newEntity = new CurrenciesCollection(currencies);
 
-                return new List<CurrencyContent>
-                {
-                    new KztCurrencyContent(DateTime.UtcNow),
-                };
+                _context.CurrencyCollections.Add(newEntity);
+                await _context.SaveChangesAsync(cancellationToken);
+
+                return newEntity;
             }
+
+            _logger.LogInformation(
+                "There is an existing record for date {Date} ({Currencies}) [ID:{RecordId}]",
+                existingEntity.CurrencyDate.ToString("O"),
+                string.Join(", ", existingEntity.Currencies.Select(x => x.Key)),
+                existingEntity.Id);
+
+            return existingEntity;
+        }
+
+        private List<CurrencyContent> CreateDefaultCollection()
+        {
+            return new List<CurrencyContent>
+            {
+                new KztCurrencyContent(DateTime.UtcNow),
+            };
         }
     }
 }

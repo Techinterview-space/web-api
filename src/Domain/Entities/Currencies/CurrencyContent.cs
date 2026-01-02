@@ -1,10 +1,10 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Xml.Linq;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
-using Domain.Migrations;
 
-namespace Infrastructure.Currencies.Contracts
+namespace Domain.Entities.Currencies
 {
     public record CurrencyContent
     {

@@ -1,6 +1,7 @@
-﻿using Domain.Entities.Salaries;
+﻿using System;
+using Domain.Entities.Salaries;
 
-namespace Infrastructure.Currencies.Contracts;
+namespace Domain.Entities.Currencies;
 
 public record KztCurrencyContent : CurrencyContent
 {

@@ -1,8 +1,21 @@
-﻿namespace InfrastructureTests.Fakes.Data
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Domain.Entities.Salaries;
+using Domain.Extensions;
+using Infrastructure.Currencies;
+using InfrastructureTests.Mocks;
+using MemoryCache.Testing.Moq;
+using Microsoft.Extensions.Logging;
+using Moq;
+using TestUtils.Fakes;
+using Xunit;
+
+namespace InfrastructureTests.Services;
+
+public class CurrenciesHttpServiceTests
 {
-    public static class FakeXml
-    {
-        public const string CurrenciesXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    public const string CurrenciesXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <rss version=""2.0"">
     <channel>
         <generator>Alternate RSS Builder</generator>
@@ -365,5 +378,38 @@
                 </item>
                         </channel>
 </rss>";
+
+    [Fact]
+    public async Task GetCurrenciesAsync_ValidResponse_ReturnsAllCurrencies()
+    {
+        var memoryConfig = new InMemoryConfig(
+            new Dictionary<string, string>
+            {
+                { "Currencies:Url", "https://currencies.com/rates_all.xml" },
+            });
+
+        using var mockedCache = Create.MockedMemoryCache();
+        var mockHttpClientFactory = new HttpClientFactoryMock(CurrenciesXml);
+
+        var currencyService = new CurrenciesHttpService(
+            mockHttpClientFactory.Object,
+            memoryConfig.Value(),
+            new Mock<ILogger<CurrenciesHttpService>>().Object);
+
+        var currencies = await currencyService.GetCurrenciesAsync(default);
+
+        // Assert
+        var existingCurrencies = EnumHelper
+            .Values<Currency>(true)
+            .Where(x => x != Currency.KZT)
+            .ToList();
+
+        Assert.NotEmpty(existingCurrencies);
+
+        Assert.Equal(existingCurrencies.Count, currencies.Count);
+        foreach (var currency in currencies)
+        {
+            Assert.Contains(currency.Key, existingCurrencies);
+        }
     }
 }

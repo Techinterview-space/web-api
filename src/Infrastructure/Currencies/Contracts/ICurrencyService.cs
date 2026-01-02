@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Salaries;
+﻿using Domain.Entities.Currencies;
+using Domain.Entities.Salaries;
 
 namespace Infrastructure.Currencies.Contracts
 {
@@ -8,14 +9,10 @@ namespace Infrastructure.Currencies.Contracts
             Currency currency,
             CancellationToken cancellationToken);
 
-        Task<List<CurrencyContent>> GetCurrenciesAsync(
-            List<Currency> currenciesToGet,
-            CancellationToken cancellationToken);
-
         Task<List<CurrencyContent>> GetAllCurrenciesAsync(
             CancellationToken cancellationToken);
 
-        Task ResetCacheAsync(
+        Task RefetchServiceCurrenciesAsync(
             CancellationToken cancellationToken);
     }
 }

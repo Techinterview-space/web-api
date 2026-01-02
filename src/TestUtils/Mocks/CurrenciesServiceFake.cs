@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Currencies;
 using Domain.Entities.Salaries;
 using Infrastructure.Currencies.Contracts;
 
@@ -61,7 +62,7 @@ public class CurrenciesServiceFake : ICurrencyService
         return Task.FromResult(_currencies);
     }
 
-    public Task ResetCacheAsync(
+    public Task RefetchServiceCurrenciesAsync(
         CancellationToken cancellationToken)
     {
         return Task.CompletedTask;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities.Currencies;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;

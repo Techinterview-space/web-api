@@ -16,7 +16,7 @@ public static class ScheduleConfig
     {
         services
             .AddScheduler()
-            .AddTransient<CurrenciesResetJob>()
+            .AddTransient<RefetchServiceCurrenciesJob>()
             .AddTransient<TelegramSalariesRegularStatsUpdateJob>()
             .AddTransient<SalariesSubscriptionPublishMessageJob>()
             .AddTransient<SalariesAiAnalysisSubscriptionWeeklyJob>()
@@ -34,9 +34,10 @@ public static class ScheduleConfig
         app.ApplicationServices.UseScheduler((scheduler) =>
         {
             scheduler
-                .Schedule<CurrenciesResetJob>()
+                .Schedule<RefetchServiceCurrenciesJob>()
                 .DailyAt(6, 0)
-                .RunOnceAtStart();
+                .RunOnceAtStart()
+                .PreventOverlapping(nameof(RefetchServiceCurrenciesJob));
 
             scheduler
                 .Schedule<SalariesHistoricalDataJob>()

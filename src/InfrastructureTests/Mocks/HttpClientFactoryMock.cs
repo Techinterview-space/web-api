@@ -25,10 +25,10 @@ namespace InfrastructureTests.Mocks
                     Content = new StringContent(respData)
                 });
 
-            var httpClient = new HttpClient(mockHandler.Object);
+            var client = new HttpClient(mockHandler.Object);
 
             Setup(factory => factory.CreateClient(It.IsAny<string>()))
-                .Returns(httpClient);
+                .Returns(client);
         }
     }
 }

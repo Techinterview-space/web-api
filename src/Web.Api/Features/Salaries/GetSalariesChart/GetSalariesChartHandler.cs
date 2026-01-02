@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Currencies;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
