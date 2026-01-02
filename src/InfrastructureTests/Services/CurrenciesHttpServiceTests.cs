@@ -409,7 +409,7 @@ public class CurrenciesHttpServiceTests
         Assert.Equal(existingCurrencies.Count, currencies.Count);
         foreach (var currency in currencies)
         {
-            Assert.Contains(currency.Currency, existingCurrencies);
+            Assert.Contains(currency.Key, existingCurrencies);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Currencies;
 using Domain.Entities.Salaries;
 using Infrastructure.Currencies;
 using MemoryCache.Testing.Moq;
@@ -25,16 +26,22 @@ namespace InfrastructureTests.Services
             var currenciesHttpService = new Mock<ICurrenciesHttpService>();
             currenciesHttpService
                 .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                .ReturnsAsync(new Dictionary<Currency, CurrencyContent>
                 {
-                    new (
-                        400,
+                    {
                         Currency.USD,
-                        now),
-                    new (
-                        500,
+                        new CurrencyContent(
+                            400,
+                            Currency.USD,
+                            now)
+                    },
+                    {
                         Currency.EUR,
-                        now),
+                        new CurrencyContent(
+                            500,
+                            Currency.EUR,
+                            now)
+                    },
                 });
 
             using var mockedCache = Create.MockedMemoryCache();
@@ -70,19 +77,26 @@ namespace InfrastructureTests.Services
         {
             await using var context = new InMemoryDatabaseContext();
             var now = DateTime.UtcNow;
+
             var currenciesHttpService = new Mock<ICurrenciesHttpService>();
             currenciesHttpService
                 .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                .ReturnsAsync(new Dictionary<Currency, CurrencyContent>
                 {
-                    new (
-                        400,
+                    {
                         Currency.USD,
-                        now),
-                    new (
-                        500,
+                        new CurrencyContent(
+                            400,
+                            Currency.USD,
+                            now)
+                    },
+                    {
                         Currency.EUR,
-                        now),
+                        new CurrencyContent(
+                            500,
+                            Currency.EUR,
+                            now)
+                    },
                 });
 
             using var mockedCache = Create.MockedMemoryCache();
@@ -129,10 +143,22 @@ namespace InfrastructureTests.Services
             var currenciesHttpService = new Mock<ICurrenciesHttpService>();
             currenciesHttpService
                 .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                .ReturnsAsync(new Dictionary<Currency, CurrencyContent>
                 {
-                    new (400, Currency.USD, now),
-                    new (500, Currency.EUR, now),
+                    {
+                        Currency.USD,
+                        new CurrencyContent(
+                            400,
+                            Currency.USD,
+                            now)
+                    },
+                    {
+                        Currency.EUR,
+                        new CurrencyContent(
+                            500,
+                            Currency.EUR,
+                            now)
+                    },
                 });
 
             using var mockedCache = Create.MockedMemoryCache();
@@ -169,7 +195,7 @@ namespace InfrastructureTests.Services
             var currenciesHttpService = new Mock<ICurrenciesHttpService>();
             currenciesHttpService
                 .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>());
+                .ReturnsAsync(new Dictionary<Currency, CurrencyContent>());
 
             using var mockedCache = Create.MockedMemoryCache();
 
@@ -206,10 +232,22 @@ namespace InfrastructureTests.Services
             var currenciesHttpService = new Mock<ICurrenciesHttpService>();
             currenciesHttpService
                 .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                .ReturnsAsync(new Dictionary<Currency, CurrencyContent>
                 {
-                    new (400, Currency.USD, now),
-                    new (500, Currency.EUR, now),
+                    {
+                        Currency.USD,
+                        new CurrencyContent(
+                            400,
+                            Currency.USD,
+                            now)
+                    },
+                    {
+                        Currency.EUR,
+                        new CurrencyContent(
+                            500,
+                            Currency.EUR,
+                            now)
+                    },
                 });
 
             using var mockedCache = Create.MockedMemoryCache();
@@ -253,10 +291,22 @@ namespace InfrastructureTests.Services
             var currenciesHttpService = new Mock<ICurrenciesHttpService>();
             currenciesHttpService
                 .Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new List<Domain.Entities.Currencies.CurrencyContent>
+                .ReturnsAsync(new Dictionary<Currency, CurrencyContent>
                 {
-                    new (400, Currency.USD, now),
-                    new (500, Currency.EUR, now),
+                    {
+                        Currency.USD,
+                        new CurrencyContent(
+                            400,
+                            Currency.USD,
+                            now)
+                    },
+                    {
+                        Currency.EUR,
+                        new CurrencyContent(
+                            500,
+                            Currency.EUR,
+                            now)
+                    },
                 });
 
             using var mockedCache = Create.MockedMemoryCache();

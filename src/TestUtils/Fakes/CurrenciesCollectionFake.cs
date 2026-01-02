@@ -10,26 +10,35 @@ public class CurrenciesCollectionFake : CurrenciesCollection
 {
     public CurrenciesCollectionFake(
         DateTime currencyDate,
-        List<CurrencyContent> currencies = null)
+        Dictionary<Currency, CurrencyContent> currencies = null)
         : base(
             currencies ?? CreateDefaultCurrencies(currencyDate))
     {
     }
 
-    public static List<CurrencyContent> CreateDefaultCurrencies(
+    public static Dictionary<Currency, CurrencyContent> CreateDefaultCurrencies(
         DateTime currencyDate)
     {
-        return new List<CurrencyContent>()
+        return new Dictionary<Currency, CurrencyContent>
         {
-            new CurrencyContent(
-                400,
+            {
                 Currency.USD,
-                currencyDate),
-            new CurrencyContent(
-                500,
+                new CurrencyContent(
+                    400,
+                    Currency.USD,
+                    currencyDate)
+            },
+            {
                 Currency.EUR,
-                currencyDate),
-            new KztCurrencyContent(currencyDate),
+                new CurrencyContent(
+                    500,
+                    Currency.EUR,
+                    currencyDate)
+            },
+            {
+                Currency.KZT,
+                new KztCurrencyContent(currencyDate)
+            }
         };
     }
 

@@ -23,7 +23,7 @@ public class CurrenciesHttpService : ICurrenciesHttpService
         _logger = logger;
     }
 
-    public async Task<List<CurrencyContent>> GetCurrenciesAsync(
+    public async Task<Dictionary<Currency, CurrencyContent>> GetCurrenciesAsync(
         CancellationToken cancellationToken)
     {
         var currenciesUrl = _configuration["Currencies:Url"];
@@ -42,7 +42,8 @@ public class CurrenciesHttpService : ICurrenciesHttpService
             return xdoc.Descendants("item")
                 .Select(x => new CurrencyContent(x))
                 .Where(x => currenciesToSave.Contains(x.Currency))
-                .ToList();
+                .GroupBy(x => x.Currency)
+                .ToDictionary(x => x.Key, x => x.First());
         }
         catch (Exception e)
         {
@@ -52,7 +53,7 @@ public class CurrenciesHttpService : ICurrenciesHttpService
                 currenciesUrl,
                 e.Message);
 
-            return new List<CurrencyContent>(0);
+            return new Dictionary<Currency, CurrencyContent>(0);
         }
     }
 }

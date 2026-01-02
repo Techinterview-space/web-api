@@ -14,7 +14,7 @@ public class CurrenciesCollection : HasDatesBase, IHasIdBase<Guid>
     public DateTime CurrencyDate { get; protected set; }
 
     public CurrenciesCollection(
-        List<CurrencyContent> currencies)
+        Dictionary<Currency, CurrencyContent> currencies)
     {
         if (currencies.Count == 0)
         {
@@ -22,13 +22,13 @@ public class CurrenciesCollection : HasDatesBase, IHasIdBase<Guid>
         }
 
         Id = Guid.NewGuid();
-        CurrencyDate = currencies[0].PubDate;
+        CurrencyDate = currencies.First().Value.PubDate;
         CreatedAt = UpdatedAt = DateTimeOffset.UtcNow;
 
         Currencies = currencies
             .ToDictionary(
-                x => x.Currency,
-                x => x.Value);
+                x => x.Key,
+                x => x.Value.Value);
     }
 
     public List<CurrencyContent> CreateCurrencies()

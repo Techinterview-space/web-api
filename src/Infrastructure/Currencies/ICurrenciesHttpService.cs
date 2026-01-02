@@ -1,9 +1,10 @@
 ﻿using Domain.Entities.Currencies;
+using Domain.Entities.Salaries;
 
 namespace Infrastructure.Currencies;
 
 public interface ICurrenciesHttpService
 {
-    Task<List<CurrencyContent>> GetCurrenciesAsync(
+    Task<Dictionary<Currency, CurrencyContent>> GetCurrenciesAsync(
         CancellationToken cancellationToken);
 }
