@@ -24,6 +24,11 @@ public class CreateCurrenciesCollectionHandler(
             throw new BadRequestException("Currencies collection must have at least one currency.");
         }
 
+        if (request.CurrencyDate > System.DateTime.UtcNow.Date)
+        {
+            throw new BadRequestException("Currency date cannot be in the future.");
+        }
+
         var existingRecord = await context.CurrencyCollections
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.CurrencyDate == request.CurrencyDate, cancellationToken);
