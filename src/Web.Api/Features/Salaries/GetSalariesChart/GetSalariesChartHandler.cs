@@ -8,7 +8,6 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.ValueObjects;
-using Domain.ValueObjects.Dates;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;
