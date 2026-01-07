@@ -160,9 +160,12 @@ public record SalariesForChartQuery
         }
         else if (SalarySourceTypes.Count == 0)
         {
+            var currentQuarterYear = CurrentQuarter.Year;
             query = query
                 .Where(x =>
-                    (x.Year == CurrentQuarter.Year || x.Year == CurrentQuarter.Year - 1) &&
+                    (x.Year == currentQuarterYear ||
+                     x.Year == currentQuarterYear - 1 ||
+                     x.Year == currentQuarterYear - 2) &&
                     x.CreatedAt >= From && x.CreatedAt <= To);
         }
 
