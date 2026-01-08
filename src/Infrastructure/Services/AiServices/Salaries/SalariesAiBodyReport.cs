@@ -106,6 +106,6 @@ public record SalariesAiBodyReport
             stringBuilder.AppendLine();
         }
 
-        return stringBuilder.ToString();
+        return stringBuilder.ToString().TrimEnd();
     }
 }

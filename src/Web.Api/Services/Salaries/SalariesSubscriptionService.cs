@@ -219,8 +219,11 @@ public class SalariesSubscriptionService
                 if (analysis != null)
                 {
                     var detailedChanges = analysis.ParseSourceAs<SalariesAiBodyReport>().ToTelegramHtmlSummary();
+                    var aiReportText = $"{analysis.GetClearedReport()}\n\nМодель: {analysis.Model}";
+
                     textMessageToBeSent += $"\n\n{detailedChanges}" +
-                                           $"\n\n<em>🤖 AI анализ:</em>\n\n{analysis.GetClearedReport()}";
+                                           $"\n\n<em>🤖 AI анализ:</em>\n\n" +
+                                           $"<blockquote expandable>{aiReportText}</blockquote>";
                 }
             }
 
