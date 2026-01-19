@@ -56,8 +56,6 @@ public class OpenAiPrompt : HasDatesBase
         Model = model?.Trim().ToLowerInvariant();
         Engine = engine;
         IsActive = false;
-
-        ValidateModel();
     }
 
     protected OpenAiPrompt()
@@ -84,23 +82,6 @@ public class OpenAiPrompt : HasDatesBase
         Prompt = prompt;
         Model = model;
         Engine = engine;
-
-        ValidateModel();
-    }
-
-    public void ValidateModel()
-    {
-        if (Engine is AiEngine.OpenAi &&
-            !_chatGptAllowedModels.Contains(Model))
-        {
-            throw new InvalidOperationException($"Model '{Model}' is not allowed for OpenAI engine.");
-        }
-
-        if (Engine is AiEngine.Claude &&
-            !_claudeAllowedModels.Contains(Model))
-        {
-            throw new InvalidOperationException($"Model '{Model}' is not allowed for Claude engine.");
-        }
     }
 
     public void Activate()
