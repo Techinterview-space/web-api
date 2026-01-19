@@ -78,18 +78,25 @@ public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
     {
         Logger.LogDebug("Received update of type {UpdateType}", updateRequest.Type);
 
-        var messageSent = updateRequest.Message?.Date;
-        if (messageSent < _startedToListenTo)
+        // Skip date check for callback queries - they should always be processed
+        if (updateRequest.CallbackQuery is null)
         {
-            Logger.LogWarning(
-                "Ignoring message sent at {MessageSentDate} because it was sent before the bot started listening at {StartedToListenTo}",
-                messageSent.Value.ToString("O"),
-                _startedToListenTo.ToString("O"));
+            var messageSent = updateRequest.Message?.Date;
+            if (messageSent < _startedToListenTo)
+            {
+                Logger.LogWarning(
+                    "Ignoring message sent at {MessageSentDate} because it was sent before the bot started listening at {StartedToListenTo}",
+                    messageSent.Value.ToString("O"),
+                    _startedToListenTo.ToString("O"));
 
-            return;
+                return;
+            }
         }
 
-        if (updateRequest.Message is null && updateRequest.InlineQuery is null && updateRequest.ChosenInlineResult is null)
+        if (updateRequest.Message is null &&
+            updateRequest.InlineQuery is null &&
+            updateRequest.ChosenInlineResult is null &&
+            updateRequest.CallbackQuery is null)
         {
             return;
         }
