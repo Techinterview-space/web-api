@@ -1,277 +1,151 @@
-# CLAUDE.md - AI Agent Guidelines for Tech.Interviewer Web API
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-This repository contains the backend API for [techinterview.space](https://techinterview.space) - a monolithic .NET 10 web API application.
+Backend API for [techinterview.space](https://techinterview.space) - a monolithic .NET 10 web API for interview management, salary data analysis, company reviews, and AI-powered insights.
 
 **Repository:** https://github.com/techinterview-space/web-api
 
 ---
 
-## Tech Stack
+## Common Commands
 
-- .NET 10
-- Entity Framework Core
-- PostgreSQL (via Docker)
-- Elasticsearch (via Docker)
-- LocalStack (AWS services emulation)
+### Build
+```bash
+cd src && dotnet build
+```
+
+### Run All Tests
+```bash
+cd src && dotnet test
+```
+
+### Run Single Test Project
+```bash
+cd src && dotnet test Domain.Tests
+cd src && dotnet test InfrastructureTests
+cd src && dotnet test Web.Api.Tests
+```
+
+### Run Single Test
+```bash
+cd src && dotnet test --filter "FullyQualifiedName~TestClassName.TestMethodName"
+# Example:
+cd src && dotnet test --filter "FullyQualifiedName~InterviewsControllerTests.Get_ReturnsOnlyMyInterviews"
+```
+
+### Run Application
+```bash
+# Start infrastructure first
+docker-compose up -d --build database.api elasticsearch localstack
+
+# Run the API
+cd src && dotnet run --project Web.Api
+```
+
+**Application URL:** `https://localhost:5001`
+**Swagger UI:** `https://localhost:5001/swagger`
 
 ---
 
-## Code Style Guidelines
+## Architecture
 
-### Ruleset File
-
-**ALWAYS follow the linter rules defined in `src/standard.ruleset`.**
-
-Before writing any code, review the `standard.ruleset` file to understand the project's code analysis rules. This file contains the authoritative style and quality rules for the project.
-
-```bash
-# Location of the ruleset file
-src/standard.ruleset
+### Layer Structure (Clean Architecture)
+```
+Web.Api (Controllers, Features, Middlewares)
+    ↓
+Infrastructure (Database, External Services, AI, Email, Storage)
+    ↓
+Domain (Entities, Value Objects, Validation, Enums)
 ```
 
-### Additional Style Guidelines
+### Solution Projects
+- **Web.Api** - ASP.NET Core API, feature-based controllers
+- **Domain** - Core entities, enums, validation, value objects
+- **Infrastructure** - EF Core DbContext, external integrations, services
+- **TestUtils** - Shared testing utilities (fakes, mocks, in-memory DB)
+- **Domain.Tests**, **InfrastructureTests**, **Web.Api.Tests** - Test projects
 
-In addition to the ruleset, follow these conventions consistent with the existing codebase:
+### Key Design Patterns
+- **CQRS-like**: `IRequestHandler<TRequest, TResult>` for command/query separation
+- **Mediator**: `ServiceProviderExtensions.HandleBy<THandler, TRequest, TResult>()`
+- **Feature-based organization**: Controllers grouped by domain (Interviews, Salaries, Companies, etc.)
 
-#### Naming Conventions
+---
 
+## Key File Locations
+
+| Component | Location |
+|-----------|----------|
+| Startup/DI | `src/Web.Api/Startup.cs`, `src/Web.Api/Setup/ServiceRegistration.cs` |
+| Database Context | `src/Infrastructure/Database/DatabaseContext.cs` |
+| Entity Configs | `src/Infrastructure/Database/Config/` |
+| Code Analysis Rules | `src/standard.ruleset` |
+| Feature Controllers | `src/Web.Api/Features/{FeatureName}/` |
+| Test Fakes | `src/TestUtils/Fakes/` |
+| In-Memory DB | `src/TestUtils/Db/InMemoryDatabaseContext.cs` |
+
+---
+
+## Code Style
+
+**ALWAYS follow `src/standard.ruleset`** - StyleCop and CA rules enforced as errors.
+
+### Naming Conventions
 | Element | Style | Example |
 |---------|-------|---------|
-| Namespaces | PascalCase | `TechInterviewer.Features.Interviews` |
-| Classes | PascalCase | `InterviewService` |
-| Interfaces | PascalCase with "I" prefix | `IInterviewRepository` |
-| Methods | PascalCase | `GetInterviewByIdAsync` |
-| Properties | PascalCase | `CreatedAt` |
-| Private fields | camelCase with underscore prefix | `_dbContext` |
-| Local variables | camelCase | `interviewId` |
-| Parameters | camelCase | `cancellationToken` |
-| Async methods | PascalCase with "Async" suffix | `CreateInterviewAsync` |
-
-#### Code Organization
-
-- Follow existing project structure and patterns
-- Use dependency injection for all service dependencies
-- Use `async`/`await` for all asynchronous operations
-- Follow existing patterns for controllers, services, and repositories
-
----
-
-## Build Verification
-
-### Required Action After Code Changes
-
-**After applying any feature or code modification, always run:**
-
-```bash
-cd src
-dotnet build
-```
-
-This ensures:
-- All syntax errors are caught
-- All references are resolved
-- Code analysis rules from `standard.ruleset` pass
-- The solution compiles successfully
-
-If the build fails, fix the issues before considering the task complete.
+| Private fields | `_camelCase` | `_dbContext` |
+| Async methods | `PascalCaseAsync` | `GetInterviewAsync` |
+| Interfaces | `IPascalCase` | `IInterviewService` |
+| Local variables/params | `camelCase` | `interviewId` |
 
 ---
 
 ## Database Migrations
 
-### ⚠️ IMPORTANT: Migration Restrictions
+**DO NOT generate or modify migrations.** Migrations are created manually by the user.
 
-**DO NOT generate or modify Entity Framework migrations.**
-
-- Migrations will be created manually by the user using the provided PowerShell script or EF CLI
-- **NEVER** touch or modify `*DatabaseContextModelSnapshot.cs` files (DbContext snapshots)
-- **NEVER** create new migration files in the `Migrations` folder
-- **NEVER** modify existing migration files
-
-When making changes to entity models:
-1. Modify only the entity classes as needed
-2. Inform the user that migrations need to be generated manually
-3. Remind the user to run `dotnet ef migrations add <MigrationName>`
+- Never modify `*DatabaseContextModelSnapshot.cs` files
+- Never create/modify files in `src/Infrastructure/Migrations/`
+- When changing entity models, inform user to run: `dotnet ef migrations add <Name>`
 
 ---
 
-## Running the Application
+## Testing
 
-### Prerequisites
+### Framework
+xUnit with Moq and Faker.Net
 
-1. Docker Desktop installed and running
-2. .NET 10 SDK installed
+### Test Utilities (in TestUtils project)
+```csharp
+// Entity fakes - create test data
+var user = await new UserFake(Role.Admin).PleaseAsync(context);
+var interview = new InterviewFake(user).Please(context);
 
-### Start Infrastructure
+// In-memory database
+using var context = new InMemoryDatabaseContext();
 
-```bash
-# Start required services (database, elasticsearch, localstack)
-docker-compose up -d --build database.api elasticsearch localstack
+// Fake auth
+var fakeAuth = new FakeAuth(user);
+var fakeCurrentUser = new FakeCurrentUser(user);
 ```
 
-### Run the Application
-
-```bash
-cd src
-dotnet run
-```
-
-The application will be available at `https://localhost:5001`
-
----
-
-## Unit Testing Guidelines
-
-### Project Structure
-
-**DO NOT create new test projects.** Test projects will be created manually by the user.
-
-When asked to write tests, add test files to the existing test project structure.
-
-### Testing Framework
-
-All unit tests must use **xUnit** library.
-
-### Test File Requirements
-
-Each test file **MUST** contain at least one test for the **Happy Path** scenario.
-
-Additional tests are optional but recommended for:
-- Edge cases
-- Error handling
-- Boundary conditions
-- Invalid input validation
-
-### Test Naming Convention
-
-Use descriptive test names following this pattern:
-
+### Test Naming Pattern
 ```csharp
 [Fact]
 public async Task MethodName_StateUnderTest_ExpectedBehavior()
-{
-    // Arrange
-    // Act
-    // Assert
-}
 ```
 
-Examples:
-```csharp
-[Fact]
-public async Task GetInterview_WithValidId_ReturnsInterview()
-
-[Fact]
-public async Task GetInterview_WithInvalidId_ThrowsNotFoundException()
-
-[Theory]
-[InlineData(null)]
-[InlineData("")]
-public async Task CreateInterview_WithInvalidTitle_ThrowsValidationException(string invalidTitle)
-```
-
-### Test Structure
-
-Follow the **Arrange-Act-Assert** pattern:
-
-```csharp
-[Fact]
-public async Task CreateInterview_WithValidData_ReturnsCreatedInterview()
-{
-    // Arrange
-    var request = new CreateInterviewRequest { /* ... */ };
-    
-    // Act
-    var result = await _sut.CreateInterviewAsync(request, CancellationToken.None);
-    
-    // Assert
-    Assert.NotNull(result);
-    Assert.Equal(expected, result.Id);
-}
-```
+Each test file must have at least one Happy Path test.
 
 ---
 
-## Test Framework Utilities
+## Verification Checklist
 
-If the project contains a test framework, **use the existing utilities**:
-
-### Available Test Utilities (if present)
-
-#### Mock Services
-Look for classes that mock business services:
-- Pattern: `Mock*Service`, `*ServiceMock`, `Fake*Service`, `*ServiceFake`
-- Location: Usually in a `Mocks/` or `Fakes/` folder within the test project
-
-#### Entity Fakes
-Look for `...Fake` classes that create test database entities:
-- Pattern: `*Fake`, `*Builder`
-- Purpose: Create valid entity instances for testing
-- Example usage:
-  ```csharp
-  var interview = new InterviewFake()
-      .WithUserId(userId)
-      .WithStatus(InterviewStatus.Completed)
-      .Please(context);
-  ```
-
-#### In-Memory Database Context
-Look for `InMemoryDatabaseContext` or similar classes for database operations in tests:
-- Use for integration-style tests that need database operations
-- Provides isolated, in-memory database for each test
-- Example usage:
-  ```csharp
-  using var context = new InMemoryDatabaseContext();
-  context.Interviews.Add(interviewEntity);
-  await context.SaveChangesAsync();
-  // ... test repository methods
-  ```
-
-### Discovering Test Utilities
-
-Before writing tests, check for existing test infrastructure:
-
-```bash
-# Find fake/mock classes
-find . -name "*Fake*.cs" -o -name "*Mock*.cs" -o -name "*Builder*.cs"
-
-# Find in-memory context
-find . -name "*InMemory*.cs" -o -name "*TestDbContext*.cs"
-```
-
----
-
-## Project-Specific Notes
-
-### This is a Monolith
-
-This is a single monolithic application - there are no microservices or separate service projects. All features are contained within this single solution.
-
-### Docker Compose Services
-
-The project uses Docker Compose for local development infrastructure:
-- `database.api` - PostgreSQL database
-- `elasticsearch` - Search functionality
-- `localstack` - AWS services emulation (S3, etc.)
-
-### API Documentation
-
-The API provides RSS feeds and standard REST endpoints. Check the README.md for API documentation.
-
----
-
-## Summary Checklist
-
-Before completing any task, verify:
-
-- [ ] Code follows rules defined in `src/standard.ruleset`
-- [ ] `dotnet build` succeeds without errors in the `src` directory
-- [ ] No migrations were generated or modified
-- [ ] No DbContext snapshot files were touched
-- [ ] Unit tests use xUnit
-- [ ] Each test file has at least one Happy Path test
-- [ ] Existing test framework utilities are used when available
-- [ ] No new test projects were created
-- [ ] Code follows existing patterns in the codebase
+Before completing any task:
+- [ ] `cd src && dotnet build` succeeds
+- [ ] No migrations generated or modified
+- [ ] Code follows `standard.ruleset`
+- [ ] Tests use xUnit and existing TestUtils utilities

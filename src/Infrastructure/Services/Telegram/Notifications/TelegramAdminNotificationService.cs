@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Infrastructure.Services.Telegram.Notifications;
 
@@ -76,11 +77,23 @@ public class TelegramAdminNotificationService : ITelegramAdminNotificationServic
             return;
         }
 
-        var message = $"Новый отзыв о компании {company.Name}:\n" +
-                      $"Рейтинг: {review.TotalRating}\n" +
-                      $"Плюсы: {review.Pros?.Length}\n" +
-                      $"Минусы: {review.Cons?.Length}\n\n" +
-                      $"Ссылка: {_globalSettings.FrontendBaseUrl}/admin/companies/reviews-to-approve";
+        var pros = FormatReviewContent(review.Pros);
+        var cons = FormatReviewContent(review.Cons);
+
+        var message = $"<b>Новый отзыв о компании {EscapeHtml(company.Name)}</b>\n\n" +
+                      $"<b>Рейтинг:</b> {review.TotalRating}\n\n" +
+                      $"<b>Плюсы:</b>\n{pros}\n\n" +
+                      $"<b>Минусы:</b>\n{cons}\n\n" +
+                      $"<a href=\"{_globalSettings.FrontendBaseUrl}/admin/companies/reviews-to-approve\">Перейти к модерации</a>";
+
+        var inlineKeyboard = new InlineKeyboardMarkup(new[]
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("✅ Одобрить", $"review_approve:{review.Id}"),
+                InlineKeyboardButton.WithCallbackData("❌ Отклонить", $"review_reject:{review.Id}")
+            }
+        });
 
         foreach (var admin in admins)
         {
@@ -88,6 +101,7 @@ public class TelegramAdminNotificationService : ITelegramAdminNotificationServic
                 admin.ChatId,
                 message,
                 parseMode: ParseMode.Html,
+                replyMarkup: inlineKeyboard,
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
@@ -96,5 +110,28 @@ public class TelegramAdminNotificationService : ITelegramAdminNotificationServic
                 admin.ChatId,
                 review.Id);
         }
+    }
+
+    private static string FormatReviewContent(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return "<i>Не указано</i>";
+        }
+
+        return EscapeHtml(content);
+    }
+
+    private static string EscapeHtml(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        return text
+            .Replace("&", "&amp;")
+            .Replace("<", "&lt;")
+            .Replace(">", "&gt;");
     }
 }

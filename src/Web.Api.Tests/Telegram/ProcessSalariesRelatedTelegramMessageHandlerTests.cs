@@ -5,6 +5,7 @@ using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Infrastructure.Database;
+using Infrastructure.Services.Telegram.Notifications;
 using MemoryCache.Testing.Moq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -76,6 +77,8 @@ namespace Web.Api.Tests.Telegram
                     })
                 .Build();
 
+            var companyReviewCallbackHandler = new Mock<ICompanyReviewTelegramCallbackHandler>();
+
             var processTelegramMessageHandler = new ProcessSalariesRelatedTelegramMessageHandler(
                 logger.Object,
                 currencyService,
@@ -83,7 +86,8 @@ namespace Web.Api.Tests.Telegram
                 mockedCache,
                 new GlobalFake(),
                 new ProfessionsCacheServiceFake(context),
-                configuration);
+                configuration,
+                companyReviewCallbackHandler.Object);
 
             var mockUpdate = new Mock<Update>();
 
@@ -129,6 +133,8 @@ namespace Web.Api.Tests.Telegram
                     })
                 .Build();
 
+            var companyReviewCallbackHandler = new Mock<ICompanyReviewTelegramCallbackHandler>();
+
             var processTelegramMessageHandler = new ProcessSalariesRelatedTelegramMessageHandler(
                 logger.Object,
                 currencyService,
@@ -136,7 +142,8 @@ namespace Web.Api.Tests.Telegram
                 mockedCache,
                 new GlobalFake(),
                 new ProfessionsCacheServiceFake(context),
-                configuration);
+                configuration,
+                companyReviewCallbackHandler.Object);
 
             var mockUpdate = new Mock<Update>();
             mockUpdate.Object.Message = new Message()

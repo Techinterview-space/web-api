@@ -129,11 +129,18 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
     {
         if (ApprovedAt != null)
         {
-            throw new BadRequestException("Review is already approved");
+            return;
+        }
+
+        if (Company is null)
+        {
+            throw new BadRequestException("Company is null");
         }
 
         ApprovedAt = DateTime.UtcNow;
         OutdatedAt = null;
+
+        Company.ApproveReview(Id);
     }
 
     public void MarkAsOutdated()

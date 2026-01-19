@@ -40,6 +40,7 @@ public class CompanyReviewFake : CompanyReview
         DateTime date)
     {
         ApprovedAt = date;
+        OutdatedAt = null;
         return this;
     }
 

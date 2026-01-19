@@ -61,6 +61,7 @@ public static class ServiceRegistration
             .AddTransient<SalariesSubscriptionService>()
             .AddTransient<CompanyReviewsSubscriptionService>()
             .AddScoped<ITelegramAdminNotificationService, TelegramAdminNotificationService>()
+            .AddScoped<ICompanyReviewTelegramCallbackHandler, CompanyReviewTelegramCallbackHandler>()
             .AddScoped<IViewRenderer, ViewRenderer>()
             .AddScoped<IGithubPersonalUserTokenService, GithubPersonalUserTokenService>()
             .AddScoped<IGithubGraphQLService, GithubGraphQlService>()

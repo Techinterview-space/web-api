@@ -27,11 +27,11 @@ public class GetRecentCompanyReviewsRssHandlerTests
 
         var company = new CompanyFake().Please(context);
         var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
-        var review = new CompanyReviewFake(company, user).Please(context);
 
         // Approve the review to make it appear in RSS
-        review.Approve();
-        await context.SaveChangesAsync();
+        var review = new CompanyReviewFake(company, user)
+            .SetApprovedAt(DateTime.UtcNow)
+            .Please(context);
 
         var query = new GetRecentCompanyReviewsRssQuery(1, 10);
 

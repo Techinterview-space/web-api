@@ -15,6 +15,7 @@ using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Infrastructure.Services.Mediator;
 using Infrastructure.Services.Professions;
+using Infrastructure.Services.Telegram.Notifications;
 using Infrastructure.Services.Telegram.ReplyMessages;
 using Infrastructure.Services.Telegram.UserCommands;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,7 @@ public class ProcessSalariesRelatedTelegramMessageHandler
     private readonly IMemoryCache _cache;
     private readonly IGlobal _global;
     private readonly IConfiguration _configuration;
+    private readonly ICompanyReviewTelegramCallbackHandler _companyReviewCallbackHandler;
 
     public ProcessSalariesRelatedTelegramMessageHandler(
         ILogger<ProcessSalariesRelatedTelegramMessageHandler> logger,
@@ -51,7 +53,8 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         IMemoryCache cache,
         IGlobal global,
         IProfessionsCacheService professionsCacheService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ICompanyReviewTelegramCallbackHandler companyReviewCallbackHandler)
     {
         _logger = logger;
         _currencyService = currencyService;
@@ -60,6 +63,7 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         _global = global;
         _professionsCacheService = professionsCacheService;
         _configuration = configuration;
+        _companyReviewCallbackHandler = companyReviewCallbackHandler;
     }
 
     public async Task<(bool Processed, string TextToSend)> ProcessJobRelatedMessageAsync(
@@ -144,6 +148,19 @@ public class ProcessSalariesRelatedTelegramMessageHandler
         ProcessTelegramMessageCommand request,
         CancellationToken cancellationToken)
     {
+        if (request.UpdateRequest.CallbackQuery is not null)
+        {
+            var handled = await _companyReviewCallbackHandler.TryHandleCallbackAsync(
+                request.BotClient,
+                request.UpdateRequest.CallbackQuery,
+                cancellationToken);
+
+            if (handled)
+            {
+                return null;
+            }
+        }
+
         if (request.UpdateRequest.ChosenInlineResult is not null)
         {
             _logger.LogInformation(
