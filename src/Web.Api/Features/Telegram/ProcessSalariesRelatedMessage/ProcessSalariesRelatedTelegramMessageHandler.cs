@@ -150,6 +150,17 @@ public class ProcessSalariesRelatedTelegramMessageHandler
     {
         if (request.UpdateRequest.CallbackQuery is not null)
         {
+            _logger.LogInformation(
+                "TELEGRAM_BOT. Salaries. Processing CallbackQuery " +
+                "with Data: {Data} " +
+                "from {Name}. " +
+                "Id {Id}. " +
+                "IsBot {IsBot}",
+                request.UpdateRequest.CallbackQuery.Data,
+                request.UpdateRequest.CallbackQuery.From.Username,
+                request.UpdateRequest.CallbackQuery.From.Id,
+                request.UpdateRequest.CallbackQuery.From.IsBot);
+
             var handled = await _companyReviewCallbackHandler.TryHandleCallbackAsync(
                 request.BotClient,
                 request.UpdateRequest.CallbackQuery,

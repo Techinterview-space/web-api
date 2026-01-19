@@ -37,11 +37,14 @@ public class CompanyReviewTelegramCallbackHandler : ICompanyReviewTelegramCallba
         var data = callbackQuery.Data;
         if (string.IsNullOrEmpty(data))
         {
+            _logger.LogInformation("Callback query data is null or empty. Skipping");
+
             return false;
         }
 
         if (!data.StartsWith(ApprovePrefix) && !data.StartsWith(RejectPrefix))
         {
+            _logger.LogInformation("Callback query data does not match review approve/reject prefixes. Skipping");
             return false;
         }
 
@@ -49,6 +52,12 @@ public class CompanyReviewTelegramCallbackHandler : ICompanyReviewTelegramCallba
         var reviewIdString = isApprove
             ? data[ApprovePrefix.Length..]
             : data[RejectPrefix.Length..];
+
+        _logger.LogInformation(
+            "Received review ID: {reviewId}. IsApprove: {isApprove}. Text {Data}",
+            reviewIdString,
+            isApprove,
+            data);
 
         if (!Guid.TryParse(reviewIdString, out var reviewId))
         {
@@ -63,6 +72,11 @@ public class CompanyReviewTelegramCallbackHandler : ICompanyReviewTelegramCallba
         var chatId = callbackQuery.Message?.Chat.Id ?? callbackQuery.From.Id;
 
         var isAdmin = await IsUserAdminAsync(chatId, cancellationToken);
+        _logger.LogInformation(
+            "Is user admin: {isAdmin}. ChatId: {ChatId}",
+            isAdmin,
+            chatId);
+
         if (!isAdmin)
         {
             await botClient.AnswerCallbackQuery(
