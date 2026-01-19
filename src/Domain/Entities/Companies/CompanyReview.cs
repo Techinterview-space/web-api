@@ -125,7 +125,8 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
                OutdatedAt == null;
     }
 
-    public void Approve()
+    public void Approve(
+        bool calledByCompany = false)
     {
         if (ApprovedAt != null)
         {
@@ -140,7 +141,10 @@ public class CompanyReview : HasDatesBase, IHasIdBase<Guid>
         ApprovedAt = DateTime.UtcNow;
         OutdatedAt = null;
 
-        Company.ApproveReview(Id);
+        if (!calledByCompany)
+        {
+            Company.ApproveReview(Id);
+        }
     }
 
     public void MarkAsOutdated()

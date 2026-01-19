@@ -134,7 +134,7 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
             throw new NotFoundException("Review not found");
         }
 
-        review.Approve();
+        review.Approve(true);
         var newRating = RecalculateRating();
 
         RatingHistory.Add(
