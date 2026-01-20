@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using Domain.Entities.Salaries;
 using Domain.Enums;
+using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
 using Infrastructure.Salaries;
 using Microsoft.EntityFrameworkCore;
-using SendGrid.Helpers.Errors.Model;
 using Web.Api.Features.Salaries.Models;
 using NotFoundException = Domain.Validation.Exceptions.NotFoundException;
 
@@ -34,12 +34,12 @@ public class UpdateSalaryHandler : Infrastructure.Services.Mediator.IRequestHand
                          .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
                      ?? throw new NotFoundException("Salary record not found");
 
-        var currentUser = await _auth.GetCurrentUserOrNullAsync();
+        var currentUser = await _auth.GetCurrentUserOrNullAsync(cancellationToken);
 
         if (!currentUser.Has(Role.Admin) &&
             salary.UserId != currentUser.Id)
         {
-            throw new ForbiddenException("You can only edit your own salary records");
+            throw new NoPermissionsException("You can only edit your own salary records");
         }
 
         Skill skill = null;

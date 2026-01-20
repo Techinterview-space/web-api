@@ -24,7 +24,7 @@ jobs:
           sed -i 's/"__DATABASE_CONNECTION_STRING",/"${{ vars.DATABASE_CONNECTION_STRING }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__TELEGRAM_BOT_KEY",/"${{ secrets.TELEGRAM_BOT_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__PROFILE_GITHUB_BOT_KEY",/"${{ secrets.PROFILE_GITHUB_BOT_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
-          sed -i 's/"__SENDGRID_API_KEY",/"${{ secrets.SENDGRID_API_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__RESEND_COM_API_KEY",/"${{ secrets.RESEND_COM_API_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__SENDGRID_WEBHOOK_SIGNATURE",/"${{ secrets.SENDGRID_WEBHOOK_SIGNATURE }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__OPEN_AI_SECRET",/"${{ secrets.OPEN_AI_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i "s|__OPENAI_API_KEY|${{ secrets.OPENAI_API_KEY }}|g" ${{env.PRODUCTION_SETTINGS_FILE}}
