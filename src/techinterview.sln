@@ -17,6 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Api.Tests", "Web.Api.Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Items", "Items", "{0613B82A-F688-480D-B644-FED4A8FF9B7D}"
 	ProjectSection(SolutionItems) = preProject
+	    ..\.github\workflows\deploy.yml = ..\.github\workflows\deploy.yml 
 		Dockerfile = Dockerfile
 		..\docker-compose.deploy.yml = ..\docker-compose.deploy.yml
 		..\docker-compose.yml = ..\docker-compose.yml
