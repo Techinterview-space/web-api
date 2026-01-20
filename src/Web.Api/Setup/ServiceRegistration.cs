@@ -98,7 +98,7 @@ public static class ServiceRegistration
         else
         {
             services
-                .AddScoped<IEmailApiSender, SendgridEmailApiSender>();
+                .AddScoped<IEmailApiSender, ResendEmailApiSender>();
         }
 
         return services;
