@@ -115,7 +115,7 @@ public class SalaryUpdateReminderEmailJob
                         UserEmailType.SalaryFormReminder,
                         userToSend));
 
-                await Task.Delay(100, cancellationToken);
+                await ShortDelayAsync(cancellationToken);
             }
         }
 
@@ -135,5 +135,11 @@ public class SalaryUpdateReminderEmailJob
                 usersToSend.Count,
                 jobCorrelationId);
         }
+    }
+
+    protected virtual Task ShortDelayAsync(
+        CancellationToken cancellationToken)
+    {
+        return Task.Delay(600, cancellationToken);
     }
 }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Infrastructure.Database;
 using Infrastructure.Emails.Contracts;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -45,7 +46,7 @@ public class SalaryUpdateReminderEmailJobTests
         context.ChangeTracker.Clear();
         Assert.Equal(0, context.UserEmails.Count());
 
-        var target = new SalaryUpdateReminderEmailJob(
+        var target = new SalaryUpdateReminderEmailJobTestable(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
             context,
             emailService.Object);
@@ -92,7 +93,7 @@ public class SalaryUpdateReminderEmailJobTests
         context.ChangeTracker.Clear();
         Assert.Equal(0, context.UserEmails.Count());
 
-        var target = new SalaryUpdateReminderEmailJob(
+        var target = new SalaryUpdateReminderEmailJobTestable(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
             context,
             emailService.Object);
@@ -140,7 +141,7 @@ public class SalaryUpdateReminderEmailJobTests
         context.ChangeTracker.Clear();
         Assert.Equal(1, context.UserEmails.Count());
 
-        var target = new SalaryUpdateReminderEmailJob(
+        var target = new SalaryUpdateReminderEmailJobTestable(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
             context,
             emailService.Object);
@@ -192,7 +193,7 @@ public class SalaryUpdateReminderEmailJobTests
         context.ChangeTracker.Clear();
         Assert.Equal(1, context.UserEmails.Count());
 
-        var target = new SalaryUpdateReminderEmailJob(
+        var target = new SalaryUpdateReminderEmailJobTestable(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
             context,
             emailService.Object);
@@ -242,7 +243,7 @@ public class SalaryUpdateReminderEmailJobTests
         context.ChangeTracker.Clear();
         Assert.Equal(1, context.UserEmails.Count());
 
-        var target = new SalaryUpdateReminderEmailJob(
+        var target = new SalaryUpdateReminderEmailJobTestable(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
             context,
             emailService.Object);
@@ -297,7 +298,7 @@ public class SalaryUpdateReminderEmailJobTests
         context.ChangeTracker.Clear();
         Assert.Equal(SalaryUpdateReminderEmailJob.MaximumEmailsPerDay, context.UserEmails.Count());
 
-        var target = new SalaryUpdateReminderEmailJob(
+        var target = new SalaryUpdateReminderEmailJobTestable(
             new Mock<ILogger<SalaryUpdateReminderEmailJob>>().Object,
             context,
             emailService.Object);
@@ -311,5 +312,21 @@ public class SalaryUpdateReminderEmailJobTests
                 It.Is<User>(u => u.Id == user1.Id),
                 It.IsAny<CancellationToken>()),
             Times.Never);
+    }
+
+    private class SalaryUpdateReminderEmailJobTestable : SalaryUpdateReminderEmailJob
+    {
+        public SalaryUpdateReminderEmailJobTestable(
+            ILogger<SalaryUpdateReminderEmailJob> logger,
+            DatabaseContext context,
+            ITechinterviewEmailService emailService)
+            : base(logger, context, emailService)
+        {
+        }
+
+        protected override Task ShortDelayAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
     }
 }
