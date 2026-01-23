@@ -15,23 +15,6 @@ public class OpenAiPrompt : HasDatesBase
         "You are a helpful assistant. Analyze the user's input and provide a response. " +
         "Your reply should be in question language, markdown formatted.";
 
-    private static readonly List<string> _chatGptAllowedModels = new List<string>
-    {
-        "gpt-3.5-turbo",
-        "gpt-4",
-        "gpt-4o",
-    };
-
-    private static readonly List<string> _claudeAllowedModels = new List<string>
-    {
-        "claude-3-5-haiku-20241022",
-        "claude-3-5-haiku-latest",
-        "claude-3-5-sonnet-20241022",
-        "claude-3-5-sonnet-latest",
-        "claude-sonnet-4-20250514",
-        "claude-sonnet-4-0",
-    };
-
     public Guid Id { get; protected set; }
 
     public OpenAiPromptType Type { get; protected set; }
