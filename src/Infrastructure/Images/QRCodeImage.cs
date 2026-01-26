@@ -1,4 +1,4 @@
-﻿using QRCoder;
+using QRCoder;
 
 namespace Infrastructure.Images;
 

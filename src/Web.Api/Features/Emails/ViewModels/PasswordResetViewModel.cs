@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Emails.ViewModels;
+namespace Web.Api.Features.Emails.ViewModels;
 
 public record PasswordResetViewModel
 {

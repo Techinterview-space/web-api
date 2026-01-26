@@ -1,4 +1,4 @@
-﻿namespace Domain.ValueObjects.OAuth;
+namespace Domain.ValueObjects.OAuth;
 
 public record OAuthUserInfo
 {

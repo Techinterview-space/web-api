@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Github;
+using Domain.Entities.Github;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

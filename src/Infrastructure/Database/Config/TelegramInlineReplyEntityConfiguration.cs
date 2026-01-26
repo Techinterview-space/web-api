@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Telegram;
+using Domain.Entities.Telegram;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

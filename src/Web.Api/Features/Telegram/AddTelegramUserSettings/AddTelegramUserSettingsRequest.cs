@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Telegram.AddTelegramUserSettings;
+namespace Web.Api.Features.Telegram.AddTelegramUserSettings;
 
 public record AddTelegramUserSettingsRequest
 {

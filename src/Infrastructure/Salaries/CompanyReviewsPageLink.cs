@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.Global;
+using Infrastructure.Services.Global;
 
 namespace Infrastructure.Salaries;
 

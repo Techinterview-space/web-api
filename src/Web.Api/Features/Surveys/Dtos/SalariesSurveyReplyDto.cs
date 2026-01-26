@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Questions;
 
 namespace Web.Api.Features.Surveys.Dtos;

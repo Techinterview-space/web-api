@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Prompts;
 
 namespace Web.Api.Features.Admin.AiPrompts.Models;

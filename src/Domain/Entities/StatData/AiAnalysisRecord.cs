@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using Domain.Entities.StatData.CompanyReviews;
 using Domain.Entities.StatData.Salary;

@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Entities.Auth;
 using Domain.Entities.Companies;
 using Domain.Entities.CSV;

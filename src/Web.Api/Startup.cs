@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Enums;
 using Infrastructure.Configs;
 using Infrastructure.Database;

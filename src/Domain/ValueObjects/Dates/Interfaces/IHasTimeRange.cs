@@ -1,4 +1,4 @@
-﻿namespace Domain.ValueObjects.Dates.Interfaces
+namespace Domain.ValueObjects.Dates.Interfaces
 {
     public interface IHasTimeRange : IHasFromToDates
     {

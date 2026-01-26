@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Accounts.Dtos;
+namespace Web.Api.Features.Accounts.Dtos;
 
 public record CheckTotpResponse
 {

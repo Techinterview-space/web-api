@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Questions;
+namespace Domain.Entities.Questions;
 
 public enum SurveyUsefulnessReplyType
 {

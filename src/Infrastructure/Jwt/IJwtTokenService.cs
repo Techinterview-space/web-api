@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Domain.Entities.Auth;
 using Domain.Entities.Users;
 

@@ -1,4 +1,4 @@
-﻿using Infrastructure.Authentication.Contracts;
+using Infrastructure.Authentication.Contracts;
 
 namespace Infrastructure.Authentication;
 

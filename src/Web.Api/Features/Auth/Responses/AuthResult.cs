@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Auth.Responses;
+namespace Web.Api.Features.Auth.Responses;
 
 public record AuthResult
 {

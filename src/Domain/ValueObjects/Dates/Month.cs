@@ -1,4 +1,4 @@
-﻿namespace Domain.ValueObjects.Dates
+namespace Domain.ValueObjects.Dates
 {
     public enum Month
     {

@@ -1,4 +1,4 @@
-﻿using Infrastructure.Database;
+using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types.Enums;
 

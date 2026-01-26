@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Companies
+namespace Domain.Entities.Companies
 {
     public enum CompanyEmploymentType
     {

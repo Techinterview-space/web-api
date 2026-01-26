@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Github;
+namespace Infrastructure.Services.Github;
 
 public enum GithubProfileDataResultType
 {

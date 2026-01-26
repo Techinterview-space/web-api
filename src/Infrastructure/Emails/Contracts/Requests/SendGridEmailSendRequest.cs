@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Emails.Contracts.Requests;
+namespace Infrastructure.Emails.Contracts.Requests;
 
 public record SendGridEmailSendRequest
 {

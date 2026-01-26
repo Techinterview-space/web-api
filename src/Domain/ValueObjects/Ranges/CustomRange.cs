@@ -1,4 +1,4 @@
-﻿namespace Domain.ValueObjects.Ranges;
+namespace Domain.ValueObjects.Ranges;
 
 public record CustomRange<T>
     where T : struct

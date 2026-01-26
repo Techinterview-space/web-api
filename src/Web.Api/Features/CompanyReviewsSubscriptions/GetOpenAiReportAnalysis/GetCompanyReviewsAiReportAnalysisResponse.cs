@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.AiServices.Reviews;
+using Infrastructure.Services.AiServices.Reviews;
 
 namespace Web.Api.Features.CompanyReviewsSubscriptions.GetOpenAiReportAnalysis;
 

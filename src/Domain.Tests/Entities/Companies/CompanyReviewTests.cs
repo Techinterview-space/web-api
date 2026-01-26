@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Companies;
 using Domain.Enums;
 using TestUtils.Fakes;

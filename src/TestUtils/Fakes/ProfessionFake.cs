@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Salaries;
+using Domain.Entities.Salaries;
 using Domain.ValueObjects;
 
 namespace TestUtils.Fakes;

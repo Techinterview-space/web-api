@@ -1,4 +1,4 @@
-﻿using Domain.ValueObjects.OAuth;
+using Domain.ValueObjects.OAuth;
 
 namespace Infrastructure.Authentication.OAuth;
 

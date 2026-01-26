@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using AspNetCore.Aws.S3.Simple.Settings;
 using Infrastructure.Ai;

@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
+namespace Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
 
 public record TelegramInlineUsageUsersDataItem
 {

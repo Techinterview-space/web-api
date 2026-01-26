@@ -1,4 +1,4 @@
-﻿using Domain.Validation.Exceptions;
+using Domain.Validation.Exceptions;
 using Xunit;
 
 namespace InfrastructureTests.Exceptions;

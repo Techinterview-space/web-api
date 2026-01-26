@@ -1,4 +1,4 @@
-﻿using Domain.Extensions;
+using Domain.Extensions;
 using Xunit;
 
 namespace InfrastructureTests.Extensions;

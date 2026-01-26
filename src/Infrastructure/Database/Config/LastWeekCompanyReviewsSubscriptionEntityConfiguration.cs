@@ -1,4 +1,4 @@
-﻿using Domain.Entities.StatData;
+using Domain.Entities.StatData;
 using Domain.Entities.StatData.CompanyReviews;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

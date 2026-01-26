@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Salaries;
+namespace Infrastructure.Salaries;
 
 public record SalaryInfo
 {

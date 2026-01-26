@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Admin.QR;
+namespace Web.Api.Features.Admin.QR;
 
 public record GenerateQRCodeResponse
 {

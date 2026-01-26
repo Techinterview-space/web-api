@@ -1,4 +1,4 @@
-﻿using Domain.Enums;
+using Domain.Enums;
 using Domain.Validation;
 
 namespace Domain.Entities.Users;

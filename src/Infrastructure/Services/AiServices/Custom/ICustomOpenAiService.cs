@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.AiServices.Salaries;
+using Infrastructure.Services.AiServices.Salaries;
 
 namespace Infrastructure.Services.AiServices.Custom;
 

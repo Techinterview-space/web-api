@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Github;
+using Domain.Entities.Github;
 
 namespace Infrastructure.Services.Github;
 

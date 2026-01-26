@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData;

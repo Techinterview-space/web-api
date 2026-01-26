@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.AiServices.Reviews;
+namespace Infrastructure.Services.AiServices.Reviews;
 
 public record CompanyReviewsAiReport
 {

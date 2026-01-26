@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Telegram.UpdateTelegramUserSettings;
+namespace Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 
 public record UpdateTelegramUserSettingsBody
 {

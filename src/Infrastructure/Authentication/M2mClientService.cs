@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Domain.Entities.Auth;
 using Domain.Enums;
 using Infrastructure.Authentication.Contracts;

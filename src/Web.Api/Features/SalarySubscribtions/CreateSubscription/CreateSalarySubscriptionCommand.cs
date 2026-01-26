@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.SalarySubscribtions.CreateSubscription;
+namespace Web.Api.Features.SalarySubscribtions.CreateSubscription;
 
 public record CreateSalarySubscriptionCommand
     : CreateSalarySubscriptionBodyRequest

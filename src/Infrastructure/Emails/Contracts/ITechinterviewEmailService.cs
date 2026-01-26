@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Users;
+using Domain.Entities.Users;
 using Infrastructure.Emails.Contracts.Requests;
 
 namespace Infrastructure.Emails.Contracts;

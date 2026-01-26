@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Validation.Exceptions;
 
 namespace Domain.Entities.Telegram;

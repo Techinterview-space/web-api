@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Companies;
+using Domain.Entities.Companies;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;

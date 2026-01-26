@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Authentication.Contracts;
+namespace Infrastructure.Authentication.Contracts;
 
 public interface IPasswordHasher
 {

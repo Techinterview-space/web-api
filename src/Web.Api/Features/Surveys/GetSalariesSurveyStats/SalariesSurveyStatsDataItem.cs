@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
+namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 
 public record SalariesSurveyStatsDataItem
 {

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Web.Api.Features.Companies.CreateCompany;
 
 namespace Web.Api.Features.Companies.UpdateCompany;

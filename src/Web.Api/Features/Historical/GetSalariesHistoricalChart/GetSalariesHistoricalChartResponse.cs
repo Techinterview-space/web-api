@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Domain.Entities.HistoricalRecords;

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.StatData;
+namespace Domain.Entities.StatData;
 
 public enum SubscriptionRegularityType
 {

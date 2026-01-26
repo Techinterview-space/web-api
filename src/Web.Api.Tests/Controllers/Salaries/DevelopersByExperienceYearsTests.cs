@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Infrastructure.Salaries;
 using Web.Api.Features.Salaries.GetSalariesChart.Charts;

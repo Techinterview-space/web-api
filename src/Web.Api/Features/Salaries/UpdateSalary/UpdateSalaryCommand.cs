@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Web.Api.Features.Salaries.Models;
 
 namespace Web.Api.Features.Salaries.UpdateSalary;

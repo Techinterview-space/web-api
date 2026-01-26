@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Prompts;
+namespace Domain.Entities.Prompts;
 
 public enum AiEngine
 {

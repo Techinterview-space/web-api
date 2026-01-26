@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using AspNetCore.Aws.S3.Simple.Models;
 using Infrastructure.Services.Files;
 using Moq;

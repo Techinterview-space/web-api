@@ -1,4 +1,4 @@
-﻿using AspNetCore.Aws.S3.Simple.AmazonServices;
+using AspNetCore.Aws.S3.Simple.AmazonServices;
 using AspNetCore.Aws.S3.Simple.Contracts;
 using AspNetCore.Aws.S3.Simple.Settings;
 

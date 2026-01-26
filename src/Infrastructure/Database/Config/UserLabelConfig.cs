@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Labels;
+using Domain.Entities.Labels;
 using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

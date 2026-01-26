@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Setup.Attributes;
+namespace Web.Api.Setup.Attributes;
 
 public class StandardAllowedFileExtensionsAttribute : AllowedExtensionsAttribute
 {

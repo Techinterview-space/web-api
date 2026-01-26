@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Currencies;
+using Domain.Entities.Currencies;
 using Domain.Entities.Salaries;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Database;

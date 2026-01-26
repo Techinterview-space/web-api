@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Domain.Entities.Labels;
 using Domain.Entities.Users;
 using Domain.ValueObjects;

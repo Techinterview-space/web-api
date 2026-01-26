@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Auth;
 using Domain.Validation.Exceptions;

@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Github;
+namespace Domain.Entities.Github;
 
 public class GithubProfileProcessingJob : HasDatesBase
 {

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.CSV;
+using Domain.Entities.CSV;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

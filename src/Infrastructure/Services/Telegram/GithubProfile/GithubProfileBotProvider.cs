@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.Telegram.Salaries;
+using Infrastructure.Services.Telegram.Salaries;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;

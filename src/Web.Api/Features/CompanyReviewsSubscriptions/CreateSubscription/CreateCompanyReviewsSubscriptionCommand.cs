@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.CompanyReviewsSubscriptions.CreateSubscription;
+namespace Web.Api.Features.CompanyReviewsSubscriptions.CreateSubscription;
 
 public record CreateCompanyReviewsSubscriptionCommand
     : CreateCompanyReviewsSubscriptionBodyRequest

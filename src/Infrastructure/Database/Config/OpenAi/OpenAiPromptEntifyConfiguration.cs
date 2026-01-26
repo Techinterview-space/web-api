@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Prompts;
+using Domain.Entities.Prompts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

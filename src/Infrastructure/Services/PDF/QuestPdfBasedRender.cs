@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.Files;
+using Infrastructure.Services.Files;
 using QuestPDF.Fluent;
 
 namespace Infrastructure.Services.PDF;

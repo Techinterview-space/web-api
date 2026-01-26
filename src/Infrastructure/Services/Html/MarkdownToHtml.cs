@@ -1,4 +1,4 @@
-﻿using Markdig;
+using Markdig;
 
 namespace Infrastructure.Services.Html;
 

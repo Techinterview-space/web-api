@@ -1,4 +1,4 @@
-﻿using Web.Api.Features.Companies.Dtos;
+using Web.Api.Features.Companies.Dtos;
 
 namespace Web.Api.Features.Companies.GetCompany;
 
