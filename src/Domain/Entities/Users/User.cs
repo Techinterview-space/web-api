@@ -24,6 +24,27 @@ public class User : BaseModel, IHasDeletedAt
     {
     }
 
+    public static User CreateFromGoogleAuth(
+        string email,
+        string firstName,
+        string lastName,
+        string identityId,
+        string profilePicture,
+        List<Role> roles)
+    {
+        var user = new User(
+            email,
+            firstName,
+            lastName,
+            roles.ToArray());
+
+        user.SetIdentityId(identityId);
+        user.ConfirmEmail();
+        user.SetProfilePicture(profilePicture);
+
+        return user;
+    }
+
     public User(
         string email,
         string firstName,

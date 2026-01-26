@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Domain.Enums;
 using Infrastructure.Configs;
 using Infrastructure.Database;
@@ -94,7 +94,7 @@ public class Startup
     {
         if (_environment.IsDevelopment())
         {
-            app.UseMiddleware<DevelopmentEnvironmentMiddleware>();
+            // app.UseMiddleware<DevelopmentEnvironmentMiddleware>();
             app.UseDeveloperExceptionPage();
             IdentityModelEventSource.ShowPII = true;
         }

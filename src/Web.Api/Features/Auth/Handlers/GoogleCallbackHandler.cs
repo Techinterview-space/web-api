@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Auth;
@@ -55,14 +56,16 @@ public class GoogleCallbackHandler
 
         if (user == null)
         {
-            user = new User(
+            var hasAnyOtherUsers = await _context.Users.AnyAsync(cancellationToken);
+            user = User.CreateFromGoogleAuth(
                 email: googleUser.Email,
                 firstName: googleUser.GivenName ?? googleUser.Email.Split('@')[0],
                 lastName: googleUser.FamilyName ?? "-",
-                roles: Role.Interviewer);
-            user.SetIdentityId(identityId);
-            user.ConfirmEmail();
-            user.SetProfilePicture(googleUser.Picture);
+                identityId: identityId,
+                profilePicture: googleUser.Picture,
+                roles: hasAnyOtherUsers
+                    ? new List<Role> { Role.Interviewer, }
+                    : new List<Role> { Role.Interviewer, Role.Admin, });
 
             _context.Users.Add(user);
             await _context.TrySaveChangesAsync(cancellationToken);
@@ -80,15 +83,20 @@ public class GoogleCallbackHandler
         }
 
         var accessToken = _jwtTokenService.GenerateAccessToken(user);
-        var refreshToken = _jwtTokenService.GenerateRefreshToken(user.Id, request.DeviceInfo);
+        var refreshToken = _jwtTokenService.GenerateRefreshToken(
+            user.Id,
+            request.DeviceInfo);
 
-        _context.Set<RefreshToken>().Add(refreshToken);
-        await _context.TrySaveChangesAsync(cancellationToken);
+        if (refreshToken is not null)
+        {
+            _context.Set<RefreshToken>().Add(refreshToken);
+            await _context.TrySaveChangesAsync(cancellationToken);
+        }
 
         return new AuthTokenResponse
         {
             AccessToken = accessToken,
-            RefreshToken = refreshToken.Token,
+            RefreshToken = refreshToken?.Token,
             ExpiresIn = 3600,
             TokenType = "Bearer",
         };

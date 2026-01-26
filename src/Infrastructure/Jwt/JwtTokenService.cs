@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -87,10 +87,11 @@ public class JwtTokenService : IJwtTokenService
             .Replace("/", string.Empty)
             .Replace("=", string.Empty);
 
+        var tokenExpirationDays = GetRefreshTokenExpirationDays();
         return new RefreshToken(
             userId: userId,
             token: token,
-            expiresAt: DateTimeOffset.UtcNow.AddDays(GetRefreshTokenExpirationDays()),
+            expiresAt: DateTimeOffset.UtcNow.AddDays(tokenExpirationDays),
             deviceInfo: deviceInfo);
     }
 
@@ -140,6 +141,9 @@ public class JwtTokenService : IJwtTokenService
     private int GetM2mTokenExpirationMinutes() =>
         int.TryParse(_configuration["OAuth:Jwt:M2mTokenExpirationMinutes"], out var minutes) ? minutes : 60;
 
-    private int GetRefreshTokenExpirationDays() =>
-        int.TryParse(_configuration["OAuth:Jwt:RefreshTokenExpirationDays"], out var days) ? days : 30;
+    private int GetRefreshTokenExpirationDays()
+    {
+        var configValue = _configuration["OAuth:Jwt:RefreshTokenExpirationDays"] ?? "10";
+        return int.TryParse(configValue, out var days) ? days : 30;
+    }
 }
