@@ -1,8 +1,10 @@
-﻿using Domain.Enums;
+﻿using System;
+using Domain.Enums;
 using Infrastructure.Configs;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +51,16 @@ public class Startup
         services.AddHttpClient();
         services.AddControllersWithViews();
         services.AddRazorPages();
+
+        services.AddDistributedMemoryCache();
+        services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
 
         services
             .AddSwaggerGen(c => SwaggerConfig.Apply(c, AppName, _global.FrontendBaseUrl));
@@ -100,6 +112,8 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseCors(CorsPolicyName);
+
+        app.UseSession();
 
         app.UseAuthentication();
         app.UseAuthorization();

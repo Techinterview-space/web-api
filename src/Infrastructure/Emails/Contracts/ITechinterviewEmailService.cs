@@ -19,6 +19,16 @@ public interface ITechinterviewEmailService
         User user,
         CancellationToken cancellationToken);
 
+    Task<bool> SendEmailVerificationAsync(
+        User user,
+        string verificationUrl,
+        CancellationToken cancellationToken);
+
+    Task<bool> SendPasswordResetAsync(
+        User user,
+        string resetUrl,
+        CancellationToken cancellationToken);
+
     EmailContent Prepare(
         SendGridEmailSendRequest emailContent);
 }

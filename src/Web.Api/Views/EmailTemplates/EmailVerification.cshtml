@@ -1,0 +1,25 @@
+@model Web.Api.Features.Emails.ViewModels.EmailVerificationViewModel
+@{
+    Layout = "/Views/Shared/_EmailLayout.cshtml";
+    ViewData["EmailTitle"] = "Verify your email";
+    ViewData["PreHeader"] = "Welcome to TechInterview.space";
+
+    ViewData["CallToActionTitle"] = "Verify Email";
+    ViewData["CallToActionLink"] = Model.VerificationUrl;
+}
+
+<p>
+    Hello @Model.FirstName,
+</p>
+
+<p>
+    Welcome to TechInterview.space! Please click the button below to verify your email address.
+</p>
+
+<p>
+    If you did not create an account, you can safely ignore this email.
+</p>
+
+<p>
+    This link will expire in 24 hours.
+</p>

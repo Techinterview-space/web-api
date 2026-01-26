@@ -88,6 +88,20 @@ public class User : BaseModel, IHasDeletedAt
 
     public DateTimeOffset? LastLoginAt { get; protected set; }
 
+    public string PasswordHash { get; protected set; }
+
+    public string PasswordResetToken { get; protected set; }
+
+    public DateTimeOffset? PasswordResetTokenExpiresAt { get; protected set; }
+
+    public string EmailVerificationToken { get; protected set; }
+
+    public DateTimeOffset? EmailVerificationTokenExpiresAt { get; protected set; }
+
+    public int FailedLoginAttempts { get; protected set; }
+
+    public DateTimeOffset? LockedUntil { get; protected set; }
+
     public virtual List<UserRole> UserRoles { get; protected set; } = new ();
 
     public virtual List<UserSalary> Salaries { get; protected set; } = new ();
@@ -402,5 +416,72 @@ public class User : BaseModel, IHasDeletedAt
     public void UnsubscribeFromAll()
     {
         UnsubscribeMeFromAll = true;
+    }
+
+    public void SetPassword(string passwordHash)
+    {
+        PasswordHash = passwordHash;
+    }
+
+    public void SetEmailVerificationToken(string token, TimeSpan validity)
+    {
+        EmailVerificationToken = token;
+        EmailVerificationTokenExpiresAt = DateTimeOffset.UtcNow.Add(validity);
+    }
+
+    public void ClearEmailVerificationToken()
+    {
+        EmailVerificationToken = null;
+        EmailVerificationTokenExpiresAt = null;
+    }
+
+    public void SetPasswordResetToken(string token, TimeSpan validity)
+    {
+        PasswordResetToken = token;
+        PasswordResetTokenExpiresAt = DateTimeOffset.UtcNow.Add(validity);
+    }
+
+    public void ClearPasswordResetToken()
+    {
+        PasswordResetToken = null;
+        PasswordResetTokenExpiresAt = null;
+    }
+
+    public void IncrementFailedLoginAttempts()
+    {
+        FailedLoginAttempts++;
+        if (FailedLoginAttempts >= 5)
+        {
+            LockedUntil = DateTimeOffset.UtcNow.AddMinutes(15);
+        }
+    }
+
+    public void ResetFailedLoginAttempts()
+    {
+        FailedLoginAttempts = 0;
+        LockedUntil = null;
+    }
+
+    public bool IsLockedOut => LockedUntil.HasValue && LockedUntil > DateTimeOffset.UtcNow;
+
+    public bool IsLocalAuth()
+    {
+        return IdentityId != null &&
+               IdentityId.StartsWith(CurrentUser.LocalPrefix);
+    }
+
+    public void SetIdentityId(string identityId)
+    {
+        IdentityId = identityId;
+    }
+
+    public void SetProfilePicture(string profilePicture)
+    {
+        ProfilePicture = profilePicture;
+    }
+
+    public void RecordLogin()
+    {
+        LastLoginAt = DateTimeOffset.UtcNow;
     }
 }

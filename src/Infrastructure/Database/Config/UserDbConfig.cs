@@ -23,6 +23,24 @@ internal class UserDbConfig : IEntityTypeConfiguration<User>, IEntityTypeConfigu
         builder
             .HasIndex(x => x.UniqueToken)
             .IsUnique();
+
+        builder
+            .Property(x => x.PasswordHash)
+            .HasMaxLength(200);
+
+        builder
+            .Property(x => x.PasswordResetToken)
+            .HasMaxLength(100);
+
+        builder
+            .HasIndex(x => x.PasswordResetToken);
+
+        builder
+            .Property(x => x.EmailVerificationToken)
+            .HasMaxLength(100);
+
+        builder
+            .HasIndex(x => x.EmailVerificationToken);
     }
 
     public void Configure(EntityTypeBuilder<UserRole> builder)

@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Auth;
 using Domain.Entities.Companies;
 using Domain.Entities.CSV;
 using Domain.Entities.Currencies;
@@ -30,6 +31,12 @@ public class DatabaseContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+    public DbSet<M2mClient> M2mClients { get; set; }
+
+    public DbSet<M2mClientScope> M2mClientScopes { get; set; }
 
     public DbSet<InterviewTemplate> InterviewTemplates { get; set; }
 

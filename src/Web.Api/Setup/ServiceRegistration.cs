@@ -6,10 +6,12 @@ using Infrastructure.Ai.ChatGpt;
 using Infrastructure.Ai.Claude;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Authentication.OAuth;
 using Infrastructure.Currencies;
 using Infrastructure.Currencies.Contracts;
 using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
+using Infrastructure.Jwt;
 using Infrastructure.Services.AiServices;
 using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.Correlation;
@@ -27,6 +29,7 @@ using Infrastructure.Services.Telegram.Salaries;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Web.Api.Features.Auth.Handlers;
 using Web.Api.Features.Salaries.Providers;
 using Web.Api.Features.Telegram;
 using Web.Api.Services.CompanyReviews;
@@ -68,7 +71,15 @@ public static class ServiceRegistration
             .AddScoped<IArtificialIntellectService, AiService>()
             .AddScoped<IAiProviderFactory, AiProviderFactory>()
             .AddScoped<ChatGptProvider>()
-            .AddScoped<ClaudeAiProvider>();
+            .AddScoped<ClaudeAiProvider>()
+            .AddScoped<IPasswordHasher, PasswordHasher>()
+            .AddScoped<IJwtTokenService, JwtTokenService>()
+            .AddScoped<IM2mClientService, M2mClientService>()
+            .AddScoped<IOAuthProviderFactory, OAuthProviderFactory>()
+            .AddScoped<GoogleOAuthProvider>()
+            .AddScoped<GitHubOAuthProvider>()
+            .AddScoped<GoogleCallbackHandler>()
+            .AddScoped<GitHubCallbackHandler>();
 
         // https://github.com/rdvojmoc/DinkToPdf/#dependency-injection
         // services.AddSingleton<IDisposableConverter, InjectedSynchronizedConverter>();
