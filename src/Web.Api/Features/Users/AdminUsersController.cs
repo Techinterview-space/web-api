@@ -191,4 +191,67 @@ public class AdminUsersController : ControllerBase
             .Select(UserDto.Transformation)
             .ToListAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// Unlocks a user account that was locked due to too many failed login attempts.
+    /// </summary>
+    [HttpPost("{id:long}/unlock")]
+    public async Task<IActionResult> Unlock(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        user.ResetFailedLoginAttempts();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return Ok(new { message = "User account unlocked successfully" });
+    }
+
+    /// <summary>
+    /// Resets the failed login attempts counter without necessarily unlocking the account.
+    /// </summary>
+    [HttpPost("{id:long}/reset-failed-attempts")]
+    public async Task<IActionResult> ResetFailedAttempts(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        user.ResetFailedLoginAttempts();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return Ok(new { message = "Failed login attempts reset successfully" });
+    }
+
+    /// <summary>
+    /// Force verifies a user's email address without requiring the verification token.
+    /// </summary>
+    [HttpPost("{id:long}/force-verify-email")]
+    public async Task<IActionResult> ForceVerifyEmail(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        if (user.EmailConfirmed)
+        {
+            return BadRequest(new { message = "Email is already verified" });
+        }
+
+        user.ConfirmEmail();
+        user.ClearEmailVerificationToken();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return Ok(new { message = "Email verified successfully" });
+    }
 }
