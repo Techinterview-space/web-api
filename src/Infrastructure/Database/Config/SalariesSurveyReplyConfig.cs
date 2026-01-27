@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Questions;
+using Domain.Entities.Questions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

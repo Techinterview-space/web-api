@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Infrastructure.Salaries;
 using Web.Api.Features.Labels.Models;

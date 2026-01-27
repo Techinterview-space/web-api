@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Domain.Enums;
 using Infrastructure.Services.PDF.Interviews;

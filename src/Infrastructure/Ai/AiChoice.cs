@@ -1,4 +1,4 @@
-﻿using Infrastructure.Ai.ChatGpt;
+using Infrastructure.Ai.ChatGpt;
 using Infrastructure.Ai.Claude;
 
 namespace Infrastructure.Ai;

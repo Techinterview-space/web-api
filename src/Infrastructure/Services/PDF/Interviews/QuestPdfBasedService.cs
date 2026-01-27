@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Interviews;
+using Domain.Entities.Interviews;
 using Infrastructure.Services.Files;
 using Infrastructure.Services.Global;
 using QuestPDF.Fluent;

@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain.Entities;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Pagination;

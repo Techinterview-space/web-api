@@ -1,4 +1,4 @@
-﻿using Domain.Entities.HistoricalRecords;
+using Domain.Entities.HistoricalRecords;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

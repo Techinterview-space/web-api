@@ -1,4 +1,4 @@
-﻿using Domain.Validation;
+using Domain.Validation;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 

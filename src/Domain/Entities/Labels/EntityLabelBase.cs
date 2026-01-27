@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Validation.Exceptions;

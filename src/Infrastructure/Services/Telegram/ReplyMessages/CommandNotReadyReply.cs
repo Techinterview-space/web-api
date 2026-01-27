@@ -1,4 +1,4 @@
-﻿using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.Enums;
 
 namespace Infrastructure.Services.Telegram.ReplyMessages;
 

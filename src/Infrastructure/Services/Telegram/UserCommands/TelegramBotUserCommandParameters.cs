@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Enums;
+using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;
 using Domain.ValueObjects;

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Companies;
+using Domain.Entities.Companies;
 using Infrastructure.Ai;
 using Infrastructure.Services.AiServices.Reviews;
 using Infrastructure.Services.AiServices.Salaries;

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Users;
+using Domain.Entities.Users;
 using Infrastructure.Emails.Contracts.Requests;
 
 namespace Infrastructure.Emails.Contracts;
@@ -17,6 +17,16 @@ public interface ITechinterviewEmailService
 
     Task<bool> SalaryUpdateReminderEmailAsync(
         User user,
+        CancellationToken cancellationToken);
+
+    Task<bool> SendEmailVerificationAsync(
+        User user,
+        string verificationUrl,
+        CancellationToken cancellationToken);
+
+    Task<bool> SendPasswordResetAsync(
+        User user,
+        string resetUrl,
         CancellationToken cancellationToken);
 
     EmailContent Prepare(

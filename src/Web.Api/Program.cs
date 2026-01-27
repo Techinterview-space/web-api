@@ -1,4 +1,4 @@
-﻿#pragma warning disable SA1005, SA1515
+#pragma warning disable SA1005, SA1515
 //
 //            God Bless         No Bugs
 //

@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Emails;
+namespace Web.Api.Features.Emails;
 
 public record EmailPreviewResponse
 {

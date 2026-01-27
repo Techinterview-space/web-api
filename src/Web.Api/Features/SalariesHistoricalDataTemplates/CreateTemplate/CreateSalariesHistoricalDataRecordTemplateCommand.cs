@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.SalariesHistoricalDataTemplates.CreateTemplate;
+namespace Web.Api.Features.SalariesHistoricalDataTemplates.CreateTemplate;
 
 public record CreateSalariesHistoricalDataRecordTemplateCommand
     : CreateSalariesHistoricalDataRecordTemplateBodyRequest

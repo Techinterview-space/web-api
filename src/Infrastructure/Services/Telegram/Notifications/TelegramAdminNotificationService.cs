@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Companies;
+using Domain.Entities.Companies;
 using Domain.Enums;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;

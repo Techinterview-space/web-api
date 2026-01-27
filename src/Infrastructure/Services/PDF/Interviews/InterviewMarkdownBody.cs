@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Domain.Entities.Enums;
 using Domain.Entities.Interviews;
 using Domain.Extensions;

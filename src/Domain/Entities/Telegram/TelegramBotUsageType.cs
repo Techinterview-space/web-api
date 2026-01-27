@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Telegram;
+namespace Domain.Entities.Telegram;
 
 public enum TelegramBotUsageType
 {

@@ -1,4 +1,4 @@
-﻿using Web.Api.Features.Salaries;
+using Web.Api.Features.Salaries;
 
 namespace Web.Api.Features.SalariesChartShare.GetChartSharePage;
 

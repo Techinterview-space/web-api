@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Web.Api.Features.CompanyReviewsSubscriptions.Shared;
 using Web.Api.Features.SalarySubscribtions.Shared;
 

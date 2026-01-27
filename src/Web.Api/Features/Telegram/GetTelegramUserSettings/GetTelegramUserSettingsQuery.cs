@@ -1,4 +1,4 @@
-﻿using Domain.ValueObjects.Pagination;
+using Domain.ValueObjects.Pagination;
 
 namespace Web.Api.Features.Telegram.GetTelegramUserSettings;
 

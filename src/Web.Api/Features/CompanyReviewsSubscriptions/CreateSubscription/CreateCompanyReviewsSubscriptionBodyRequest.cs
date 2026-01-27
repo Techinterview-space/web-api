@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Domain.Attributes;
 using Web.Api.Features.CompanyReviewsSubscriptions.Shared;
 

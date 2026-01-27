@@ -1,4 +1,4 @@
-﻿using Infrastructure.Emails.Contracts;
+using Infrastructure.Emails.Contracts;
 using Infrastructure.Emails.Contracts.Requests;
 using Microsoft.Extensions.Logging;
 

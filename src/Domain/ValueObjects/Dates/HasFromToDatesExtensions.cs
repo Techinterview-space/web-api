@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Dates.Interfaces;
 

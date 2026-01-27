@@ -1,4 +1,4 @@
-﻿using System.Data.Common;
+using System.Data.Common;
 using System.Threading.Tasks;
 using Infrastructure.Database;
 using Microsoft.Data.Sqlite;

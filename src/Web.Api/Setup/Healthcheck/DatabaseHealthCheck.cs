@@ -1,4 +1,4 @@
-﻿using System.Data.Common;
+using System.Data.Common;
 using Domain.Validation;
 using Microsoft.Extensions.Configuration;
 using Npgsql;

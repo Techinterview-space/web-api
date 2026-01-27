@@ -1,4 +1,4 @@
-﻿namespace Domain.ValueObjects.Pagination;
+namespace Domain.ValueObjects.Pagination;
 
 public abstract record PaginatedListBase
 {

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities;
@@ -10,8 +12,10 @@ using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
+using Infrastructure.Emails.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Web.Api.Features.Users.Models;
 using Web.Api.Features.Users.SearchUsersForAdmin;
 using Web.Api.Setup.Attributes;
@@ -25,13 +29,19 @@ public class AdminUsersController : ControllerBase
 {
     private readonly IAuthorization _auth;
     private readonly DatabaseContext _context;
+    private readonly ITechinterviewEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
     public AdminUsersController(
         IAuthorization auth,
-        DatabaseContext context)
+        DatabaseContext context,
+        ITechinterviewEmailService emailService,
+        IConfiguration configuration)
     {
         _auth = auth;
         _context = context;
+        _emailService = emailService;
+        _configuration = configuration;
     }
 
     [HttpGet("")]
@@ -190,5 +200,96 @@ public class AdminUsersController : ControllerBase
             .Where(x => x.DeletedAt != null)
             .Select(UserDto.Transformation)
             .ToListAsync(cancellationToken);
+    }
+
+    [HttpPost("{id:long}/unlock")]
+    public async Task<IActionResult> Unlock(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        user.ResetFailedLoginAttempts();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return Ok(new { message = "User account unlocked successfully" });
+    }
+
+    [HttpPost("{id:long}/reset-failed-attempts")]
+    public async Task<IActionResult> ResetFailedAttempts(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        user.ResetFailedLoginAttempts();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return Ok(new { message = "Failed login attempts reset successfully" });
+    }
+
+    [HttpPost("{id:long}/force-verify-email")]
+    public async Task<IActionResult> ForceVerifyEmail(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        if (user.EmailConfirmed)
+        {
+            return BadRequest(new { message = "Email is already verified" });
+        }
+
+        user.ConfirmEmail();
+        user.ClearEmailVerificationToken();
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return Ok(new { message = "Email verified successfully" });
+    }
+
+    [HttpPost("{id:long}/resend-verification")]
+    public async Task<IActionResult> ResendVerification(
+        [FromRoute] long id,
+        CancellationToken cancellationToken)
+    {
+        await _auth.HasRoleOrFailAsync(Role.Admin, cancellationToken);
+
+        var user = await _context.Users
+            .ByIdOrFailAsync(id, cancellationToken: cancellationToken);
+
+        if (user.EmailConfirmed)
+        {
+            return BadRequest(new { message = "Email is already verified" });
+        }
+
+        var verificationToken = GenerateSecureToken();
+        user.SetEmailVerificationToken(verificationToken, TimeSpan.FromHours(24));
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        var frontendUrl = _configuration["Frontend:BaseUrl"];
+        var verificationUrl = $"{frontendUrl}/verify-email?token={verificationToken}";
+        await _emailService.SendEmailVerificationAsync(user, verificationUrl, cancellationToken);
+
+        return Ok(new { message = "Verification email sent successfully" });
+    }
+
+    private static string GenerateSecureToken()
+    {
+        var bytes = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(bytes);
+        return Convert.ToBase64String(bytes)
+            .Replace("+", string.Empty)
+            .Replace("/", string.Empty)
+            .Replace("=", string.Empty);
     }
 }

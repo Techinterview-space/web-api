@@ -1,4 +1,4 @@
-﻿using Web.Api.Features.SalariesHistoricalDataTemplates.Shared;
+using Web.Api.Features.SalariesHistoricalDataTemplates.Shared;
 
 namespace Web.Api.Features.SalariesHistoricalDataTemplates.CreateTemplate;
 

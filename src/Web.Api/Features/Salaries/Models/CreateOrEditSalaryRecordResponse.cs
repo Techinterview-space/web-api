@@ -1,4 +1,4 @@
-﻿using Infrastructure.Salaries;
+using Infrastructure.Salaries;
 
 namespace Web.Api.Features.Salaries.Models;
 

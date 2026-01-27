@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using OtpNet;
 
 namespace Domain.Totp;

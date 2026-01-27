@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 

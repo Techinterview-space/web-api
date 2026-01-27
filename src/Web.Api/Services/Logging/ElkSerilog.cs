@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Infrastructure.Services.Correlation;
 using Microsoft.Extensions.Configuration;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Domain.Entities.Enums;
 using Infrastructure.Services.Global;
 using Web.Api.Features.Salaries.GetSalariesChart.Charts;

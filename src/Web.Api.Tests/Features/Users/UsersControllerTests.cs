@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Domain.Enums;
 using TestUtils.Auth;
 using TestUtils.Db;

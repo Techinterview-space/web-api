@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Prompts;
 
 namespace Web.Api.Features.Admin.AiPrompts.Models;

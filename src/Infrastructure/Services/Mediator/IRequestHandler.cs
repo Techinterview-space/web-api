@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Mediator;
+namespace Infrastructure.Services.Mediator;
 
 public interface IRequestHandler<TRequest, TResult>
 {

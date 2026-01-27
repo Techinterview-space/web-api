@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Ai;
+namespace Infrastructure.Ai;
 
 public interface IAiProvider
 {

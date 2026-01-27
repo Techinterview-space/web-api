@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 

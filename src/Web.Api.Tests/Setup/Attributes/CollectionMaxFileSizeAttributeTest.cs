@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Microsoft.AspNetCore.Http;

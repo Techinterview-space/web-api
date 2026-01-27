@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Services.Telegram.Salaries;
 using Microsoft.Extensions.DependencyInjection;

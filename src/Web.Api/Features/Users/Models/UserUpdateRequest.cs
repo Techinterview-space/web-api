@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Domain.Entities.Users;
 
 namespace Web.Api.Features.Users.Models;

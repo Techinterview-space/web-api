@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Users;
+using Domain.Entities.Users;
 using Infrastructure.Images;
 
 namespace Web.Api.Features.Accounts.Dtos;

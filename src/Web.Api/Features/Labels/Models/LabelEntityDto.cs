@@ -1,4 +1,4 @@
-﻿using Domain.ValueObjects;
+using Domain.ValueObjects;
 
 namespace Web.Api.Features.Labels.Models;
 

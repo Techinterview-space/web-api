@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Currencies;
+using Domain.Entities.Currencies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

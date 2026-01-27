@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Files;
+namespace Infrastructure.Services.Files;
 
 #pragma warning disable SA1313
 public record FileData(

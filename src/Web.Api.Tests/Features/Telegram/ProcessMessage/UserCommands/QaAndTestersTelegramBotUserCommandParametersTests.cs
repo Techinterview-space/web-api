@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Domain.Entities.Salaries;
 using Infrastructure.Services.Telegram.UserCommands;
 using TestUtils.Fakes;

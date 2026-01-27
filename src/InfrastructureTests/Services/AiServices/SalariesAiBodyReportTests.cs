@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Infrastructure.Services.AiServices.Salaries;
 using Xunit;
 

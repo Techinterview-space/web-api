@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities;
+namespace Domain.Entities;
 
 public interface IHasIdBase<out TKey>
     where TKey : struct

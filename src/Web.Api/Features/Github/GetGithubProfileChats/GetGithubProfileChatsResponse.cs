@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Domain.ValueObjects.Pagination;
 using Web.Api.Features.Github.Dtos;
 

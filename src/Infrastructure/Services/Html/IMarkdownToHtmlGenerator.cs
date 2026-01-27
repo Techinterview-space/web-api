@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Html;
+namespace Infrastructure.Services.Html;
 
 public interface IMarkdownToHtmlGenerator
 {

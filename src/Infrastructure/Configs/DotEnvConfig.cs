@@ -1,4 +1,4 @@
-﻿using dotenv.net;
+using dotenv.net;
 
 namespace Infrastructure.Configs;
 

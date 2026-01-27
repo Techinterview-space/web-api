@@ -20,7 +20,11 @@ jobs:
       - name: Docker build and push
         run: |
           echo ${{env.PRODUCTION_SETTINGS_FILE}}
-          sed -i 's/"__AUTH0_AUDIENCE",/"${{ vars.AUTH0_AUDIENCE }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__GOOGLE_CLIENT_ID",/"${{ vars.GOOGLE_CLIENT_ID }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__GOOGLE_CLIENT_SECRET",/"${{ vars.GOOGLE_CLIENT_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__AUTH_GITHUB_CLIENT_ID",/"${{ vars.AUTH_GITHUB_CLIENT_ID }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__AUTH_GITHUB_CLIENT_SECRET",/"${{ vars.AUTH_GITHUB_CLIENT_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          sed -i 's/"__JWT_SECRET",/"${{ vars.JWT_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__DATABASE_CONNECTION_STRING",/"${{ vars.DATABASE_CONNECTION_STRING }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__TELEGRAM_BOT_KEY",/"${{ secrets.TELEGRAM_BOT_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__PROFILE_GITHUB_BOT_KEY",/"${{ secrets.PROFILE_GITHUB_BOT_KEY }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}

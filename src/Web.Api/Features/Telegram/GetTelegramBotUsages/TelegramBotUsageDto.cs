@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Telegram;
 
 namespace Web.Api.Features.Telegram.GetTelegramBotUsages;

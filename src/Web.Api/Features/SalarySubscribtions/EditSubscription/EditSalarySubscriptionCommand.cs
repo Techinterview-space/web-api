@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Web.Api.Features.SalarySubscribtions.Shared;
 
 namespace Web.Api.Features.SalarySubscribtions.EditSubscription;

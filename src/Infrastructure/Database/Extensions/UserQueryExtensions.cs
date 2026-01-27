@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain.Entities.Users;
 using Domain.Extensions;
 using Microsoft.EntityFrameworkCore;

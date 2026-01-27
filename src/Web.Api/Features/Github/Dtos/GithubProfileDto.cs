@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Github;
 
 namespace Web.Api.Features.Github.Dtos;

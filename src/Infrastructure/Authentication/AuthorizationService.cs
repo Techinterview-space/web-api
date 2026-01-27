@@ -1,4 +1,4 @@
-﻿using System.Security.Authentication;
+using System.Security.Authentication;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.ValueObjects;

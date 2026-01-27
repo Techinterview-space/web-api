@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Files;
+namespace Infrastructure.Services.Files;
 
 public interface IPdf
 {

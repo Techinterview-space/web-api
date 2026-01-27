@@ -1,4 +1,4 @@
-﻿using Domain.Validation;
+using Domain.Validation;
 using Xunit;
 
 namespace InfrastructureTests.Validation;

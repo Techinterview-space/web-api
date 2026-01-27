@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.Telegram.GithubProfiles;
+namespace Web.Api.Features.Telegram.GithubProfiles;
 
 public record RepositoryChangesStats
 {

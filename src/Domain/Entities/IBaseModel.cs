@@ -1,4 +1,4 @@
-﻿using Domain.ValueObjects.Dates.Interfaces;
+using Domain.ValueObjects.Dates.Interfaces;
 
 namespace Domain.Entities;
 

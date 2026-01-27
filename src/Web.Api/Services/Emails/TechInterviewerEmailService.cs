@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -113,6 +113,52 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
             new EmailContent(
                 _global.NoReplyEmail,
                 SalaryUpdateReminderViewModel.Subject,
+                view,
+                new List<string>
+                {
+                    user.Email,
+                }),
+            cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> SendEmailVerificationAsync(
+        User user,
+        string verificationUrl,
+        CancellationToken cancellationToken)
+    {
+        var view = await _viewRenderer.RenderHtmlAsync(
+            EmailVerificationViewModel.ViewName,
+            new EmailVerificationViewModel(user.FirstName, verificationUrl));
+
+        await _emailApiSender.SendAsync(
+            new EmailContent(
+                _global.NoReplyEmail,
+                EmailVerificationViewModel.Subject,
+                view,
+                new List<string>
+                {
+                    user.Email,
+                }),
+            cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> SendPasswordResetAsync(
+        User user,
+        string resetUrl,
+        CancellationToken cancellationToken)
+    {
+        var view = await _viewRenderer.RenderHtmlAsync(
+            PasswordResetViewModel.ViewName,
+            new PasswordResetViewModel(user.FirstName, resetUrl));
+
+        await _emailApiSender.SendAsync(
+            new EmailContent(
+                _global.NoReplyEmail,
+                PasswordResetViewModel.Subject,
                 view,
                 new List<string>
                 {

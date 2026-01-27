@@ -1,3 +1,3 @@
-﻿namespace Web.Api.Features.Salaries.GetSelectBoxItems;
+namespace Web.Api.Features.Salaries.GetSelectBoxItems;
 
 public record GetSelectBoxItemsQuery;

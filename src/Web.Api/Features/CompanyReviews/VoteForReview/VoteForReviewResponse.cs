@@ -1,4 +1,4 @@
-﻿namespace Web.Api.Features.CompanyReviews.VoteForReview;
+namespace Web.Api.Features.CompanyReviews.VoteForReview;
 
 public record VoteForReviewResponse
 {

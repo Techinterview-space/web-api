@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Salaries;
+using Domain.Entities.Salaries;
 using Domain.Extensions;
 using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;

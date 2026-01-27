@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Web.Api.Features.Surveys.GetSalariesSurveyStats;
 

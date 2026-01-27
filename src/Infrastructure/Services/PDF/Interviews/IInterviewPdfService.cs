@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Interviews;
+using Domain.Entities.Interviews;
 using Infrastructure.Services.Files;
 
 namespace Infrastructure.Services.PDF.Interviews;

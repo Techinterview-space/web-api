@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;

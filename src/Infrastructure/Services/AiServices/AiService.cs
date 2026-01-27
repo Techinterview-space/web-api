@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Domain.Entities.Companies;
 using Domain.Entities.Prompts;
 using Infrastructure.Ai;

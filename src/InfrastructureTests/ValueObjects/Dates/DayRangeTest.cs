@@ -1,4 +1,4 @@
-﻿using Domain.ValueObjects.Dates;
+using Domain.ValueObjects.Dates;
 using Xunit;
 using Date = Domain.ValueObjects.Dates.Date;
 

@@ -1,4 +1,4 @@
-﻿using Infrastructure.Emails.Contracts.Requests;
+using Infrastructure.Emails.Contracts.Requests;
 
 namespace Infrastructure.Emails.Contracts;
 

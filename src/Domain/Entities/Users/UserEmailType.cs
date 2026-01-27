@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Users;
+namespace Domain.Entities.Users;
 
 public enum UserEmailType
 {

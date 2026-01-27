@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Companies;
 
 namespace Web.Api.Features.Companies.Dtos;

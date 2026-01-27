@@ -1,4 +1,4 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 using Domain.Entities.Currencies;
 using Domain.Entities.Salaries;
 using Domain.Extensions;

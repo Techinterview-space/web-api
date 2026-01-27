@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Interviews;
 
 namespace Web.Api.Features.Interviews.RevokeShareLinkToken;

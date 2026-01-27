@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Salaries;
+namespace Domain.Entities.Salaries;
 
 public enum UserProfessionEnum
 {

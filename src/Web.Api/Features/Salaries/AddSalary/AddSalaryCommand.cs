@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Domain.Entities.Salaries;
 using Domain.Validation.Exceptions;
 using Web.Api.Features.Salaries.Models;

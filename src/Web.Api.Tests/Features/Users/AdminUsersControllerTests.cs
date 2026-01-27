@@ -1,6 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
+using Infrastructure.Emails.Contracts;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using TestUtils.Auth;
 using TestUtils.Db;
 using TestUtils.Fakes;
@@ -22,7 +25,9 @@ public class AdminUsersControllerTests
 
         var controller = new AdminUsersController(
             new FakeAuth(admin),
-            context);
+            context,
+            Mock.Of<ITechinterviewEmailService>(),
+            Mock.Of<IConfiguration>());
 
         var queryParams = new SearchUsersForAdminQueryParams
         {
@@ -46,7 +51,9 @@ public class AdminUsersControllerTests
 
         var controller = new AdminUsersController(
             new FakeAuth(admin),
-            context);
+            context,
+            Mock.Of<ITechinterviewEmailService>(),
+            Mock.Of<IConfiguration>());
 
         var queryParams = new SearchUsersForAdminQueryParams
         {
@@ -71,7 +78,9 @@ public class AdminUsersControllerTests
 
         var controller = new AdminUsersController(
             new FakeAuth(admin),
-            context);
+            context,
+            Mock.Of<ITechinterviewEmailService>(),
+            Mock.Of<IConfiguration>());
 
         var queryParams = new SearchUsersForAdminQueryParams
         {
@@ -96,7 +105,9 @@ public class AdminUsersControllerTests
 
         var controller = new AdminUsersController(
             new FakeAuth(admin),
-            context);
+            context,
+            Mock.Of<ITechinterviewEmailService>(),
+            Mock.Of<IConfiguration>());
 
         var queryParams = new SearchUsersForAdminQueryParams();
 
@@ -116,7 +127,9 @@ public class AdminUsersControllerTests
 
         var controller = new AdminUsersController(
             new FakeAuth(admin),
-            context);
+            context,
+            Mock.Of<ITechinterviewEmailService>(),
+            Mock.Of<IConfiguration>());
 
         var queryParams = new SearchUsersForAdminQueryParams
         {

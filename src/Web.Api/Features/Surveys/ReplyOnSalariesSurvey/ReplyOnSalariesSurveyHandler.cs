@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Questions;
 using Domain.Validation.Exceptions;

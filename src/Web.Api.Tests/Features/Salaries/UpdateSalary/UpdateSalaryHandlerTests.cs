@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;

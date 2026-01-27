@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.Salaries;
 using Moq;

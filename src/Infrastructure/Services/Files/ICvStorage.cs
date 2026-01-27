@@ -1,4 +1,4 @@
-﻿using AspNetCore.Aws.S3.Simple.Contracts;
+using AspNetCore.Aws.S3.Simple.Contracts;
 
 namespace Infrastructure.Services.Files;
 

@@ -1,4 +1,4 @@
-﻿using Infrastructure.Salaries;
+using Infrastructure.Salaries;
 using Xunit;
 
 namespace InfrastructureTests.Salaries;

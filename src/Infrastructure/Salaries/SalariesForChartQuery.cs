@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Enums;

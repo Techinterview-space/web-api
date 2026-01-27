@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Correlation;
+namespace Infrastructure.Services.Correlation;
 
 public interface ICorrelationIdAccessor
 {

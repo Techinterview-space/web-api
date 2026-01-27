@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Global;
+namespace Infrastructure.Services.Global;
 
 public interface IGlobal
 {

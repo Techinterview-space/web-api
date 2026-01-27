@@ -1,4 +1,4 @@
-﻿using Infrastructure.Salaries;
+using Infrastructure.Salaries;
 using Infrastructure.Services.Global;
 using Telegram.Bot.Types.Enums;
 
