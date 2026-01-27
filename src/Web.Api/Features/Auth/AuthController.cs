@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
         var result = await handler.HandleAsync(request, cancellationToken);
 
         var frontendUrl = _configuration["Frontend:CallbackUrl"];
-        return Redirect($"{frontendUrl}?access_token={result.AccessToken}&refresh_token={result.RefreshToken}");
+        return Redirect($"{frontendUrl}?access_token={result.AccessToken}&refresh_token={result.RefreshToken}&expires_in={result.ExpiresIn}");
     }
 
     [HttpGet("github")]
@@ -110,7 +110,7 @@ public class AuthController : ControllerBase
         var result = await handler.HandleAsync(request, cancellationToken);
 
         var frontendUrl = _configuration["Frontend:CallbackUrl"];
-        return Redirect($"{frontendUrl}?access_token={result.AccessToken}&refresh_token={result.RefreshToken}");
+        return Redirect($"{frontendUrl}?access_token={result.AccessToken}&refresh_token={result.RefreshToken}&expires_in={result.ExpiresIn}");
     }
 
     [HttpPost("register")]

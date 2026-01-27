@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Infrastructure.Authentication;
 using Infrastructure.Authentication.Contracts;
+using Infrastructure.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Setup.Attributes;
 
@@ -17,13 +18,16 @@ public class M2mClientController : ControllerBase
 {
     private readonly IM2mClientService _m2mClientService;
     private readonly IAuthorization _auth;
+    private readonly IJwtTokenService _jwtTokenService;
 
     public M2mClientController(
         IM2mClientService m2mClientService,
-        IAuthorization auth)
+        IAuthorization auth,
+        IJwtTokenService jwtTokenService)
     {
         _m2mClientService = m2mClientService;
         _auth = auth;
+        _jwtTokenService = jwtTokenService;
     }
 
     [HttpGet]
@@ -114,6 +118,32 @@ public class M2mClientController : ControllerBase
     {
         var newSecret = await _m2mClientService.RegenerateSecretAsync(id);
         return Ok(new { clientSecret = newSecret });
+    }
+
+    [HttpPost("{id}/generate-token")]
+    public async Task<IActionResult> GenerateToken([FromRoute] long id)
+    {
+        var client = await _m2mClientService.GetByIdAsync(id);
+        if (client == null)
+        {
+            return NotFound();
+        }
+
+        if (!client.IsActive)
+        {
+            return BadRequest(new { message = "Cannot generate token for inactive client" });
+        }
+
+        var scopes = client.Scopes.Select(s => s.Scope).ToArray();
+        var accessToken = _jwtTokenService.GenerateAccessToken(client, scopes);
+
+        return Ok(new M2mTokenResponseDto
+        {
+            AccessToken = accessToken,
+            TokenType = "Bearer",
+            ExpiresIn = 3600,
+            Scopes = scopes,
+        });
     }
 
     [HttpPut("{id}/scopes")]
@@ -220,4 +250,15 @@ public record M2mClientCreatedDto
     public string[] Scopes { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record M2mTokenResponseDto
+{
+    public string AccessToken { get; init; }
+
+    public string TokenType { get; init; }
+
+    public int ExpiresIn { get; init; }
+
+    public string[] Scopes { get; init; }
 }

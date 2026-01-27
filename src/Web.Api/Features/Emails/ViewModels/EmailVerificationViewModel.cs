@@ -1,6 +1,6 @@
-namespace Web.Api.Features.Emails.ViewModels;
+﻿namespace Web.Api.Features.Emails.ViewModels;
 
-public record EmailVerificationViewModel
+public record EmailVerificationViewModel : ViewModelBase
 {
     public const string ViewName = "/Views/EmailTemplates/EmailVerification.cshtml";
 
@@ -8,7 +8,9 @@ public record EmailVerificationViewModel
 
     public EmailVerificationViewModel(
         string firstName,
-        string verificationUrl)
+        string verificationUrl,
+        string unsubscribeToken = null)
+        : base(unsubscribeToken)
     {
         FirstName = firstName;
         VerificationUrl = verificationUrl;

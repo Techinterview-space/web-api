@@ -72,7 +72,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest, AuthResult>
         return new AuthResult
         {
             Success = true,
-            Message = "Registration successful. Please check your email to verify your account.",
+            Message = "Регистрация прошла успешно. Пожалуйста, проверьте вашу электронную почту для подтверждения аккаунта.",
         };
     }
 

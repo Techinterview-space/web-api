@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Auth;
 using Domain.Validation.Exceptions;
@@ -57,11 +57,6 @@ public class LoginHandler : IRequestHandler<LoginRequest, AuthTokenResponse>
             user.IncrementFailedLoginAttempts();
             await _context.TrySaveChangesAsync(cancellationToken);
             throw new UnauthorizedException("Invalid email or password");
-        }
-
-        if (!user.EmailConfirmed)
-        {
-            throw new UnauthorizedException("Please verify your email before logging in");
         }
 
         user.ResetFailedLoginAttempts();
