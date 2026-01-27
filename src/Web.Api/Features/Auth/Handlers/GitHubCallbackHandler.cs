@@ -45,6 +45,8 @@ public class GitHubCallbackHandler
         var githubUser = await _gitHubProvider.GetUserInfoAsync(githubTokens.AccessToken);
 
         var identityId = $"{CurrentUser.GithubPrefix}{githubUser.Id}";
+
+        // TODO: To not take user from database if there is no email provided by GitHub
         var emailUpper = githubUser.Email?.ToUpperInvariant();
 
         var user = await _context.Users

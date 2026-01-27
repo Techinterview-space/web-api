@@ -45,8 +45,7 @@ public class Program
         {
             // Load .env file BEFORE building the host so environment variables
             // are available when configuration is constructed and can override appsettings.json
-            DotEnvConfig.LoadEnvFileIfExists();
-
+            // DotEnvConfig.LoadEnvFileIfExists();
             QuestPDF.Settings.License = LicenseType.Community;
 
             await CreateHostBuilder(args)
