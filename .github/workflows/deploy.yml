@@ -20,7 +20,8 @@ jobs:
       - name: Docker build and push
         run: |
           echo ${{env.PRODUCTION_SETTINGS_FILE}}
-          sed -i 's/"__JWT_SECRET",/"${{ secrets.OAUTH_JWT_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
+          echo ${{secrets.OAUTH_JWT_SECRET}}
+          sed -i "s|__OAUTH_JWT_SECRET|${{ secrets.OAUTH_JWT_SECRET }}|g" ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__GOOGLE_CLIENT_ID",/"${{ secrets.GOOGLE_CLIENT_ID }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__GOOGLE_CLIENT_SECRET",/"${{ secrets.GOOGLE_CLIENT_SECRET }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
           sed -i 's/"__AUTH_GITHUB_CLIENT_ID",/"${{ secrets.AUTH_GITHUB_CLIENT_ID }}",/g' ${{env.PRODUCTION_SETTINGS_FILE}}
