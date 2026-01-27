@@ -1,6 +1,5 @@
 ﻿using System;
 using Domain.Enums;
-using Infrastructure.Configs;
 using Infrastructure.Database;
 using Infrastructure.Services.Global;
 using Microsoft.AspNetCore.Builder;
@@ -41,7 +40,8 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        DotEnvConfig.LoadEnvFileIfExists();
+        // Note: DotEnvConfig.LoadEnvFileIfExists() is called in Program.cs before host is built
+        // so environment variables can override appsettings.json values
         new ElkSerilog(
             config: _configuration,
             appName: AppName,

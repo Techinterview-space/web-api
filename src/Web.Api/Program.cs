@@ -28,6 +28,7 @@
 #pragma warning restore SA1005, SA1515
 using System;
 using System.Threading.Tasks;
+using Infrastructure.Configs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using QuestPDF.Infrastructure;
@@ -42,6 +43,10 @@ public class Program
     {
         try
         {
+            // Load .env file BEFORE building the host so environment variables
+            // are available when configuration is constructed and can override appsettings.json
+            DotEnvConfig.LoadEnvFileIfExists();
+
             QuestPDF.Settings.License = LicenseType.Community;
 
             await CreateHostBuilder(args)
