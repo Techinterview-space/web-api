@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Auth;
@@ -49,20 +50,21 @@ public class GitHubCallbackHandler
         var user = await _context.Users
             .Include(u => u.UserRoles)
             .FirstOrDefaultAsync(
-                u => u.IdentityId == identityId ||
-                     (u.IdentityId == null && !string.IsNullOrEmpty(emailUpper) && u.Email.ToUpper() == emailUpper),
+                u => !string.IsNullOrEmpty(emailUpper) && u.Email.ToUpper() == emailUpper,
                 cancellationToken);
 
         if (user == null)
         {
-            user = new User(
+            var hasAnyOtherUsers = await _context.Users.AnyAsync(cancellationToken);
+            user = User.CreateFromExternalProviderAuth(
                 email: githubUser.Email ?? $"{githubUser.Id}@github.placeholder",
                 firstName: githubUser.GivenName ?? githubUser.Name ?? "GitHub",
                 lastName: githubUser.FamilyName ?? "User",
-                roles: Role.Interviewer);
-            user.SetIdentityId(identityId);
-            user.ConfirmEmail();
-            user.SetProfilePicture(githubUser.Picture);
+                identityId: identityId,
+                profilePicture: githubUser.Picture,
+                roles: hasAnyOtherUsers
+                    ? new List<Role> { Role.Interviewer, }
+                    : new List<Role> { Role.Interviewer, Role.Admin, });
 
             _context.Users.Add(user);
             await _context.TrySaveChangesAsync(cancellationToken);

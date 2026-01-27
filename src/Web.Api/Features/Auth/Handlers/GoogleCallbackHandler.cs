@@ -50,14 +50,13 @@ public class GoogleCallbackHandler
         var user = await _context.Users
             .Include(u => u.UserRoles)
             .FirstOrDefaultAsync(
-                u => u.IdentityId == identityId ||
-                     (u.IdentityId == null && u.Email.ToUpper() == emailUpper),
+                u => u.Email.ToUpper() == emailUpper,
                 cancellationToken);
 
         if (user == null)
         {
             var hasAnyOtherUsers = await _context.Users.AnyAsync(cancellationToken);
-            user = User.CreateFromGoogleAuth(
+            user = User.CreateFromExternalProviderAuth(
                 email: googleUser.Email,
                 firstName: googleUser.GivenName ?? googleUser.Email.Split('@')[0],
                 lastName: googleUser.FamilyName ?? "-",

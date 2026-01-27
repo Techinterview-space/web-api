@@ -24,7 +24,7 @@ public class User : BaseModel, IHasDeletedAt
     {
     }
 
-    public static User CreateFromGoogleAuth(
+    public static User CreateFromExternalProviderAuth(
         string email,
         string firstName,
         string lastName,
