@@ -39,14 +39,26 @@ public class AuthController : ControllerBase
 
     [HttpGet("google")]
     [AllowAnonymous]
-    public IActionResult GoogleLogin([FromQuery] string redirectUri)
+    public IActionResult GoogleLogin(
+        [FromQuery] string redirectUrl,
+        [FromQuery] string frontendReturnUrl)
     {
         var googleProvider = HttpContext.RequestServices.GetRequiredService<GoogleOAuthProvider>();
         var state = GenerateState();
 
         HttpContext.Session.SetString("oauth_state", state);
 
-        var authUrl = googleProvider.GetAuthorizationUrl(state, redirectUri);
+        if (!string.IsNullOrEmpty(frontendReturnUrl))
+        {
+            var baseUri = GetBaseUri(frontendReturnUrl);
+            if (baseUri != null && IsAllowedRedirectOrigin(baseUri))
+            {
+                HttpContext.Session.SetString("frontend_redirect_uri", frontendReturnUrl);
+            }
+        }
+
+        // TODO to not pass redirectURL since nobody uses it
+        var authUrl = googleProvider.GetAuthorizationUrl(state, redirectUrl);
         return Redirect(authUrl);
     }
 
@@ -69,22 +81,35 @@ public class AuthController : ControllerBase
             Code = code,
             DeviceInfo = Request.Headers["User-Agent"].ToString(),
         };
+
         var result = await handler.HandleAsync(request, cancellationToken);
 
-        var frontendUrl = _configuration["Frontend:CallbackUrl"];
+        var frontendUrl = GetFrontendRedirectUrl();
         return Redirect($"{frontendUrl}?access_token={result.AccessToken}&refresh_token={result.RefreshToken}&expires_in={result.ExpiresIn}");
     }
 
     [HttpGet("github")]
     [AllowAnonymous]
-    public IActionResult GitHubLogin([FromQuery] string redirectUri)
+    public IActionResult GitHubLogin(
+        [FromQuery] string redirectUrl,
+        [FromQuery] string frontendReturnUrl)
     {
         var githubProvider = HttpContext.RequestServices.GetRequiredService<GitHubOAuthProvider>();
         var state = GenerateState();
 
         HttpContext.Session.SetString("oauth_state", state);
 
-        var authUrl = githubProvider.GetAuthorizationUrl(state, redirectUri);
+        if (!string.IsNullOrEmpty(frontendReturnUrl))
+        {
+            var baseUri = GetBaseUri(frontendReturnUrl);
+            if (baseUri != null && IsAllowedRedirectOrigin(baseUri))
+            {
+                HttpContext.Session.SetString("frontend_redirect_uri", frontendReturnUrl);
+            }
+        }
+
+        // TODO to not pass redirectURL since nobody uses it
+        var authUrl = githubProvider.GetAuthorizationUrl(state, redirectUrl);
         return Redirect(authUrl);
     }
 
@@ -109,7 +134,7 @@ public class AuthController : ControllerBase
         };
         var result = await handler.HandleAsync(request, cancellationToken);
 
-        var frontendUrl = _configuration["Frontend:CallbackUrl"];
+        var frontendUrl = GetFrontendRedirectUrl();
         return Redirect($"{frontendUrl}?access_token={result.AccessToken}&refresh_token={result.RefreshToken}&expires_in={result.ExpiresIn}");
     }
 
@@ -230,5 +255,54 @@ public class AuthController : ControllerBase
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(bytes);
         return Convert.ToBase64String(bytes);
+    }
+
+    private string GetFrontendRedirectUrl()
+    {
+        var storedRedirectUri = HttpContext.Session.GetString("frontend_redirect_uri");
+        if (!string.IsNullOrEmpty(storedRedirectUri))
+        {
+            HttpContext.Session.Remove("frontend_redirect_uri");
+            return storedRedirectUri;
+        }
+
+        return _configuration["Frontend:CallbackUrl"];
+    }
+
+    private static string GetBaseUri(string url)
+    {
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return $"{uri.Scheme}://{uri.Authority}";
+        }
+
+        return null;
+    }
+
+    private bool IsAllowedRedirectOrigin(string baseUri)
+    {
+        var allowedOrigins = _configuration.GetSection("Frontend:AllowedRedirectOrigins").Get<string[]>()
+            ?? Array.Empty<string>();
+
+        foreach (var origin in allowedOrigins)
+        {
+            if (string.Equals(origin, baseUri, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        // Also allow the configured base URL
+        var configuredBaseUrl = _configuration["Frontend:BaseUrl"];
+        if (!string.IsNullOrEmpty(configuredBaseUrl))
+        {
+            var configuredBase = GetBaseUri(configuredBaseUrl);
+            if (string.Equals(configuredBase, baseUri, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

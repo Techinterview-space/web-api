@@ -10,8 +10,7 @@ This repo is for Backend API for [techinterview.space](https://techinterview.spa
 
 ## Tech Stack
 
-- .NET 8
-- Angular 17
+- .NET 10
 
 ## Docs
 
@@ -24,7 +23,7 @@ This repo is for Backend API for [techinterview.space](https://techinterview.spa
 
 - MacOs, Windows, or Linux (_MacOs is preferred. Because I think so_)
 - Docker Desktop installed
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) installed
+- [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed
 - Visual Studio Code, JetBrains Rider, or Visual Studio installed
 
 1. Clone the repository
