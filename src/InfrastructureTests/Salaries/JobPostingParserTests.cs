@@ -249,6 +249,7 @@ Middle Frontend Developer
     [InlineData("#вакансия Java developer от 200к", 200_000d, null)]
     [InlineData("#вакансия Frontend зп 150 тыс - 250 тысяч", 150_000d, 250_000d)]
     [InlineData("#вакансия Backend developer salary 100000-200000", 100_000d, 200_000d)]
+    [InlineData("#вакансия Фуллтайм, навороченный офис, аймаки, от 1млн гросс", 1_000_000d, null)]
     public void GetResult_HasSalariesInText_Ok(
         string text,
         double? min,
