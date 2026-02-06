@@ -86,7 +86,7 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             }
 
             var query = salariesQuery.ToQueryable();
-            if (currentUser == null || userSalariesForLastYear.Count == 0)
+            if (!request.AllowReadonly && (currentUser == null || userSalariesForLastYear.Count == 0))
             {
                 var salaryValues = await query
                     .Select(x => new { x.Company, x.Value })
@@ -101,8 +101,10 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
             }
 
             var salaries = await query.ToListAsync(cancellationToken);
-            var hasSurveyRecentReply = await new SalariesSurveyUserService(_context)
-                .HasFilledSurveyAsync(currentUser, cancellationToken);
+            var hasSurveyRecentReply = currentUser != null
+                ? await new SalariesSurveyUserService(_context)
+                    .HasFilledSurveyAsync(currentUser, cancellationToken)
+                : false;
 
             var currencies = await GetCurrenciesAsync(
                 request,
@@ -163,9 +165,13 @@ namespace Web.Api.Features.Salaries.GetSalariesChart
                 CreateGenderDistributionData(localSalaries),
                 CreateGenderDistributionData(remoteSalaries));
 
+            var currentUserSalary = userSalariesForLastYear.Count > 0
+                ? new UserSalaryAdminDto(userSalariesForLastYear.First())
+                : null;
+
             return new SalariesChartResponse(
                 salaries,
-                new UserSalaryAdminDto(userSalariesForLastYear.First()),
+                currentUserSalary,
                 hasSurveyRecentReply,
                 salariesQuery.From,
                 salariesQuery.To,

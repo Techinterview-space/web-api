@@ -76,6 +76,7 @@ public class SalariesController : ControllerBase
                 QuarterTo = request.QuarterTo,
                 YearTo = request.YearTo,
                 DateTo = request.DateTo,
+                AllowReadonly = request.AllowReadonly,
             },
             cancellationToken);
     }

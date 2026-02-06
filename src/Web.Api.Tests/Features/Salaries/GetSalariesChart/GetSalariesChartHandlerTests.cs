@@ -366,4 +366,106 @@ public class GetSalariesChartHandlerTests
         Assert.Null(salariesResponse.WorkIndustriesChartData);
         Assert.Null(salariesResponse.CitiesDoughnutChartData);
     }
+
+    [Fact]
+    public async Task Handle_AllowReadonly_NoCurrentUser_ReturnsFullChartData()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+        await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 700_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
+            .AsDomain());
+
+        await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 600_000,
+                createdAt: DateTimeOffset.Now.AddDays(-2),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Tester))
+            .AsDomain());
+
+        var salariesResponse = await new GetSalariesChartHandler(
+                new FakeAuth(null),
+                context,
+                new CurrenciesServiceFake())
+            .Handle(new GetSalariesChartQuery { AllowReadonly = true }, default);
+
+        Assert.False(salariesResponse.ShouldAddOwnSalary);
+        Assert.Equal(2, salariesResponse.SalariesCount);
+        Assert.Null(salariesResponse.CurrentUserSalary);
+
+        Assert.NotNull(salariesResponse.SalariesSkillsChartData);
+        Assert.NotNull(salariesResponse.WorkIndustriesChartData);
+        Assert.NotNull(salariesResponse.CitiesDoughnutChartData);
+        Assert.NotNull(salariesResponse.GradesMinMaxChartData);
+        Assert.NotNull(salariesResponse.ProfessionsDistributionChartData);
+        Assert.NotNull(salariesResponse.PeopleByGenderChartData);
+        Assert.Equal(3, salariesResponse.Currencies.Count);
+    }
+
+    [Fact]
+    public async Task Handle_AllowReadonly_UserHasNoSalary_ReturnsFullChartData()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+        await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 700_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
+            .AsDomain());
+
+        var salariesResponse = await new GetSalariesChartHandler(
+                new FakeAuth(user2),
+                context,
+                new CurrenciesServiceFake())
+            .Handle(new GetSalariesChartQuery { AllowReadonly = true }, default);
+
+        Assert.False(salariesResponse.ShouldAddOwnSalary);
+        Assert.Equal(1, salariesResponse.SalariesCount);
+        Assert.Null(salariesResponse.CurrentUserSalary);
+
+        Assert.NotNull(salariesResponse.SalariesSkillsChartData);
+        Assert.NotNull(salariesResponse.WorkIndustriesChartData);
+        Assert.NotNull(salariesResponse.CitiesDoughnutChartData);
+        Assert.NotNull(salariesResponse.GradesMinMaxChartData);
+        Assert.NotNull(salariesResponse.ProfessionsDistributionChartData);
+        Assert.NotNull(salariesResponse.PeopleByGenderChartData);
+        Assert.Equal(3, salariesResponse.Currencies.Count);
+    }
+
+    [Fact]
+    public async Task Handle_AllowReadonly_UserHasSalary_ReturnsFullChartDataWithCurrentUserSalary()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+        var salary = await context.SaveAsync(new UserSalaryFake(
+                user1,
+                value: 800_000,
+                createdAt: DateTimeOffset.Now.AddDays(-1),
+                professionOrNull: await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer))
+            .AsDomain());
+
+        var salariesResponse = await new GetSalariesChartHandler(
+                new FakeAuth(user1),
+                context,
+                new CurrenciesServiceFake())
+            .Handle(new GetSalariesChartQuery { AllowReadonly = true }, default);
+
+        Assert.False(salariesResponse.ShouldAddOwnSalary);
+        Assert.Equal(1, salariesResponse.SalariesCount);
+        Assert.NotNull(salariesResponse.CurrentUserSalary);
+        Assert.Equal(salary.Value, salariesResponse.CurrentUserSalary.Value);
+
+        Assert.NotNull(salariesResponse.GradesMinMaxChartData);
+        Assert.NotNull(salariesResponse.ProfessionsDistributionChartData);
+        Assert.NotNull(salariesResponse.PeopleByGenderChartData);
+        Assert.Equal(3, salariesResponse.Currencies.Count);
+    }
 }

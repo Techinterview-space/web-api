@@ -157,6 +157,7 @@ public record CurrentUser
     /// <summary>
     /// Checks if the current user (M2M client) has the specified scope.
     /// </summary>
+    /// <param name="scope">Scope.</param>
     public bool HasScope(string scope)
     {
         return Scopes.Contains("*") || Scopes.Contains(scope);

@@ -34,6 +34,9 @@ public record SalariesChartQueryParamsBase : ISalariesChartQueryParams
     [FromQuery(Name = "dateTo")]
     public DateTime? DateTo { get; init; }
 
+    [FromQuery(Name = "allowReadonly")]
+    public bool AllowReadonly { get; init; }
+
     public Domain.ValueObjects.SalariesChartQueryParamsBase CreateDatabaseQueryParams()
     {
         return new Domain.ValueObjects.SalariesChartQueryParamsBase(
