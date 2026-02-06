@@ -12,8 +12,6 @@ namespace Web.Api.Features.Sitemaps;
 public class GetSitemapHandler
     : IRequestHandler<Nothing, SitemapUrlSet>
 {
-    private const string BaseUrl = "https://techinterview.space";
-
     private readonly DatabaseContext _context;
     private readonly IGlobal _global;
 

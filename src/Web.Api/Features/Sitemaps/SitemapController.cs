@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,23 +34,24 @@ public class SitemapController : ControllerBase
                 cancellationToken);
 
         var xmlSerializer = new XmlSerializer(typeof(SitemapUrlSet));
-        var stringBuilder = new StringBuilder();
 
         var namespaces = new XmlSerializerNamespaces();
         namespaces.Add(string.Empty, "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-        await using var writer = XmlWriter.Create(stringBuilder, new XmlWriterSettings
+        using var memoryStream = new MemoryStream();
+        await using var writer = XmlWriter.Create(memoryStream, new XmlWriterSettings
         {
-            Encoding = Encoding.UTF8,
+            Encoding = new UTF8Encoding(false),
             Indent = true,
             OmitXmlDeclaration = false,
             Async = true,
         });
 
         xmlSerializer.Serialize(writer, sitemap, namespaces);
+        await writer.FlushAsync();
 
-        return Content(
-            stringBuilder.ToString(),
-            "application/xml; charset=utf-8");
+        var xml = Encoding.UTF8.GetString(memoryStream.ToArray());
+
+        return Content(xml, "application/xml; charset=utf-8");
     }
 }
