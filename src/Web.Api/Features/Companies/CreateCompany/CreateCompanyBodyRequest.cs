@@ -14,4 +14,6 @@ public record CreateCompanyBodyRequest
     public List<string> Links { get; init; } = new List<string>();
 
     public string LogoUrl { get; init; }
+
+    public string Slug { get; init; }
 }

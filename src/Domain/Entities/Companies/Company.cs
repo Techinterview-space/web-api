@@ -41,7 +41,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         string name,
         string description,
         List<string> links,
-        string logoUrl)
+        string logoUrl,
+        string slug = null)
     {
         name = name?.Trim();
 
@@ -53,7 +54,9 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
         LogoUrl = logoUrl;
         Rating = 0;
         ReviewsCount = 0;
-        Slug = new CompanySlug(Name).ToString();
+        Slug = !string.IsNullOrEmpty(slug)
+            ? new KebabCaseSlug(slug).ToString()
+            : new CompanySlug(Name).ToString();
 
         Reviews = new List<CompanyReview>();
         RatingHistory = new List<CompanyRatingHistory>();

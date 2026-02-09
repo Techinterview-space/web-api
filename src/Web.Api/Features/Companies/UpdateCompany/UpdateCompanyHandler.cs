@@ -25,6 +25,11 @@ public record UpdateCompanyHandler : Infrastructure.Services.Mediator.IRequestHa
     {
         request.Body.ThrowIfInvalid();
 
+        if (string.IsNullOrWhiteSpace(request.Body.Slug))
+        {
+            throw new BadRequestException("Slug is required for updating a company.");
+        }
+
         var company = await _context.Companies.FirstOrDefaultAsync(
             c => c.Id == request.CompanyId,
             cancellationToken)
