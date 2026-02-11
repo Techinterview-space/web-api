@@ -9,7 +9,7 @@ public class DotEnvConfig
     /// Searches in the following locations (first found wins):
     /// 1. Current directory (.env)
     /// 2. Parent directory (../. env) - for running from src/Web.Api
-    /// 3. Two levels up (../../.env) - for running from src/Web.Api/bin/Debug
+    /// 3. Two levels up (../../.env) - for running from src/Web.Api/bin/Debug.
     /// </summary>
     public static void LoadEnvFileIfExists()
     {
