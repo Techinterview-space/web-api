@@ -17,6 +17,7 @@ public record ItemsPerDayChartData
         Items = new List<int>();
 
         var itemsGroupedByDay = sourceItems
+            .OrderBy(x => x.Date)
             .GroupBy(x => x.Date.Date)
             .Select(x => new
             {
