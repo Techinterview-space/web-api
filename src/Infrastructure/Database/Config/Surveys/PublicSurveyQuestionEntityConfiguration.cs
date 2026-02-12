@@ -12,6 +12,10 @@ public class PublicSurveyQuestionEntityConfiguration : IEntityTypeConfiguration<
         builder.HasKey(x => x.Id);
 
         builder
+            .Property(x => x.Id)
+            .ValueGeneratedNever();
+
+        builder
             .Property(x => x.Text)
             .HasMaxLength(PublicSurveyQuestion.TextMaxLength)
             .IsRequired();

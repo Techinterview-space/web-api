@@ -12,6 +12,10 @@ public class PublicSurveyResponseEntityConfiguration : IEntityTypeConfiguration<
         builder.HasKey(x => x.Id);
 
         builder
+            .Property(x => x.Id)
+            .ValueGeneratedNever();
+
+        builder
             .HasIndex(x => new { x.QuestionId, x.UserId })
             .IsUnique();
 
