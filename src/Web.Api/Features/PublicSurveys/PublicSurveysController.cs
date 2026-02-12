@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Validation;
+using Domain.ValueObjects.Pagination;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using Web.Api.Features.PublicSurveys.Dtos;
 using Web.Api.Features.PublicSurveys.GetMyPublicSurveys;
 using Web.Api.Features.PublicSurveys.GetPublicSurveyBySlug;
 using Web.Api.Features.PublicSurveys.GetPublicSurveyResults;
+using Web.Api.Features.PublicSurveys.GetPublicSurveys;
 using Web.Api.Features.PublicSurveys.PublishPublicSurvey;
 using Web.Api.Features.PublicSurveys.ReopenPublicSurvey;
 using Web.Api.Features.PublicSurveys.RestorePublicSurvey;
@@ -24,7 +26,7 @@ namespace Web.Api.Features.PublicSurveys;
 
 [ApiController]
 [Route("api/public-surveys")]
-[HasAnyRole]
+
 public class PublicSurveysController : ControllerBase
 {
     private readonly IServiceProvider _serviceProvider;
@@ -36,6 +38,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPost]
+    [HasAnyRole]
     public async Task<IActionResult> Create(
         [FromBody] CreatePublicSurveyRequest request,
         CancellationToken cancellationToken)
@@ -48,12 +51,24 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpGet("my-surveys")]
+    [HasAnyRole]
     public async Task<IActionResult> GetMySurveys(
         [FromQuery] GetMyPublicSurveysQuery query,
         CancellationToken cancellationToken)
     {
         return Ok(
             await _serviceProvider.HandleBy<GetMyPublicSurveysHandler, GetMyPublicSurveysQuery, List<MySurveyListItemDto>>(
+                query, cancellationToken));
+    }
+
+    [HttpGet("all")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] GetPublicSurveysQuery query,
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _serviceProvider.HandleBy<GetPublicSurveysHandler, GetPublicSurveysQuery, Pageable<MySurveyListItemDto>>(
                 query, cancellationToken));
     }
 
@@ -69,6 +84,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
+    [HasAnyRole]
     public async Task<IActionResult> Update(
         [FromRoute] Guid id,
         [FromBody] UpdatePublicSurveyRequest request,
@@ -82,6 +98,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPost("{id:guid}/publish")]
+    [HasAnyRole]
     public async Task<IActionResult> Publish(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -92,6 +109,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPost("{id:guid}/close")]
+    [HasAnyRole]
     public async Task<IActionResult> Close(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -102,6 +120,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPost("{id:guid}/reopen")]
+    [HasAnyRole]
     public async Task<IActionResult> Reopen(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -112,6 +131,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [HasAnyRole]
     public async Task<IActionResult> Delete(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -123,6 +143,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPost("{id:guid}/restore")]
+    [HasAnyRole]
     public async Task<IActionResult> Restore(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -133,6 +154,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpPost("{slug}/responses")]
+    [HasAnyRole]
     public async Task<IActionResult> SubmitResponse(
         [FromRoute] string slug,
         [FromBody] SubmitPublicSurveyResponseRequest request,
@@ -147,6 +169,7 @@ public class PublicSurveysController : ControllerBase
     }
 
     [HttpGet("{slug}/results")]
+    [HasAnyRole]
     public async Task<IActionResult> GetResults(
         [FromRoute] string slug,
         CancellationToken cancellationToken)
