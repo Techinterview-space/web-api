@@ -13,8 +13,6 @@ jobs:
     env:
       DO_TOKEN: ${{ secrets.DO_TOKEN }}
       PRODUCTION_SETTINGS_FILE: ./src/Web.Api/appsettings.Production.json
-    container:
-      image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     steps:
       - uses: actions/checkout@v4
       - name: Docker build and push
