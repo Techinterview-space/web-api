@@ -13,6 +13,7 @@ using Domain.Entities.Salaries;
 using Domain.Entities.StatData;
 using Domain.Entities.StatData.CompanyReviews;
 using Domain.Entities.StatData.Salary;
+using Domain.Entities.Surveys;
 using Domain.Entities.Telegram;
 using Domain.Entities.Users;
 using Domain.Validation;
@@ -105,6 +106,16 @@ public class DatabaseContext : DbContext
     public DbSet<SalariesHistoricalDataRecord> SalariesHistoricalDataRecords { get; set; }
 
     public DbSet<CurrenciesCollection> CurrencyCollections { get; set; }
+
+    public DbSet<PublicSurvey> PublicSurveys { get; set; }
+
+    public DbSet<PublicSurveyQuestion> PublicSurveyQuestions { get; set; }
+
+    public DbSet<PublicSurveyOption> PublicSurveyOptions { get; set; }
+
+    public DbSet<PublicSurveyResponse> PublicSurveyResponses { get; set; }
+
+    public DbSet<PublicSurveyResponseOption> PublicSurveyResponseOptions { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
