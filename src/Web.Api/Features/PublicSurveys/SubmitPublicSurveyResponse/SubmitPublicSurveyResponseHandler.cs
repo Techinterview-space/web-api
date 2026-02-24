@@ -48,37 +48,70 @@ public class SubmitPublicSurveyResponseHandler
             throw new BadRequestException("This survey is not accepting responses.");
         }
 
-        var question = survey.Questions.FirstOrDefault()
-            ?? throw new BadRequestException("Survey has no questions.");
+        if (!survey.Questions.Any())
+        {
+            throw new BadRequestException("Survey has no questions.");
+        }
 
-        var alreadyResponded = question.Responses?.Any(r => r.UserId == user.Id) ?? false;
+        // Validate no duplicate question answers
+        var answeredQuestionIds = request.Body.Answers
+            .Select(a => a.QuestionId)
+            .ToHashSet();
+
+        if (answeredQuestionIds.Count != request.Body.Answers.Count)
+        {
+            throw new BadRequestException("Duplicate question answers are not allowed.");
+        }
+
+        // Validate answers cover all questions
+        var surveyQuestionIds = survey.Questions
+            .Select(q => q.Id)
+            .ToHashSet();
+
+        if (!surveyQuestionIds.SetEquals(answeredQuestionIds))
+        {
+            throw new BadRequestException("You must answer all questions in the survey.");
+        }
+
+        // Check if user already responded to any question
+        var alreadyResponded = survey.Questions
+            .Any(q => q.Responses?.Any(r => r.UserId == user.Id) ?? false);
+
         if (alreadyResponded)
         {
             throw new BadRequestException("You have already responded to this survey.");
         }
 
-        if (!question.AllowMultipleChoices && request.Body.OptionIds.Count > 1)
+        // Process each answer
+        foreach (var answer in request.Body.Answers)
         {
-            throw new BadRequestException("This question allows only one choice.");
+            var question = survey.Questions.First(q => q.Id == answer.QuestionId);
+
+            if (!question.AllowMultipleChoices && answer.OptionIds.Count > 1)
+            {
+                throw new BadRequestException(
+                    $"Question \"{question.Text}\" allows only one choice.");
+            }
+
+            var selectedOptions = question.Options
+                .Where(o => answer.OptionIds.Contains(o.Id))
+                .ToList();
+
+            if (selectedOptions.Count != answer.OptionIds.Count)
+            {
+                throw new BadRequestException("One or more selected options are invalid.");
+            }
+
+            var response = new PublicSurveyResponse(question, user.Id);
+
+            foreach (var option in selectedOptions)
+            {
+                response.AddSelectedOption(option);
+            }
+
+            await _context.PublicSurveyResponses.AddAsync(response, cancellationToken);
         }
 
-        var selectedOptions = question.Options
-            .Where(o => request.Body.OptionIds.Contains(o.Id))
-            .ToList();
-
-        if (selectedOptions.Count != request.Body.OptionIds.Count)
-        {
-            throw new BadRequestException("One or more selected options are invalid.");
-        }
-
-        var response = new PublicSurveyResponse(question, user.Id);
-
-        foreach (var option in selectedOptions)
-        {
-            response.AddSelectedOption(option);
-        }
-
-        await _context.PublicSurveyResponses.AddAsync(response, cancellationToken);
         await _context.TrySaveChangesAsync(cancellationToken);
 
         return Nothing.Value;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Entities.Surveys;
 using Domain.Enums;
@@ -27,7 +28,7 @@ public record PublicSurveyDto
 
     public bool IsAuthor { get; init; }
 
-    public PublicSurveyQuestionDto Question { get; init; }
+    public List<PublicSurveyQuestionDto> Questions { get; init; }
 
     public PublicSurveyDto()
     {
@@ -49,10 +50,9 @@ public record PublicSurveyDto
         DeletedAt = survey.DeletedAt;
         IsAuthor = isAuthor;
 
-        var question = survey.Questions?.FirstOrDefault();
-        if (question != null)
-        {
-            Question = new PublicSurveyQuestionDto(question, hasUserResponded);
-        }
+        Questions = survey.Questions?
+            .OrderBy(q => q.Order)
+            .Select(q => new PublicSurveyQuestionDto(q, hasUserResponded))
+            .ToList() ?? new List<PublicSurveyQuestionDto>();
     }
 }

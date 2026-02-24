@@ -17,8 +17,18 @@ public record CreatePublicSurveyRequest
     public string Slug { get; init; }
 
     [Required]
+    [MinLength(1)]
+    [MaxLength(30)]
+    public List<CreatePublicSurveyQuestionRequest> Questions { get; init; }
+}
+
+public record CreatePublicSurveyQuestionRequest
+{
+    [Required]
     [StringLength(500)]
-    public string Question { get; init; }
+    public string Text { get; init; }
+
+    public int Order { get; init; }
 
     public bool AllowMultipleChoices { get; init; }
 

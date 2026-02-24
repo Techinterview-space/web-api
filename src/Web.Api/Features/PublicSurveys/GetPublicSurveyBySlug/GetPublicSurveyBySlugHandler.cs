@@ -57,13 +57,10 @@ public class GetPublicSurveyBySlugHandler
         }
 
         var hasUserResponded = false;
-        if (user != null)
+        if (user != null && survey.Questions.Any())
         {
-            var question = survey.Questions.FirstOrDefault();
-            if (question != null)
-            {
-                hasUserResponded = question.Responses?.Any(r => r.UserId == user.Id) ?? false;
-            }
+            hasUserResponded = survey.Questions
+                .All(q => q.Responses?.Any(r => r.UserId == user.Id) ?? false);
         }
 
         return new PublicSurveyDto(survey, isAuthor, hasUserResponded);

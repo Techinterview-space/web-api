@@ -11,6 +11,8 @@ public record PublicSurveyQuestionDto
 
     public string Text { get; init; }
 
+    public int Order { get; init; }
+
     public bool AllowMultipleChoices { get; init; }
 
     public List<PublicSurveyOptionDto> Options { get; init; }
@@ -29,6 +31,7 @@ public record PublicSurveyQuestionDto
     {
         Id = question.Id;
         Text = question.Text;
+        Order = question.Order;
         AllowMultipleChoices = question.AllowMultipleChoices;
         Options = question.Options?
             .OrderBy(o => o.Order)

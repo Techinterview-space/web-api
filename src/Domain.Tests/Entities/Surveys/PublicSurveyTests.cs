@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Domain.Entities.Surveys;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
@@ -311,5 +313,131 @@ public class PublicSurveyTests
             .SetDeletedAt(DateTimeOffset.UtcNow);
 
         Assert.Throws<BadRequestException>(() => survey.Close());
+    }
+
+    [Fact]
+    public void AddQuestion_Draft_AddsQuestion()
+    {
+        var survey = new PublicSurveyFake();
+        var question = survey.AddQuestion("New question?", 0);
+        Assert.Single(survey.Questions);
+        Assert.Equal("New question?", question.Text);
+        Assert.Equal(0, question.Order);
+    }
+
+    [Fact]
+    public void AddQuestion_ExceedsMaxQuestions_Throws()
+    {
+        var survey = new PublicSurveyFake();
+        for (int i = 0; i < PublicSurvey.MaxQuestions; i++)
+        {
+            survey.AddQuestion($"Question {i}?", i);
+        }
+
+        Assert.Throws<BadRequestException>(() => survey.AddQuestion("One too many?", 30));
+    }
+
+    [Fact]
+    public void AddQuestion_Published_Throws()
+    {
+        var survey = new PublicSurveyFake().SetStatus(PublicSurveyStatus.Published);
+        Assert.Throws<BadRequestException>(() => survey.AddQuestion("Q?", 0));
+    }
+
+    [Fact]
+    public void AddQuestion_Deleted_Throws()
+    {
+        var survey = new PublicSurveyFake().SetDeletedAt(DateTimeOffset.UtcNow);
+        Assert.Throws<BadRequestException>(() => survey.AddQuestion("Q?", 0));
+    }
+
+    [Fact]
+    public void RemoveQuestion_MoreThanOne_RemovesQuestion()
+    {
+        var survey = new PublicSurveyFake();
+        var q1 = survey.AddQuestion("Q1?", 0);
+        var q2 = survey.AddQuestion("Q2?", 1);
+        survey.RemoveQuestion(q2.Id);
+        Assert.Single(survey.Questions);
+        Assert.Equal(q1.Id, survey.Questions.First().Id);
+    }
+
+    [Fact]
+    public void RemoveQuestion_LastQuestion_Throws()
+    {
+        var survey = new PublicSurveyFake();
+        var q = survey.AddQuestion("Q?", 0);
+        Assert.Throws<BadRequestException>(() => survey.RemoveQuestion(q.Id));
+    }
+
+    [Fact]
+    public void RemoveQuestion_NonExistent_Throws()
+    {
+        var survey = new PublicSurveyFake();
+        survey.AddQuestion("Q?", 0);
+        Assert.Throws<NotFoundException>(() => survey.RemoveQuestion(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public void RemoveQuestion_Published_Throws()
+    {
+        var survey = new PublicSurveyFake().SetStatus(PublicSurveyStatus.Published);
+        Assert.Throws<BadRequestException>(() => survey.RemoveQuestion(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public void ReorderQuestions_Draft_UpdatesOrder()
+    {
+        var survey = new PublicSurveyFake();
+        var q1 = survey.AddQuestion("Q1?", 0);
+        var q2 = survey.AddQuestion("Q2?", 1);
+        survey.ReorderQuestions(new List<(Guid, int)> { (q1.Id, 1), (q2.Id, 0) });
+        Assert.Equal(1, q1.Order);
+        Assert.Equal(0, q2.Order);
+    }
+
+    [Fact]
+    public void ReorderQuestions_MissingQuestion_Throws()
+    {
+        var survey = new PublicSurveyFake();
+        var q1 = survey.AddQuestion("Q1?", 0);
+        survey.AddQuestion("Q2?", 1);
+        Assert.Throws<BadRequestException>(() =>
+            survey.ReorderQuestions(new List<(Guid, int)> { (q1.Id, 0) }));
+    }
+
+    [Fact]
+    public void ReorderQuestions_Published_Throws()
+    {
+        var survey = new PublicSurveyFake().SetStatus(PublicSurveyStatus.Published);
+        Assert.Throws<BadRequestException>(() =>
+            survey.ReorderQuestions(new List<(Guid, int)> { }));
+    }
+
+    [Fact]
+    public void Publish_DuplicateQuestionOrders_Throws()
+    {
+        var survey = new PublicSurveyFake();
+        var q1 = survey.AddQuestion("Q1?", 0);
+        q1.AddOption("A", 0);
+        q1.AddOption("B", 1);
+        var q2 = survey.AddQuestion("Q2?", 0); // same order as q1
+        q2.AddOption("C", 0);
+        q2.AddOption("D", 1);
+        Assert.Throws<BadRequestException>(() => survey.Publish());
+    }
+
+    [Fact]
+    public void Publish_MultipleQuestionsUniqueOrders_Ok()
+    {
+        var survey = new PublicSurveyFake();
+        var q1 = survey.AddQuestion("Q1?", 0);
+        q1.AddOption("A", 0);
+        q1.AddOption("B", 1);
+        var q2 = survey.AddQuestion("Q2?", 1);
+        q2.AddOption("C", 0);
+        q2.AddOption("D", 1);
+        survey.Publish();
+        Assert.Equal(PublicSurveyStatus.Published, survey.Status);
     }
 }

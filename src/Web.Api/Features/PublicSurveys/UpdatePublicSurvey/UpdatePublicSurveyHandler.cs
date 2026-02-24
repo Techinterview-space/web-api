@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Surveys;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
@@ -60,26 +61,27 @@ public class UpdatePublicSurveyHandler
                 survey.UpdateSlug(request.Body.Slug);
             }
 
-            var question = survey.Questions.FirstOrDefault();
-            if (question != null)
+            if (request.Body.Questions != null)
             {
-                if (request.Body.Question != null)
+                // Remove all existing questions and their options
+                foreach (var existingQuestion in survey.Questions.ToList())
                 {
-                    question.UpdateText(request.Body.Question);
+                    _context.PublicSurveyOptions.RemoveRange(existingQuestion.Options);
                 }
 
-                if (request.Body.AllowMultipleChoices.HasValue)
-                {
-                    question.SetAllowMultipleChoices(request.Body.AllowMultipleChoices.Value);
-                }
+                _context.PublicSurveyQuestions.RemoveRange(survey.Questions);
+                survey.Questions.Clear();
 
-                if (request.Body.Options != null)
+                // Add new questions with their options via domain method
+                foreach (var questionRequest in request.Body.Questions)
                 {
-                    _context.PublicSurveyOptions.RemoveRange(question.Options);
-                    question.Options.Clear();
-                    for (int i = 0; i < request.Body.Options.Count; i++)
+                    var question = survey.AddQuestion(
+                        questionRequest.Text,
+                        questionRequest.Order,
+                        questionRequest.AllowMultipleChoices);
+
+                    foreach (var optionRequest in questionRequest.Options)
                     {
-                        var optionRequest = request.Body.Options[i];
                         question.AddOption(optionRequest.Text, optionRequest.Order);
                     }
                 }
@@ -89,9 +91,7 @@ public class UpdatePublicSurveyHandler
         {
             if (request.Body.Title != null ||
                 request.Body.Slug != null ||
-                request.Body.Question != null ||
-                request.Body.AllowMultipleChoices.HasValue ||
-                request.Body.Options != null)
+                request.Body.Questions != null)
             {
                 throw new BadRequestException("Only description can be updated for published or closed surveys.");
             }

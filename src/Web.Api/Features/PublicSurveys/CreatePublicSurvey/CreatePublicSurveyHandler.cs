@@ -37,17 +37,17 @@ public class CreatePublicSurveyHandler
             request.Slug,
             user.Id);
 
-        var question = new PublicSurveyQuestion(
-            request.Question,
-            0,
-            survey,
-            request.AllowMultipleChoices);
-
-        survey.Questions.Add(question);
-
-        for (int i = 0; i < request.Options.Count; i++)
+        foreach (var questionRequest in request.Questions)
         {
-            question.AddOption(request.Options[i], i);
+            var question = survey.AddQuestion(
+                questionRequest.Text,
+                questionRequest.Order,
+                questionRequest.AllowMultipleChoices);
+
+            for (int i = 0; i < questionRequest.Options.Count; i++)
+            {
+                question.AddOption(questionRequest.Options[i], i);
+            }
         }
 
         await _context.PublicSurveys.AddAsync(survey, cancellationToken);

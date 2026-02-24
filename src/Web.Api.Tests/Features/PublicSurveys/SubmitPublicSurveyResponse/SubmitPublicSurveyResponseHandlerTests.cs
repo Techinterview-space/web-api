@@ -29,7 +29,10 @@ public class SubmitPublicSurveyResponseHandlerTests
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = new List<Guid> { optionA.Id },
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { optionA.Id } },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -53,7 +56,14 @@ public class SubmitPublicSurveyResponseHandlerTests
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = question.Options.Select(o => o.Id).ToList(),
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new ()
+                    {
+                        QuestionId = question.Id,
+                        OptionIds = question.Options.Select(o => o.Id).ToList(),
+                    },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -77,7 +87,14 @@ public class SubmitPublicSurveyResponseHandlerTests
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = question.Options.Select(o => o.Id).ToList(),
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new ()
+                    {
+                        QuestionId = question.Id,
+                        OptionIds = question.Options.Select(o => o.Id).ToList(),
+                    },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -101,7 +118,10 @@ public class SubmitPublicSurveyResponseHandlerTests
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = new List<Guid> { optionA.Id },
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { optionA.Id } },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -131,7 +151,10 @@ public class SubmitPublicSurveyResponseHandlerTests
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = new List<Guid> { question.Options.First().Id },
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { question.Options.First().Id } },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -147,13 +170,16 @@ public class SubmitPublicSurveyResponseHandlerTests
         await using var context = new InMemoryDatabaseContext();
         var author = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var respondent = await new UserFake(Role.Interviewer).PleaseAsync(context);
-        CreatePublishedSurvey(author, context);
+        var (survey, question) = CreatePublishedSurvey(author, context);
 
         var command = new SubmitPublicSurveyResponseCommand(
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = new List<Guid> { Guid.NewGuid() },
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { Guid.NewGuid() } },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -174,7 +200,10 @@ public class SubmitPublicSurveyResponseHandlerTests
             "test-slug",
             new SubmitPublicSurveyResponseRequest
             {
-                OptionIds = new List<Guid> { question.Options.First().Id },
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { question.Options.First().Id } },
+                },
             });
 
         context.ChangeTracker.Clear();
@@ -183,6 +212,90 @@ public class SubmitPublicSurveyResponseHandlerTests
             .Handle(command, default);
 
         Assert.Equal(1, context.PublicSurveyResponses.Count());
+    }
+
+    [Fact]
+    public async Task Submit_MultipleQuestions_Ok()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var author = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var respondent = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var (survey, question1, question2) = CreatePublishedSurveyWithTwoQuestions(author, context);
+
+        var command = new SubmitPublicSurveyResponseCommand(
+            "test-slug",
+            new SubmitPublicSurveyResponseRequest
+            {
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question1.Id, OptionIds = new List<Guid> { question1.Options.First().Id } },
+                    new () { QuestionId = question2.Id, OptionIds = new List<Guid> { question2.Options.First().Id } },
+                },
+            });
+
+        context.ChangeTracker.Clear();
+
+        await new SubmitPublicSurveyResponseHandler(context, new FakeAuth(respondent))
+            .Handle(command, default);
+
+        Assert.Equal(2, context.PublicSurveyResponses.Count());
+        Assert.Equal(2, context.PublicSurveyResponseOptions.Count());
+    }
+
+    [Fact]
+    public async Task Submit_DuplicateQuestionIds_Throws()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var author = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var respondent = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var (survey, question) = CreatePublishedSurvey(author, context);
+
+        var optionA = question.Options.First();
+        var optionB = question.Options.Last();
+
+        // Submit two answers for the same question
+        var command = new SubmitPublicSurveyResponseCommand(
+            "test-slug",
+            new SubmitPublicSurveyResponseRequest
+            {
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { optionA.Id } },
+                    new () { QuestionId = question.Id, OptionIds = new List<Guid> { optionB.Id } },
+                },
+            });
+
+        context.ChangeTracker.Clear();
+
+        await Assert.ThrowsAsync<BadRequestException>(() =>
+            new SubmitPublicSurveyResponseHandler(context, new FakeAuth(respondent))
+                .Handle(command, default));
+    }
+
+    [Fact]
+    public async Task Submit_MultipleQuestions_MissingAnswer_Throws()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var author = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var respondent = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var (survey, question1, question2) = CreatePublishedSurveyWithTwoQuestions(author, context);
+
+        // Only answer one of two questions
+        var command = new SubmitPublicSurveyResponseCommand(
+            "test-slug",
+            new SubmitPublicSurveyResponseRequest
+            {
+                Answers = new List<SubmitPublicSurveyAnswerRequest>
+                {
+                    new () { QuestionId = question1.Id, OptionIds = new List<Guid> { question1.Options.First().Id } },
+                },
+            });
+
+        context.ChangeTracker.Clear();
+
+        await Assert.ThrowsAsync<BadRequestException>(() =>
+            new SubmitPublicSurveyResponseHandler(context, new FakeAuth(respondent))
+                .Handle(command, default));
     }
 
     private static (PublicSurvey Survey, PublicSurveyQuestion Question) CreatePublishedSurvey(
@@ -202,5 +315,29 @@ public class SubmitPublicSurveyResponseHandlerTests
         context.SaveChanges();
 
         return (survey, question);
+    }
+
+    private static (PublicSurvey Survey, PublicSurveyQuestion Question1, PublicSurveyQuestion Question2) CreatePublishedSurveyWithTwoQuestions(
+        Domain.Entities.Users.User user,
+        InMemoryDatabaseContext context)
+    {
+        var survey = new PublicSurvey("Test", "desc", "test-slug", user.Id);
+        var question1 = new PublicSurveyQuestion("Q1?", 0, survey);
+        survey.Questions.Add(question1);
+        question1.AddOption("A1", 0);
+        question1.AddOption("B1", 1);
+
+        var question2 = new PublicSurveyQuestion("Q2?", 1, survey);
+        survey.Questions.Add(question2);
+        question2.AddOption("A2", 0);
+        question2.AddOption("B2", 1);
+
+        context.PublicSurveys.Add(survey);
+        context.SaveChanges();
+
+        survey.Publish();
+        context.SaveChanges();
+
+        return (survey, question1, question2);
     }
 }

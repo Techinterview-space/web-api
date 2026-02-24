@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Surveys;
 using Domain.Enums;
 using Domain.Validation.Exceptions;
 using Infrastructure.Authentication.Contracts;
@@ -50,38 +51,63 @@ public class GetPublicSurveyResultsHandler
             throw new NotFoundException("Survey not found.");
         }
 
-        var question = survey.Questions.FirstOrDefault()
-            ?? throw new BadRequestException("Survey has no questions.");
+        if (!survey.Questions.Any())
+        {
+            throw new BadRequestException("Survey has no questions.");
+        }
 
-        var hasResponded = question.Responses?.Any(r => r.UserId == user.Id) ?? false;
-        if (!hasResponded)
+        // User must have responded to all questions
+        var hasRespondedToAll = survey.Questions
+            .All(q => q.Responses?.Any(r => r.UserId == user.Id) ?? false);
+
+        if (!hasRespondedToAll)
         {
             throw new BadRequestException("You must respond to the survey to view results.");
         }
 
-        var totalResponses = question.Responses?.Count ?? 0;
+        var totalResponses = survey.Questions
+            .SelectMany(q => (IEnumerable<PublicSurveyResponse>)q.Responses ?? Enumerable.Empty<PublicSurveyResponse>())
+            .Select(r => r.UserId)
+            .Distinct()
+            .Count();
 
-        var options = question.Options
-            .Select(o =>
+        var questions = survey.Questions
+            .OrderBy(q => q.Order)
+            .Select(q =>
             {
-                var responseCount = o.ResponseOptions?.Count ?? 0;
-                return new PublicSurveyOptionResultDto
+                var questionTotalResponses = q.Responses?.Count ?? 0;
+
+                var options = q.Options
+                    .Select(o =>
+                    {
+                        var responseCount = o.ResponseOptions?.Count ?? 0;
+                        return new PublicSurveyOptionResultDto
+                        {
+                            Id = o.Id,
+                            Text = o.Text,
+                            ResponseCount = responseCount,
+                            Percentage = questionTotalResponses > 0
+                                ? Math.Round((decimal)responseCount / questionTotalResponses * 100, 1)
+                                : 0,
+                        };
+                    })
+                    .OrderByDescending(o => o.ResponseCount)
+                    .ToList();
+
+                return new PublicSurveyQuestionResultDto
                 {
-                    Id = o.Id,
-                    Text = o.Text,
-                    ResponseCount = responseCount,
-                    Percentage = totalResponses > 0
-                        ? Math.Round((decimal)responseCount / totalResponses * 100, 1)
-                        : 0,
+                    Id = q.Id,
+                    Text = q.Text,
+                    Order = q.Order,
+                    Options = options,
                 };
             })
-            .OrderByDescending(o => o.ResponseCount)
             .ToList();
 
         return new PublicSurveyResultsDto
         {
             TotalResponses = totalResponses,
-            Options = options,
+            Questions = questions,
         };
     }
 }

@@ -13,6 +13,7 @@ public class PublicSurvey : HasDatesBase, IHasIdBase<Guid>, IHasDeletedAt
     public const int TitleMaxLength = 500;
     public const int DescriptionMaxLength = 2000;
     public const int SlugMaxLength = 100;
+    public const int MaxQuestions = 30;
 
     public Guid Id { get; protected set; }
 
@@ -68,6 +69,67 @@ public class PublicSurvey : HasDatesBase, IHasIdBase<Guid>, IHasDeletedAt
         Status = PublicSurveyStatus.Draft;
     }
 
+    public PublicSurveyQuestion AddQuestion(
+        string text,
+        int order,
+        bool allowMultipleChoices = false)
+    {
+        NotDeletedOrFail();
+        EnsureDraftOrFail();
+
+        if (Questions.Count >= MaxQuestions)
+        {
+            throw new BadRequestException($"A survey cannot have more than {MaxQuestions} questions.");
+        }
+
+        var question = new PublicSurveyQuestion(text, order, this, allowMultipleChoices);
+        Questions.Add(question);
+        return question;
+    }
+
+    public void RemoveQuestion(Guid questionId)
+    {
+        NotDeletedOrFail();
+        EnsureDraftOrFail();
+
+        var question = Questions.FirstOrDefault(q => q.Id == questionId);
+        if (question == null)
+        {
+            throw new NotFoundException($"Question {questionId} not found.");
+        }
+
+        if (Questions.Count <= 1)
+        {
+            throw new BadRequestException("A survey must have at least one question.");
+        }
+
+        Questions.Remove(question);
+    }
+
+    public void ReorderQuestions(List<(Guid QuestionId, int Order)> ordering)
+    {
+        NotDeletedOrFail();
+        EnsureDraftOrFail();
+
+        if (ordering == null)
+        {
+            throw new ArgumentNullException(nameof(ordering));
+        }
+
+        if (ordering.Count != Questions.Count)
+        {
+            throw new BadRequestException("Ordering must include all questions.");
+        }
+
+        foreach (var (questionId, order) in ordering)
+        {
+            var question = Questions.FirstOrDefault(q => q.Id == questionId)
+                ?? throw new NotFoundException($"Question {questionId} not found.");
+
+            question.UpdateOrder(order);
+        }
+    }
+
     public void Publish()
     {
         NotDeletedOrFail();
@@ -81,6 +143,15 @@ public class PublicSurvey : HasDatesBase, IHasIdBase<Guid>, IHasDeletedAt
         if (Questions.Any(q => !q.HasValidOptions()))
         {
             throw new BadRequestException("All questions must have at least 2 options before publishing.");
+        }
+
+        var duplicateOrders = Questions
+            .GroupBy(q => q.Order)
+            .Any(g => g.Count() > 1);
+
+        if (duplicateOrders)
+        {
+            throw new BadRequestException("All questions must have unique order values.");
         }
 
         Status = PublicSurveyStatus.Published;

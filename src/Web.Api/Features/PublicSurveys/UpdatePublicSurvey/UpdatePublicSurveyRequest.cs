@@ -15,11 +15,23 @@ public record UpdatePublicSurveyRequest
     [StringLength(100)]
     public string Slug { get; init; }
 
+    [MinLength(1)]
+    [MaxLength(30)]
+    public List<UpdatePublicSurveyQuestionRequest> Questions { get; init; }
+}
+
+public record UpdatePublicSurveyQuestionRequest
+{
+    [Required]
     [StringLength(500)]
-    public string Question { get; init; }
+    public string Text { get; init; }
 
-    public bool? AllowMultipleChoices { get; init; }
+    public int Order { get; init; }
 
+    public bool AllowMultipleChoices { get; init; }
+
+    [Required]
+    [MinLength(2)]
     [MaxLength(10)]
     public List<UpdatePublicSurveyOptionRequest> Options { get; init; }
 }

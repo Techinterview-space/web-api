@@ -7,6 +7,17 @@ public record PublicSurveyResultsDto
 {
     public int TotalResponses { get; init; }
 
+    public List<PublicSurveyQuestionResultDto> Questions { get; init; }
+}
+
+public record PublicSurveyQuestionResultDto
+{
+    public Guid Id { get; init; }
+
+    public string Text { get; init; }
+
+    public int Order { get; init; }
+
     public List<PublicSurveyOptionResultDto> Options { get; init; }
 }
 
