@@ -112,6 +112,36 @@ public class GetPublicSurveyResultsHandlerTests
         Assert.Equal(33.3m, bResult.Percentage);
     }
 
+    [Fact]
+    public async Task GetResults_OptionsOrderedByResponseCountDescending()
+    {
+        await using var context = new InMemoryDatabaseContext();
+        var author = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user1 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var user2 = await new UserFake(Role.Interviewer).PleaseAsync(context);
+        var (survey, question) = CreatePublishedSurvey(author, context);
+
+        // Option A has Order=0, Option B has Order=1
+        var optionA = question.Options.First(o => o.Text == "A");
+        var optionB = question.Options.First(o => o.Text == "B");
+
+        // Give B more responses than A so it should appear first
+        await SubmitResponse(context, user1, "test-slug", new List<Guid> { optionB.Id });
+        await SubmitResponse(context, user2, "test-slug", new List<Guid> { optionB.Id });
+        await SubmitResponse(context, author, "test-slug", new List<Guid> { optionA.Id });
+
+        context.ChangeTracker.Clear();
+
+        var result = await new GetPublicSurveyResultsHandler(context, new FakeAuth(user1))
+            .Handle("test-slug", default);
+
+        Assert.Equal(3, result.TotalResponses);
+        Assert.Equal("B", result.Options[0].Text);
+        Assert.Equal(2, result.Options[0].ResponseCount);
+        Assert.Equal("A", result.Options[1].Text);
+        Assert.Equal(1, result.Options[1].ResponseCount);
+    }
+
     private static async Task SubmitResponse(
         InMemoryDatabaseContext context,
         Domain.Entities.Users.User user,
