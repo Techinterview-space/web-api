@@ -130,6 +130,9 @@ var interview = new InterviewFake(user).Please(context);
 // In-memory database
 using var context = new InMemoryDatabaseContext();
 
+// SQLite database (for relational behavior - FK constraints, indexes)
+using var context = new SqliteContext();
+
 // Fake auth
 var fakeAuth = new FakeAuth(user);
 var fakeCurrentUser = new FakeCurrentUser(user);
@@ -152,3 +155,20 @@ Before completing any task:
 - [ ] No migrations generated or modified
 - [ ] Code follows `standard.ruleset`
 - [ ] Tests use xUnit and existing TestUtils utilities
+
+## Gotchas
+
+### EF Core Guid Primary Keys
+When entities use client-generated Guid PKs (set via `Id = Guid.NewGuid()` in constructors), **always configure `ValueGeneratedNever()`** in the entity configuration. Without this, EF Core's `ValueGeneratedOnAdd` convention causes entities added through navigation properties to be tracked as `Modified` instead of `Added`, resulting in `DbUpdateConcurrencyException`.
+
+### Soft-Delete is Manual
+No `GlobalQueryFilter` exists. Entities implementing `IHasDeletedAt` (e.g., `Company`, `User`, `PublicSurvey`) must be filtered manually using `.Active()` extension from `ContextExtensions`, or deleted records will silently appear in results.
+
+### `AllAsync()` Returns Untracked Entities
+The `ContextExtensions.AllAsync<T>()` helper always appends `.AsNoTracking()`. Do not call `context.Update()` on entities fetched this way without re-attaching them.
+
+### Handler Auto-Registration
+`RegisterAllImplementations` in `Startup.cs` scans all assemblies and registers every `IRequestHandler<,>` implementation with `Scoped` lifetime. No manual DI registration is needed for new handlers.
+
+### Npgsql Legacy Timestamps
+`EnableLegacyTimestampBehavior` is set to `true` globally. Do not change this — it would break timestamp handling across the entire app.

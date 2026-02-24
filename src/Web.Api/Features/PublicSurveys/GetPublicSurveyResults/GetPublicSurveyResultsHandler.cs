@@ -62,7 +62,6 @@ public class GetPublicSurveyResultsHandler
         var totalResponses = question.Responses?.Count ?? 0;
 
         var options = question.Options
-            .OrderBy(o => o.Order)
             .Select(o =>
             {
                 var responseCount = o.ResponseOptions?.Count ?? 0;
@@ -76,6 +75,7 @@ public class GetPublicSurveyResultsHandler
                         : 0,
                 };
             })
+            .OrderByDescending(o => o.ResponseCount)
             .ToList();
 
         return new PublicSurveyResultsDto
