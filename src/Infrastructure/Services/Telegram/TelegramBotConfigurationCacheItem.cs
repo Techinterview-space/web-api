@@ -22,21 +22,21 @@ public class TelegramBotConfigurationCacheItem
         UpdatedAt = entity.UpdatedAt;
     }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public TelegramBotType BotType { get; set; }
+    public TelegramBotType BotType { get; init; }
 
-    public string DisplayName { get; set; }
+    public string DisplayName { get; init; }
 
-    public string Token { get; set; }
+    public string Token { get; init; }
 
-    public bool IsEnabled { get; set; }
+    public bool IsEnabled { get; init; }
 
-    public string BotUsername { get; set; }
+    public string BotUsername { get; init; }
 
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; init; }
 
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; init; }
 
     public bool IsAvailableForProcessing()
     {

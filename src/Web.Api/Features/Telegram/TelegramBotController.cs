@@ -10,7 +10,6 @@ using Web.Api.Features.Telegram.AddTelegramUserSettings;
 using Web.Api.Features.Telegram.BotConfigurations;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
-using Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
 using Web.Api.Features.Telegram.GetTelegramUserSettings;
 using Web.Api.Features.Telegram.UpdateTelegramUserSettings;
 using Web.Api.Setup.Attributes;
@@ -51,7 +50,7 @@ public class TelegramBotController : ControllerBase
 
     [HttpPost("configurations")]
     public async Task<TelegramBotConfigurationDto> CreateBotConfiguration(
-        CreateTelegramBotConfigurationRequest request,
+        [FromBody] CreateTelegramBotConfigurationRequest request,
         CancellationToken cancellationToken)
     {
         return await _serviceProvider.HandleBy<CreateTelegramBotConfigurationHandler, CreateTelegramBotConfigurationRequest, TelegramBotConfigurationDto>(
@@ -62,7 +61,7 @@ public class TelegramBotController : ControllerBase
     [HttpPut("configurations/{id:guid}")]
     public async Task<TelegramBotConfigurationDto> UpdateBotConfiguration(
         [FromRoute] Guid id,
-        UpdateTelegramBotConfigurationRequest request,
+        [FromBody] UpdateTelegramBotConfigurationRequest request,
         CancellationToken cancellationToken)
     {
         return await _serviceProvider.HandleBy<UpdateTelegramBotConfigurationHandler, UpdateTelegramBotConfigurationCommand, TelegramBotConfigurationDto>(
