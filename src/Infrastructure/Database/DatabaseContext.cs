@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Domain.Entities.Auth;
+using Domain.Entities.ChannelStats;
 using Domain.Entities.Companies;
 using Domain.Entities.CSV;
 using Domain.Entities.Currencies;
@@ -118,6 +119,14 @@ public class DatabaseContext : DbContext
     public DbSet<PublicSurveyResponse> PublicSurveyResponses { get; set; }
 
     public DbSet<PublicSurveyResponseOption> PublicSurveyResponseOptions { get; set; }
+
+    public DbSet<MonitoredChannel> MonitoredChannels { get; set; }
+
+    public DbSet<TelegramRawUpdate> TelegramRawUpdates { get; set; }
+
+    public DbSet<ChannelPost> ChannelPosts { get; set; }
+
+    public DbSet<MonthlyStatsRun> MonthlyStatsRuns { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)

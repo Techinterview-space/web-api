@@ -93,6 +93,8 @@ Domain (Entities, Value Objects, Validation, Enums)
 
 **ALWAYS follow `src/standard.ruleset`** - StyleCop and CA rules enforced as errors.
 
+> StyleCop rules run during `dotnet build` — there is no separate lint command. Build failures ARE lint failures.
+
 ### Rules
 - **Do NOT use the `new` modifier** to hide inherited properties or methods in derived records/classes. Instead, validate at the handler level when stricter constraints are needed (e.g., check that an optional base property is not null/empty).
 

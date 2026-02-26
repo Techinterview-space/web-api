@@ -14,6 +14,7 @@ using Infrastructure.Emails.Contracts;
 using Infrastructure.Jwt;
 using Infrastructure.Services.AiServices;
 using Infrastructure.Services.AiServices.Custom;
+using Infrastructure.Services.ChannelStats;
 using Infrastructure.Services.Correlation;
 using Infrastructure.Services.Files;
 using Infrastructure.Services.Github;
@@ -24,9 +25,11 @@ using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
 using Infrastructure.Services.Telegram;
+using Infrastructure.Services.Telegram.ChannelStats;
 using Infrastructure.Services.Telegram.GithubProfile;
 using Infrastructure.Services.Telegram.Notifications;
 using Infrastructure.Services.Telegram.Salaries;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -58,6 +61,8 @@ public static class ServiceRegistration
             .AddScoped<ITelegramBotConfigurationService, TelegramBotConfigurationService>()
             .AddTransient<ISalariesTelegramBotClientProvider, SalariesTelegramBotClientProvider>()
             .AddTransient<IGithubProfileBotProvider, GithubProfileBotProvider>()
+            .AddTransient<IChannelStatsBotProvider, ChannelStatsBotProvider>()
+            .AddScoped<IChannelStatsAggregationService, ChannelStatsAggregationService>()
             .AddTransient<SalariesTelegramBotHostedService>()
             .AddTransient<GithubProfileBotHostedService>()
             .AddTransient<ICurrencyService, CurrencyService>()

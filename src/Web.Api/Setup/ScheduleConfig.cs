@@ -4,6 +4,7 @@ using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.BackgroundJobs;
+using Web.Api.Features.BackgroundJobs.ChannelStats;
 using Web.Api.Features.BackgroundJobs.Companies;
 using Web.Api.Features.BackgroundJobs.Salaries;
 
@@ -23,7 +24,8 @@ public static class ScheduleConfig
             .AddTransient<SalaryUpdateReminderEmailJob>()
             .AddTransient<CompanyReviewsAiAnalysisSubscriptionWeeklyJob>()
             .AddTransient<SalariesHistoricalDataJob>()
-            .AddTransient<SalariesHistoricalDataBackfillJob>();
+            .AddTransient<SalariesHistoricalDataBackfillJob>()
+            .AddTransient<ChannelStatsMonthlyAggregationJob>();
 
         return services;
     }
@@ -90,6 +92,11 @@ public static class ScheduleConfig
                 .EveryMinute()
                 .When(() => Task.FromResult(isDebuggerAttached))
                 .PreventOverlapping(nameof(SalariesHistoricalDataJob));
+
+            scheduler
+                .Schedule<ChannelStatsMonthlyAggregationJob>()
+                .DailyAt(15, 0)
+                .PreventOverlapping(nameof(ChannelStatsMonthlyAggregationJob));
 
             for (var i = 0; i < 10; i++)
             {
