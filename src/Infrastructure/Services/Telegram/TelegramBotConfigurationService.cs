@@ -31,7 +31,7 @@ public class TelegramBotConfigurationService : ITelegramBotConfigurationService
         TelegramBotType botType,
         CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"TelegramBotConfig_{botType}";
+        var cacheKey = GetCacheKey(botType);
 
         if (_cache.TryGetValue(cacheKey, out TelegramBotConfigurationCacheItem cached))
         {
@@ -64,9 +64,10 @@ public class TelegramBotConfigurationService : ITelegramBotConfigurationService
 
     public void InvalidateCache(TelegramBotType botType)
     {
-        var cacheKey = $"TelegramBotConfig_{botType}";
-        _cache.Remove(cacheKey);
+        _cache.Remove(GetCacheKey(botType));
     }
+
+    private static string GetCacheKey(TelegramBotType botType) => $"TelegramBotConfig_{botType}";
 
     private TelegramBotConfigurationCacheItem BuildFromLegacyConfig(TelegramBotType botType)
     {

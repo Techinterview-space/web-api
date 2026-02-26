@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Database;
-using Infrastructure.Services.Telegram;
 using Microsoft.EntityFrameworkCore;
 
 namespace Web.Api.Features.Telegram.BotConfigurations;
