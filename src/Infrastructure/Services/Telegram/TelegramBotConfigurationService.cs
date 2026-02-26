@@ -56,4 +56,6 @@ public class TelegramBotConfigurationService : ITelegramBotConfigurationService
     {
         _cache.Remove(GetCacheKey(botType));
     }
+
+    private static string GetCacheKey(TelegramBotType botType) => $"TelegramBotConfig_{botType}";
 }
