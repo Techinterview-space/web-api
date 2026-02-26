@@ -57,6 +57,8 @@ public class DatabaseContext : DbContext
 
     public DbSet<SalariesBotMessage> SalariesBotMessages { get; set; }
 
+    public DbSet<TelegramBotConfiguration> TelegramBotConfigurations { get; set; }
+
     public DbSet<TelegramUserSettings> TelegramUserSettings { get; set; }
 
     public DbSet<UserCsvDownload> UserCsvDownloads { get; set; }

@@ -1,9 +1,9 @@
 using System.Threading;
+using System.Threading.Tasks;
 using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.Salaries;
 using Moq;
 using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
 
 namespace TestUtils.Services;
 
@@ -16,9 +16,10 @@ public class TelegramBotClientProviderFake : ISalariesTelegramBotClientProvider
         _telegramBotClient = new Mock<ITelegramBotClient>();
     }
 
-    public ITelegramBotClient CreateClient()
+    public Task<ITelegramBotClient> CreateClientAsync(
+        CancellationToken cancellationToken = default)
     {
-        return _telegramBotClient.Object;
+        return Task.FromResult(_telegramBotClient.Object);
     }
 
     public Mock<ITelegramBotClient> GetMock()

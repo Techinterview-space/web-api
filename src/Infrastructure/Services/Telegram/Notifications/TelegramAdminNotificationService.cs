@@ -70,7 +70,7 @@ public class TelegramAdminNotificationService : ITelegramAdminNotificationServic
             return;
         }
 
-        var botClient = _botClientProvider.CreateClient();
+        var botClient = await _botClientProvider.CreateClientAsync(cancellationToken);
         if (botClient is null)
         {
             _logger.LogWarning("Telegram bot client is null. Skipping notification");

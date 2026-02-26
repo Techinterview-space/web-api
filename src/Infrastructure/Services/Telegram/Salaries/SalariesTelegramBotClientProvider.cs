@@ -1,4 +1,5 @@
-using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using Domain.Entities.Telegram;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 
@@ -6,40 +7,40 @@ namespace Infrastructure.Services.Telegram.Salaries;
 
 public class SalariesTelegramBotClientProvider : ISalariesTelegramBotClientProvider
 {
-    private readonly IConfiguration _configuration;
+    private readonly ITelegramBotConfigurationService _botConfigurationService;
     private readonly ILogger<SalariesTelegramBotClientProvider> _logger;
 
     public SalariesTelegramBotClientProvider(
-        IConfiguration configuration,
+        ITelegramBotConfigurationService botConfigurationService,
         ILogger<SalariesTelegramBotClientProvider> logger)
     {
-        _configuration = configuration;
+        _botConfigurationService = botConfigurationService;
         _logger = logger;
     }
 
-    public ITelegramBotClient CreateClient()
+    public async Task<ITelegramBotClient> CreateClientAsync(
+        CancellationToken cancellationToken = default)
     {
-        var enabled = _configuration["Telegram:SalariesBotEnable"]?.ToLowerInvariant();
-        var parsedEnabled = bool.TryParse(enabled, out var isEnabled);
+        var config = await _botConfigurationService.GetByBotTypeAsync(TelegramBotType.Salaries, cancellationToken);
+        return CreateClientFromConfig(config);
+    }
 
-        var token = Environment.GetEnvironmentVariable("Telegram__SalariesBotToken");
-        if (string.IsNullOrEmpty(token))
+    private ITelegramBotClient CreateClientFromConfig(TelegramBotConfigurationCacheItem config)
+    {
+        if (config == null)
         {
-            token = _configuration["Telegram:SalariesBotToken"];
-        }
-
-        if (!parsedEnabled ||
-            !isEnabled ||
-            string.IsNullOrEmpty(token))
-        {
-            _logger.LogWarning(
-                "Salaries Telegram bot is disabled. Value {Value}. Parsed: {Parsed}",
-                enabled,
-                parsedEnabled);
-
+            _logger.LogWarning("Salaries Telegram bot configuration not found");
             return null;
         }
 
-        return new TelegramBotClient(token);
+        if (!config.IsAvailableForProcessing())
+        {
+            _logger.LogWarning(
+                "Salaries Telegram bot is disabled or missing token. IsEnabled: {IsEnabled}",
+                config.IsEnabled);
+            return null;
+        }
+
+        return new TelegramBotClient(config.Token);
     }
 }

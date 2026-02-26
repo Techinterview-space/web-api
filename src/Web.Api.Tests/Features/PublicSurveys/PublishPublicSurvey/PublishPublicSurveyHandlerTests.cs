@@ -35,7 +35,7 @@ public class PublishPublicSurveyHandlerTests
         var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
         var survey = CreateDraftSurvey(user, context);
         survey.Publish();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 

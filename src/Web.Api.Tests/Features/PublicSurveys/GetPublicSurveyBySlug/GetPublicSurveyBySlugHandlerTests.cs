@@ -65,7 +65,7 @@ public class GetPublicSurveyBySlugHandlerTests
         question.AddOption("A", 0);
         question.AddOption("B", 1);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -86,7 +86,7 @@ public class GetPublicSurveyBySlugHandlerTests
         question.AddOption("A", 0);
         question.AddOption("B", 1);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -107,7 +107,7 @@ public class GetPublicSurveyBySlugHandlerTests
         var survey = CreatePublishedSurvey(author, context);
 
         survey.Delete();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -178,10 +178,10 @@ public class GetPublicSurveyBySlugHandlerTests
         question2.AddOption("B2", 1);
 
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         survey.Publish();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         // Submit response to all questions
         var submitCommand = new SubmitPublicSurveyResponseCommand(

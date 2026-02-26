@@ -23,6 +23,7 @@ using Infrastructure.Services.Http;
 using Infrastructure.Services.PDF;
 using Infrastructure.Services.PDF.Interviews;
 using Infrastructure.Services.Professions;
+using Infrastructure.Services.Telegram;
 using Infrastructure.Services.Telegram.GithubProfile;
 using Infrastructure.Services.Telegram.Notifications;
 using Infrastructure.Services.Telegram.Salaries;
@@ -54,6 +55,7 @@ public static class ServiceRegistration
             .AddScoped<IPdf, QuestPdfBasedRender>()
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
             .AddScoped<ICustomOpenAiService, CustomOpenAiService>()
+            .AddScoped<ITelegramBotConfigurationService, TelegramBotConfigurationService>()
             .AddTransient<ISalariesTelegramBotClientProvider, SalariesTelegramBotClientProvider>()
             .AddTransient<IGithubProfileBotProvider, GithubProfileBotProvider>()
             .AddTransient<SalariesTelegramBotHostedService>()

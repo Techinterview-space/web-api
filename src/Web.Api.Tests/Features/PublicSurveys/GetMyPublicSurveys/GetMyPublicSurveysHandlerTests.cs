@@ -22,7 +22,7 @@ public class GetMyPublicSurveysHandlerTests
         context.PublicSurveys.Add(new PublicSurvey("Survey 1", null, "slug-1", user1.Id));
         context.PublicSurveys.Add(new PublicSurvey("Survey 2", null, "slug-2", user1.Id));
         context.PublicSurveys.Add(new PublicSurvey("Other", null, "slug-3", user2.Id));
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -43,10 +43,10 @@ public class GetMyPublicSurveysHandlerTests
         var survey2 = new PublicSurvey("Deleted", null, "slug-2", user.Id);
         context.PublicSurveys.Add(survey1);
         context.PublicSurveys.Add(survey2);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         survey2.Delete();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -67,10 +67,10 @@ public class GetMyPublicSurveysHandlerTests
         var survey2 = new PublicSurvey("Deleted", null, "slug-2", user.Id);
         context.PublicSurveys.Add(survey1);
         context.PublicSurveys.Add(survey2);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         survey2.Delete();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -95,10 +95,10 @@ public class GetMyPublicSurveysHandlerTests
         question.AddOption("A", 0);
         question.AddOption("B", 1);
         context.PublicSurveys.Add(published);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         published.Publish();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 

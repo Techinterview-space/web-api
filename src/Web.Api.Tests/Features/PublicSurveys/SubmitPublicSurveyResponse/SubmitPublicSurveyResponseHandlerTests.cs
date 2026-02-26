@@ -145,7 +145,7 @@ public class SubmitPublicSurveyResponseHandlerTests
         var (survey, question) = CreatePublishedSurvey(author, context);
 
         survey.Close();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var command = new SubmitPublicSurveyResponseCommand(
             "test-slug",

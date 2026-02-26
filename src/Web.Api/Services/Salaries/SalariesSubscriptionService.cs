@@ -247,7 +247,7 @@ public class SalariesSubscriptionService
 
         await _context.TrySaveChangesAsync(cancellationToken);
 
-        var client = _botClientProvider.CreateClient();
+        var client = await _botClientProvider.CreateClientAsync(cancellationToken);
         if (client is null)
         {
             _logger.LogWarning(

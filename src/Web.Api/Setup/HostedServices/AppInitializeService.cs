@@ -46,10 +46,10 @@ public class AppInitializeService : IHostedService
         await MigrateAsync(database, cancellationToken);
 
         var telegramService = scope.ServiceProvider.GetRequiredService<SalariesTelegramBotHostedService>();
-        telegramService.StartReceiving(cancellationToken);
+        await telegramService.StartReceivingAsync(cancellationToken);
 
         var githubProfileService = scope.ServiceProvider.GetRequiredService<GithubProfileBotHostedService>();
-        githubProfileService.StartReceiving(cancellationToken);
+        await githubProfileService.StartReceivingAsync(cancellationToken);
     }
 
     private static async Task MigrateAsync(

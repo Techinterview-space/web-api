@@ -7,4 +7,6 @@ public enum TelegramBotType
     Salaries = 1,
 
     GithubProfile = 2,
+
+    ChannelStats = 3,
 }

@@ -43,7 +43,7 @@ public class TelegramSalariesRegularStatsUpdateJob
             return;
         }
 
-        var client = _botClientProvider.CreateClient();
+        var client = await _botClientProvider.CreateClientAsync(cancellationToken);
         if (client is null)
         {
             Logger.LogWarning("Telegram bot is disabled.");

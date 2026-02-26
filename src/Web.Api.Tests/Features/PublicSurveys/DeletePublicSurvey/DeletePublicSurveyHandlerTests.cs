@@ -21,7 +21,7 @@ public class DeletePublicSurveyHandlerTests
 
         var survey = new PublicSurvey("Test", "desc", "slug", user.Id);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -41,7 +41,7 @@ public class DeletePublicSurveyHandlerTests
 
         var survey = new PublicSurvey("Test", "desc", "slug", author.Id);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 

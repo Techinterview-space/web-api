@@ -26,7 +26,7 @@ public class GetPublicSurveysHandlerTests
 
         context.PublicSurveys.Add(published);
         context.PublicSurveys.Add(closed);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
 
         var result = await new GetPublicSurveysHandler(context)
@@ -50,7 +50,7 @@ public class GetPublicSurveysHandlerTests
 
         context.PublicSurveys.Add(draft);
         context.PublicSurveys.Add(published);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
 
         var result = await new GetPublicSurveysHandler(context)
@@ -76,7 +76,7 @@ public class GetPublicSurveysHandlerTests
 
         context.PublicSurveys.Add(active);
         context.PublicSurveys.Add(deleted);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
 
         var result = await new GetPublicSurveysHandler(context)
@@ -100,7 +100,7 @@ public class GetPublicSurveysHandlerTests
             context.PublicSurveys.Add(survey);
         }
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
 
         var result = await new GetPublicSurveysHandler(context)
