@@ -28,17 +28,20 @@ public class ProcessGithubProfileTelegramMessageHandler
     private readonly IGithubGraphQLService _githubGraphQLService;
     private readonly DatabaseContext _context;
     private readonly IConfiguration _configuration;
+    private readonly ITelegramBotConfigurationService _botConfigurationService;
 
     public ProcessGithubProfileTelegramMessageHandler(
         ILogger<ProcessGithubProfileTelegramMessageHandler> logger,
         IGithubGraphQLService githubGraphQLService,
         DatabaseContext context,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ITelegramBotConfigurationService botConfigurationService)
     {
         _logger = logger;
         _githubGraphQLService = githubGraphQLService;
         _context = context;
         _configuration = configuration;
+        _botConfigurationService = botConfigurationService;
     }
 
     public async Task<string> Handle(
@@ -89,13 +92,14 @@ public class ProcessGithubProfileTelegramMessageHandler
             return string.Empty;
         }
 
-        var telegramBotUsername = _configuration["Telegram:GithubTelegramBotName"];
+        var botConfig = await _botConfigurationService.GetByBotTypeAsync(
+            TelegramBotType.GithubProfile, cancellationToken);
 
         // Handle inline query click logging only if the bot was added to the chat.
-        // TODO: mgorbatyuk: catch inline replies and log them
         var messageSentByBot =
             message.ViaBot is not null &&
-            message.ViaBot.Username == telegramBotUsername;
+            botConfig?.BotUsername != null &&
+            message.ViaBot.Username == botConfig.BotUsername;
 
         if (messageSentByBot)
         {
