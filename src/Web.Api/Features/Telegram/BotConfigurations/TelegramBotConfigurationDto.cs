@@ -51,11 +51,11 @@ public record TelegramBotConfigurationDto
             return null;
         }
 
-        if (token.Length <= 3)
+        if (token.Length <= 10)
         {
-            return "***";
+            return token + "****";
         }
 
-        return "***" + token[^3..];
+        return token[..10] + "****";
     }
 }
