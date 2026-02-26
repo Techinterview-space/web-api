@@ -43,10 +43,6 @@ public class ProcessTelegramUpdateHandler
             return Nothing.Value;
         }
 
-        _logger.LogInformation(
-            "Telegram webhook body: {UpdateJson}",
-            request.PayloadJson);
-
         var rawUpdate = new TelegramRawUpdate(request.UpdateId, request.PayloadJson);
         await _context.SaveAsync(rawUpdate, cancellationToken);
 
