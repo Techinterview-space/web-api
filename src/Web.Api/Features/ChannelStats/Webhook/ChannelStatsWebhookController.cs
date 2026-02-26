@@ -44,7 +44,10 @@ public class ChannelStatsWebhookController : ControllerBase
         var headerSecret = Request.Headers["X-Telegram-Bot-Api-Secret-Token"].ToString();
         if (!string.Equals(expectedSecret, headerSecret, StringComparison.Ordinal))
         {
-            _logger.LogWarning("Telegram webhook received with invalid secret token");
+            _logger.LogWarning(
+                "Telegram webhook received with invalid secret token ({HeaderToken})",
+                headerSecret);
+
             return Unauthorized();
         }
 
