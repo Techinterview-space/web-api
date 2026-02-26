@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
@@ -6,6 +7,7 @@ using Domain.ValueObjects.Pagination;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Web.Api.Features.Telegram.AddTelegramUserSettings;
+using Web.Api.Features.Telegram.BotConfigurations;
 using Web.Api.Features.Telegram.DeleteTelegramUserSettings;
 using Web.Api.Features.Telegram.GetTelegramBotUsages;
 using Web.Api.Features.Telegram.GetTelegramInlineUsageStats;
@@ -26,6 +28,46 @@ public class TelegramBotController : ControllerBase
         IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
+    }
+
+    [HttpGet("configurations")]
+    public async Task<List<TelegramBotConfigurationDto>> GetBotConfigurations(
+        CancellationToken cancellationToken)
+    {
+        return await _serviceProvider.HandleBy<GetTelegramBotConfigurationsHandler, GetTelegramBotConfigurationsQuery, List<TelegramBotConfigurationDto>>(
+            new GetTelegramBotConfigurationsQuery(),
+            cancellationToken);
+    }
+
+    [HttpGet("configurations/{id:guid}")]
+    public async Task<TelegramBotConfigurationDto> GetBotConfiguration(
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken)
+    {
+        return await _serviceProvider.HandleBy<GetTelegramBotConfigurationByIdHandler, GetTelegramBotConfigurationByIdQuery, TelegramBotConfigurationDto>(
+            new GetTelegramBotConfigurationByIdQuery(id),
+            cancellationToken);
+    }
+
+    [HttpPost("configurations")]
+    public async Task<TelegramBotConfigurationDto> CreateBotConfiguration(
+        CreateTelegramBotConfigurationRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await _serviceProvider.HandleBy<CreateTelegramBotConfigurationHandler, CreateTelegramBotConfigurationRequest, TelegramBotConfigurationDto>(
+            request,
+            cancellationToken);
+    }
+
+    [HttpPut("configurations/{id:guid}")]
+    public async Task<TelegramBotConfigurationDto> UpdateBotConfiguration(
+        [FromRoute] Guid id,
+        UpdateTelegramBotConfigurationRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await _serviceProvider.HandleBy<UpdateTelegramBotConfigurationHandler, UpdateTelegramBotConfigurationCommand, TelegramBotConfigurationDto>(
+            new UpdateTelegramBotConfigurationCommand(id, request),
+            cancellationToken);
     }
 
     [HttpGet("bot-usages")]

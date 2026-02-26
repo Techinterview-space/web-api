@@ -122,7 +122,7 @@ public class CompanyReviewsSubscriptionService
             messagesToBeSent.Add((subscription, messageToBeSent));
         }
 
-        var client = _botClientProvider.CreateClient();
+        var client = await _botClientProvider.CreateClientAsync(cancellationToken);
         if (client is null)
         {
             _logger.LogWarning(

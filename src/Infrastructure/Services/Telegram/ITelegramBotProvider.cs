@@ -4,5 +4,5 @@ namespace Infrastructure.Services.Telegram;
 
 public interface ITelegramBotProvider
 {
-    ITelegramBotClient CreateClient();
+    Task<ITelegramBotClient> CreateClientAsync(CancellationToken cancellationToken = default);
 }

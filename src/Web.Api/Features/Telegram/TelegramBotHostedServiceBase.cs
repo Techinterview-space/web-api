@@ -31,10 +31,10 @@ public abstract class TelegramBotHostedServiceBase<TChild, TBotProvider>
         _startedToListenTo = DateTime.UtcNow;
     }
 
-    public void StartReceiving(
+    public async Task StartReceivingAsync(
         CancellationToken cancellationToken)
     {
-        var client = _botClientProvider.CreateClient();
+        var client = await _botClientProvider.CreateClientAsync(cancellationToken);
         if (client is null)
         {
             return;

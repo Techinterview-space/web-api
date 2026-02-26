@@ -39,7 +39,7 @@ public class ReopenPublicSurveyHandlerTests
         question.AddOption("A", 0);
         question.AddOption("B", 1);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 

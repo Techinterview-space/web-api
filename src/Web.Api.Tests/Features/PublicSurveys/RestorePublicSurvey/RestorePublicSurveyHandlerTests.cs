@@ -25,10 +25,10 @@ public class RestorePublicSurveyHandlerTests
         question.AddOption("A", 0);
         question.AddOption("B", 1);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         survey.Delete();
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
@@ -46,7 +46,7 @@ public class RestorePublicSurveyHandlerTests
 
         var survey = new PublicSurvey("Test", "desc", "slug", user.Id);
         context.PublicSurveys.Add(survey);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         context.ChangeTracker.Clear();
 
