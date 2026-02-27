@@ -40,8 +40,14 @@ public class ProcessTelegramUpdateHandler
             _logger.LogInformation(
                 "Telegram update {UpdateId} already exists, skipping",
                 request.UpdateId);
+
             return Nothing.Value;
         }
+
+        // TODO remove after some time
+        _logger.LogInformation(
+            "TG update payload: {PayloadJson}",
+            request.PayloadJson);
 
         var rawUpdate = new TelegramRawUpdate(request.UpdateId, request.PayloadJson);
         await _context.SaveAsync(rawUpdate, cancellationToken);
