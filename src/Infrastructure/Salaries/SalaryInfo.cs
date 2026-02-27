@@ -1,3 +1,5 @@
+using Domain.Entities.Salaries;
+
 namespace Infrastructure.Salaries;
 
 public record SalaryInfo
@@ -6,12 +8,14 @@ public record SalaryInfo
         double? minSalary,
         double? maxSalary,
         string originalText,
-        bool hasHashtag)
+        bool hasHashtag,
+        Currency? currency = null)
     {
         MinSalary = minSalary;
         MaxSalary = maxSalary;
         OriginalText = originalText;
         HasHashtag = hasHashtag;
+        Currency = currency;
     }
 
     public double? MinSalary { get; }
@@ -21,6 +25,8 @@ public record SalaryInfo
     public string OriginalText { get; }
 
     public bool HasHashtag { get; }
+
+    public Currency? Currency { get; }
 
     public static SalaryInfo NoInfo(
         string originalText)
@@ -44,17 +50,24 @@ public record SalaryInfo
 
     public string ToTelegramHtml()
     {
+        var currencySymbol = Currency switch
+        {
+            Domain.Entities.Salaries.Currency.USD => "$",
+            Domain.Entities.Salaries.Currency.EUR => "€",
+            _ => "₸",
+        };
+
         var stringBuilder = new System.Text.StringBuilder();
         stringBuilder.Append("Указанная зарплата в вакансии: ");
 
         if (MinSalary.HasValue)
         {
-            stringBuilder.Append($"от <b>{MinSalary.Value:N0}</b> ");
+            stringBuilder.Append($"от <b>{MinSalary.Value:N0}</b>{currencySymbol} ");
         }
 
         if (MaxSalary.HasValue)
         {
-            stringBuilder.Append($"до <b>{MaxSalary.Value:N0}</b>.");
+            stringBuilder.Append($"до <b>{MaxSalary.Value:N0}</b>{currencySymbol}.");
         }
 
         return stringBuilder.ToString();

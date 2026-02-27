@@ -1,3 +1,4 @@
+using Domain.Entities.Salaries;
 using Infrastructure.Salaries;
 using Xunit;
 
@@ -281,7 +282,7 @@ Middle Frontend Developer
     [InlineData(MultilineText16, null, null)]
     [InlineData(MultilineText17, null, 800_000d)]
     [InlineData(MultilineText18, null, 2_000_000d)]
-    [InlineData(MultilineText19, null, null)]
+    [InlineData(MultilineText19, 3_500d, null)]
     public void MultilineText_Cases_Match(
         string text,
         double? min,
@@ -316,5 +317,58 @@ Middle Frontend Developer
         Assert.False(result.HasAnySalary());
         Assert.Null(result.MinSalary);
         Assert.Null(result.MaxSalary);
+    }
+
+    [Theory]
+    [InlineData("#вакансия зп от 500 000 тенге", Currency.KZT)]
+    [InlineData("#вакансия зп от 500 000тг", Currency.KZT)]
+    [InlineData("#вакансия зп от 500 000 ₸", Currency.KZT)]
+    [InlineData("#вакансия зп от 3 500$", Currency.USD)]
+    [InlineData("#вакансия зп от 3 500 USD", Currency.USD)]
+    [InlineData("#вакансия зп от 3 500€", Currency.EUR)]
+    [InlineData("#вакансия зп от 3 500 EUR", Currency.EUR)]
+    [InlineData("#вакансия зп от 500к", null)]
+    public void GetResult_DetectsCurrency_Correctly(
+        string text,
+        Currency? expectedCurrency)
+    {
+        var result = new JobPostingParser(text).GetResult();
+
+        Assert.True(result.HasHashtag);
+        Assert.True(result.HasAnySalary());
+        Assert.Equal(expectedCurrency, result.Currency);
+    }
+
+    [Fact]
+    public void GetResult_UsdSalaryRange_ParsedCorrectly()
+    {
+        var result = new JobPostingParser("#вакансия от 4 500 до 6 200 USD").GetResult();
+
+        Assert.True(result.HasHashtag);
+        Assert.Equal(4_500d, result.MinSalary);
+        Assert.Equal(6_200d, result.MaxSalary);
+        Assert.Equal(Currency.USD, result.Currency);
+    }
+
+    [Fact]
+    public void GetResult_EurSalaryRange_ParsedCorrectly()
+    {
+        var result = new JobPostingParser("#вакансия от 3 000 до 5 000€").GetResult();
+
+        Assert.True(result.HasHashtag);
+        Assert.Equal(3_000d, result.MinSalary);
+        Assert.Equal(5_000d, result.MaxSalary);
+        Assert.Equal(Currency.EUR, result.Currency);
+    }
+
+    [Fact]
+    public void GetResult_UsdSingleSalary_NotMultipliedByThousand()
+    {
+        var result = new JobPostingParser("#вакансия от 3 500$").GetResult();
+
+        Assert.True(result.HasHashtag);
+        Assert.Equal(3_500d, result.MinSalary);
+        Assert.Null(result.MaxSalary);
+        Assert.Equal(Currency.USD, result.Currency);
     }
 }

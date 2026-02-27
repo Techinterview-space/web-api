@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Domain.Entities.Salaries;
 
 namespace Infrastructure.Salaries;
 
@@ -23,15 +24,15 @@ public class JobPostingParser
 
     // More specific regex patterns for different salary formats
     private static readonly Regex SalaryRangeInThousandsRegex = new Regex(
-        @"(?:вилка|зарплата|зп|от|до|salary|заработная плата)?\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч)?\s*(?:-|–|—|до)\s*((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тенге|тг)?",
+        @"(?:вилка|зарплата|зп|от|до|salary|заработная плата)?\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|₸|\$|USD|EUR|€)?\s*(?:-|–|—|до)\s*((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тенге|тг|₸|\$|USD|EUR|€)?",
         RegexOptions.IgnoreCase);
 
     private static readonly Regex FromSalarySingleThousandRegex = new Regex(
-        @"(?:вилка|зарплата|зп|от|salary|заработная плата)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тг|тенге)",
+        @"(?:вилка|зарплата|зп|от|salary|заработная плата)\s*:?\s*(?:от\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тг|тенге|₸|\$|USD|EUR|€)",
         RegexOptions.IgnoreCase);
 
     private static readonly Regex UpToSalarySingleThousandRegex = new Regex(
-        @"(?:вилка|зарплата|зп|до|salary|заработная плата)\s*:?\s*(?:до\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тг|тенге)",
+        @"(?:вилка|зарплата|зп|до|salary|заработная плата)\s*:?\s*(?:до\s*)?((?:\d+\s*)+\d+)\s*(?:к|000|тыс|тысяч|тг|тенге|₸|\$|USD|EUR|€)",
         RegexOptions.IgnoreCase);
 
     // Additional regex for million format like "От 1.2млн до 1.9млн"
@@ -82,6 +83,9 @@ public class JobPostingParser
             return SalaryInfo.NoInfo(_sourceMessage);
         }
 
+        var currency = DetectCurrency();
+        var isKzt = currency is null or Currency.KZT;
+
         double? minSalary = null;
         double? maxSalary = null;
         string originalText = null;
@@ -98,7 +102,8 @@ public class JobPostingParser
                 minSalary,
                 maxSalary,
                 originalText,
-                true);
+                true,
+                currency);
         }
 
         // Try to find single million salary value
@@ -112,7 +117,8 @@ public class JobPostingParser
                 minSalary,
                 null,
                 originalText,
-                true);
+                true,
+                currency);
         }
 
         var upToMillionSingleMatch = UpToSalarySingleMillionRegex.Match(_sourceMessage);
@@ -125,7 +131,8 @@ public class JobPostingParser
                 null,
                 maxSalary,
                 originalText,
-                true);
+                true,
+                currency);
         }
 
         // Try to find salary range first
@@ -137,18 +144,22 @@ public class JobPostingParser
                                     fullMatch.Contains("к") ||
                                     fullMatch.Contains("k");
 
-            minSalary = ParseSalaryInThousands(rangeMatch.Groups[1].Value, containsThousands);
-            maxSalary = ParseSalaryInThousands(rangeMatch.Groups[2].Value, containsThousands);
+            minSalary = ParseSalaryInThousands(rangeMatch.Groups[1].Value, containsThousands && isKzt);
+            maxSalary = ParseSalaryInThousands(rangeMatch.Groups[2].Value, containsThousands && isKzt);
             originalText = rangeMatch.Value;
 
-            if (minSalary >= MinimalSalaryThreshold && maxSalary >= MinimalSalaryThreshold &&
-                ((maxSalary - minSalary) / minSalary >= 0.1))
+            var meetsThreshold = isKzt
+                ? minSalary >= MinimalSalaryThreshold && maxSalary >= MinimalSalaryThreshold
+                : minSalary > 0 && maxSalary > 0;
+
+            if (meetsThreshold && ((maxSalary - minSalary) / minSalary >= 0.1))
             {
                 return new SalaryInfo(
                     minSalary,
                     maxSalary,
                     originalText,
-                    true);
+                    true,
+                    currency);
             }
         }
 
@@ -156,53 +167,48 @@ public class JobPostingParser
         var fromSingleMatch = FromSalarySingleThousandRegex.Match(_sourceMessage);
         if (fromSingleMatch.Success)
         {
-            minSalary = ParseSalaryInThousands(fromSingleMatch.Groups[1].Value);
+            minSalary = ParseSalaryInThousands(fromSingleMatch.Groups[1].Value, isKzt);
             originalText = fromSingleMatch.Value;
 
             return new SalaryInfo(
                 minSalary,
                 null,
                 originalText,
-                true);
+                true,
+                currency);
         }
 
         var upToSingleSalary = UpToSalarySingleThousandRegex.Match(_sourceMessage);
         if (upToSingleSalary.Success)
         {
-            maxSalary = ParseSalaryInThousands(upToSingleSalary.Groups[1].Value);
+            maxSalary = ParseSalaryInThousands(upToSingleSalary.Groups[1].Value, isKzt);
             originalText = upToSingleSalary.Value;
 
             return new SalaryInfo(
                 null,
                 maxSalary,
                 originalText,
-                true);
+                true,
+                currency);
         }
 
         var justOneSalary = JustOneSalaryValueRegex.Match(_sourceMessage);
         if (justOneSalary.Success)
         {
-            var doesNotContainUsdOrEur = !_sourceMessage.Contains('$') &&
-                                    !_sourceMessage.Contains("USD", StringComparison.InvariantCultureIgnoreCase) &&
-                                    !_sourceMessage.Contains("eur", StringComparison.InvariantCultureIgnoreCase) &&
-                                    !_sourceMessage.Contains('€');
-
-            if (doesNotContainUsdOrEur)
+            minSalary = ParseSalaryInThousands(justOneSalary.Groups[1].Value);
+            if (minSalary == 0)
             {
-                minSalary = ParseSalaryInThousands(justOneSalary.Groups[1].Value);
-                if (minSalary == 0)
-                {
-                    minSalary = ParseSalaryInThousands(justOneSalary.Groups[0].Value);
-                }
-
-                originalText = justOneSalary.Value;
-
-                return new SalaryInfo(
-                    minSalary,
-                    null,
-                    originalText,
-                    true);
+                minSalary = ParseSalaryInThousands(justOneSalary.Groups[0].Value);
             }
+
+            originalText = justOneSalary.Value;
+
+            return new SalaryInfo(
+                minSalary,
+                null,
+                originalText,
+                true,
+                currency);
         }
 
         var tengeMatch = SalaryWithTengeBeforeRegex.Match(_sourceMessage);
@@ -215,14 +221,41 @@ public class JobPostingParser
                 minSalary,
                 null,
                 originalText,
-                true);
+                true,
+                currency);
         }
 
         return new SalaryInfo(
             null,
             null,
             _sourceMessage,
-            true);
+            true,
+            currency);
+    }
+
+    private Currency? DetectCurrency()
+    {
+        if (_sourceMessage.Contains("тенге", StringComparison.InvariantCultureIgnoreCase) ||
+            _sourceMessage.Contains("тг", StringComparison.InvariantCultureIgnoreCase) ||
+            _sourceMessage.Contains("₸") ||
+            _sourceMessage.Contains("KZT", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Currency.KZT;
+        }
+
+        if (_sourceMessage.Contains('$') ||
+            _sourceMessage.Contains("USD", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Currency.USD;
+        }
+
+        if (_sourceMessage.Contains('€') ||
+            _sourceMessage.Contains("EUR", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return Currency.EUR;
+        }
+
+        return null;
     }
 
     private static double ParseSalaryInThousands(

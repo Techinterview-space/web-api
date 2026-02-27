@@ -81,6 +81,15 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return (false, null);
         }
 
+        if (jobSalaryInfo.Currency is not null and not Currency.KZT)
+        {
+            _logger.LogInformation(
+                "Job posting has non-KZT currency ({Currency}), skipping grade comparison.",
+                jobSalaryInfo.Currency);
+
+            return (false, null);
+        }
+
         var jobPostingSubscription = await _context.JobPostingMessageSubscriptions
             .AsNoTracking()
             .FirstOrDefaultAsync(
