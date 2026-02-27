@@ -81,13 +81,29 @@ public class ProcessSalariesRelatedTelegramMessageHandler
             return (false, null);
         }
 
+        double? minForComparison = jobSalaryInfo.MinSalary;
+        double? maxForComparison = jobSalaryInfo.MaxSalary;
+
         if (jobSalaryInfo.Currency is not null and not Currency.KZT)
         {
-            _logger.LogInformation(
-                "Job posting has non-KZT currency ({Currency}), skipping grade comparison.",
-                jobSalaryInfo.Currency);
+            var currencyRate = await _currencyService.GetCurrencyOrNullAsync(
+                jobSalaryInfo.Currency.Value,
+                cancellationToken);
 
-            return (false, null);
+            if (currencyRate is null)
+            {
+                _logger.LogInformation(
+                    "Currency rate for {Currency} is unavailable, skipping job posting reply.",
+                    jobSalaryInfo.Currency);
+                return (false, null);
+            }
+
+            minForComparison = jobSalaryInfo.MinSalary.HasValue
+                ? jobSalaryInfo.MinSalary.Value * currencyRate.Value
+                : null;
+            maxForComparison = jobSalaryInfo.MaxSalary.HasValue
+                ? jobSalaryInfo.MaxSalary.Value * currencyRate.Value
+                : null;
         }
 
         var jobPostingSubscription = await _context.JobPostingMessageSubscriptions
@@ -138,8 +154,8 @@ public class ProcessSalariesRelatedTelegramMessageHandler
 
         var textToSend =
             new SalaryGradeRanges(salariesForReply, jobPostingProfessions).ToTelegramHtml(
-                jobSalaryInfo.MinSalary,
-                jobSalaryInfo.MaxSalary);
+                minForComparison,
+                maxForComparison);
 
         if (textToSend is not null)
         {

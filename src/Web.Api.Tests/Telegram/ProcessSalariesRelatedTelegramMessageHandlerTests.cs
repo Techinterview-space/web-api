@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
+using Domain.Entities.StatData.Salary;
 using Domain.Enums;
 using Infrastructure.Database;
 using Infrastructure.Services.Telegram.Notifications;
@@ -164,6 +166,130 @@ namespace Web.Api.Tests.Telegram
                     telegramBotClient.Object, mockUpdate.Object), default);
 
             Assert.Equal(ProcessMessage2, replyText);
+        }
+
+        [Fact]
+        public async Task ProcessJobRelatedMessage_KztJobPosting_ReturnsGradeComparison()
+        {
+            await using var context = new InMemoryDatabaseContext();
+            var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Junior,
+                [200_000, 300_000, 400_000]);
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Middle,
+                [500_000, 600_000, 700_000]);
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Senior,
+                [800_000, 900_000, 1_000_000]);
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Lead,
+                [1_100_000, 1_200_000, 1_300_000]);
+
+            var developerProfession = await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer);
+            await context.SaveAsync(
+                new JobPostingMessageSubscription(
+                    "Test Chat",
+                    123456L,
+                    new List<long> { developerProfession.Id }));
+
+            var handler = CreateHandler(context);
+
+            var (processed, textToSend) = await handler.ProcessJobRelatedMessageAsync(
+                "#вакансия от 500 000 до 700 000",
+                123456L,
+                null,
+                CancellationToken.None);
+
+            Assert.True(processed);
+            Assert.NotNull(textToSend);
+            Assert.Contains("Указанная зарплата соответствует", textToSend);
+        }
+
+        [Fact]
+        public async Task ProcessJobRelatedMessage_UsdJobPosting_ConvertsToKztAndReturnsGradeComparison()
+        {
+            await using var context = new InMemoryDatabaseContext();
+            var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Junior,
+                [200_000, 300_000, 400_000]);
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Middle,
+                [500_000, 600_000, 700_000]);
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Senior,
+                [800_000, 900_000, 1_000_000]);
+            await GenerateUserSalaries(
+                context,
+                user,
+                DeveloperGrade.Lead,
+                [1_100_000, 1_200_000, 1_300_000]);
+
+            var developerProfession = await context.Professions.FirstAsync(x => x.Id == (long)UserProfessionEnum.Developer);
+            await context.SaveAsync(
+                new JobPostingMessageSubscription(
+                    "Test Chat",
+                    123456L,
+                    new List<long> { developerProfession.Id }));
+
+            var handler = CreateHandler(context);
+
+            // CurrenciesServiceFake has USD rate = 450.
+            // $1,200 * 450 = 540,000 KZT, $1,600 * 450 = 720,000 KZT — should match Middle grade.
+            var (processed, textToSend) = await handler.ProcessJobRelatedMessageAsync(
+                "#вакансия от 1 200 до 1 600 USD",
+                123456L,
+                null,
+                CancellationToken.None);
+
+            Assert.True(processed);
+            Assert.NotNull(textToSend);
+            Assert.Contains("Указанная зарплата соответствует", textToSend);
+            Assert.Contains("₸", textToSend);
+        }
+
+        private static ProcessSalariesRelatedTelegramMessageHandler CreateHandler(
+            DatabaseContext context)
+        {
+            var logger = new Mock<ILogger<ProcessSalariesRelatedTelegramMessageHandler>>();
+            var currencyService = new CurrenciesServiceFake();
+            using var mockedCache = Create.MockedMemoryCache();
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(
+                    new Dictionary<string, string>
+                    {
+                        { "Telegram:AdminUsername", "maximgorbatyuk" },
+                    })
+                .Build();
+
+            var companyReviewCallbackHandler = new Mock<ICompanyReviewTelegramCallbackHandler>();
+
+            return new ProcessSalariesRelatedTelegramMessageHandler(
+                logger.Object,
+                currencyService,
+                context,
+                mockedCache,
+                new GlobalFake(),
+                new ProfessionsCacheServiceFake(context),
+                configuration,
+                companyReviewCallbackHandler.Object);
         }
 
         private async Task GenerateUserSalaries(
