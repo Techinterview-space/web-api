@@ -49,7 +49,10 @@ public class ChannelStatsAggregationService : IChannelStatsAggregationService
         if (channels.Count == 0)
         {
             _logger.LogInformation("No active monitored channels found, skipping aggregation");
-            return new ChannelStatsAggregationResult(new List<MonthlyStatsRun>(), new List<ChannelStatsAggregationError>());
+            return new ChannelStatsAggregationResult(
+                new List<MonthlyStatsRun>(),
+                new List<ChannelStatsAggregationError>(),
+                new Dictionary<long, MonitoredChannel>());
         }
 
         var runs = new List<MonthlyStatsRun>();
@@ -87,7 +90,8 @@ public class ChannelStatsAggregationService : IChannelStatsAggregationService
             errors.Count,
             triggerSource);
 
-        return new ChannelStatsAggregationResult(runs, errors);
+        var channelsDictionary = channels.ToDictionary(x => x.Id);
+        return new ChannelStatsAggregationResult(runs, errors, channelsDictionary);
     }
 
     private async Task<MonthlyStatsRun> AggregateChannelAsync(

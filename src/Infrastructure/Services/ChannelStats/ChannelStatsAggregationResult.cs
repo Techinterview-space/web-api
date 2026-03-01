@@ -7,15 +7,19 @@ public record ChannelStatsAggregationResult
 {
     public ChannelStatsAggregationResult(
         List<MonthlyStatsRun> runs,
-        List<ChannelStatsAggregationError> errors)
+        List<ChannelStatsAggregationError> errors,
+        IReadOnlyDictionary<long, MonitoredChannel> channels)
     {
         Runs = runs;
         Errors = errors;
+        Channels = channels;
     }
 
     public List<MonthlyStatsRun> Runs { get; init; }
 
     public List<ChannelStatsAggregationError> Errors { get; init; }
+
+    public IReadOnlyDictionary<long, MonitoredChannel> Channels { get; init; }
 }
 
 public record ChannelStatsAggregationError

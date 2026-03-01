@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Web.Api.Tests" />
+  </ItemGroup>
+
 </Project>
