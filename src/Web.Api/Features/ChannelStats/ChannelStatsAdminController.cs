@@ -5,9 +5,12 @@ using System.Threading.Tasks;
 using Domain.Enums;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Web.Api.Features.ChannelStats.CalculateSingleChannelStats;
 using Web.Api.Features.ChannelStats.Channels;
+using Web.Api.Features.ChannelStats.GetChannelRuns;
 using Web.Api.Features.ChannelStats.GetMonthlyStatsResults;
 using Web.Api.Features.ChannelStats.RunMonthlyStats;
+using Web.Api.Features.ChannelStats.SendStatsRun;
 using Web.Api.Setup.Attributes;
 
 namespace Web.Api.Features.ChannelStats;
@@ -76,6 +79,40 @@ public class ChannelStatsAdminController : ControllerBase
         return await _serviceProvider
             .HandleBy<GetMonthlyStatsResultsHandler, GetMonthlyStatsResultsQuery, List<MonthlyStatsRunDto>>(
                 new GetMonthlyStatsResultsQuery(year, month),
+                cancellationToken);
+    }
+
+    [HttpPost("channels/{channelId:long}/calculate")]
+    public async Task<RunMonthlyChannelStatsResponse> CalculateChannelStats(
+        [FromRoute] long channelId,
+        CancellationToken cancellationToken)
+    {
+        return await _serviceProvider
+            .HandleBy<CalculateSingleChannelStatsHandler, CalculateSingleChannelStatsRequest, RunMonthlyChannelStatsResponse>(
+                new CalculateSingleChannelStatsRequest(channelId),
+                cancellationToken);
+    }
+
+    [HttpGet("channels/{channelId:long}/runs")]
+    public async Task<List<MonthlyStatsRunDto>> GetChannelRuns(
+        [FromRoute] long channelId,
+        [FromQuery] int take = 3,
+        CancellationToken cancellationToken = default)
+    {
+        return await _serviceProvider
+            .HandleBy<GetChannelRunsHandler, GetChannelRunsQuery, List<MonthlyStatsRunDto>>(
+                new GetChannelRunsQuery(channelId, take),
+                cancellationToken);
+    }
+
+    [HttpPost("runs/{runId:long}/send")]
+    public async Task<SendStatsRunResponse> SendStatsRun(
+        [FromRoute] long runId,
+        CancellationToken cancellationToken)
+    {
+        return await _serviceProvider
+            .HandleBy<SendStatsRunHandler, SendStatsRunRequest, SendStatsRunResponse>(
+                new SendStatsRunRequest(runId),
                 cancellationToken);
     }
 }

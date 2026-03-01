@@ -11,4 +11,10 @@ public interface IChannelStatsAggregationService
         StatsTriggerSource triggerSource,
         DateTimeOffset executionTimeUtc,
         CancellationToken cancellationToken = default);
+
+    Task<MonthlyStatsRun> RunForChannelAsync(
+        long channelId,
+        StatsTriggerSource triggerSource,
+        DateTimeOffset executionTimeUtc,
+        CancellationToken cancellationToken = default);
 }

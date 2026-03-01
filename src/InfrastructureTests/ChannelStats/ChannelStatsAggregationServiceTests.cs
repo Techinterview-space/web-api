@@ -405,6 +405,66 @@ public class ChannelStatsAggregationServiceTests
         Assert.Equal(1.0 / 29, run.AveragePostsPerDay);
     }
 
+    [Fact]
+    public async Task RunForChannelAsync_ValidChannel_ReturnsRun()
+    {
+        await using var context = new InMemoryDatabaseContext();
+
+        var channel = await new MonitoredChannelFake().PleaseAsync(context);
+        context.ChangeTracker.Clear();
+
+        var executionTime = new DateTimeOffset(2025, 3, 15, 12, 0, 0, TimeSpan.Zero);
+        var service = CreateService(context);
+
+        var run = await service.RunForChannelAsync(
+            channel.Id,
+            StatsTriggerSource.Manual,
+            executionTime);
+
+        Assert.NotNull(run);
+        Assert.Equal(channel.Id, run.MonitoredChannelId);
+        Assert.Equal(StatsTriggerSource.Manual, run.TriggerSource);
+
+        var savedRuns = await context.MonthlyStatsRuns.ToListAsync();
+        Assert.Single(savedRuns);
+    }
+
+    [Fact]
+    public async Task RunForChannelAsync_ChannelNotFound_ThrowsNotFoundException()
+    {
+        await using var context = new InMemoryDatabaseContext();
+
+        var service = CreateService(context);
+
+        await Assert.ThrowsAsync<Domain.Validation.Exceptions.NotFoundException>(
+            () => service.RunForChannelAsync(
+                999,
+                StatsTriggerSource.Manual,
+                DateTimeOffset.UtcNow));
+    }
+
+    [Fact]
+    public async Task RunForChannelAsync_InactiveChannel_StillCalculates()
+    {
+        await using var context = new InMemoryDatabaseContext();
+
+        var channel = await new MonitoredChannelFake(
+            channelExternalId: -1005555555555,
+            channelName: "Inactive").AsInactive().PleaseAsync(context);
+        context.ChangeTracker.Clear();
+
+        var executionTime = new DateTimeOffset(2025, 3, 15, 12, 0, 0, TimeSpan.Zero);
+        var service = CreateService(context);
+
+        var run = await service.RunForChannelAsync(
+            channel.Id,
+            StatsTriggerSource.Manual,
+            executionTime);
+
+        Assert.NotNull(run);
+        Assert.Equal(channel.Id, run.MonitoredChannelId);
+    }
+
     private static ChannelStatsAggregationService CreateService(
         InMemoryDatabaseContext context)
     {

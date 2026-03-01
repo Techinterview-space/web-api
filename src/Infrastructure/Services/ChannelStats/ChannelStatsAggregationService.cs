@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.ChannelStats;
+using Domain.Validation.Exceptions;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -92,6 +93,46 @@ public class ChannelStatsAggregationService : IChannelStatsAggregationService
 
         var channelsDictionary = channels.ToDictionary(x => x.Id);
         return new ChannelStatsAggregationResult(runs, errors, channelsDictionary);
+    }
+
+    public async Task<MonthlyStatsRun> RunForChannelAsync(
+        long channelId,
+        StatsTriggerSource triggerSource,
+        DateTimeOffset executionTimeUtc,
+        CancellationToken cancellationToken = default)
+    {
+        executionTimeUtc = executionTimeUtc.ToUniversalTime();
+
+        var channel = await _context.MonitoredChannels
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == channelId, cancellationToken)
+            ?? throw NotFoundException.CreateFromEntity<MonitoredChannel>(channelId);
+
+        if (!channel.IsActive)
+        {
+            _logger.LogWarning(
+                "Calculating stats for inactive channel {ChannelName} (Id: {ChannelId})",
+                channel.ChannelName,
+                channel.Id);
+        }
+
+        var monthStartUtc = new DateTimeOffset(
+            executionTimeUtc.Year,
+            executionTimeUtc.Month,
+            1,
+            0,
+            0,
+            0,
+            TimeSpan.Zero);
+
+        var endUtc = executionTimeUtc;
+
+        var run = await AggregateChannelAsync(
+            channel, triggerSource, executionTimeUtc, monthStartUtc, endUtc, cancellationToken);
+
+        await _context.TrySaveChangesAsync(cancellationToken);
+
+        return run;
     }
 
     private async Task<MonthlyStatsRun> AggregateChannelAsync(
