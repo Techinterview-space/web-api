@@ -13,7 +13,6 @@ using Infrastructure.Emails;
 using Infrastructure.Emails.Contracts;
 using Infrastructure.Jwt;
 using Infrastructure.Services.AiServices;
-using Infrastructure.Services.AiServices.Custom;
 using Infrastructure.Services.ChannelStats;
 using Infrastructure.Services.Correlation;
 using Infrastructure.Services.Files;
@@ -57,7 +56,6 @@ public static class ServiceRegistration
             .AddScoped<IMarkdownToHtmlGenerator, MarkdownToHtmlGenerator>()
             .AddScoped<IPdf, QuestPdfBasedRender>()
             .AddScoped<ISalaryLabelsProvider, SalaryLabelsProvider>()
-            .AddScoped<ICustomOpenAiService, CustomOpenAiService>()
             .AddScoped<ITelegramBotConfigurationService, TelegramBotConfigurationService>()
             .AddTransient<ISalariesTelegramBotClientProvider, SalariesTelegramBotClientProvider>()
             .AddTransient<IGithubProfileBotProvider, GithubProfileBotProvider>()

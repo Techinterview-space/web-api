@@ -8,6 +8,8 @@ namespace Infrastructure.Ai.ChatGpt;
 
 public class ChatGptProvider : IAiProvider
 {
+    private const string ApiKeyTemplate = "__OPENAI_API_KEY";
+
     private readonly ILogger<ChatGptProvider> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
@@ -34,7 +36,8 @@ public class ChatGptProvider : IAiProvider
         model ??= _configuration["OpenAI:DefaultModel"];
 
         if (string.IsNullOrEmpty(apiKey) ||
-            string.IsNullOrEmpty(baseUrl))
+            string.IsNullOrEmpty(baseUrl) ||
+            apiKey == ApiKeyTemplate)
         {
             _logger.LogError(
                 "OpenAI configuration is missing. " +
@@ -43,7 +46,7 @@ public class ChatGptProvider : IAiProvider
                 "Model: {Model}, " +
                 "BaseUrl: {BaseUrl}",
                 correlationId,
-                apiKey?.Length.ToString() ?? "-",
+                apiKey ?? "-",
                 model,
                 baseUrl);
 
