@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using Domain.Entities.ChannelStats;
 using Telegram.Bot.Types.Enums;
@@ -18,7 +19,7 @@ public static class ChannelStatsReplyMessageBuilder
         sb.AppendLine();
 
         sb.AppendLine($"Всего постов: <b>{run.PostsCountTotal}</b>");
-        sb.AppendLine($"Среднее постов в день: <b>{run.AveragePostsPerDay:F1}</b>");
+        sb.AppendLine($"Среднее постов в день: <b>{run.AveragePostsPerDay.ToString("F1", CultureInfo.InvariantCulture)}</b>");
 
         if (run.MaxPostsDayUtc.HasValue)
         {

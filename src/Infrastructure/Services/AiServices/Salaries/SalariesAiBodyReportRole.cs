@@ -6,6 +6,7 @@ namespace Infrastructure.Services.AiServices.Salaries;
 
 public record SalariesAiBodyReportRole
 {
+    private const int CountOfDays = 30;
     private const int HistoricalDataCount = 3;
 
     public SalariesAiBodyReportRole(
@@ -19,7 +20,7 @@ public record SalariesAiBodyReportRole
 
         for (var i = 0; i < HistoricalDataCount; i++)
         {
-            var daysCount = (i + 1) * 7;
+            var daysCount = (i + 1) * CountOfDays;
             var salariesForDate = salaries
                 .Where(x => x.CreatedAt <= now.AddDays(-daysCount))
                 .ToList();
