@@ -10,4 +10,9 @@ public record LoginRequest
 
     [Required]
     public string Password { get; init; }
+
+    [StringLength(500)]
+    public string Website { get; init; }
+
+    public int? FormDurationSeconds { get; init; }
 }

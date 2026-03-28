@@ -20,4 +20,9 @@ public record RegisterRequest
     [Required]
     [StringLength(150)]
     public string LastName { get; init; }
+
+    [StringLength(500)]
+    public string Website { get; init; }
+
+    public int? FormDurationSeconds { get; init; }
 }

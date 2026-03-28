@@ -32,6 +32,16 @@ public class LoginHandler : IRequestHandler<LoginRequest, AuthTokenResponse>
         LoginRequest request,
         CancellationToken cancellationToken)
     {
+        if (!string.IsNullOrEmpty(request.Website))
+        {
+            throw new UnauthorizedException("Invalid email or password");
+        }
+
+        if (request.FormDurationSeconds.HasValue && request.FormDurationSeconds < 1)
+        {
+            throw new UnauthorizedException("Invalid email or password");
+        }
+
         var emailUpper = request.Email.ToUpperInvariant();
         var user = await _context.Users
             .Include(u => u.UserRoles)

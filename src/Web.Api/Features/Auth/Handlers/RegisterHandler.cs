@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 using Infrastructure.Authentication.Contracts;
 using Infrastructure.Database;
@@ -39,13 +40,23 @@ public class RegisterHandler : IRequestHandler<RegisterRequest, AuthResult>
         RegisterRequest request,
         CancellationToken cancellationToken)
     {
+        if (!string.IsNullOrEmpty(request.Website))
+        {
+            throw new BadRequestException("Invalid request");
+        }
+
+        if (request.FormDurationSeconds.HasValue && request.FormDurationSeconds < 2)
+        {
+            throw new BadRequestException("Invalid request");
+        }
+
         var emailUpper = request.Email.ToUpperInvariant();
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.Email.ToUpper() == emailUpper, cancellationToken);
 
         if (existingUser != null)
         {
-            throw new Domain.Validation.Exceptions.BadRequestException("Email already registered");
+            throw new BadRequestException("Email already registered");
         }
 
         var user = new User(

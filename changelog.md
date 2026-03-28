@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-03-28
+
+### Added
+
+- Anti-bot protection for login and registration endpoints
+  - Honeypot field (`Website`) — rejects requests where the hidden field is filled (bots auto-fill it, real users never see it)
+  - Form timing analysis (`FormDurationSeconds`) — rejects login submissions under 1 second and registration submissions under 2 seconds
+  - `[StringLength(500)]` constraint on honeypot field to prevent payload abuse
+- Unit tests for anti-bot validation in `LoginHandler` and `RegisterHandler` (10 tests covering honeypot, timing thresholds, and backward compatibility)
+
+### Changed
+
+- `LoginRequest` — added optional `Website` (string) and `FormDurationSeconds` (int?) fields
+- `RegisterRequest` — added optional `Website` (string) and `FormDurationSeconds` (int?) fields
+- `LoginHandler` — anti-bot rejections use `UnauthorizedException` (same as invalid credentials) to avoid leaking detection signals
+- `RegisterHandler` — anti-bot rejections use `BadRequestException` with generic message
+
 ## 2026-02-12
 
 - Added a full public surveys domain model with `PublicSurvey`, `PublicSurveyQuestion`, `PublicSurveyOption`, `PublicSurveyResponse`, `PublicSurveyResponseOption`, and `PublicSurveyStatus`.
