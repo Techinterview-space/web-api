@@ -1,6 +1,6 @@
 namespace Web.Api.Features.Emails.ViewModels;
 
-public record PasswordResetViewModel
+public record PasswordResetViewModel : ViewModelBase
 {
     public const string ViewName = "/Views/EmailTemplates/PasswordReset.cshtml";
 
@@ -8,7 +8,9 @@ public record PasswordResetViewModel
 
     public PasswordResetViewModel(
         string firstName,
-        string resetUrl)
+        string resetUrl,
+        string unsubscribeToken = null)
+        : base(unsubscribeToken)
     {
         FirstName = firstName;
         ResetUrl = resetUrl;

@@ -153,7 +153,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
     {
         var view = await _viewRenderer.RenderHtmlAsync(
             PasswordResetViewModel.ViewName,
-            new PasswordResetViewModel(user.FirstName, resetUrl));
+            new PasswordResetViewModel(user.FirstName, resetUrl, user.UniqueToken));
 
         await _emailApiSender.SendAsync(
             new EmailContent(
