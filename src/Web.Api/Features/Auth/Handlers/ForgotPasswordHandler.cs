@@ -36,7 +36,7 @@ public class ForgotPasswordHandler : IRequestHandler<ForgotPasswordRequest, Auth
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email.ToUpper() == emailUpper, cancellationToken);
 
-        if (user == null || string.IsNullOrEmpty(user.PasswordHash))
+        if (user == null)
         {
             return new AuthResult
             {
