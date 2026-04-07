@@ -683,7 +683,7 @@ Chat ID: {message.Chat.Id}
                         .OrderByDescending(x => x.CreatedAt)
                         .First();
 
-                    replyText += $"\n\n<blockquote>{latestAnalysis.AnalysisText}</blockquote>";
+                    replyText += $"\n\n<blockquote expandable>{latestAnalysis.AnalysisText}</blockquote>";
                 }
 
                 replyText += $"\n\nhttps://techinterview.space/companies/{company.Slug}";

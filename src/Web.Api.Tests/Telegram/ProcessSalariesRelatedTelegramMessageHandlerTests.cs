@@ -391,7 +391,7 @@ namespace Web.Api.Tests.Telegram
 
             var content = (results[0] as InlineQueryResultArticle)?.InputMessageContent as InputTextMessageContent;
             Assert.NotNull(content);
-            Assert.Contains("<blockquote>Отличная компания с хорошей культурой</blockquote>", content.MessageText);
+            Assert.Contains("<blockquote expandable>Отличная компания с хорошей культурой</blockquote>", content.MessageText);
         }
 
         [Fact]
