@@ -542,6 +542,20 @@ Chat ID: {message.Chat.Id}
         Update updateRequest,
         CancellationToken cancellationToken)
     {
+        const string companyReviewsCommand = "company_reviews ";
+        var query = updateRequest.InlineQuery?.Query ?? string.Empty;
+
+        if (query.StartsWith(companyReviewsCommand, StringComparison.InvariantCultureIgnoreCase))
+        {
+            await ProcessCompanyReviewsInlineQueryAsync(
+                client,
+                query.Substring(companyReviewsCommand.Length),
+                updateRequest,
+                cancellationToken);
+
+            return;
+        }
+
         var results = new List<InlineQueryResult>();
 
         var counter = 0;
@@ -630,6 +644,76 @@ Chat ID: {message.Chat.Id}
             _logger.LogError(
                 e,
                 "An error occurred while answering inline query: {Message}",
+                e.Message);
+        }
+    }
+
+    private async Task ProcessCompanyReviewsInlineQueryAsync(
+        ITelegramBotClient client,
+        string searchQuery,
+        Update updateRequest,
+        CancellationToken cancellationToken)
+    {
+        var results = new List<InlineQueryResult>();
+
+        searchQuery = searchQuery.Trim();
+        if (searchQuery.Length >= 2)
+        {
+            var searchQueryLower = searchQuery.ToLowerInvariant();
+            var companies = await _context.Companies
+                .AsNoTracking()
+                .Include(x => x.OpenAiAnalysisRecords)
+                .Where(x => x.DeletedAt == null)
+                .Where(x => x.Name.ToLower().Contains(searchQueryLower))
+                .OrderByDescending(x => x.ReviewsCount)
+                .ThenByDescending(x => x.ViewsCount)
+                .Take(10)
+                .ToListAsync(cancellationToken);
+
+            for (var i = 0; i < companies.Count; i++)
+            {
+                var company = companies[i];
+                var replyText = $"<b>{company.Name}</b>\n" +
+                                $"Рейтинг: {company.Rating:F1}\n" +
+                                $"Отзывов: {company.ReviewsCount}";
+
+                if (company.HasAiAnalysis())
+                {
+                    var latestAnalysis = company.OpenAiAnalysisRecords
+                        .OrderByDescending(x => x.CreatedAt)
+                        .First();
+
+                    replyText += $"\n\n<blockquote>{latestAnalysis.AnalysisText}</blockquote>";
+                }
+
+                replyText += $"\n\nhttps://techinterview.space/companies/{company.Slug}";
+
+                results.Add(new InlineQueryResultArticle(
+                    i.ToString(),
+                    company.Name,
+                    new InputTextMessageContent(replyText)
+                    {
+                        ParseMode = ParseMode.Html,
+                    })
+                {
+                    Description = $"Отзывов: {company.ReviewsCount}, рейтинг: {company.Rating:F1}",
+                });
+            }
+        }
+
+        try
+        {
+            await client.AnswerInlineQuery(
+                updateRequest.InlineQuery!.Id,
+                results,
+                cacheTime: 10 * 60,
+                cancellationToken: cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(
+                e,
+                "An error occurred while answering company reviews inline query: {Message}",
                 e.Message);
         }
     }

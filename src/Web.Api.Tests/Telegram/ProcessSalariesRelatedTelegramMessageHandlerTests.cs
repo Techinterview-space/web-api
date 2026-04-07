@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain.Entities.Companies;
 using Domain.Entities.Enums;
 using Domain.Entities.Salaries;
 using Domain.Entities.StatData.Salary;
@@ -14,8 +16,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Telegram.Bot;
+using Telegram.Bot.Requests;
+using Telegram.Bot.Requests.Abstractions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineQueryResults;
 using TestUtils.Db;
 using TestUtils.Fakes;
 using TestUtils.Mocks;
@@ -263,6 +268,268 @@ namespace Web.Api.Tests.Telegram
             Assert.NotNull(textToSend);
             Assert.Contains("Указанная зарплата соответствует", textToSend);
             Assert.Contains("₸", textToSend);
+        }
+
+        [Fact]
+        public async Task Handle_CompanyReviewsInlineQuery_ReturnsMatchingCompanies()
+        {
+            await using var context = new InMemoryDatabaseContext();
+
+            var company1 = CreateAndSaveCompany(context, "Freedom Finance");
+            var company2 = CreateAndSaveCompany(context, "Freedom Insurance");
+            CreateAndSaveCompany(context, "Kaspi Bank");
+
+            var user = await new UserFake(Role.Interviewer).PleaseAsync(context);
+
+            var review = new CompanyReviewFake(company1, user)
+                .SetApprovedAt(DateTime.UtcNow);
+            review.Please(context);
+            company1 = context.Companies
+                .Include(x => x.Reviews)
+                .First(x => x.Id == company1.Id);
+            company1.RecalculateRating();
+            await context.SaveChangesAsync();
+
+            var handler = CreateHandler(context);
+            var telegramBotClient = new Mock<ITelegramBotClient>();
+
+            AnswerInlineQueryRequest capturedRequest = null;
+            telegramBotClient
+                .Setup(x => x.SendRequest(
+                    It.IsAny<AnswerInlineQueryRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<IRequest<bool>, CancellationToken>((req, _) => capturedRequest = req as AnswerInlineQueryRequest)
+                .ReturnsAsync(true);
+
+            var mockUpdate = new Mock<Update>();
+            mockUpdate.Object.InlineQuery = new InlineQuery
+            {
+                Id = "test-inline-id",
+                Query = "company_reviews Freedom",
+                From = new User
+                {
+                    Id = 12345,
+                    Username = "test_user",
+                },
+                Offset = string.Empty,
+            };
+
+            var result = await handler.Handle(
+                new ProcessTelegramMessageCommand(
+                    telegramBotClient.Object,
+                    mockUpdate.Object),
+                default);
+
+            Assert.Null(result);
+            Assert.NotNull(capturedRequest);
+
+            var results = capturedRequest.Results.ToList();
+            Assert.Equal(2, results.Count);
+
+            var firstResult = results[0] as InlineQueryResultArticle;
+            Assert.NotNull(firstResult);
+            Assert.Equal("Freedom Finance", firstResult.Title);
+            Assert.Contains("Отзывов: 1", firstResult.Description);
+
+            var firstContent = firstResult.InputMessageContent as InputTextMessageContent;
+            Assert.NotNull(firstContent);
+            Assert.Contains("<b>Freedom Finance</b>", firstContent.MessageText);
+            Assert.Contains("Рейтинг:", firstContent.MessageText);
+            Assert.Contains("Отзывов: 1", firstContent.MessageText);
+            Assert.Contains("https://techinterview.space/companies/", firstContent.MessageText);
+
+            var secondResult = results[1] as InlineQueryResultArticle;
+            Assert.NotNull(secondResult);
+            Assert.Equal("Freedom Insurance", secondResult.Title);
+        }
+
+        [Fact]
+        public async Task Handle_CompanyReviewsInlineQuery_WithAiAnalysis_IncludesBlockquote()
+        {
+            await using var context = new InMemoryDatabaseContext();
+
+            var company = CreateAndSaveCompany(context, "TestCompany");
+            var aiAnalysis = new CompanyOpenAiAnalysis(
+                company,
+                "Отличная компания с хорошей культурой",
+                "gpt-4");
+            await context.SaveAsync(aiAnalysis);
+
+            var handler = CreateHandler(context);
+            var telegramBotClient = new Mock<ITelegramBotClient>();
+
+            AnswerInlineQueryRequest capturedRequest = null;
+            telegramBotClient
+                .Setup(x => x.SendRequest(
+                    It.IsAny<AnswerInlineQueryRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<IRequest<bool>, CancellationToken>((req, _) => capturedRequest = req as AnswerInlineQueryRequest)
+                .ReturnsAsync(true);
+
+            var mockUpdate = new Mock<Update>();
+            mockUpdate.Object.InlineQuery = new InlineQuery
+            {
+                Id = "test-inline-id",
+                Query = "company_reviews TestCompany",
+                From = new User
+                {
+                    Id = 12345,
+                    Username = "test_user",
+                },
+                Offset = string.Empty,
+            };
+
+            await handler.Handle(
+                new ProcessTelegramMessageCommand(
+                    telegramBotClient.Object,
+                    mockUpdate.Object),
+                default);
+
+            Assert.NotNull(capturedRequest);
+            var results = capturedRequest.Results.ToList();
+            Assert.Single(results);
+
+            var content = (results[0] as InlineQueryResultArticle)?.InputMessageContent as InputTextMessageContent;
+            Assert.NotNull(content);
+            Assert.Contains("<blockquote>Отличная компания с хорошей культурой</blockquote>", content.MessageText);
+        }
+
+        [Fact]
+        public async Task Handle_CompanyReviewsInlineQuery_QueryTooShort_ReturnsEmptyResults()
+        {
+            await using var context = new InMemoryDatabaseContext();
+
+            CreateAndSaveCompany(context, "Freedom Finance");
+
+            var handler = CreateHandler(context);
+            var telegramBotClient = new Mock<ITelegramBotClient>();
+
+            AnswerInlineQueryRequest capturedRequest = null;
+            telegramBotClient
+                .Setup(x => x.SendRequest(
+                    It.IsAny<AnswerInlineQueryRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<IRequest<bool>, CancellationToken>((req, _) => capturedRequest = req as AnswerInlineQueryRequest)
+                .ReturnsAsync(true);
+
+            var mockUpdate = new Mock<Update>();
+            mockUpdate.Object.InlineQuery = new InlineQuery
+            {
+                Id = "test-inline-id",
+                Query = "company_reviews F",
+                From = new User
+                {
+                    Id = 12345,
+                    Username = "test_user",
+                },
+                Offset = string.Empty,
+            };
+
+            await handler.Handle(
+                new ProcessTelegramMessageCommand(
+                    telegramBotClient.Object,
+                    mockUpdate.Object),
+                default);
+
+            Assert.NotNull(capturedRequest);
+            var results = capturedRequest.Results.ToList();
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public async Task Handle_CompanyReviewsInlineQuery_NoMatchingCompanies_ReturnsEmptyResults()
+        {
+            await using var context = new InMemoryDatabaseContext();
+
+            CreateAndSaveCompany(context, "Kaspi Bank");
+
+            var handler = CreateHandler(context);
+            var telegramBotClient = new Mock<ITelegramBotClient>();
+
+            AnswerInlineQueryRequest capturedRequest = null;
+            telegramBotClient
+                .Setup(x => x.SendRequest(
+                    It.IsAny<AnswerInlineQueryRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<IRequest<bool>, CancellationToken>((req, _) => capturedRequest = req as AnswerInlineQueryRequest)
+                .ReturnsAsync(true);
+
+            var mockUpdate = new Mock<Update>();
+            mockUpdate.Object.InlineQuery = new InlineQuery
+            {
+                Id = "test-inline-id",
+                Query = "company_reviews Freedom",
+                From = new User
+                {
+                    Id = 12345,
+                    Username = "test_user",
+                },
+                Offset = string.Empty,
+            };
+
+            await handler.Handle(
+                new ProcessTelegramMessageCommand(
+                    telegramBotClient.Object,
+                    mockUpdate.Object),
+                default);
+
+            Assert.NotNull(capturedRequest);
+            var results = capturedRequest.Results.ToList();
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public async Task Handle_CompanyReviewsInlineQuery_DeletedCompany_IsExcluded()
+        {
+            await using var context = new InMemoryDatabaseContext();
+
+            var company = CreateAndSaveCompany(context, "Freedom Finance");
+            company.Delete();
+            await context.SaveChangesAsync();
+
+            var handler = CreateHandler(context);
+            var telegramBotClient = new Mock<ITelegramBotClient>();
+
+            AnswerInlineQueryRequest capturedRequest = null;
+            telegramBotClient
+                .Setup(x => x.SendRequest(
+                    It.IsAny<AnswerInlineQueryRequest>(),
+                    It.IsAny<CancellationToken>()))
+                .Callback<IRequest<bool>, CancellationToken>((req, _) => capturedRequest = req as AnswerInlineQueryRequest)
+                .ReturnsAsync(true);
+
+            var mockUpdate = new Mock<Update>();
+            mockUpdate.Object.InlineQuery = new InlineQuery
+            {
+                Id = "test-inline-id",
+                Query = "company_reviews Freedom",
+                From = new User
+                {
+                    Id = 12345,
+                    Username = "test_user",
+                },
+                Offset = string.Empty,
+            };
+
+            await handler.Handle(
+                new ProcessTelegramMessageCommand(
+                    telegramBotClient.Object,
+                    mockUpdate.Object),
+                default);
+
+            Assert.NotNull(capturedRequest);
+            var results = capturedRequest.Results.ToList();
+            Assert.Empty(results);
+        }
+
+        private static Company CreateAndSaveCompany(
+            InMemoryDatabaseContext context,
+            string name)
+        {
+            var company = new Company(name, "Test description", new List<string>(), string.Empty);
+            var entry = context.Companies.Add(company);
+            context.SaveChanges();
+            return entry.Entity;
         }
 
         private static ProcessSalariesRelatedTelegramMessageHandler CreateHandler(
