@@ -1,62 +1,67 @@
-## Tech.Interviewer
+# Tech.Interviewer Web API
 
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Techinterview-space/web-api?utm_source=oss&utm_medium=github&utm_campaign=Techinterview-space%2Fweb-api&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
-This repo is for Backend API for [techinterview.space](https://techinterview.space).
+Backend API for [techinterview.space](https://techinterview.space) — interview management, salary data, company reviews, and AI-powered analysis. Monolithic ASP.NET Core service over PostgreSQL, with Elasticsearch, S3, Resend, Telegram, OpenAI, Claude, and the GitHub GraphQL API.
 
-## Apps
-1. [Frontend](https://techinterview.space)
-2. [API](https://api.techinterview.space)
+- Frontend: <https://techinterview.space>
+- API (production): <https://api.techinterview.space>
 
-## Tech Stack
+## Prerequisites
 
-- .NET 10
+- .NET 10 SDK ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0))
+- Docker Desktop (or any Docker Engine + `docker-compose`)
+- An IDE that understands `.sln`: Rider, Visual Studio, or VS Code with the C# extension
+- macOS, Linux, or Windows
 
-## Docs
+## Run locally
 
-- [Contribution Guidelines](./CONTRIBUTING.md)
-- [Code of Conduct](./CODE_OF_CONDUCT.md)
+```bash
+# 1. Start dependencies (Postgres, Elasticsearch, LocalStack S3)
+docker-compose up -d --build database.api elasticsearch localstack
 
-## How to run .NET Web Api
+# 2. Run the API
+cd src
+dotnet run --project Web.Api
+```
 
-### Prerequisites
+URLs:
 
-- MacOs, Windows, or Linux (_MacOs is preferred. Because I think so_)
-- Docker Desktop installed
-- [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) installed
-- Visual Studio Code, JetBrains Rider, or Visual Studio installed
+- API: `https://localhost:5001`
+- Swagger UI: `https://localhost:5001/swagger`
+- Health: `https://localhost:5001/health`
 
-1. Clone the repository
-2. Open the solution in Visual Studio Code, JetBrains Rider, or Visual Studio.
-3. Install dependencies by suggestion of the IDe or by running `dotnet restore` in the terminal in the `./src` folder of the project.
-4. Run command `docker-compose up -d --build database.api elasticsearch localstack` in the terminal in the root folder of the project.
-5. Launch the application in your IDE or by running `dotnet run` in the terminal in the `./src` folder of the project.
+The first run will pull and apply EF Core migrations automatically (`AppInitializeService.MigrateAsync`).
 
-Expected: The application should be running on `https://localhost:5001`.
+## Build, lint, test
 
-## RSS Feeds
+```bash
+cd src
+dotnet build         # also runs StyleCop and standard.ruleset as errors
+dotnet test          # runs Domain.Tests, InfrastructureTests, Web.Api.Tests
+```
 
-The API provides RSS 2.0 feeds for staying updated with the latest content:
+CI: `.github/workflows/test.yml` builds and tests on every PR; `.github/workflows/deploy.yml` builds the Docker image and SCPs the deploy compose file on pushes to `main`.
 
-### Company Reviews RSS Feed
+## Documentation
 
-Get the latest approved company reviews in RSS format:
+- [`AGENTS.md`](./AGENTS.md) — agent rules and quick orientation
+- [`CLAUDE.md`](./CLAUDE.md) — Claude Code working agreement
+- [`docs/architecture.md`](./docs/architecture.md) — runtime topology, projects, mediator pattern, scheduler
+- [`docs/authentication.md`](./docs/authentication.md) — OAuth, JWT, refresh tokens, M2M, role and scope filters
+- [`docs/domain.md`](./docs/domain.md) — top-level aggregates and shared base types
+- [`docs/interactions.md`](./docs/interactions.md) — external systems and recurring jobs
+- [`docs/testing.md`](./docs/testing.md) — test infrastructure and fakes
+- [`docs/gotchas.md`](./docs/gotchas.md) — non-obvious behaviour to know about
+- [`docs/github-api-optimization.md`](./docs/github-api-optimization.md) — GitHub GraphQL usage notes
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
+
+## RSS feeds
+
+Approved company reviews are exposed as RSS 2.0:
 
 ```
 GET /api/companies/reviews/recent.rss
 ```
 
-**Parameters:**
-- `page` (optional): Page number (default: 1)
-- `pageSize` (optional): Number of items per page (default: 50, max: 100)
-
-**Example:**
-```
-https://api.techinterview.space/companies/reviews/recent.rss?pageSize=20
-```
-
-The RSS feed includes:
-- Rich descriptions with detailed rating breakdowns
-- Company information and direct links
-- Proper RSS 2.0 formatting for compatibility with all feed readers
-- HTML-formatted content with emojis and structured data
+Query parameters: `page` (default `1`), `pageSize` (default `50`, max `100`). Example: `https://api.techinterview.space/companies/reviews/recent.rss?pageSize=20`.
