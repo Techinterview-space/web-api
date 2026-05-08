@@ -25,6 +25,10 @@ public record CompanyReviewAiReportItem
 
     public string CompanyName { get; init; }
 
+    public string CompanyLink => CompanySlug != null
+        ? $"https://techinterview.space/companies/{CompanySlug}"
+        : null;
+
     public double TotalReviewsCount { get; init; }
 
     public double TotalCompanyRating { get; init; }
