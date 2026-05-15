@@ -12,6 +12,7 @@ External systems this service depends on at runtime, with the file that owns eac
 | SendGrid (legacy) | `POST` against the controllers in `Features/Webhooks/` modelled by `SendgridEventItem`. | Email-event webhook scaffolding. |
 | Health probes | `GET /health` | Custom JSON response built by `HealthCheckCustomResponse.WriteAsync`. |
 | Sitemap / RSS | `GET /sitemaps/...`, `GET /api/companies/reviews/recent.rss` | Anonymous. |
+| Agent discovery | `GET /.well-known/oauth-protected-resource` | Anonymous. RFC 9728 metadata describing the API as a protected resource and pointing at the authorization server (`OAuth:Jwt:Issuer`). Owner: `Features/WellKnown/WellKnownController.cs`. |
 
 ## Outbound
 

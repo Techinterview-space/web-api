@@ -52,6 +52,17 @@ OAuth state is stored in ASP.NET Core's session middleware. Cookies are configur
 
 `[AllowAnonymous]` on auth endpoints, sitemap, RSS feeds, public surveys list, public salary endpoints. Everything else falls back to JWT bearer.
 
+## Agent-discovery metadata
+
+Two well-known endpoints describe the auth surface so AI agents can discover how to authenticate without hard-coding URLs:
+
+| Endpoint | Spec | Served by |
+|---|---|---|
+| `https://api.techinterview.space/.well-known/oauth-protected-resource` | RFC 9728 | `Features/WellKnown/WellKnownController.cs` (this repo). Lists the resource URL, the authorization server (`OAuth:Jwt:Issuer`), and `bearer_methods_supported = ["header"]`. |
+| `https://techinterview.space/.well-known/oauth-authorization-server` | RFC 8414 | Frontend Express SSR (`frontend/src/server/well-known.ts`). Lives there because the JWT `iss` claim is the frontend origin. Advertises the token endpoint (`/api/auth/m2m/token`), `grant_types_supported = ["client_credentials"]`, and `token_endpoint_auth_methods_supported = ["client_secret_post"]`. |
+
+The site is not a general-purpose authorization server: user-facing flows delegate to Google/GitHub (no local `authorization_endpoint`), tokens are HMAC-signed (no public `jwks_uri`), and the M2M endpoint accepts a non-standard `scopes` array rather than the RFC 6749 space-delimited `scope` parameter. The metadata documents only what is actually exposed.
+
 ## Configuration keys
 
 | Key | Purpose |
