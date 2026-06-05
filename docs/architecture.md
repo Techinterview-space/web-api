@@ -63,7 +63,7 @@ The pipeline (`Startup.Configure`) is conventional: correlation id → exception
 
 ## Feature folders
 
-`src/Web.Api/Features/` is organised by domain area, not by HTTP verb. Each folder contains a controller plus per-action subfolders holding the handler, request, response, and DTOs for that action. Examples: `Features/Auth/`, `Features/Salaries/`, `Features/Companies/`, `Features/Interviews/`, `Features/PublicSurveys/`, `Features/CompanyReviewsSubscriptions/`. `Features/BackgroundJobs/` holds Coravel `IInvocable` jobs scheduled in `ScheduleConfig.cs`.
+`src/Web.Api/Features/` is organised by domain area, not by HTTP verb. Each folder contains a controller plus per-action subfolders holding the handler, request, response, and DTOs for that action. Examples: `Features/Auth/`, `Features/Salaries/`, `Features/Companies/`, `Features/Interviews/`, `Features/PublicSurveys/`, `Features/CompanyReviewsSubscriptions/`, `Features/Vacancies/` (public + authored vacancies), `Features/Admin/Vacancies/` (admin moderation). `Features/BackgroundJobs/` holds Coravel `IInvocable` jobs scheduled in `ScheduleConfig.cs`.
 
 Browse `src/Web.Api/Features/` for the full set; do not maintain a list here.
 

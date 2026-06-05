@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Entities.Vacancies;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects;
 
@@ -37,6 +38,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
 
     public virtual List<CompanyOpenAiAnalysis> OpenAiAnalysisRecords { get; protected set; }
 
+    public virtual List<Vacancy> Vacancies { get; protected set; }
+
     public Company(
         string name,
         string description,
@@ -60,6 +63,8 @@ public class Company : HasDatesBase, IHasIdBase<Guid>
 
         Reviews = new List<CompanyReview>();
         RatingHistory = new List<CompanyRatingHistory>();
+        Vacancies = new List<Vacancy>();
+        OpenAiAnalysisRecords = new List<CompanyOpenAiAnalysis>();
     }
 
     public List<CompanyReview> GetRelevantReviews()

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Domain.Entities.Companies;
 using Domain.Entities.Salaries;
+using Domain.Entities.Vacancies;
 using Domain.Enums;
 using Domain.Extensions;
 using Domain.Totp;
@@ -132,6 +133,8 @@ public class User : BaseModel, IHasDeletedAt
     public virtual List<CompanyReviewVote> Votes { get; protected set; }
 
     public virtual List<UserEmail> Emails { get; protected set; }
+
+    public virtual List<Vacancy> Vacancies { get; protected set; }
 
     public string GetFullname()
     {
