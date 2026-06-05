@@ -17,6 +17,7 @@ using Domain.Entities.StatData.Salary;
 using Domain.Entities.Surveys;
 using Domain.Entities.Telegram;
 using Domain.Entities.Users;
+using Domain.Entities.Vacancies;
 using Domain.Validation;
 using Domain.Validation.Exceptions;
 using Domain.ValueObjects.Dates.Interfaces;
@@ -127,6 +128,10 @@ public class DatabaseContext : DbContext
     public DbSet<ChannelPost> ChannelPosts { get; set; }
 
     public DbSet<MonthlyStatsRun> MonthlyStatsRuns { get; set; }
+
+    public DbSet<Vacancy> Vacancies { get; set; }
+
+    public DbSet<VacancyHistory> VacancyHistoryRecords { get; set; }
 
     public async Task SaveAsync<TEntity>(
         IReadOnlyCollection<TEntity> entities)
