@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Domain.Entities.Telegram;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
