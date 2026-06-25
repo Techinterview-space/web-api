@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Enums;
@@ -6,6 +7,8 @@ using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Api.Features.Companies.CreateCompany;
+using Web.Api.Features.Companies.Dtos;
+using Web.Api.Features.Companies.GetAllCompanies;
 using Web.Api.Features.Companies.GetCompany;
 using Web.Api.Features.Companies.GetCompanyAiAnalysis;
 using Web.Api.Features.Companies.GetCompanyByAdmin;
@@ -37,6 +40,16 @@ public class CompaniesController : ControllerBase
         return Ok(
             await _serviceProvider.HandleBy<SearchCompaniesHandler, SearchCompaniesQueryParams, SearchCompaniesResponse>(
                 queryParams,
+                cancellationToken));
+    }
+
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllCompanies(
+        CancellationToken cancellationToken)
+    {
+        return Ok(
+            await _serviceProvider.HandleBy<GetAllCompaniesHandler, GetAllCompaniesQuery, IReadOnlyCollection<CompanyListItemDto>>(
+                new GetAllCompaniesQuery(),
                 cancellationToken));
     }
 
