@@ -71,6 +71,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
     public async Task<bool> CompanyReviewWasRejectedAsync(
         User user,
         string companyName,
+        string comment,
         CancellationToken cancellationToken)
     {
         if (ShouldSkipEmailSending(user))
@@ -80,7 +81,7 @@ public class TechInterviewerEmailService : ITechinterviewEmailService
 
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasRejectedViewModel.ViewName,
-            new ReviewWasRejectedViewModel(companyName, user.UniqueToken));
+            new ReviewWasRejectedViewModel(companyName, user.UniqueToken, comment));
 
         await _emailApiSender.SendAsync(
             new EmailContent(

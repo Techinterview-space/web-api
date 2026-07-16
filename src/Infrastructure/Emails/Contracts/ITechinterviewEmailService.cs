@@ -13,6 +13,7 @@ public interface ITechinterviewEmailService
     Task<bool> CompanyReviewWasRejectedAsync(
         User user,
         string companyName,
+        string comment,
         CancellationToken cancellationToken);
 
     Task<bool> SalaryUpdateReminderEmailAsync(

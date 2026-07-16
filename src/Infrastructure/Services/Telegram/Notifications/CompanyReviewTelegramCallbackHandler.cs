@@ -210,6 +210,7 @@ public class CompanyReviewTelegramCallbackHandler : ICompanyReviewTelegramCallba
             await _emailService.CompanyReviewWasRejectedAsync(
                 user,
                 companyName,
+                null,
                 cancellationToken);
 
             await _context.SaveAsync(
