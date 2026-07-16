@@ -8,11 +8,17 @@ public record ReviewWasRejectedViewModel : ViewModelBase
 
     public ReviewWasRejectedViewModel(
         string companyName,
-        string unsubscribeToken)
+        string unsubscribeToken,
+        string comment = null)
         : base(unsubscribeToken)
     {
         CompanyName = companyName;
+        Comment = comment;
     }
 
     public string CompanyName { get; }
+
+    public string Comment { get; }
+
+    public bool HasComment => !string.IsNullOrWhiteSpace(Comment);
 }

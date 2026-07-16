@@ -52,6 +52,7 @@ public class DeleteCompanyReviewHandler : IRequestHandler<DeleteCompanyReviewCom
             await _emailService.CompanyReviewWasRejectedAsync(
                 review.User,
                 review.Company.Name,
+                request.Comment,
                 cancellationToken))
         {
             await _context.SaveAsync(

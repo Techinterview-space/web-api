@@ -33,7 +33,10 @@ public class EmailPreviewController : ControllerBase
     {
         var view = await _viewRenderer.RenderHtmlAsync(
             ReviewWasRejectedViewModel.ViewName,
-            new ReviewWasRejectedViewModel("Company Name", Guid.NewGuid().ToString()));
+            new ReviewWasRejectedViewModel(
+                "Company Name",
+                Guid.NewGuid().ToString(),
+                "Пример комментария администратора о причине отклонения отзыва."));
 
         return new EmailPreviewResponse(view);
     }

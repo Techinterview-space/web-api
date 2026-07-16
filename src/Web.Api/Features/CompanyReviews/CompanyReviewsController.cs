@@ -12,6 +12,7 @@ using Domain.Validation;
 using Domain.ValueObjects.Pagination;
 using Infrastructure.Services.Mediator;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Web.Api.Features.Companies.Dtos;
 using Web.Api.Features.CompanyReviews.AddCompanyReview;
 using Web.Api.Features.CompanyReviews.ApproveReview;
@@ -170,10 +171,11 @@ public class CompanyReviewsController : ControllerBase
     public async Task<IActionResult> DeleteCompanyReview(
         [FromRoute] Guid companyId,
         [FromRoute] Guid reviewId,
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] DeleteCompanyReviewBodyRequest request,
         CancellationToken cancellationToken)
     {
         await _serviceProvider.HandleBy<DeleteCompanyReviewHandler, DeleteCompanyReviewCommand, Nothing>(
-            new DeleteCompanyReviewCommand(companyId, reviewId),
+            new DeleteCompanyReviewCommand(companyId, reviewId, request?.Comment),
             cancellationToken);
 
         return Ok();
